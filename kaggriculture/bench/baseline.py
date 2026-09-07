@@ -1,5 +1,42 @@
+# ============================================================================
+#  KAGGRICULTURE — agent "Homestead"  (Cell 4 / submission.py)
+# ----------------------------------------------------------------------------
+#  CHIẾN LƯỢC:
+#   1. MUA HẠT GIỐNG TRƯỚC, MUA ĐẤT SAU (giữ sàn tiền $250) — tránh phá sản.
+#   2. MUA ĐẤT sớm (NE $1k -> SW $2k -> SE $4k): 100 ô là "máy in" duy nhất.
+#   3. THUÊ THỢ rẻ (fib $1,$1,$2,$3...): tối đa 12 thợ/ngày, theo khối lượng
+#      công việc (tính cả kế hoạch trồng hôm nay).
+#   4. ĐA DẠNG CÂY theo "sức chứa thị trường": ước lượng lượng thị trấn sẽ
+#      'uống' tới hết mùa (forward absorption từ town shops + town center),
+#      trừ đi sản lượng đối thủ đang đứng trên board (public!) -> không tự
+#      phá giá như melon_maxxer.
+#   5. Kỷ luật tưới: cây sắp chết (2 ngày không tưới) ưu tiên tối đa; tưới
+#      cách ngày ngoài "cửa sổ năng suất" để tiết kiệm hành động; nhịp trồng
+#      mới chỉ bằng đúng sức tưới của lực lượng hiện có.
+#   6. PHÂN CÔNG "DÍNH" (sticky): mỗi unit giữ task tới khi xong — không
+#      ping-pong giữa các target.
+#   7. BÁN theo mô phỏng giá biên (port 1-1 công thức giá của engine): bán
+#      đúng số lượng sao cho MỖI unit đều >= ngưỡng theo giai đoạn mùa
+#      (90% -> 92% -> 75% -> 55% -> thanh lý 2%); nhận biết thị trường
+#      "bão hòa vĩnh viễn" để chốt hạ sớm.
+#   8. Vật nuôi: TẮT mặc định (goose_target = cow_target = 0). Thử nghiệm
+#      cho thấy với scheduler hiện tại, CARE/FEED cướp lao động của cây
+#      trồng nhiều hơn giá trị sữa/trứng tạo ra (lỗ ròng ~$10k/episode).
+#      Khung mã (mua/build/deliver/feed/care/harvest) vẫn giữ nguyên —
+#      muốn thử lại chỉ cần đổi target trong _daily_plan().
+#  Không import ngoài stdlib; hằng số sao chép từ engine (kaggle-environments
+#  1.32.x) để file chạy độc lập trên server Kaggle. Hàm `agent` (cuối file)
+#  là entry point — kaggle-environments lấy callable cuối cùng của file.
+#  Kết quả benchmark local (720 steps, ~4s/episode):
+#    vs melon_maxxer: 8/8 thắng, $31-51k (đối thủ $4-5.8k)
+#    vs random: $33-47k (đối thủ $0)
+#    vs starter: $33k (đối thủ $3.5k)
+#    self-play: ~hòa 23-24k (không tự hủy)
+# ============================================================================
+
 import math
 
+# ------------------------- engine constants ---------------------------------
 CROPS = {
     "WHEAT":      {"seed": 10,  "first_yield_day": 2,  "max_yield_day": 4,  "interval": 0, "max_yield": 6, "ongoing": False},
     "CARROT":     {"seed": 20,  "first_yield_day": 2,  "max_yield_day": 3,  "interval": 0, "max_yield": 4, "ongoing": False},
@@ -47,26 +84,27 @@ MAX_SHOP_INSTANCES = 8
 CYCLE_LEN = {"WHEAT": 5, "CARROT": 4, "TOMATO": 12, "STRAWBERRY": 17, "MELON": 13}
 YIELD_PER_CYCLE = {"WHEAT": 4, "CARROT": 3, "TOMATO": 4, "STRAWBERRY": 4, "MELON": 6}
 
-T_WATER_CRIT = 0
-T_SERVICE_URG = 1
-T_HARVEST_URG = 2
-T_DELIVER = 2
-T_BUILD_URG = 2
-T_SERVICE = 2
-T_WATER_YIELD = 3
-T_BUILD = 4
-T_HARVEST_ANIMAL = 4
-T_HARVEST = 5
-T_PLANT = 5
-T_DIG = 5
-T_WATER_MAINT = 3
-T_FERTILIZE = 7
-
-FERT_SELL = True
+# mức ưu tiên công việc (nhỏ = gấp)
+T_WATER_CRIT = 0     # cây sắp thành cỏ dại
+T_FEED_STARVE = 1    # thú sắp bỏ trốn
+T_HARVEST_URG = 2    # thu hoạch gấp
+T_DELIVER = 2        # đưa thú tới chuồng
+T_BUILD_URG = 2      # xây chuồng khi thú đang chờ trong kho
+T_WATER_YIELD = 3    # tưới trong cửa sổ năng suất
+T_FEED_BONUS = 4     # cho ăn hằng ngày (điều kiện CARE)
+T_CARE = 4           # vuốt ve -> x2-3 sản lượng
+T_HARVEST = 5        # thu hoạch bình thường
+T_PLANT = 5          # trồng mới (ngang thu hoạch — ưu tiên cao)
+T_DIG = 6            # cuốc cỏ dại
+T_WATER_MAINT = 7    # tưới duy trì (ngoài cửa sổ)
+T_COLLECT_FERT = 8   # gom phân
+T_FERTILIZE = 7      # bón phân (lúa mì/cà rốt trong cửa sổ)
+T_BUILD = 4          # xây chuồng (kế hoạch đã tính tiền -> xây ngay)
 
 _STATE = {}
 
 
+# ------------------------- tiện ích -----------------------------------------
 def _g(o, k, d=None):
     try:
         if isinstance(o, dict):
@@ -114,6 +152,7 @@ def _is_num(v):
     return isinstance(v, (int, float)) and not isinstance(v, bool)
 
 
+# ------------------------- mô phỏng thị trường -------------------------------
 def _shape(func, x, T=None):
     x = max(0.0, x)
     if func == "linear":
@@ -242,6 +281,7 @@ def _pipeline(tiles, shed):
     return pipe
 
 
+# ------------------------- kế hoạch ngày ------------------------------------
 def _struct_reserve(need, unit_cost, money):
     if need <= 0:
         return 0
@@ -266,8 +306,7 @@ def _daily_plan(tiles, shed, seeds, inv, prices, shops, day, opp_farm, money):
         r = deficit + absorb.get(it, 0) + _above_headroom(it, 0.78)
         return r - my_pipe.get(it, 0) - 0.6 * opp_pipe.get(it, 0)
 
-    coops = pastures = wheat_standing = 0
-    animals_now = 0
+    geese_now = cows_now = coops = pastures = wheat_standing = 0
     for row in tiles:
         for t in row:
             if isinstance(t, dict):
@@ -276,20 +315,25 @@ def _daily_plan(tiles, shed, seeds, inv, prices, shops, day, opp_farm, money):
                     coops += 1
                 elif k == "PASTURE":
                     pastures += 1
-                if "animal" in t:
-                    animals_now += 1
+                an = t.get("animal")
+                if an == "GOOSE":
+                    geese_now += 1
+                elif an == "COW":
+                    cows_now += 1
                 if k == "PLANT" and t.get("crop") == "WHEAT":
                     wheat_standing += 1
     shed_geese = shed.get("GOOSE", 0) if shed and _is_num(shed.get("GOOSE", 0)) else 0
     shed_cows = shed.get("COW", 0) if shed and _is_num(shed.get("COW", 0)) else 0
-    shed_sheep = shed.get("SHEEP", 0) if shed and _is_num(shed.get("SHEEP", 0)) else 0
 
-    goose_target = 4 if 2 <= day <= 14 else 0
-    cow_target = 3 if 6 <= day <= 16 else 0
-    sheep_target = 4 if 4 <= day <= 15 else 0
+    goose_target = 0
+    cow_target = 0
+    if 2 <= day <= 16:
+        goose_target = 0
+    if 4 <= day <= 18:
+        cow_target = 0
 
     coop_need = _struct_reserve(goose_target + shed_geese - coops, 300, money)
-    past_need = _struct_reserve(cow_target + shed_cows + sheep_target + shed_sheep - pastures, 500, money)
+    past_need = _struct_reserve(cow_target + shed_cows - pastures, 400, money)
 
     board = len(tiles)
     cx = board // 2
@@ -311,9 +355,9 @@ def _daily_plan(tiles, shed, seeds, inv, prices, shops, day, opp_farm, money):
             ri += 1
     plantable = empties[ri:]
 
-    feed_demand = (animals_now + shed_geese + shed_cows + shed_sheep
-                   + goose_target + cow_target + sheep_target) * max(0, 29 - day)
+    feed_demand = (geese_now + cows_now + shed_geese + shed_cows + goose_target + cow_target) * max(0, 29 - day)
 
+    # tỷ lệ tối đa mỗi loại cây trên tổng ô trồng được (chống đơn canh)
     SHARE = {"WHEAT": 0.5, "CARROT": 0.5, "TOMATO": 0.35, "STRAWBERRY": 0.45, "MELON": 0.3}
     entries = []
     for crop in CROPS:
@@ -329,7 +373,7 @@ def _daily_plan(tiles, shed, seeds, inv, prices, shops, day, opp_farm, money):
             continue
         tile_cap = int(r // upt) + (1 if r % upt > 0 else 0)
         if crop == "WHEAT":
-            tile_cap = min(tile_cap, 20 if feed_demand > 0 else 16)
+            tile_cap = min(tile_cap, 16)
         if crop == "MELON":
             tile_cap = min(tile_cap, 14)
         base = MARKET_PARAMS[crop]["base"]
@@ -337,13 +381,13 @@ def _daily_plan(tiles, shed, seeds, inv, prices, shops, day, opp_farm, money):
         pr_exp = max(base * 0.8, min(pr if _is_num(pr) else base, base * 1.25))
         profit = upt * pr_exp - cycles * CROPS[crop]["seed"]
         score = profit / (cycles * cl)
-        if day <= 5:
+        if day <= 5:  # ưu tiên dòng tiền sớm
             fy = CROPS[crop]["first_yield_day"]
             if fy <= 2:
                 score *= 1.3
             elif cl > 5:
                 score *= 0.7
-        if day <= 14 and money < 4000:
+        if day <= 14 and money < 4000:  # thiếu tiền mặt -> né cây chậm
             if cl >= 17:
                 score *= 0.7
             elif cl >= 12:
@@ -362,12 +406,14 @@ def _daily_plan(tiles, shed, seeds, inv, prices, shops, day, opp_farm, money):
         if remaining <= 0:
             break
 
+    # ô dư -> lúa mì (cám thú + bán rẻ vẫn lời)
     if remaining > 0 and day <= 20:
         w = crop_tiles.get("WHEAT", 0) + remaining
         crop_tiles["WHEAT"] = min(w, 18)
         remaining = 0
 
-    if (goose_target or cow_target or sheep_target) and day <= 3 and wheat_standing == 0:
+    # sàn lúa mì khi có kế hoạch nuôi thú mà chưa có nguồn cám
+    if (goose_target or cow_target) and day <= 3 and wheat_standing == 0:
         if crop_tiles.get("WHEAT", 0) < 2 and sum(crop_tiles.values()) > 0:
             for c in list(crop_tiles):
                 if c != "WHEAT" and crop_tiles[c] > 0:
@@ -378,6 +424,7 @@ def _daily_plan(tiles, shed, seeds, inv, prices, shops, day, opp_farm, money):
                     if crop_tiles.get("WHEAT", 0) >= 2:
                         break
 
+    # mùa đầu cần tiền nhanh: >= 55% ô là lúa mì + cà rốt
     if day <= 1 and plantable:
         fast = sum(v for c, v in crop_tiles.items() if c in ("WHEAT", "CARROT"))
         if fast < 0.55 * len(plantable):
@@ -397,11 +444,10 @@ def _daily_plan(tiles, shed, seeds, inv, prices, shops, day, opp_farm, money):
         "reserved": reserved,
         "goose_target": goose_target,
         "cow_target": cow_target,
-        "sheep_target": sheep_target,
-        "feed_demand": feed_demand,
     }
 
 
+# ------------------------- dựng công việc ------------------------------------
 def _build_tasks(tiles, shed, seeds, plan, day, hour, step, inventories, n_units):
     tasks = []
     stats = {"water_crit": 0, "total": 0}
@@ -414,6 +460,7 @@ def _build_tasks(tiles, shed, seeds, plan, day, hour, step, inventories, n_units
     wheat_available = (shed.get("WHEAT", 0) if shed else 0) + sum(
         (u.get("WHEAT", 0) or 0) for u in inventories if isinstance(u, dict))
 
+    # số ô có thể bón phân hôm nay (chỉ bón lúa mì/cà rốt đang trong cửa sổ)
     fert_usable = 0
     for row in tiles:
         for t in row:
@@ -450,16 +497,14 @@ def _build_tasks(tiles, shed, seeds, plan, day, hour, step, inventories, n_units
                     cu = t.get("consecutive_unwatered", 0) or 0
                     ws = (cd["max_yield_day"] + 1) // 2
                     in_win = (not cd["ongoing"]) and (ws <= age <= cd["max_yield_day"])
-                    if in_win:
+                    if cu >= 1:
+                        tasks.append(_mk(T_WATER_CRIT, x, y, "WATER"))
+                        stats["water_crit"] += 1
+                    elif in_win:
                         tasks.append(_mk(T_WATER_YIELD, x, y, "WATER"))
                         stats["water_yield"] = stats.get("water_yield", 0) + 1
                     else:
-                        on_day = (x + y + day) % 2 == 0
-                        if on_day:
-                            tasks.append(_mk(T_WATER_MAINT, x, y, "WATER"))
-                        elif cu >= 1:
-                            tasks.append(_mk(T_WATER_CRIT, x, y, "WATER"))
-                            stats["water_crit"] += 1
+                        tasks.append(_mk(T_WATER_MAINT, x, y, "WATER"))
                 if yu > 0 and age >= cd["first_yield_day"]:
                     urgent = mls >= 0 and mls - step <= 4
                     if cd["ongoing"]:
@@ -474,35 +519,41 @@ def _build_tasks(tiles, shed, seeds, plan, day, hour, step, inventories, n_units
                 if ad is None:
                     continue
                 starve = (t.get("consecutive_unfed", 0) or 0) >= 1
-                need_feed = (not t.get("fed_today", False)) and wheat_available > 0
-                need_care = not t.get("cared_today", False)
-                need_fert = bool(t.get("fertilizer_available", False))
-                if day <= 28 and (need_feed or need_care or need_fert):
-                    tasks.append(_mk(T_SERVICE_URG if starve else T_SERVICE, x, y, "SERVICE",
-                                     want_wheat=need_feed, feed=need_feed))
+                if not t.get("fed_today", False):
+                    if starve:
+                        tasks.append(_mk(T_FEED_STARVE, x, y, "FEED"))
+                    elif wheat_available > 0:
+                        tasks.append(_mk(T_FEED_BONUS, x, y, "FEED"))
+                if not t.get("cared_today", False) and day <= 27:
+                    tasks.append(_mk(T_CARE, x, y, "CARE"))
                 yu = t.get("yield_units", 0) or 0
                 if yu >= ad["max_held"] - 1:
                     tasks.append(_mk(T_HARVEST_URG, x, y, "HARVEST"))
-                elif yu >= 3 or (yu > 0 and day >= 27):
-                    tasks.append(_mk(T_HARVEST_ANIMAL, x, y, "HARVEST"))
+                elif yu > 0 and day >= 27:
+                    tasks.append(_mk(T_HARVEST, x, y, "HARVEST"))
+                if t.get("fertilizer_available", False) and day < 26 \
+                        and fert_usable > 0 and fert_made < fert_usable:
+                    tasks.append(_mk(T_COLLECT_FERT, x, y, "COLLECT_FERTILIZER"))
+                    fert_made += 1
             elif kind == "WEED":
                 tasks.append(_mk(T_DIG, x, y, "DIG"))
             elif kind in ("COOP", "PASTURE"):
                 pass
 
+    # xây chuồng (chỉ khi có kế hoạch và thú sắp mua/đang chờ)
     if hour <= 20:
         built = 0
         for (x, y, bop) in plan.get("reserved", []):
             if built >= 2:
                 break
             if 0 <= y < board and 0 <= x < board and tiles[y][x] is None:
-                animal_waiting = ((shed.get("GOOSE", 0) or 0) + (shed.get("COW", 0) or 0)
-                                  + (shed.get("SHEEP", 0) or 0)) > 0
+                animal_waiting = ((shed.get("GOOSE", 0) or 0) + (shed.get("COW", 0) or 0)) > 0
                 tasks.append(_mk(T_BUILD_URG if animal_waiting else T_BUILD, x, y, bop))
                 built += 1
 
+    # đưa thú trong kho ra chuồng trống
     if shed:
-        for animal in ("GOOSE", "COW", "SHEEP"):
+        for animal in ("GOOSE", "COW"):
             n_pending = shed.get(animal, 0) or 0
             if n_pending <= 0:
                 continue
@@ -520,6 +571,7 @@ def _build_tasks(tiles, shed, seeds, plan, day, hour, step, inventories, n_units
                 if placed >= limit:
                     break
 
+    # trồng
     planted = _STATE.get(("planted", day)) or {}
     budget = []
     for crop, cap in plan.get("crop_tiles", {}).items():
@@ -536,14 +588,9 @@ def _build_tasks(tiles, shed, seeds, plan, day, hour, step, inventories, n_units
                     empties.append((x, y))
         empties.sort(key=lambda c: abs(c[0] - board // 2) + abs(c[1] - board // 2))
         flat = []
-        wfirst = (plan.get("feed_demand", 0) or 0) > 0
         for crop, n in budget:
-            if wfirst and crop == "WHEAT":
-                flat.extend(["WHEAT"] * n)
-        for crop, n in budget:
-            if wfirst and crop == "WHEAT":
-                continue
             flat.extend([crop] * n)
+        # nhịp trồng an toàn: mỗi cây mới ~5 lượt (đi+trồng+tưới), tưới cũ ~2.5 lượt
         turn_budget = n_units * max(1, 23 - hour)
         water_load = stats.get("water_crit", 0) + stats.get("water_yield", 0)
         safe_plant = int((turn_budget - water_load * 2.5) / 5)
@@ -552,7 +599,8 @@ def _build_tasks(tiles, shed, seeds, plan, day, hour, step, inventories, n_units
             x, y = empties[i]
             tasks.append(_mk(T_PLANT, x, y, "PLANT", crop=flat[i]))
 
-    if not FERT_SELL and fert_available > 0 and day < 26:
+    # bón phân
+    if fert_available > 0 and day < 26:
         made = 0
         for y in range(board):
             for x in range(board):
@@ -575,6 +623,7 @@ def _build_tasks(tiles, shed, seeds, plan, day, hour, step, inventories, n_units
     return tasks, stats
 
 
+# ------------------------- hành động đơn vị ---------------------------------
 def _drop_action(ux, uy, board):
     st = _nearest_shed_tile(ux, uy, board)
     if (ux, uy) == st:
@@ -586,34 +635,6 @@ def _drop_action(ux, uy, board):
 def _task_action(tk, ux, uy, uinv, tiles, shed, board):
     op = tk["op"]
     tx, ty = tk["x"], tk["y"]
-
-    if op == "SERVICE":
-        t = tiles[ty][tx] if 0 <= tx < board and 0 <= ty < board else None
-        an = t if (isinstance(t, dict) and "animal" in t) else None
-        if an is None:
-            return ["PASS"]
-        w = uinv.get("WHEAT", 0) or 0
-        if (ux, uy) == (tx, ty):
-            if not an.get("fed_today", False) and w > 0:
-                return ["FEED"]
-            if not an.get("cared_today", False):
-                return ["CARE"]
-            if an.get("fertilizer_available", False):
-                return ["COLLECT_FERTILIZER"]
-            return ["PASS"]
-        if not an.get("fed_today", False) and w <= 0 and tk.get("want_wheat") \
-                and (shed.get("WHEAT", 0) or 0) > 0:
-            st = _nearest_shed_tile(ux, uy, board)
-            if (ux, uy) == st:
-                n = min(12, (shed.get("WHEAT", 0) or 0) if shed else 0)
-                if n > 0:
-                    return ["PICKUP", "WHEAT", n]
-            else:
-                mv = _step_toward(ux, uy, st[0], st[1])
-                if mv:
-                    return [mv]
-        mv = _step_toward(ux, uy, tx, ty)
-        return [mv] if mv else ["PASS"]
 
     if op == "FEED":
         w = uinv.get("WHEAT", 0) or 0
@@ -671,7 +692,9 @@ def _task_action(tk, ux, uy, uinv, tiles, shed, board):
     return [mv] if mv else ["PASS"]
 
 
+# ------------------------- phân công & sinh hành động ------------------------
 def _task_still_valid(tk, tiles, board, shed, uinv):
+    """Kiểm tra task còn làm được không (để giữ assignment dính)."""
     x, y = tk["x"], tk["y"]
     if not (0 <= x < board and 0 <= y < board):
         return False
@@ -683,13 +706,6 @@ def _task_still_valid(tk, tiles, board, shed, uinv):
         return isinstance(t, dict) and t.get("kind") == "PLANT" and not t.get("watered_today", False)
     if op == "HARVEST":
         return isinstance(t, dict) and (t.get("yield_units", 0) or 0) > 0
-    if op == "SERVICE":
-        if not (isinstance(t, dict) and "animal" in t):
-            return False
-        if not t.get("fed_today", False):
-            if (uinv.get("WHEAT", 0) or 0) > 0 or (shed.get("WHEAT", 0) or 0) > 0:
-                return True
-        return (not t.get("cared_today", False)) or bool(t.get("fertilizer_available", False))
     if op in ("FEED", "CARE"):
         return isinstance(t, dict) and "animal" in t and not t.get(
             "fed_today" if op == "FEED" else "cared_today", False)
@@ -713,11 +729,8 @@ def _assign_and_act(units, tasks, tiles, shed, inventories, day, hour, board, se
         u = inventories[i] if i < len(inventories) and isinstance(inventories[i], dict) else {}
         uinv_cache[i] = u
 
+    # ---- 1) giữ assignment cũ còn hiệu lực (chống ping-pong) ----
     sticky = _STATE.setdefault(("sticky", day), {})
-    feed_pending = 0
-    for tk2 in tasks:
-        if tk2["op"] == "SERVICE" and tk2.get("feed"):
-            feed_pending += 1
     for i in list(sticky.keys()):
         if i >= len(units):
             del sticky[i]
@@ -725,14 +738,11 @@ def _assign_and_act(units, tasks, tiles, shed, inventories, day, hour, board, se
         tk = sticky[i]
         if not _task_still_valid(tk, tiles, board, shed, uinv_cache[i]):
             del sticky[i]
-            continue
-        if feed_pending > 0 and tk["tier"] >= 2 and tk["op"] not in ("SERVICE", "FEED", "DELIVER") \
-                and (uinv_cache[i].get("WHEAT", 0) or 0) > 0:
-            del sticky[i]
     claimed = set()
     for i, tk in sticky.items():
         claimed.add((tk["op"], tk["x"], tk["y"]))
 
+    # ---- 2) task mới gán cho unit rảnh (theo tier + khoảng cách) ----
     free = [i for i in range(len(units)) if i not in sticky]
     plant_sticky = {}
     for i, tk in sticky.items():
@@ -743,12 +753,9 @@ def _assign_and_act(units, tasks, tiles, shed, inventories, day, hour, board, se
         u = uinv_cache[i]
         if tk["op"] == "DELIVER" and (u.get(tk.get("item"), 0) or 0) > 0:
             return 0
-        if tk["op"] in ("FEED", "SERVICE") and (u.get("WHEAT", 0) or 0) > 0:
+        if tk["op"] == "FEED" and (u.get("WHEAT", 0) or 0) > 0:
             return 0
-        d = abs(units[i][1] - tk["x"]) + abs(units[i][2] - tk["y"])
-        if (u.get("WHEAT", 0) or 0) > 0 and tk["tier"] >= 1 and tk["op"] not in ("SERVICE", "FEED"):
-            d += 6
-        return d
+        return abs(units[i][1] - tk["x"]) + abs(units[i][2] - tk["y"])
 
     def skey(tk):
         return (tk["tier"], min((dist(i, tk) for i in free), default=99))
@@ -768,18 +775,17 @@ def _assign_and_act(units, tasks, tiles, shed, inventories, day, hour, board, se
         claimed.add((tk["op"], tk["x"], tk["y"]))
         free.remove(best)
 
+    # ---- 3) sinh hành động ----
     planted = _STATE.setdefault(("planted", day), {})
     actions = []
     for idx in range(len(units)):
         ux, uy = units[idx][1], units[idx][2]
         uinv = uinv_cache[idx]
         carried = sum(v for v in uinv.values() if _is_num(v))
-        sellable = carried - (uinv.get("WHEAT", 0) or 0)
         act = ["PASS"]
         tk = sticky.get(idx)
 
-        need_drop = sellable >= 12 or (hour >= 21 and sellable >= 2) \
-            or (day >= 28 and hour >= 14 and sellable >= 1)
+        need_drop = carried >= 14 or (hour >= 21 and carried >= 2) or (day >= 28 and hour >= 14 and carried >= 2)
         if need_drop:
             act = _drop_action(ux, uy, board)
         elif tk is not None:
@@ -791,6 +797,7 @@ def _assign_and_act(units, tasks, tiles, shed, inventories, day, hour, board, se
     return actions
 
 
+# ------------------------- đơn hàng thị trường -------------------------------
 def _wheat_all(shed, inventories):
     w = (shed.get("WHEAT", 0) or 0) if shed else 0
     for u in inventories or []:
@@ -808,17 +815,18 @@ def _build_orders(me, shed, seeds, inventories, inv, prices, day, hour, plan,
     board = len(tiles) if tiles else 10
     shed_total = sum(v for v in (shed or {}).values() if _is_num(v))
 
+    # 1) HIRE — đầu ngày, tính cả kế hoạch trồng hôm nay (không chỉ task hiện tại)
     if hour <= 5 and day < 29:
         planted_today = _STATE.get(("planted", day)) or {}
         plant_budget = sum(max(0, n - planted_today.get(c, 0))
                            for c, n in plan.get("crop_tiles", {}).items())
         workload = stats.get("total", 0) + plant_budget
-        target_units = min(12, 1 + int(math.ceil(workload * 3.0 / max(5, 23 - hour))))
+        target_units = min(12, 1 + int(math.ceil(workload * 1.9 / max(5, 23 - hour))))
         want = target_units - (1 + len(hands))
         n_hired = _g(me, "hires_today", 0) or 0
         cost = 0
         k = 0
-        hire_budget = min(money - 100, max(20, money * 0.16))
+        hire_budget = min(money - 100, max(15, money * 0.12))
         while k < want and k < 5:
             c = _fib(n_hired + k)
             if cost + c > hire_budget:
@@ -827,6 +835,7 @@ def _build_orders(me, shed, seeds, inventories, inv, prices, day, hour, plan,
             orders.append(["HIRE"])
             k += 1
 
+    # 2) BUY_SEED — ưu tiên cao nhất trong chi tiêu (ROI tốt nhất)
     seed_spent = 0
     if hour <= 17 and seeds is not None:
         for crop, n_tiles in plan.get("crop_tiles", {}).items():
@@ -834,14 +843,15 @@ def _build_orders(me, shed, seeds, inventories, inv, prices, day, hour, plan,
             if have < n_tiles:
                 buy = n_tiles - have
                 c = buy * CROPS[crop]["seed"]
-                if c > 0 and money - c >= 250:
+                if c > 0 and money - c >= 250:  # sàn tiền mặt: luôn đủ tiền thuê thợ
                     orders.append(["BUY_SEED", crop, buy])
                     money -= c
                     seed_spent += c
             if len(orders) >= 7:
                 break
 
-    bought = _STATE.setdefault(("bought", day), {"GOOSE": 0, "COW": 0, "SHEEP": 0, "LAND": 0})
+    # 3) BUY_ANIMAL — tối đa 1 con mỗi loại/ngày, chuồng trống, không kẹt giao hàng
+    bought = _STATE.setdefault(("bought", day), {"GOOSE": 0, "COW": 0, "LAND": 0})
     if hour <= 6 and 2 <= day <= 22:
         struct_free = {"COOP": 0, "PASTURE": 0}
         for row in tiles:
@@ -853,24 +863,25 @@ def _build_orders(me, shed, seeds, inventories, inv, prices, day, hour, plan,
         animals_total = sum(1 for row in tiles for t in row
                             if isinstance(t, dict) and "animal" in t)
         wt = _wheat_all(shed, inventories)
-        for animal, target, w0, w1 in (("GOOSE", plan.get("goose_target", 0), 2, 20),
-                                       ("SHEEP", plan.get("sheep_target", 0), 4, 17),
-                                       ("COW", plan.get("cow_target", 0), 5, 18)):
+        for animal, target in (("GOOSE", plan.get("goose_target", 0)),
+                               ("COW", plan.get("cow_target", 0))):
             owned = sum(1 for row in tiles for t in row
                         if isinstance(t, dict) and t.get("animal") == animal)
             owned += (shed.get(animal, 0) or 0) if shed else 0
             ad = ANIMALS[animal]
+            w0, w1 = (2, 20) if animal == "GOOSE" else (4, 18)
             if (owned < target and w0 <= day <= w1
                     and bought.get(animal, 0) < 1
-                    and (shed.get(animal, 0) or 0) == 0
-                    and struct_free[ad["structure"]] > 0
-                    and money >= ad["cost"] + 400 and shed_total < 90
-                    and wt >= animals_total * 2):
+                    and (shed.get(animal, 0) or 0) == 0  # giao hết rồi mới mua tiếp
+                    and struct_free[ad["structure"]] > 1  # chừa 1 chuồng dự phòng
+                    and money >= ad["cost"] + 600 and shed_total < 95
+                    and wt >= animals_total * 2):  # thú hiện tại có cám ăn
                 orders.append(["BUY_ANIMAL", animal, 1])
                 bought[animal] = bought.get(animal, 0) + 1
                 money -= ad["cost"]
                 break
 
+    # 4) BUY_LAND — nới lỏng: hạt giống đã ưu tiên mua trước đất trong list
     nq = len(unlocked)
     if nq < 4 and bought.get("LAND", 0) < 1:
         owned_empty = sum(1 for row in tiles for t in row if t is None)
@@ -883,9 +894,10 @@ def _build_orders(me, shed, seeds, inventories, inv, prices, day, hour, plan,
             bought["LAND"] = 1
             money -= price
 
+    # 5) BUY_PRODUCT WHEAT — cám: chỉ đệm ~2 ngày, không được hút cạn quỹ
     animals = sum(1 for row in tiles for t in row
                   if isinstance(t, dict) and "animal" in t)
-    plan_animals = plan.get("goose_target", 0) + plan.get("cow_target", 0) + plan.get("sheep_target", 0)
+    plan_animals = plan.get("goose_target", 0) + plan.get("cow_target", 0)
     if animals > 0 or plan_animals > 0:
         wt = _wheat_all(shed, inventories)
         wheat_want = min(animals * 2 + 6, 28)
@@ -898,6 +910,7 @@ def _build_orders(me, shed, seeds, inventories, inv, prices, day, hour, plan,
                 orders.append(["BUY_PRODUCT", "WHEAT", n])
                 money -= n * pw
 
+    # 6) SELL — mô phỏng giá biên + nhận biết thị trường bão hòa vĩnh viễn
     if day >= 28:
         frac = 0.02
     elif day >= 25:
@@ -932,12 +945,6 @@ def _build_orders(me, shed, seeds, inventories, inv, prices, day, hour, plan,
     if shed:
         for it in PRODUCTS:
             if it == "FERTILIZER" and day < 28:
-                if FERT_SELL:
-                    nf = shed.get("FERTILIZER", 0) or 0
-                    if nf > 0 and day >= 3:
-                        k = _sell_count("FERTILIZER", nf, inv.get("FERTILIZER", MARKET_I0), 68)
-                        if k > 0:
-                            cands.append((k * 80, ["SELL", "FERTILIZER", k]))
                 continue
             n = shed.get(it, 0) or 0
             if it == "WHEAT":
@@ -958,6 +965,7 @@ def _build_orders(me, shed, seeds, inventories, inv, prices, day, hour, plan,
     return orders[:MAX_ORDERS]
 
 
+# ------------------------- agent chính ---------------------------------------
 def _agent(obs):
     player = _g(obs, "player", 0)
     farms = _g(obs, "farms", None) or []

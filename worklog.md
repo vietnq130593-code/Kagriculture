@@ -36,3 +36,27 @@ Stage Summary:
 - Sản phẩm: /home/z/my-project/kaggriculture/cell4_agent.py (1006 dòng, hàm `agent` cuối file, không import ngoài stdlib, an toàn nộp Kaggle).
 - Quyết định chính: bỏ vật nuôi v1 (lỗ ròng do cướp lao động), ưu tiên hạt > đất, sticky task assignment là bản vá quyết định (tăng +$10k).
 - Còn tiềm năng: bật lại thú với lịch trình lao động tốt hơn, tối ưu luồng bán melon khi đối thủ dump, tomato gần như chưa dùng (market trống).
+
+---
+Task ID: 3
+Agent: main-agent (Z.ai Code)
+Task: Kaggriculture — tối ưu agent khai thác toàn bộ thị trường (EGG/MILK/WOOL/FERTILIZER), xuất code thuần cho cell 4, hướng dẫn nộp bài & tính điểm
+
+Work Log:
+- Đọc lại artifact phiên trước: /home/z/my-project/kaggriculture/cell4_agent.py (agent "Homestead", vật nuôi TẮT), /tmp/kagri_*.json (overview/rules/notebook).
+- Đọc source engine kaggle-environments 1.32.7 (envs/kaggriculture/kaggriculture.py): công thức giá, cơ chế FEED/CARE/pending_care_bonus, fertilizer_available 1/con/ngày, shop drain mỗi 4 step, tồn kho vật nuôi bị hút -> giá trên base.
+- Dựng benchmark: kaggriculture/bench/ (baseline.py = phiên trước, melon.py, run.py, run2.py). Baseline: vs melon 6/6W $36.7k; vs random $35.9k.
+- v2: bật vật nuôi 4 ngỗng/3 bò/4 cừu (SHEEP mới hoàn toàn), mua/build/deliver/feed/care/harvest đầy đủ, bán FERTILIZER hằng ngày (ngưỡng $68).
+- Benchmark v2 đầu: thua baseline head-to-head (3W/5L). Chẩn đoán: MOVE chiếm 80-90% lượt, FEED/CARE muộn, thú bỏ trốn, cỏ dại 17-29 ô, cây trồng chỉ 28-30/100.
+- Refactor lớn: (1) task SERVICE composite = FEED+CARE+COLLECT_FERTILIZER 1 chuyến/thú; (2) tưới duy trì theo parity (x+y+day)%2 thay vì hằng ngày — engine chỉ giết cây khi 2 ngày liên tiếp không tưới; (3) trồng WHEAT đầu danh sách khi có feed_demand + cap 20; (4) shield + release thợ mang lúa mì khỏi task khác khi còn thú đói; (5) need_drop tính trên hàng bán được (trừ lúa mì); (6) hire factor 3.0, budget 16%.
+- Sửa bug: unit đứng PASS trên thú không cho ăn được (validity tính wheat obtainable), bỏ detour kho khi kho rỗng, harvest thú yu=0 ngày cuối.
+- Kết quả cuối: vs BASELINE 6-7/8 W, $40-41k vs $26.3-26.6k; vs melon 6/6W $42-46k; vs random $45-48k; self-play ổn 34-38k không tự hủy; 0-3 escape (trước: 2-3/episode chết dây chuyền).
+- Thử nghiệm mở rộng: 14 thú ($37.5k) và 14 thợ ($37.5k) — đều tệ hơn, giữ 11 thú/12 thợ.
+- Xuất file thuần code không chú thích: kaggriculture/submission.py (1016 dòng, AST strip comments+docstring, syntax check OK), đồng bộ cell4_agent.py. Xác minh lại benchmark file cuối.
+- Trích xuất hướng dẫn nộp bài/tính điểm từ kagri_overview.json: 3 cách nộp (main.py root + agent function), validation episode tự đấu với bản sao, rating skill theo W/L, 5 submit/ngày, 2 submission mới nhất active, Bradley-Terry finals, timeline 23/9-30/9-15/10/2026.
+
+Stage Summary:
+- Sản phẩm: /home/z/my-project/kaggriculture/submission.py (= cell4_agent.py, thuần code 1016 dòng) + v2.py (bản dev có chú thích) + bench/ (harness benchmark).
+- Điểm mạnh agent: đa thị trường đầy đủ 9 mặt hàng (5 cây + EGG/MILK/WOOL/FERTILIZER), giá trị/đô la của vật nuôi rất cao vì thị trấn hút tồn kho EGG/MILK/WOOL làm giá trên base (MILK quan sát $271-376).
+- Số liệu chuẩn: thắng 100% melon_maxxer & random; thắng ~85% vs bản crop-only mạnh; $40-48k/episode.
+- Hạn chế biết trước: chống đối thủ cũng chạy vật nuôi (chưa benchmark bot vật nuôi đối thủ — thị trường EGG/MILK/WOOL sẽ bị chia).
