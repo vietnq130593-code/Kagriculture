@@ -291,3 +291,27 @@ Stage Summary:
 - Sản phẩm: UI quan sát trận đấu hoàn chỉnh tại / (footer sticky mt-auto, no indigo/blue, palette emerald/rose/stone)
 - Hạ tầng Arena khép kín: UI ↔ arena-service(3005) ↔ run_battle.py ↔ kaggle-environments — sẵn sàng cho mọi trận v4 vs v5
 - BrainPanel render generic mọi key diag chưa biết trước → sẽ tự hiển thị não 6 lớp của v5 khi v5 xuất hiện
+
+---
+Task ID: 15
+Agent: KAIN (main-agent)
+Task: Triển khai v5.2 "P1-Tuned" theo 2 trọng tâm user chỉ định — (1) Bayes xác định kết quả chiến lược hiện tại giữa v5 và v4, (2) linh hoạt điều chỉnh chiến lược chống v4 — kèm chẩn đoán từng seed, battery 20 seed, và xác minh UI Arena
+
+Work Log:
+- Khôi phục bối cảnh: v5.py (1814 dòng, v5-P1) đã tồn tại từ phiên trước nhưng thua v4 0.948×/40% trên 10 seed; Arena (run_battle.py + arena-service 3005 + UI /) đã chạy từ Task 13-14
+- Chẩn đoán sâu 4 seed thua (2/42/555/3) bằng cách trích JSONL: doanh thu từng mặt hàng 2 bên, đàn/cây theo ngày, PLANT/WATER/HARVEST đếm lệnh từng ngày, tiền theo giờ, px_pred các ngày
+- Phát hiện 7 nguyên nhân gốc: (1) bug elif tưới khiến cây chết đúng ngày chẵn khi SERVICE đói; (2) herd_expand +2/+2/+1 ghi đè animal_cap (39 turn SERVICE → ruộng chết); (3) room() 0.85×opp_pipe khiến v5 nhượng dâu/sữa/dưa đúng lúc khan hiếm; (4) tier flip-flop ±50%/đêm do bán theo đợt; (5) BUY_ANIMAL đứng sau BUY_SEED trong list → tiền sáng luôn cạn trước khi mua thú (seed 555: $274-510 suốt d8-16); (6) window mua thú đóng d14-16 trong khi tín hiệu giá đến muộn; (7) melon plan 14/mua 11 hạt/trồng 0 (PLANT tier 3 đói khi window đóng)
+- Trọng tâm 1 (Bayes kết quả): _project thêm EMA α=0.45 làm mượt run-rate, dwell 2 đêm chống flip-flop tier (kèm tier_cand trong diag), calibration M-11 lite (calib_mae so dự báo đêm trước vs tiền thực, tích lũy 8 đêm)
+- Trọng tâm 2 (linh hoạt chống v4): 8 núm mới/đã sửa — straw_compete (px_pred dâu tăng + ≥2 shop → room không trừ opp), room sub 0.85→0.35 khi giá dự báo tăng (mọi mặt hàng), knobs_animal + animal floor theo shop draw (PIZZA/ICE/SMOOTHIE ≥2, YARN ≥1), thứ tự mua có điều kiện (BUY_ANIMAL trước BUY_SEED khi thị trường động vật sâu — milk+yarn shop ≥2 hoặc px_pred rising), late_ext window +2 ngày khi giá ≥1.25× base, fast_wheat quota +3 khi BEHIND, herd_expand chỉ +1 khi nợ nước ≤2 + dưới cap, water labor governance (cap đàn −2 khi nợ nước ≥3, +1 thợ khi nợ ≥1)
+- Sửa cơ học: water crit đúng semantics (cu≥1 luôn tier 0), animal_reserve chống hạt ăn tiền, PLANT leo tier 2 khi window đóng ≤3 ngày, water_crit_late ghi đè giờ cuối
+- 2 thí nghiệm thất bại ĐÃ REVERT (kèm bài học): daily-crit mọi ngày (cướp capacity PLANT), parity chase đuổi đàn (giết seed 3 0.717× vì ruộng đầy + thêm thú = quá tải)
+- Phẫu thuật text 3 lần lỗi (trùng seed loop/animal block) — phát hiện bằng grep đếm block + assert vị trí, sửa bằng python surgery cẩn thận
+- Battery 20 seed cuối: **1.063× tổng, 13/20 thắng (65%), median 1.081, P25 0.970, min 0.826** (từ 0.948×/40%)
+- Server Next.js chết giữa chừng (20 trận song song ăn RAM) → khởi động lại, verify UI: trận seed 555 qua Arena UI hiển thị "🏆 v5 THẮNG! 1.00×" khớp CLI, BrainPanel render đủ v5.2 (tier BEHIND, tier_cand LEAD, proj gap +5757, calib), responsive 390px/1280px không h-scroll, footer mt-auto, lint sạch
+- PLAN_V5.md bổ sung mục 12 (biên bản v5.2: 2 trọng tâm, bảng 8 núm, 4 bug, 3 thí nghiệm revert, bảng kết quả, hướng P2/P3)
+
+Stage Summary:
+- Sản phẩm: kaggriculture/v5.py bản v5.2 (2080 dòng, ver "v5.2" trong diag) — não 6 lớp hoạt động thật: tier ổn định bằng EMA+dwell, calib_mae tự đo sai số, 8 núm chiến thuật kích hoạt theo tín hiệu Bayes (giá dự báo + shop draw + nợ nước đo được)
+- Điểm mấu chốt kiến trúc: tín hiệu THỊ TRƯỜNG (giá/shop/px_pred) thắng tín hiệu HÀNH VI đối thủ (parity chase fail) — v4 white-box bị khai thác qua 3 kênh: quota cố định (dâu/dưa compete), điệu room reciprocity (animal floor + thứ tự mua), window đóng sớm (late_ext)
+- 20-seed: 1.063×/65% — chưa đạt gate P1 (1.08×); 7 seed thua là vấn đề portfolio cấu trúc → cần P2 FEED (mỏ tiền $8-15k) hoặc P3 Solver
+- Đường dẫn user xem: Preview Panel → chọn v5 vs v4 → start — não 6 lớp hiện trực tiếp trong BrainPanel

@@ -221,12 +221,16 @@ def _flow_pred(tm, day):
 
 
 def _project(sa, day, money, tm, days_left):
-    """v5-P1 L3-Race (trọng tâm 1): BAYES ĐÁNH GIÁ KẾT QUẢ chiến lược hiện tại.
+    """v5.2 L3-Race (trọng tâm 1): BAYES ĐÁNH GIÁ KẾT QUẢ chiến lược hiện tại.
 
-    Từ run-rate doanh thu 4 đêm gần nhất của TÔI (ledger chính xác) và ĐỐI THỦ
-    (luồng bán quan sát được × giá), ngoại suy E[tiền cuối mùa] cả 2 bên, trần
-    theo giá trị pipeline còn lại. Kết quả: gap + tier LEAD/TIGHT/BEHIND —
-    tín hiệu "chiến lược hiện tại đang thắng hay thua nếu tiếp tục"."""
+    Từ run-rate doanh thu của TÔI (ledger chính xác) và ĐỐI THỦ (luồng bán
+    quan sát được × giá) — làm MỀM bằng EMA α=0.45 (chống giật tier khi bán
+    theo đợt) — ngoại suy E[tiền cuối mùa] cả 2 bên, trần theo pipeline còn
+    lại. Kết quả: gap + tier LEAD/TIGHT/BEHIND. Tier chỉ đổi khi 2 ĐÊM LIÊN
+    TIẾP cùng tín hiệu (dwell) — v5.1 flip-flop LEAD→BEHIND→LEAD trong 4 đêm
+    làm núm chiến thuật giật liên tục (bài học seed 2). Kèm CALIBRATION: so
+    dự báo E[tiền] đêm trước với tiền thực tế hôm nay → MAE cho não tự biết
+    mình đo sai bao nhiêu (vòng học đóng M-11)."""
     try:
         rh = sa.get("rev_hist") or []
         if len(rh) < 4 or day < 12:
@@ -234,8 +238,27 @@ def _project(sa, day, money, tm, days_left):
         rec = rh[-4:]
         w = [0.6, 0.8, 1.1, 1.3]
         sw = sum(w)
-        my_r = sum(w[i] * rec[i][1] for i in range(4)) / sw
-        op_r = sum(w[i] * rec[i][2] for i in range(4)) / sw
+        my_r_now = sum(w[i] * rec[i][1] for i in range(4)) / sw
+        op_r_now = sum(w[i] * rec[i][2] for i in range(4)) / sw
+        # v5.2: EMA làm mượt run-rate (bán theo đợt làm run-rate nhảy vọt ±50%)
+        ema = sa.setdefault("ema_r", {})
+        a = 0.45
+        ema["my"] = a * my_r_now + (1 - a) * float(ema.get("my", my_r_now))
+        ema["opp"] = a * op_r_now + (1 - a) * float(ema.get("opp", op_r_now))
+        my_r = float(ema["my"])
+        op_r = float(ema["opp"])
+
+        # v5.2 CALIBRATION: dự báo e_me của ĐÊM TRƯỚC vs tiền thật HÔM NAY
+        prev_proj = sa.get("proj") or {}
+        if prev_proj.get("e_me") and day >= 13:
+            try:
+                err = abs(float(prev_proj["e_me"]) - float(money))
+                hist = sa.setdefault("calib", [])
+                hist.append(round(err))
+                del hist[:-8]
+                sa["calib_mae"] = round(sum(hist) / len(hist))
+            except Exception:
+                pass
 
         def growth(vals):
             older = sum(v for v in vals[:2]) + 1.0
@@ -252,16 +275,31 @@ def _project(sa, day, money, tm, days_left):
         gap = e_me - e_opp
         rel = gap / max(1000.0, e_opp)
         prev = (sa.get("proj") or {}).get("tier")
-        # v5-P1: hysteresis ±4% chống giật tier qua lại mỗi đêm
-        if prev == "BEHIND":
-            tier = "BEHIND" if rel < -0.04 else ("TIGHT" if rel < 0.06 else "LEAD")
-        elif prev == "LEAD":
-            tier = "LEAD" if rel > 0.04 else ("TIGHT" if rel > -0.06 else "BEHIND")
+
+        def raw_tier():
+            if prev == "BEHIND":
+                return "BEHIND" if rel < -0.04 else ("TIGHT" if rel < 0.06 else "LEAD")
+            if prev == "LEAD":
+                return "LEAD" if rel > 0.04 else ("TIGHT" if rel > -0.06 else "BEHIND")
+            return "LEAD" if rel > 0.08 else ("BEHIND" if rel < -0.08 else "TIGHT")
+
+        cand = raw_tier()
+        # v5.2 DWELL 2 ĐÊM: tier chỉ đổi khi tín hiệu lặp lại 2 đêm liên tiếp
+        pend = sa.get("pending_tier") or {}
+        tier = prev or cand
+        if cand == prev or prev is None:
+            tier = cand
+            sa["pending_tier"] = None
+        elif pend and pend.get("tier") == cand and day - int(pend.get("day", 0)) <= 1:
+            tier = cand
+            sa["pending_tier"] = None
         else:
-            tier = "LEAD" if rel > 0.08 else ("BEHIND" if rel < -0.08 else "TIGHT")
+            sa["pending_tier"] = {"tier": cand, "day": day}
         return {"day": day, "me": round(e_me), "opp": round(e_opp),
-                "gap": round(gap), "rel": round(rel, 3), "tier": tier,
-                "r_me": round(my_r), "r_opp": round(op_r)}
+                "e_me": round(e_me), "gap": round(gap), "rel": round(rel, 3),
+                "tier": tier, "cand": cand,
+                "r_me": round(my_r), "r_opp": round(op_r),
+                "calib_mae": sa.get("calib_mae")}
     except Exception:
         return None
 
@@ -683,11 +721,27 @@ def _daily_plan(tiles, shed, seeds, inv, prices, shops, day, opp_farm, money, tm
     my_pipe = _pipeline(tiles, shed)
     opp_tiles = _g(opp_farm, "tiles", None) if opp_farm else None
     opp_pipe = _pipeline(opp_tiles, None)
+    pxp_room = (tm or {}).get("px_pred") or {}  # v5.2: room() đọc dự báo giá
 
     def room(it):
         deficit = max(0.0, MARKET_I0 - inv.get(it, MARKET_I0))
         r = deficit + absorb.get(it, 0) + _above_headroom(it, 0.78)
-        return r - my_pipe.get(it, 0) - 0.85 * opp_pipe.get(it, 0)
+        # v5.2 GIẢI PHÓNG NHƯỢNG TƯỚNG QUÂN (trọng tâm 2, khái quát từ 3 bài
+        # học seed 2/42: dâu, sữa, dưa): hệ số 0.85 mặc định giả định đối thủ
+        # thích nghi + thị trường zero-sum. Nhưng khi L3-Price dự báo giá TĂNG
+        # (p3 ≥ now×1.04), thị trường đang nói "còn chỗ" — đối thủ có pipeline
+        # cũng không làm giá giảm. Khi đó giảm nhượng xuống 0.35 (minimax: vẫn
+        # giữ 1/3 bảo vệ tự glut). White-box v4 trồng quota CỐ ĐỊNH trước →
+        # nếu v5 cứ nhượng, v4 độc chiếm mọi chân khan hiếm (melon seed 42:
+        # 96 vs 48 quả, -$8.4k).
+        sub = 0.85
+        try:
+            q = (pxp_room or {}).get(it) or {}
+            if (q.get("p3", 0) or 0) >= (q.get("now", 0) or 0) * 1.04:
+                sub = 0.35
+        except Exception:
+            pass
+        return r - my_pipe.get(it, 0) - sub * opp_pipe.get(it, 0)
 
     coops = pastures = wheat_standing = 0
     animals_now = 0
@@ -741,6 +795,31 @@ def _daily_plan(tiles, shed, seeds, inv, prices, shops, day, opp_farm, money, tm
     milk_sub = max(fp.get("MILK", 0.0) * days_left if fp else 0.0, 30.0 * opp_counts["COW"])
     wool_sub = max(fp.get("WOOL", 0.0) * days_left if fp else 0.0, 28.0 * opp_counts["SHEEP"])
     egg_sub = max(fp.get("EGG", 0.0) * days_left if fp else 0.0, 46.0 * opp_counts["GOOSE"])
+    # v5.2 ANIMAL COMPETE (trọng tâm 2 — khuyết cùng họ với strawberry seed 42):
+    # opp_sub (30×bò đối thủ) là "đối thủ sẽ phủ chặng này" — hợp lý với đối thủ
+    # thích nghi, nhưng với v4 white-box + giá đang TĂNG, giá tự nói "thị trường
+    # CHƯA đầy". L3-Price rising → cap opp_sub ở mức thị trường hấp thụ được,
+    # tránh vòng lẩn nhau: v4 mua bò trước → v5 nhượng → v4 độc chiếm sữa
+    # $296 (seed 42: 4 bò v4 = $20.3k milk vs 1 bò v5 = $3.4k, thua 0.700×).
+    try:
+        pxp_a = (tm or {}).get("px_pred") or {}
+
+        def _rising_a(it):
+            q = pxp_a.get(it) or {}
+            return (q.get("p3", 0) or 0) >= (q.get("now", 0) or 0) * 1.04
+
+        if mode != "MIRROR":
+            if _rising_a("MILK"):
+                milk_sub = min(milk_sub, 0.45 * absorb.get("MILK", 0.0))
+                tm["knobs_animal"] = "MILK"
+            if _rising_a("WOOL"):
+                wool_sub = min(wool_sub, 0.45 * absorb.get("WOOL", 0.0))
+                tm["knobs_animal"] = tm.get("knobs_animal") or "WOOL"
+            if _rising_a("EGG"):
+                egg_sub = min(egg_sub, 0.45 * absorb.get("EGG", 0.0))
+                tm["knobs_animal"] = tm.get("knobs_animal") or "EGG"
+    except Exception:
+        pass
     if mode != "MIRROR" and fp:
         milk_room = (absorb.get("MILK", 0) + 0.5 * max(0.0, MARKET_I0 - inv.get("MILK", MARKET_I0))
                      - milk_sub - 40.0)
@@ -765,6 +844,22 @@ def _daily_plan(tiles, shed, seeds, inv, prices, shops, day, opp_farm, money, tm
         goose_target = max(4 if day <= 9 else 3, min(6, int(egg_room // 46)))
         cow_target = max(2, min(9, int(milk_room // 30)))
         sheep_target = max(5, min(7, int(wool_room // 30)))
+    # v5.2 ANIMAL FLOOR THEO SHOP DRAW (tín hiệu sớm nhất — d6, trước px_pred
+    # 6-8 ngày): shop cầu sữa/len mở = thị trường sâu BẤT CHẲP pipeline đối
+    # thủ (tại seed 555: 2 PIZZA d6 + 2 YARN d12 → v4 phóng 15 thú thắng
+    # $25k; room logic của v5 nhượng vì thấy đàn v4 to — vòng lẩn nhau).
+    # Floor chỉ nâng TỐI THIỂU, mua thật vẫn qua cổng tiền/cám/lao động.
+    try:
+        if mode != "MIRROR":
+            milk_shops = sum(1 for s in (shops or [])
+                             if s in ("PIZZA_SHOP", "ICE_CREAM_SHOP", "SMOOTHIE_SHOP"))
+            yarn_n = sum(1 for s in (shops or []) if s == "YARN_STORE")
+            if milk_shops >= 2 and 4 <= day <= 16:
+                cow_target = max(cow_target, min(6, 2 + milk_shops))
+            if yarn_n >= 1 and 4 <= day <= 15:
+                sheep_target = max(sheep_target, min(7, 4 + yarn_n))
+    except Exception:
+        pass
     if day < 2:
         goose_target = 0
         cow_target = 0
@@ -799,12 +894,32 @@ def _daily_plan(tiles, shed, seeds, inv, prices, shops, day, opp_farm, money, tm
             goose_target = min(goose_target, og + shed_geese)
             cow_target = min(cow_target, oc + shed_cows)
             sheep_target = min(sheep_target, osp + shed_sheep)
+    # v5.2: theo dõi gap đàn cho diag (KHÔNG đuổi đàn — bài học seed 3:
+    # v5 ruộng đầy + đuổi 5 thú = quá tải lao động → ruộng xẹp p24 vs p42)
+    try:
+        tm["herd_gap"] = int(sum(opp_counts.values())) - int(animals_now + shed_geese + shed_cows + shed_sheep)
+        tm["knobs_parity"] = 0
+    except Exception:
+        pass
     owned_total = animals_now + shed_geese + shed_cows + shed_sheep
     # v5-P1b: cap đàn theo LAO ĐỘNG. Bài học seed 42: 15 thú @ 13 thợ giết
     # planting (SERVICE tier-2 chiếm sạch unit) → ruộng trống → thua v4 đang
     # giữ 9 thú + 39 cây. Quy tắc: ~0.75 thú/thợ + 2.
     u_est = 15 if day >= 26 else (13 if day >= 9 else (12 if day >= 6 else (8 if day >= 1 else 7)))
     animal_cap = min(ANIMAL_CAP, max(4, int(u_est * 0.75) + 2))
+
+    # v5.2 TRỌNG TÂM 2 — LAO ĐỘNG LÀ RÀNG BUỘC SỐ 1 CỦA CHIẾN THUẬT:
+    # water_crit_late = số lượt tưới-cấp cứu CÒN NỢ lúc hour≥16 hôm qua
+    # (đo trực tiếp từ risk ledger L5). Mỗi thú = 3 turn SERVICE/ngày →
+    # khi ruộng đang đói nước, mở rộng đàn = đổi cây lấy thú = tự sát.
+    try:
+        water_debt = int((_STATE.get(("risk", day - 1)) or {}).get("water_crit_late", 0) or 0)
+    except Exception:
+        water_debt = 0
+    tm["water_debt"] = water_debt
+    if water_debt >= 3:
+        animal_cap = max(4, animal_cap - 2)  # siết cap khi nợ nước cao
+
     if owned_total >= animal_cap:
         goose_target = min(goose_target, animals_now + shed_geese)
         cow_target = min(cow_target, sum(1 for row in tiles for t in row
@@ -812,21 +927,36 @@ def _daily_plan(tiles, shed, seeds, inv, prices, shops, day, opp_farm, money, tm
         sheep_target = min(sheep_target, sum(1 for row in tiles for t in row
                                              if isinstance(t, dict) and t.get("animal") == "SHEEP") + shed_sheep)
 
-    # v5-P1 L7 (trọng tâm 2): DỰ BÁO THUA → khai thác chân rỗng thị trường.
-    # Bayes nói chiến lược hiện tại thua nếu tiếp tục (tier BEHIND) → dồn vốn
-    # vào mặt hàng mà đối thủ KHÔNG phủ (room dương) để đua lại, thay vì cứ
-    # throttle an toàn mãi. Chỉ khi CONTEST (không phải mirror) + không SURVIVE.
+    # v5.2 L7 (trọng tâm 2, bản SỬA LỖI): DỰ BÁO THUA → đua lại bằng thông
+    # lượng cây NHANH (wheat cycle 5 ngày) chứ KHÔNG blindly mở đàn. Bài học
+    # máu seed 2: BEHIND ngày 14 → +2 bò +2 cừu +1 ngỗng → 39 turn SERVICE
+    # → ruộng chết giữa mùa → THUA NẶNG HƠN (0.763×). Mở đàn chỉ khi cả 3
+    # điều kiện: nợ nước ≤2 (lao động còn dư), dưới animal_cap, tiền mạnh.
     proj = (tm or {}).get("proj") or {}
     if (mode != "MIRROR" and proj.get("tier") == "BEHIND" and day >= 8
             and sum(standing.values()) >= 22
             and not (rg and str(rg.get("state")) == "SURVIVE")):
-        if milk_room > 60:
-            cow_target = min(10, cow_target + 2)
-        if wool_room > 45:
-            sheep_target = min(8, sheep_target + 2)
-        if egg_room > 80:
-            goose_target = min(7, goose_target + 1)
-        tm["knobs_herd"] = True
+        if water_debt <= 2 and owned_total < animal_cap and money >= 2500:
+            # chỉ +1 thú vào chân có room dương nhất (không phải +2/+2/+1)
+            for it, add in (("COW", milk_room > 60), ("SHEEP", wool_room > 45), ("GOOSE", egg_room > 80)):
+                if not add:
+                    continue
+                if it == "COW":
+                    cow_target = min(10, cow_target + 1)
+                elif it == "SHEEP":
+                    sheep_target = min(8, sheep_target + 1)
+                else:
+                    goose_target = min(7, goose_target + 1)
+                tm["knobs_herd"] = True
+                break
+        else:
+            tm["knobs_herd"] = False
+        # BEHIND mọi trường hợp (nợ nước hay không): đẩy vòng tiền nhanh —
+        # quota wheat +3 (cây 5 ngày, thu bằng tiền mặt gần như ngay)
+        tm["knobs_fastwheat"] = True
+    else:
+        tm["knobs_fastwheat"] = False
+        tm["knobs_herd"] = False
 
     coop_need = _struct_reserve(goose_target + shed_geese - coops, 300, money)
     past_need = _struct_reserve(cow_target + shed_cows + sheep_target + shed_sheep - pastures, 500, money)
@@ -867,9 +997,30 @@ def _daily_plan(tiles, shed, seeds, inv, prices, shops, day, opp_farm, money, tm
             quotas["MELON"] = 8
     if 2 <= day <= 16:
         quotas["TOMATO"] = 0
-    if 5 <= day <= 13:
+    if 5 <= day <= 14:
         s_room = room("STRAWBERRY")
         want_straw = 30 if day >= 8 else 14
+        # v5.2 CẠNH TRANH DÂU (trọng tâm 2, white-box v4): v4 trồng 30 dâu
+        # trong window cố định 5-13 bất kể ai làm gì. room() trừ 0.85×opp
+        # → v5 tự NHƯỢNG thị trường đúng lúc khan hiếm (seed 2: dâu $265,
+        # v4 bán 74 units $17.8k vs v5 5 cây $4.9k). L3-Price dự báo giá dâu
+        # TĂNG + town ≥2 shop cầu dâu → thị trường đủ sâu cho CẢ HAI →
+        # tính room KHÔNG trừ pipeline đối thủ (minimax: chấp nhận cạnh tranh
+        # khi Bayes xác nhận khan hiếm thật).
+        try:
+            pxp = (tm or {}).get("px_pred") or {}
+            sq = pxp.get("STRAWBERRY") or {}
+            straw_rising = (sq.get("p3", 0) or 0) >= (sq.get("now", 0) or 0) * 1.05
+            straw_shops = sum(1 for s in (shops or [])
+                              if "STRAWBERRY" in SHOPS.get(s, ()))
+        except Exception:
+            straw_rising = False
+            straw_shops = 0
+        if (straw_rising and straw_shops >= 2 and mode != "MIRROR"
+                and day <= 13):
+            s_room = max(s_room, absorb.get("STRAWBERRY", 0.0)
+                         - my_pipe.get("STRAWBERRY", 0.0))
+            tm["knobs_straw"] = True
         quotas["STRAWBERRY"] = want_straw if s_room > 100 else max(0, min(want_straw, int(s_room // 4)))
     elif 14 <= day <= 15:
         quotas["STRAWBERRY"] = 6
@@ -880,6 +1031,10 @@ def _daily_plan(tiles, shed, seeds, inv, prices, shops, day, opp_farm, money, tm
             daily_q = int((animals_now + shed_geese + shed_cows + shed_sheep
                           + goose_target + cow_target + sheep_target) * 1.25) + 3
             quotas["WHEAT"] = min(24, max(20, daily_q))
+        # v5.2: BEHIND + núm fast-wheat → quota +3 (cycle 5 ngày = vòng tiền
+        # nhanh nhất có thể, nhanh hơn bất kỳ con thú nào 4-8 ngày)
+        if (tm or {}).get("knobs_fastwheat") and day <= 22:
+            quotas["WHEAT"] = min(28, quotas["WHEAT"] + 3)
     if rg and int(rg.get("F2", 0) or 0) >= 2:  # v5: F2 L2+ — tăng quota wheat tự trồng
         quotas["WHEAT"] = min(28, quotas.get("WHEAT", 20) + 2)
     if day <= 23:
@@ -956,6 +1111,11 @@ def _build_tasks(tiles, shed, seeds, plan, day, hour, step, inventories, n_units
     board = len(tiles)
     if not board:
         return tasks, stats
+    # v5.2: nợ nước hôm qua (L5→L7) — đẩy ưu tiên tưới parity khi đang thâm hụt
+    try:
+        water_debt = int((_STATE.get("tm") or {}).get("water_debt", 0) or 0)
+    except Exception:
+        water_debt = 0
 
     fert_available = (shed.get("FERTILIZER", 0) if shed else 0) + sum(
         (u.get("FERTILIZER", 0) or 0) for u in inventories if isinstance(u, dict))
@@ -1010,13 +1170,23 @@ def _build_tasks(tiles, shed, seeds, plan, day, hour, step, inventories, n_units
                     if in_win:
                         tasks.append(_mk(T_WATER_YIELD, x, y, "WATER"))
                         stats["water_yield"] = stats.get("water_yield", 0) + 1
+                    elif cu >= 1:
+                        # v5.2 FIX CHẾT CÂY (bản đúng): cu≥1 = HÔM QUA không được
+                        # tưới → hôm nay không tưới là thành cỏ dại (cu→2 tối nay)
+                        # → tier 0 VÔ ĐIỀU KIỆN, bất kể parity. Lỗi elif cũ: ngày
+                        # chẵn (parity-ON) cho cu≥1 xuống tier 3 → bị SERVICE đói
+                        # → cây chết đúng ngày chẵn (chuỗi chết seed 2). Tưới mỗi
+                        # 2 ngày/plant — cùng volume như v4 nhưng ưu tiên đúng.
+                        tasks.append(_mk(T_WATER_CRIT, x, y, "WATER"))
+                        stats["water_crit"] += 1
                     else:
                         on_day = (x + y + day) % 2 == 0
                         if on_day:
-                            tasks.append(_mk(T_WATER_MAINT, x, y, "WATER"))
-                        elif cu >= 1:
-                            tasks.append(_mk(T_WATER_CRIT, x, y, "WATER"))
-                            stats["water_crit"] += 1
+                            # v5.2: ngày CHẴN của cây — tưới theo parity tier 3,
+                            # nhưng nếu hôm qua có nợ nước (L5 water_debt) → đẩy
+                            # lên tier 2 để không bị SERVICE đói thêm vòng nữa
+                            t_w = T_WATER_MAINT if water_debt < 1 else T_SERVICE
+                            tasks.append(_mk(t_w, x, y, "WATER"))
                 if yu > 0 and age >= cd["first_yield_day"]:
                     urgent = (mls >= 0 and mls - step <= 24) or (crop == "WHEAT" and feed_crunch)
                     if cd["ongoing"]:
@@ -1120,6 +1290,16 @@ def _build_tasks(tiles, shed, seeds, plan, day, hour, step, inventories, n_units
         # SERVICE/WATER backlog chiếm trọn ngày, PLANT tier-5 không bao giờ
         # được nhận unit → hạt đã mua mà ruộng trống. v4 ít thú nên trồng được.
         p_tier = 3 if hour <= 11 else T_PLANT
+        # v5.2 WINDOW CLOSING: dưa 10 ngày lớn — d11+ mà chưa trồng là sắp mất
+        # cửa (seed 42: plan MELON 14 ngày 14, mua 11 hạt, trồng 0 = -$8.4k).
+        # Cây có window đóng trong ≤3 ngày → leo lên tier 2 cạnh SERVICE.
+        try:
+            closing = any(c == "MELON" and 11 <= day <= 15 for (c, _n) in budget) \
+                or any(c == "STRAWBERRY" and 12 <= day <= 14 for (c, _n) in budget)
+        except Exception:
+            closing = False
+        if closing and hour <= 13:
+            p_tier = T_SERVICE
         for i in range(n_plant):
             x, y = empties[i]
             tasks.append(_mk(p_tier, x, y, "PLANT", crop=flat[i]))
@@ -1403,6 +1583,14 @@ def _build_orders(me, shed, seeds, inventories, inv, prices, day, hour, plan,
             # v5-P1 L7: dự báo thua (BEHIND) → +1 thợ đẩy thông lượng đua lại
             if tier == "BEHIND" and 9 <= day <= 25 and money >= 2200:
                 cap += 1
+            # v5.2: NỢ NƯỚC = thiếu lao động trầm trọng (cây sắp chết) → mua
+            # thêm thợ hôm nay (máy bơm cứu ruộng) — $89-233/ngày rẻ hơn chết cây
+            try:
+                wdb = int((tmx.get("water_debt", 0) if isinstance(tmx, dict) else 0) or 0)
+            except Exception:
+                wdb = 0
+            if wdb >= 1 and 9 <= day <= 25 and money >= 3000:
+                cap += 1
             target_units = min(cap, max(8, 6 + money // 500))
         elif day >= 1:
             target_units = 8
@@ -1464,6 +1652,92 @@ def _build_orders(me, shed, seeds, inventories, inv, prices, day, hour, plan,
         money -= lp
 
     seed_spent = 0
+    # v5.2: dự trữ tiền cho 1 lượt mua thú khi L3-Price nói chân đó khan hiếm
+    # (knobs_animal) — tránh hạt trong ngày ăn sạch tiền khiến BUY_ANIMAL đứng
+    # sau trong list luôn fail (seed 42: v5 đứng 1 bò cả mùa vì thiếu $650).
+    animal_reserve = 0
+    try:
+        ka = tmx.get("knobs_animal") if isinstance(tmx, dict) else None
+        if ka and hour <= 8 and 4 <= day <= 20:
+            an_cost = {"MILK": ("COW", 400), "WOOL": ("SHEEP", 500), "EGG": ("GOOSE", 300)}.get(ka)
+            tgt_key = {"COW": "cow_target", "SHEEP": "sheep_target", "GOOSE": "goose_target"}
+            if an_cost:
+                an, cst = an_cost
+                owned = sum(1 for row in tiles for t in row
+                            if isinstance(t, dict) and t.get("animal") == an)
+                owned += (shed.get(an, 0) or 0) if shed else 0
+                if owned < (plan.get(tgt_key.get(an, ""), 0) or 0) and money >= cst + 250:
+                    animal_reserve = cst + 250
+    except Exception:
+        animal_reserve = 0
+    if hour <= 8 and 1 <= day <= 22 and not near_land \
+            and not (rg and int(rg.get("F1", 0) or 0) >= 2):  # v5: F1 L2 ngừng mua thú; P1b: hoãn khi tích lũy đất
+        struct_free = {"COOP": 0, "PASTURE": 0}
+        for row in tiles:
+            for t in row:
+                if isinstance(t, dict):
+                    k = t.get("kind")
+                    if k in struct_free and "animal" not in t:
+                        struct_free[k] += 1
+        animals_total = sum(1 for row in tiles for t in row
+                            if isinstance(t, dict) and "animal" in t)
+        wt = _wheat_all(shed, inventories)
+        wheat_ripe = sum(1 for row in tiles for t in row
+                         if isinstance(t, dict) and t.get("kind") == "PLANT"
+                         and t.get("crop") == "WHEAT"
+                         and (day - t.get("planted_day", day)) >= 3)
+        wt_supply = wt + 0.8 * wheat_ripe
+        # v5.2 LATE-WINDOW GIÁ-CỔNG: giá sản phẩm ≥1.25× base = thị trường sâu
+        # (bài học seed 555: sữa $270 mà cửa sổ mua bò đóng d16 → v4 độc chiếm
+        # 15 thú, v5 đứng 9). Giá cao → nới w1 thêm 2 ngày; bò d18 vẫn kịp
+        # 3-4 lứa sữa ×2 unit × giá cao = hòa vốn $400 trong 3 ngày.
+        try:
+            px_now = {p: float(prices.get(p, 0) or 0) for p in ("EGG", "MILK", "WOOL")}
+            late_ext = {"GOOSE": 2 if px_now.get("EGG", 0) >= 62 else 0,
+                        "SHEEP": 2 if px_now.get("WOOL", 0) >= 250 else 0,
+                        "COW": 2 if px_now.get("MILK", 0) >= 200 else 0}
+        except Exception:
+            late_ext = {"GOOSE": 0, "SHEEP": 0, "COW": 0}
+        animal_orders = []
+        for animal, target, w0, w1 in (("GOOSE", plan.get("goose_target", 0), 2, 14),
+                                       ("SHEEP", plan.get("sheep_target", 0), 4, 15),
+                                       ("COW", plan.get("cow_target", 0), 5, 16)):
+            w1 = w1 + late_ext.get(animal, 0)
+            owned = sum(1 for row in tiles for t in row
+                        if isinstance(t, dict) and t.get("animal") == animal)
+            owned += (shed.get(animal, 0) or 0) if shed else 0
+            ad = ANIMALS[animal]
+            cash_floor = 250
+            buy_per_day = 2 if (day <= 12) else 1
+            if (owned < target and w0 <= day <= w1
+                    and bought.get(animal, 0) < buy_per_day
+                    and struct_free[ad["structure"]] > 0
+                    and money >= ad["cost"] + cash_floor and shed_total < 92
+                    and (wt_supply >= (animals_total + 1) * 1.3 or animals_total == 0)):
+                animal_orders.append(["BUY_ANIMAL", animal, 1])
+                bought[animal] = bought.get(animal, 0) + 1
+                money -= ad["cost"]
+
+    # v5.2 THỨ TỰ MUA CÓ ĐIỀU KIỆN: thú chiếm tiền buổi sáng CHỈ khi thị
+    # trường động vật sâu (shop draw hoặc px_pred) — ngược lại hạt được giữ
+    # nguyên vị trí (bài học seed 808/7: mua thú đúng tiền nhưng sai seed →
+    # hạt bị hoãn → volume lúa mì tụt). Lệnh vẫn trong cùng list ≤10.
+    _defer_animal = None
+    try:
+        _milks = sum(1 for s in (shops or []) if s in ("PIZZA_SHOP", "ICE_CREAM_SHOP", "SMOOTHIE_SHOP"))
+        _yarn = sum(1 for s in (shops or []) if s == "YARN_STORE")
+        _animal_prio = (_milks + _yarn >= 2) or bool(tmx.get("knobs_animal") if isinstance(tmx, dict) else None)
+    except Exception:
+        _animal_prio = False
+    _aord = locals().get("animal_orders") or []
+    if not _animal_prio:
+        _defer_animal = _aord
+    elif _aord:
+        for _ao in _aord:
+            if len(orders) >= MAX_ORDERS:
+                break
+            orders.append(_ao)
+
     if hour <= 17 and seeds is not None:
         _crop_order = (("WHEAT",) if int(rg.get("F1", 0) or 0) >= 3
                        else ("WHEAT", "CARROT", "STRAWBERRY", "MELON", "TOMATO"))  # v5: F1 L3 chỉ giữ hạt wheat
@@ -1486,7 +1760,7 @@ def _build_orders(me, shed, seeds, inventories, inv, prices, day, hour, plan,
                     floor = 900
                 if crop == "MELON":
                     floor = 700
-                max_afford = max(0, int((money - floor) // unit)) if unit > 0 else 0
+                max_afford = max(0, int((money - floor - (animal_reserve if crop == "STRAWBERRY" else 0)) // unit)) if unit > 0 else 0
                 buy = min(need, max_afford)
                 if buy > 0:
                     orders.append(["BUY_SEED", crop, buy])
@@ -1494,41 +1768,11 @@ def _build_orders(me, shed, seeds, inventories, inv, prices, day, hour, plan,
                     seed_spent += buy * unit
             if len(orders) >= 9:
                 break
-
-    if hour <= 8 and 1 <= day <= 22 and not near_land \
-            and not (rg and int(rg.get("F1", 0) or 0) >= 2):  # v5: F1 L2 ngừng mua thú; P1b: hoãn khi tích lũy đất
-        struct_free = {"COOP": 0, "PASTURE": 0}
-        for row in tiles:
-            for t in row:
-                if isinstance(t, dict):
-                    k = t.get("kind")
-                    if k in struct_free and "animal" not in t:
-                        struct_free[k] += 1
-        animals_total = sum(1 for row in tiles for t in row
-                            if isinstance(t, dict) and "animal" in t)
-        wt = _wheat_all(shed, inventories)
-        wheat_ripe = sum(1 for row in tiles for t in row
-                         if isinstance(t, dict) and t.get("kind") == "PLANT"
-                         and t.get("crop") == "WHEAT"
-                         and (day - t.get("planted_day", day)) >= 3)
-        wt_supply = wt + 0.8 * wheat_ripe
-        for animal, target, w0, w1 in (("GOOSE", plan.get("goose_target", 0), 2, 14),
-                                       ("SHEEP", plan.get("sheep_target", 0), 4, 15),
-                                       ("COW", plan.get("cow_target", 0), 5, 16)):
-            owned = sum(1 for row in tiles for t in row
-                        if isinstance(t, dict) and t.get("animal") == animal)
-            owned += (shed.get(animal, 0) or 0) if shed else 0
-            ad = ANIMALS[animal]
-            cash_floor = 250
-            buy_per_day = 2 if (day <= 12) else 1
-            if (owned < target and w0 <= day <= w1
-                    and bought.get(animal, 0) < buy_per_day
-                    and struct_free[ad["structure"]] > 0
-                    and money >= ad["cost"] + cash_floor and shed_total < 92
-                    and (wt_supply >= (animals_total + 1) * 1.3 or animals_total == 0)):
-                orders.append(["BUY_ANIMAL", animal, 1])
-                bought[animal] = bought.get(animal, 0) + 1
-                money -= ad["cost"]
+    if _defer_animal:
+        for _ao in _defer_animal:
+            if len(orders) >= MAX_ORDERS:
+                break
+            orders.append(_ao)
 
     animals = sum(1 for row in tiles for t in row
                   if isinstance(t, dict) and "animal" in t)
@@ -1717,11 +1961,11 @@ def _agent(obs):
 
     tasks, stats = _build_tasks(tiles, shed, seeds, plan, day, hour, step,
                                 inventories, len(units))
-    try:  # v5: L6 F3 leading indicator — ghi nhận tưới-crit cuối ngày
+    try:  # v5.2: L6 F3 — nợ tưới-cấp cứu, ghi ĐÈ ở mỗi giờ ≥16 để giá trị
+    # cuối ngày (hour 23) phản ánh đúng số cây sắp chết lúc kết thúc ngày
         if hour >= 16:
             rk = _STATE.setdefault(("risk", day), {})
-            rk["water_crit_late"] = max(int(rk.get("water_crit_late", 0) or 0),
-                                         int(stats.get("water_crit", 0) or 0))
+            rk["water_crit_late"] = int(stats.get("water_crit", 0) or 0)
     except Exception:
         pass
 
@@ -1768,14 +2012,21 @@ def _arena_diag(obs):
             "front_run": fr,
             "hold_back": hb,
             "herd_expand": bool(tm.get("knobs_herd")),
+            "fast_wheat": bool(tm.get("knobs_fastwheat")),
+            "straw_compete": bool(tm.get("knobs_straw")),
+            "water_debt": int(tm.get("water_debt", 0) or 0),
+            "parity_chase": int(tm.get("knobs_parity", 0) or 0),
+            "herd_gap": int(tm.get("herd_gap", 0) or 0),
         }
         return {
-            "ver": "v5-P1",
+            "ver": "v5.2",
             "strategy": "S-" + str(rg.get("state", "GROW")),
             "tier": tier,
+            "tier_cand": (proj.get("cand") if isinstance(proj, dict) else None),
             "proj": ({"me": proj.get("me"), "opp": proj.get("opp"),
                       "gap": proj.get("gap"), "rel": proj.get("rel"),
-                      "r_me": proj.get("r_me"), "r_opp": proj.get("r_opp")}
+                      "r_me": proj.get("r_me"), "r_opp": proj.get("r_opp"),
+                      "calib_mae": proj.get("calib_mae")}
                      if isinstance(proj, dict) and proj else None),
             "knobs": knobs,
             "mode": tm.get("mode"),
@@ -1800,7 +2051,7 @@ def _arena_diag(obs):
             "notes": list(rg.get("notes") or [])[-5:],
         }
     except Exception:
-        return {"ver": "v5-P1"}
+        return {"ver": "v5.2"}
 
 
 def agent(obs):

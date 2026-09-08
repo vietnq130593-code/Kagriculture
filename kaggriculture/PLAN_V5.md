@@ -266,5 +266,62 @@ User yêu cầu xem trực tiếp trận v4↔v5 suốt 720 turn (30 ngày × 24
 - **UI tại / ** (Next.js): 2 bảng farm 10×10 trực tiếp (tile cây/tuổi/thú/weed, vị trí farmer/hands), biểu đồ giá 9 mặt hàng + market inventory, timeline scrub 720 turn, event log 2 bên, bảng chẩn đoán nội tâm v5 (posterior archetype · flow dự báo · sức khỏe H · trạng thái meta-controller · failure mode) — nơi user nhìn thấy "não 6 lớp" làm việc thật.
 - **Vai trò trong quy trình:** mọi trận nghiệm thu gate P0–P6 đều chạy qua Arena; user xem v5 thay đổi chiến thuật giữa trận ở đâu và hỏi ngược "tại sao quyết định này" → nguồn câu hỏi điều chỉnh chiến thuật mới đúng tinh thần thực chiến của user.
 
+
+## 12. BIÊN BẢN TRIỂN KHAI v5.2 "P1-TUNED" (2 TRỌNG TÂM CỦA USER) — 21:00
+
+User chỉ định 2 trọng tâm phát triển v5: **(1) v5 dùng Bayes xác định kết quả của chiến lược hiện tại giữa bản thân và đối thủ; (2) v5 linh hoạt điều chỉnh chiến lược để đấu với v4.** v5.2 là bản P1 đã tinh chỉnh theo đúng 2 trục này, nghiệm thu bằng battery 20 seed.
+
+### 12.1 Trọng tâm 1 — Bayes đánh giá kết quả (L3-Race + L3-Price + Calibration)
+
+- **EMA run-rate (α=0.45)** làm mượt doanh thu 2 bên trước khi ngoại suy E[tiền cuối] — v5.1 bị flip-flop tier ±50%/đêm vì bán theo đợt làm run-rate nhảy vọt.
+- **Dwell 2 đêm**: tier LEAD/TIGHT/BEHIND chỉ đổi khi tín hiệu lặp lại 2 đêm liên tiếp (có `tier_cand` hiển thị trong diag để quan sát tín hiệu đang tranh).
+- **Calibration M-11 (lite)**: mỗi đêm so E[tiền] dự báo đêm trước với tiền thực → `calib_mae` tích lũy 8 đêm, xuất ra diag — não tự biết mình đo sai bao nhiêu (vòng học đóng đúng thiết kế 4.9).
+- **L3-Price** dự báo giá +3 ngày từng mặt hàng (drift = E[opp flow] − town absorb) → đầu vào cho front-run/hold-back VÀ cho các núm cạnh tranh ở 12.2.
+
+### 12.2 Trọng tâm 2 — linh hoạt chống v4 (bảng núm hoàn chỉnh)
+
+| Núm | Kích hoạt | Hành động | Bài học gốc |
+|---|---|---|---|
+| `straw_compete` | px_pred dâu tăng ≥1.05× + ≥2 shop cầu dâu | tính room KHÔNG trừ opp pipeline | seed 2: nhượng dâu đúng lúc $265 (-$12.9k) |
+| `room sub 0.85→0.35` | px_pred tăng ≥1.04× (mọi mặt hàng) | giảm hệ số nhượng trong room() | seed 42: dưa 96 vs 48 quả (-$8.4k) |
+| `knobs_animal` + animal floor | px_pred sữa/len tăng HOẶC shop draw (≥2 PIZZA/ICE/SMOOTHIE, ≥1 YARN) | cap opp_sub ở 0.45×absorb + nâng target tối thiểu | seed 555: v4 phóng 15 thú độc chiếm $25k |
+| Thứ tự mua có điều kiện | thị trường động vật sâu (milk+yarn shop ≥2) | BUY_ANIMAL lên TRƯỚC BUY_SEED trong list lệnh | seed 555: $274-510 sáng nào cũng bị hạt ăn sạch |
+| `late_ext` | giá EGG/MILK/WOOL ≥1.25× base | nới window mua thú +2 ngày | seed 555: cửa sổ bò đóng d16 |
+| `fast_wheat` | tier BEHIND | quota wheat +3 (vòng tiền 5 ngày) | thay cho mở đàn mù quáng |
+| `herd_expand` (đã sửa) | BEHIND + nợ nước ≤2 + dưới cap + tiền ≥$2.5k | chỉ +1 thú (chọn chân room tốt nhất) | seed 2 bản cũ: +2/+2/+1 giết ruộng |
+| Water labor governance | `water_debt` (nợ tưới cuối ngày, L5) | cap đàn −2 khi nợ ≥3; +1 thợ khi nợ ≥1; tưới parity lên tier 2 | seed 2: 13 thú × 3 turn = ruộng chết |
+
+Cùng 5 núm gốc v5-P1 (front_run/hold_back/than lý sớm/threshold ×0.93/×1.02/+1 thợ khi BEHIND).
+
+### 12.3 Sửa lỗi cơ học (bắt từ bài học máu)
+
+1. **Bug elif tưới (chết cây)**: `cu≥1` vào ngày chẵn lẻ (parity-ON) chỉ được tier 3 → bị SERVICE đói → cu=2 → cỏ dại. Fix: cu≥1 luôn tier 0 bất kể parity (v5.2 cuối cùng). Tưới vẫn mỗi 2 ngày/plant (cùng volume v4) nhưng ưu tiên đúng.
+2. **Animal reserve**: hạt đắt ăn sạch tiền buổi sáng → BUY_ANIMAL fail cả mùa (seed 42: 1 bò).
+3. **Window closing**: plan MELON 14 ngày 14, mua 11 hạt, trồng 0 → leo tier PLANT lên 2 khi window đóng ≤3 ngày.
+4. **`water_crit_late` ghi ĐÈ** giờ cuối (hour 23) thay vì max — đo đúng nợ cuối ngày.
+
+### 12.4 Thí nghiệm thất bại (đã revert — mỗi cái một bài học)
+
+- **Daily-crit đảo ngược ưu tiên**: cu≥1 tier 0 mọi cây mọi ngày (bản đầu) — cây sống nhưng cướp capacity → ruộng trống. Sửa về đúng semantics trên.
+- **Parity chase** (đuổi đàn theo đối thủ +2/+2): giúp seed 555 nhưng giết seed 3 (0.717×) — v5 ruộng đầy + đuổi 5 thú = quá tải. Kết luận: cấu trúc đúng là tín hiệu THỊ TRƯỜNG (giá/shop), không phải chạy đua hành vi đối thủ.
+- **Straw capital balance** (cắt dâu khi đàn thiếu): đúng hướng nhưng cứng — nhường chỗ cho tín hiệu giá.
+
+### 12.5 Kết quả nghiệm thu battery 20 seed (run_battle v5 vs v4)
+
+| Chỉ số | v5.1 (trước) | **v5.2 (sau)** |
+|---|---|---|
+| Tỷ lệ tổng tiền | 0.948× | **1.063×** |
+| Tỷ lệ thắng | 40% (4/10) | **65% (13/20)** |
+| Median ratio | — | 1.081 |
+| P25 | — | 0.970 |
+| Tệ nhất | 0.763× (seed 2) | 0.826× (seed 19) |
+
+Xác nhận qua Arena UI (seed 555: banner "🏆 v5 THẮNG! 1.00×", não hiển thị tier/tier_cand/proj/calib đầy đủ). 7 seed còn thua (42/101/3/19/606/7/808) đều là vấn đề **cân bằng danh mục cấu trúc** — wheat volume + phân bổ cây/thú theo $/action — chính là mục tiêu M-2 Solver (P3) và P2 FEED, không phải núm.
+
+### 12.6 Tiếp theo (đúng lộ trình §7)
+
+P1 gate 1.08× chưa đạt (1.063×) — thiếu đúng phần P1 đầy đủ (L1 5-archetype + Gamma-Poisson L2). Khuyến nghị: hoặc hoàn thiện P1 đúng thiết kế (nhận diện archetype + predictive flow), hoặc kéo P2 (FEED make-vs-buy, +$8-15k không cần não) lên trước vì 7 seed thua đều nhạy chi phí cám + volume wheat.
+
+
 ---
 *KAIN — hết kế hoạch phiên bản 2.1 (đã ký chốt 4 quyết định + hạ tầng Arena Observer). File này là hợp đồng triển khai v5; mọi pha P khởi động kèm gate nghiệm thu bằng benchmark, mọi số liệu đối chiếu được với bench/ và worklog.*
