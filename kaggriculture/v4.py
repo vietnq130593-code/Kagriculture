@@ -55,7 +55,7 @@ T_BUILD_URG = 2
 T_SERVICE = 2
 T_WATER_YIELD = 3
 T_BUILD = 4
-T_HARVEST_ANIMAL = 4
+T_HARVEST_ANIMAL = 2
 T_HARVEST = 5
 T_PLANT = 5
 T_DIG = 5
@@ -64,14 +64,104 @@ T_FERTILIZE = 7
 
 FERT_SELL = True
 FERT_FLOOR = 38
-ANIMAL_CAP = 20
-TOM_QUOTA = 8
-HOLD = {"MILK": 0.98, "WOOL": 0.94, "STRAWBERRY": 0.96, "EGG": 0.84,
-        "CARROT": 0.70, "WHEAT": 0.76, "MELON": 0.52, "TOMATO": 0.88, "FERTILIZER": 0.40}
-
-_ARCHES = ("CONTEST", "MIRROR", "COOP", "PASSIVE")
+ANIMAL_CAP = 16
+TOM_QUOTA = 6
+HOLD = {"MILK": 0.98, "WOOL": 0.94, "STRAWBERRY": 0.90, "EGG": 0.86,
+        "CARROT": 0.70, "WHEAT": 0.76, "MELON": 0.52, "TOMATO": 0.82, "FERTILIZER": 0.40}
 
 _STATE = {}
+_ARCHES = ("CONTEST", "MIRROR", "COOP", "PASSIVE")
+
+
+def _gauss(x, c, s):
+    s = max(1e-6, float(s))
+    return math.exp(-0.5 * ((float(x) - float(c)) / s) ** 2)
+
+
+def _tm_step(tm, step, inv, shops):
+    try:
+        prev = tm.get("prev_inv")
+        if prev is not None and tm.get("prev_step") == step - 1:
+            drain = _drain_at(step - 1, tm.get("shops") or [])
+            ms = tm.get("my_sells") or {}
+            mb = tm.get("my_buys") or {}
+            od = tm.setdefault("opp_day", {})
+            for p in PRODUCTS:
+                delta = inv.get(p, MARKET_I0) - prev.get(p, MARKET_I0)
+                od[p] = od.get(p, 0.0) + delta + drain.get(p, 0.0) - ms.get(p, 0.0) + mb.get(p, 0.0)
+        if step % 24 == 0 and step > 0:
+            tm.setdefault("opp_daily", {})[step // 24 - 1] = dict(tm.get("opp_day") or {})
+            tm["opp_day"] = {}
+        tm["prev_inv"] = {p: inv.get(p, MARKET_I0) for p in PRODUCTS}
+        tm["prev_step"] = step
+        tm["my_sells"] = {}
+        tm["my_buys"] = {}
+    except Exception:
+        pass
+
+
+def _tm_orders(tm, orders):
+    try:
+        ms = tm.setdefault("my_sells", {})
+        mb = tm.setdefault("my_buys", {})
+        for o in orders or []:
+            if not isinstance(o, (list, tuple)) or len(o) < 3:
+                continue
+            op, item, n = o[0], o[1], o[2]
+            if op == "SELL" and item in PRODUCTS and _is_num(n):
+                ms[item] = ms.get(item, 0.0) + int(n)
+            elif op == "BUY_PRODUCT" and item in PRODUCTS and _is_num(n):
+                mb[item] = mb.get(item, 0.0) + int(n)
+    except Exception:
+        pass
+
+
+def _bayes_step(tm, day, opp_farm, my_herd, my_money):
+    try:
+        tm["mode"] = tm.get("mode", "CONTEST")
+        if day < 8:
+            tm["mode"] = "CONTEST"
+            return
+        oc = og = osp = 0
+        opp_tiles = _g(opp_farm, "tiles", None) if opp_farm else None
+        if opp_tiles:
+            for row in opp_tiles:
+                for t in row:
+                    if isinstance(t, dict) and "animal" in t:
+                        a = t.get("animal")
+                        if a == "COW":
+                            oc += 1
+                        elif a == "GOOSE":
+                            og += 1
+                        elif a == "SHEEP":
+                            osp += 1
+        opp_money = float(_g(opp_farm, "money", 0) or 0) if opp_farm else 0.0
+        mc, mg, msp = my_herd
+        money_ratio = (opp_money / my_money) if my_money > 300.0 else 1.0
+
+        # tight bit-identical twin signature (true self-play only)
+        sig = (_gauss(oc - mc, 0.0, 0.8)
+               * _gauss(og - mg, 0.0, 1.0)
+               * _gauss(osp - msp, 0.0, 0.8)
+               * _gauss(money_ratio, 1.0, 0.07)
+               * _gauss(len(opp_tiles or []) and 1.0 or 0.0, 1.0, 0.05))
+        like_m = max(0.005, min(0.98, sig))
+        like_c = max(0.05, 1.0 - 0.75 * like_m)
+
+        pm = tm.get("pm", 0.08)
+        pm = (pm ** 0.8) * (like_m / (like_m + like_c))
+        pm = min(0.99, max(0.005, pm))
+        tm["pm"] = pm
+
+        cur = tm.get("mode", "CONTEST")
+        if cur == "MIRROR":
+            if pm < 0.35:
+                tm["mode"] = "CONTEST"
+        else:
+            if pm > 0.70:
+                tm["mode"] = "MIRROR"
+    except Exception:
+        pass
 
 
 def _g(o, k, d=None):
@@ -213,134 +303,6 @@ def _drain_at(step, shops):
     return d
 
 
-def _gauss(x, c, s):
-    s = max(1e-6, float(s))
-    return math.exp(-0.5 * ((float(x) - float(c)) / s) ** 2)
-
-
-def _tm_step(tm, step, inv, shops):
-    try:
-        prev = tm.get("prev_inv")
-        if prev is not None and tm.get("prev_step") == step - 1:
-            drain = _drain_at(step - 1, tm.get("shops") or [])
-            ms = tm.get("my_sells") or {}
-            mb = tm.get("my_buys") or {}
-            od = tm.setdefault("opp_day", {})
-            md = tm.setdefault("my_day", {})
-            for p in PRODUCTS:
-                delta = inv.get(p, MARKET_I0) - prev.get(p, MARKET_I0)
-                flow = delta + drain.get(p, 0.0) - ms.get(p, 0.0) + mb.get(p, 0.0)
-                od[p] = od.get(p, 0.0) + flow
-                md[p] = md.get(p, 0.0) + (ms.get(p, 0.0) - mb.get(p, 0.0))
-            for p in PRODUCTS:
-                if p not in ("WHEAT", "FERTILIZER", "EGG") and od.get(p, 0.0) >= 8.0:
-                    tm.setdefault("pause", {})[p] = step + 48
-        if step % 24 == 0 and step > 0:
-            d = step // 24 - 1
-            tm.setdefault("opp_daily", {})[d] = dict(tm.get("opp_day") or {})
-            tm.setdefault("my_daily", {})[d] = dict(tm.get("my_day") or {})
-            tm["opp_day"] = {}
-            tm["my_day"] = {}
-        tm["prev_inv"] = {p: inv.get(p, MARKET_I0) for p in PRODUCTS}
-        tm["prev_step"] = step
-        tm["my_sells"] = {}
-        tm["my_buys"] = {}
-    except Exception:
-        pass
-
-
-def _tm_orders(tm, orders):
-    try:
-        ms = tm.setdefault("my_sells", {})
-        mb = tm.setdefault("my_buys", {})
-        for o in orders or []:
-            if not isinstance(o, (list, tuple)) or len(o) < 3:
-                continue
-            op, item, n = o[0], o[1], o[2]
-            if op == "SELL" and item in PRODUCTS and _is_num(n):
-                ms[item] = ms.get(item, 0.0) + int(n)
-            elif op == "BUY_PRODUCT" and item in PRODUCTS and _is_num(n):
-                mb[item] = mb.get(item, 0.0) + int(n)
-    except Exception:
-        pass
-
-
-def _bayes_step(tm, day, opp_farm, my_herd, my_money):
-    try:
-        post = tm.get("post")
-        if post is None:
-            post = tm["post"] = {a: 1.0 for a in _ARCHES}
-        tm["mode"] = tm.get("mode", "CONTEST")
-        if day < 2:
-            return
-        fl = (tm.get("opp_daily") or {}).get(day - 1, {})
-        myfl = (tm.get("my_daily") or {}).get(day - 1, {})
-        oc = og = osp = 0
-        opp_tiles = _g(opp_farm, "tiles", None) if opp_farm else None
-        if opp_tiles:
-            for row in opp_tiles:
-                for t in row:
-                    if isinstance(t, dict) and "animal" in t:
-                        a = t.get("animal")
-                        if a == "COW":
-                            oc += 1
-                        elif a == "GOOSE":
-                            og += 1
-                        elif a == "SHEEP":
-                            osp += 1
-        opp_money = float(_g(opp_farm, "money", 0) or 0) if opp_farm else 0.0
-        mc, mg, msp = my_herd
-        milk_f = fl.get("MILK", 0.0)
-        wool_f = fl.get("WOOL", 0.0)
-        egg_f = fl.get("EGG", 0.0)
-        wheat_f = fl.get("WHEAT", 0.0)
-        straw_f = fl.get("STRAWBERRY", 0.0)
-        melon_f = fl.get("MELON", 0.0)
-        tot_f = sum(abs(v) for v in fl.values())
-        div = sum(abs(fl.get(p, 0.0) - myfl.get(p, 0.0))
-                  for p in ("MILK", "WOOL", "EGG", "WHEAT", "STRAWBERRY", "MELON", "TOMATO"))
-        money_ratio = (opp_money / my_money) if my_money > 300.0 else 1.0
-
-        like = {}
-        like["CONTEST"] = (_gauss(og, 4.5, 2.8) * _gauss(osp, 5.0, 3.0)
-                           * _gauss(oc, 3.5, 4.5)
-                           * (_gauss(wheat_f, 30.0, 28.0) + 0.10))
-        if day >= 12:
-            like["CONTEST"] *= (_gauss(milk_f, 5.0, 7.0) + 0.10)
-        if day >= 14:
-            like["CONTEST"] *= (_gauss(melon_f, 3.0, 6.0) + 0.12)
-        like["MIRROR"] = ((_gauss(oc - mc, 0.0, 1.8) + 0.05)
-                          * (_gauss(og - mg, 0.0, 2.5) + 0.05)
-                          * (_gauss(osp - msp, 0.0, 2.0) + 0.05)
-                          * (_gauss(money_ratio, 1.0, 0.22) + 0.05)
-                          * (_gauss(div, 6.0, 14.0) + 0.08))
-        like["COOP"] = ((_gauss(milk_f, 0.0, 1.0) + 0.05)
-                        * (_gauss(wool_f, 0.0, 1.2) + 0.05)
-                        * (_gauss(egg_f, 0.0, 1.5) + 0.05)
-                        * (_gauss(oc, 0.0, 1.5) + 0.08)
-                        * (_gauss(og, 0.0, 1.5) + 0.08)
-                        * _gauss(wheat_f, 25.0, 30.0)
-                        * (_gauss(straw_f, 0.0, 14.0) + 0.10))
-        like["PASSIVE"] = _gauss(tot_f, 0.0, 3.5) + 0.02
-
-        for a in _ARCHES:
-            post[a] = post.get(a, 1.0) * max(like.get(a, 0.05), 0.01)
-        s = sum(post.values())
-        if s > 0:
-            for a in _ARCHES:
-                post[a] = post[a] / s
-        best = max(_ARCHES, key=lambda a: post.get(a, 0.0))
-        cur = tm.get("mode", "CONTEST")
-        if best != cur and post.get(best, 0.0) > post.get(cur, 0.0) + 0.12:
-            tm["mode"] = best
-        elif post.get(cur, 0.0) < 0.10:
-            tm["mode"] = best
-        else:
-            tm["mode"] = cur
-    except Exception:
-        pass
-
-
 def _forward_absorb(day, hour, shops):
     step = day * TURN_PER_DAY + hour
     cur = _shop_vector(shops)
@@ -407,7 +369,6 @@ def _daily_plan(tiles, shed, seeds, inv, prices, shops, day, opp_farm, money, tm
     my_pipe = _pipeline(tiles, shed)
     opp_tiles = _g(opp_farm, "tiles", None) if opp_farm else None
     opp_pipe = _pipeline(opp_tiles, None)
-    mode = (tm or {}).get("mode", "CONTEST")
 
     def room(it):
         deficit = max(0.0, MARKET_I0 - inv.get(it, MARKET_I0))
@@ -446,51 +407,39 @@ def _daily_plan(tiles, shed, seeds, inv, prices, shops, day, opp_farm, money, tm
                     if a in opp_counts:
                         opp_counts[a] += 1
 
-    milk_off = MARKET_I0 - inv.get("MILK", MARKET_I0)
-    wool_off = MARKET_I0 - inv.get("WOOL", MARKET_I0)
-    egg_off = MARKET_I0 - inv.get("EGG", MARKET_I0)
-
-    # ---- [E1] presence herd targets (mode-driven, T8-safe) ----
+    mode = (tm or {}).get("mode", "CONTEST")
+    milk_room = (absorb.get("MILK", 0) + 0.5 * max(0.0, MARKET_I0 - inv.get("MILK", MARKET_I0))
+                 - 30.0 * opp_counts["COW"] - 40.0)
+    wool_room = (absorb.get("WOOL", 0) + 0.5 * max(0.0, MARKET_I0 - inv.get("WOOL", MARKET_I0))
+                 - 28.0 * opp_counts["SHEEP"] - 20.0)
+    egg_room = (absorb.get("EGG", 0) + 0.5 * max(0.0, MARKET_I0 - inv.get("EGG", MARKET_I0))
+                - 46.0 * opp_counts["GOOSE"] - 20.0)
     if mode == "MIRROR":
-        goose_target, cow_target, sheep_target = 8, 5, 3
+        goose_target, cow_target, sheep_target = 6, 5, 3
     elif mode == "COOP":
-        goose_target, cow_target, sheep_target = 9, 7, 4
+        goose_target = max(4 if day <= 9 else 3, min(5, int(egg_room // 46)))
+        cow_target = max(0, min(8, int(milk_room // 30)))
+        sheep_target = max(5, min(7, int(wool_room // 30)))
     else:
-        goose_target, cow_target, sheep_target = 9, 8, 3
-    if (mode != "MIRROR" and day >= 14 and milk_off > 120
-            and opp_counts["COW"] <= 2):
-        cow_target = 9
+        goose_target = max(4 if day <= 9 else 3, min(6, int(egg_room // 46)))
+        cow_target = max(2, min(9, int(milk_room // 30)))
+        sheep_target = max(5, min(7, int(wool_room // 30)))
     if day < 2:
         goose_target = 0
         cow_target = 0
         sheep_target = 0
-    elif day < 4:
+    elif day < 5:
         cow_target = 0
         sheep_target = 0
     elif day < 6:
         sheep_target = 0
-    # hard anti-collision valve (mirror safety, independent of Bayes)
-    cows_now = sum(1 for row in tiles for t in row
-                   if isinstance(t, dict) and t.get("animal") == "COW")
-    geese_now = sum(1 for row in tiles for t in row
-                    if isinstance(t, dict) and t.get("animal") == "GOOSE")
-    sheep_now = sum(1 for row in tiles for t in row
-                    if isinstance(t, dict) and t.get("animal") == "SHEEP")
-    if cows_now + opp_counts["COW"] >= 12:
-        cow_target = min(cow_target, cows_now)
-    if opp_counts["COW"] >= 10:
-        cow_target = min(cow_target, 4)
-    if milk_off < 0:
-        cow_target = min(cow_target, cows_now)
-    if wool_off < -40:
-        sheep_target = min(sheep_target, sheep_now)
-    if egg_off < -120:
-        goose_target = min(goose_target, geese_now + shed_geese)
     owned_total = animals_now + shed_geese + shed_cows + shed_sheep
     if owned_total >= ANIMAL_CAP:
-        goose_target = min(goose_target, geese_now + shed_geese)
-        cow_target = min(cow_target, cows_now + shed_cows)
-        sheep_target = min(sheep_target, sheep_now + shed_sheep)
+        goose_target = min(goose_target, animals_now + shed_geese)
+        cow_target = min(cow_target, sum(1 for row in tiles for t in row
+                                         if isinstance(t, dict) and t.get("animal") == "COW") + shed_cows)
+        sheep_target = min(sheep_target, sum(1 for row in tiles for t in row
+                                             if isinstance(t, dict) and t.get("animal") == "SHEEP") + shed_sheep)
 
     coop_need = _struct_reserve(goose_target + shed_geese - coops, 300, money)
     past_need = _struct_reserve(cow_target + shed_cows + sheep_target + shed_sheep - pastures, 500, money)
@@ -522,15 +471,15 @@ def _daily_plan(tiles, shed, seeds, inv, prices, shops, day, opp_farm, money, tm
                    + goose_target + cow_target + sheep_target) * max(0, 29 - day)
 
     quotas = {}
-    if 6 <= day <= 14:
+    if 8 <= day <= 14:
         quotas["MELON"] = 14 if room("MELON") > -50 else 7
-    if 3 <= day <= 10:
-        quotas["TOMATO"] = TOM_QUOTA
-    elif 11 <= day <= 14:
-        quotas["TOMATO"] = 6
+        if day <= 1:
+            quotas["MELON"] = 8
+    if 2 <= day <= 16:
+        quotas["TOMATO"] = 0
     if 5 <= day <= 13:
         s_room = room("STRAWBERRY")
-        want_straw = (18 if mode == "MIRROR" else 30) if day >= 8 else (12 if mode == "MIRROR" else 14)
+        want_straw = 30 if day >= 8 else 14
         quotas["STRAWBERRY"] = want_straw if s_room > 100 else max(0, min(want_straw, int(s_room // 4)))
     elif 14 <= day <= 15:
         quotas["STRAWBERRY"] = 6
@@ -540,7 +489,7 @@ def _daily_plan(tiles, shed, seeds, inv, prices, shops, day, opp_farm, money, tm
         else:
             daily_q = int((animals_now + shed_geese + shed_cows + shed_sheep
                           + goose_target + cow_target + sheep_target) * 1.25) + 3
-            quotas["WHEAT"] = min(26, daily_q)
+            quotas["WHEAT"] = min(24, max(20, daily_q))
     if day <= 23:
         if day <= 2:
             quotas["CARROT"] = 12
@@ -554,7 +503,6 @@ def _daily_plan(tiles, shed, seeds, inv, prices, shops, day, opp_farm, money, tm
         quotas["CARROT"] = 8
         quotas["MELON"] = 8
         quotas.pop("STRAWBERRY", None)
-        quotas.pop("TOMATO", None)
 
     if day <= 2:
         order = ["WHEAT", "MELON", "TOMATO", "CARROT", "STRAWBERRY"]
@@ -607,7 +555,6 @@ def _daily_plan(tiles, shed, seeds, inv, prices, shops, day, opp_farm, money, tm
         "feed_demand": feed_demand,
         "standing": standing,
         "mode": mode,
-        "herd_planned": max(owned_total, goose_target + cow_target + sheep_target),
     }
 
 
@@ -622,6 +569,15 @@ def _build_tasks(tiles, shed, seeds, plan, day, hour, step, inventories, n_units
         (u.get("FERTILIZER", 0) or 0) for u in inventories if isinstance(u, dict))
     wheat_available = (shed.get("WHEAT", 0) if shed else 0) + sum(
         (u.get("WHEAT", 0) or 0) for u in inventories if isinstance(u, dict))
+    animals_n = 0
+    hungry_n = 0
+    for row in tiles:
+        for t in row:
+            if isinstance(t, dict) and "animal" in t:
+                animals_n += 1
+                if (t.get("consecutive_unfed", 0) or 0) >= 1 and not t.get("fed_today", False):
+                    hungry_n += 1
+    feed_crunch = hungry_n > 0 or (animals_n > 0 and wheat_available < animals_n + 3)
 
     fert_usable = 0
     for row in tiles:
@@ -670,7 +626,7 @@ def _build_tasks(tiles, shed, seeds, plan, day, hour, step, inventories, n_units
                             tasks.append(_mk(T_WATER_CRIT, x, y, "WATER"))
                             stats["water_crit"] += 1
                 if yu > 0 and age >= cd["first_yield_day"]:
-                    urgent = mls >= 0 and mls - step <= 4
+                    urgent = (mls >= 0 and mls - step <= 24) or (crop == "WHEAT" and feed_crunch)
                     if cd["ongoing"]:
                         ready = yu >= 4 or (mls >= 0 and mls - step <= 6) or day >= 27
                     else:
@@ -692,7 +648,7 @@ def _build_tasks(tiles, shed, seeds, plan, day, hour, step, inventories, n_units
                 yu = t.get("yield_units", 0) or 0
                 if yu >= ad["max_held"] - 1:
                     tasks.append(_mk(T_HARVEST_URG, x, y, "HARVEST"))
-                elif yu >= 3 or (yu > 0 and day >= 27):
+                elif yu >= 2 or (yu > 0 and day >= 27):
                     tasks.append(_mk(T_HARVEST_ANIMAL, x, y, "HARVEST"))
             elif kind == "WEED":
                 tasks.append(_mk(T_DIG, x, y, "DIG"))
@@ -763,27 +719,10 @@ def _build_tasks(tiles, shed, seeds, plan, day, hour, step, inventories, n_units
 
     if fert_available > 0 and day < 25:
         made = 0
-        capw = min(int(fert_available), 8)
+        capf = min(int(fert_available), 6)
         for y in range(board):
             for x in range(board):
-                if made >= capw:
-                    break
-                t = tiles[y][x]
-                if not isinstance(t, dict) or t.get("kind") != "PLANT":
-                    continue
-                crop = t.get("crop")
-                if crop != "WHEAT":
-                    continue
-                cd = CROPS[crop]
-                age = day - t.get("planted_day", day)
-                ws = (cd["max_yield_day"] + 1) // 2
-                if ws <= age <= cd["max_yield_day"] and t.get("fertilized_until_day", -1) < day:
-                    tasks.append(_mk(5, x, y, "FERTILIZE"))
-                    made += 1
-        capm = max(0, min(int(fert_available) - made, 6))
-        for y in range(board):
-            for x in range(board):
-                if made >= capw + capm:
+                if made >= capf:
                     break
                 t = tiles[y][x]
                 if not isinstance(t, dict) or t.get("kind") != "PLANT":
@@ -820,25 +759,29 @@ def _task_action(tk, ux, uy, uinv, tiles, shed, board):
         if an is None:
             return ["PASS"]
         w = uinv.get("WHEAT", 0) or 0
-        if (ux, uy) == (tx, ty):
-            if not an.get("fed_today", False) and w > 0:
+        unfed = not an.get("fed_today", False)
+        shed_w = (shed.get("WHEAT", 0) or 0) if shed else 0
+        if unfed and w > 0:
+            if (ux, uy) == (tx, ty):
                 return ["FEED"]
-            if not an.get("cared_today", False):
-                return ["CARE"]
-            if an.get("fertilizer_available", False):
-                return ["COLLECT_FERTILIZER"]
-            return ["PASS"]
-        if not an.get("fed_today", False) and w <= 0 and tk.get("want_wheat") \
-                and (shed.get("WHEAT", 0) or 0) > 0:
+            mv = _step_toward(ux, uy, tx, ty)
+            return [mv] if mv else ["PASS"]
+        if unfed and w <= 0 and shed_w > 0:
             st = _nearest_shed_tile(ux, uy, board)
             if (ux, uy) == st:
-                n = min(5, (shed.get("WHEAT", 0) or 0) if shed else 0)
+                n = min(5, shed_w)
                 if n > 0:
                     return ["PICKUP", "WHEAT", n]
             else:
                 mv = _step_toward(ux, uy, st[0], st[1])
                 if mv:
                     return [mv]
+        if (ux, uy) == (tx, ty):
+            if not an.get("cared_today", False):
+                return ["CARE"]
+            if an.get("fertilizer_available", False):
+                return ["COLLECT_FERTILIZER"]
+            return ["PASS"]
         mv = _step_toward(ux, uy, tx, ty)
         return [mv] if mv else ["PASS"]
 
@@ -898,7 +841,7 @@ def _task_action(tk, ux, uy, uinv, tiles, shed, board):
     return [mv] if mv else ["PASS"]
 
 
-def _task_still_valid(tk, tiles, board, shed, uinv, day=99):
+def _task_still_valid(tk, tiles, board, shed, uinv):
     x, y = tk["x"], tk["y"]
     if not (0 <= x < board and 0 <= y < board):
         return False
@@ -927,9 +870,8 @@ def _task_still_valid(tk, tiles, board, shed, uinv, day=99):
     if op == "COLLECT_FERTILIZER":
         return isinstance(t, dict) and "animal" in t and t.get("fertilizer_available", False)
     if op == "FERTILIZE":
-        return (isinstance(t, dict) and t.get("kind") == "PLANT"
-                and t.get("crop") in ("MELON", "WHEAT")
-                and t.get("fertilized_until_day", -1) < day)
+        return isinstance(t, dict) and t.get("kind") == "PLANT" and t.get("crop") == "MELON" \
+            and t.get("fertilized_until_day", -1) < day
     if op == "DELIVER":
         return (uinv.get(tk.get("item"), 0) or 0) > 0 or (shed.get(tk.get("item"), 0) or 0) > 0
     return True
@@ -951,7 +893,7 @@ def _assign_and_act(units, tasks, tiles, shed, inventories, day, hour, board, se
             del sticky[i]
             continue
         tk = sticky[i]
-        if not _task_still_valid(tk, tiles, board, shed, uinv_cache[i], day):
+        if not _task_still_valid(tk, tiles, board, shed, uinv_cache[i]):
             del sticky[i]
             continue
         if feed_pending > 0 and tk["tier"] >= 2 and tk["op"] not in ("SERVICE", "FEED", "DELIVER") \
@@ -1042,7 +984,8 @@ def _build_orders(me, shed, seeds, inventories, inv, prices, day, hour, plan,
                            for c, n in plan.get("crop_tiles", {}).items())
         workload = stats.get("total", 0) + plant_budget
         if day >= 6:
-            target_units = min(13 if (day >= 9 and money >= 1800) else 12, max(8, 6 + money // 500))
+            cap = 13 if ((day >= 9 and money >= 1800) or (day >= 18 and money >= 2500)) else 12
+            target_units = min(cap, max(8, 6 + money // 500))
         elif day >= 1:
             target_units = 8
         else:
@@ -1053,7 +996,10 @@ def _build_orders(me, shed, seeds, inventories, inv, prices, day, hour, plan,
         cost = 0
         k = 0
         hire_floor = 60 if day <= 5 else 150
-        hire_budget = min(money - hire_floor, max(88, money * 0.25))
+        if money > hire_floor + 88:
+            hire_budget = min(money - hire_floor, max(88, money * 0.25))
+        else:
+            hire_budget = max(0, money - 10)
         while k < want and k < 5:
             c = _fib(n_hired + k)
             if cost + c > hire_budget:
@@ -1104,10 +1050,11 @@ def _build_orders(me, shed, seeds, inventories, inv, prices, day, hour, plan,
         animals_total = sum(1 for row in tiles for t in row
                             if isinstance(t, dict) and "animal" in t)
         wt = _wheat_all(shed, inventories)
-        wheat_standing = sum(1 for row in tiles for t in row
-                             if isinstance(t, dict) and t.get("kind") == "PLANT"
-                             and t.get("crop") == "WHEAT")
-        wt_supply = wt + 0.8 * wheat_standing
+        wheat_ripe = sum(1 for row in tiles for t in row
+                         if isinstance(t, dict) and t.get("kind") == "PLANT"
+                         and t.get("crop") == "WHEAT"
+                         and (day - t.get("planted_day", day)) >= 3)
+        wt_supply = wt + 0.8 * wheat_ripe
         for animal, target, w0, w1 in (("GOOSE", plan.get("goose_target", 0), 2, 14),
                                        ("SHEEP", plan.get("sheep_target", 0), 4, 15),
                                        ("COW", plan.get("cow_target", 0), 5, 16)):
@@ -1131,9 +1078,9 @@ def _build_orders(me, shed, seeds, inventories, inv, prices, day, hour, plan,
         owned_empty = sum(1 for row in tiles for t in row if t is None)
         price = LAND_PRICES[nq - 1]
         if nq == 3:
-            last_day = 18
-            gate = 1.2
-            buffer = int(0.1 * price) + 500
+            last_day = 21
+            gate = 1.1
+            buffer = int(0.1 * price) + 300
         else:
             last_day = 20
             gate = 1.3
@@ -1200,8 +1147,8 @@ def _build_orders(me, shed, seeds, inventories, inv, prices, day, hour, plan,
         for it in PRODUCTS:
             if it == "FERTILIZER" and day < 26:
                 nf = shed.get("FERTILIZER", 0) or 0
-                if nf > 8 and day >= 2:
-                    k = _sell_count("FERTILIZER", nf - 8, inv.get("FERTILIZER", MARKET_I0), FERT_FLOOR)
+                if nf > 2 and day >= 1:
+                    k = _sell_count("FERTILIZER", nf - 2, inv.get("FERTILIZER", MARKET_I0), FERT_FLOOR)
                     if k > 0:
                         cands.append((k * 60, ["SELL", "FERTILIZER", k]))
                 continue
@@ -1251,10 +1198,20 @@ def _agent(obs):
     shops = _g(town, "unlocked_shops", None) or []
     opp = farms[1 - player] if len(farms) > 1 else None
 
+    tm = _STATE.setdefault("tm", {})
+    _tm_step(tm, step, inv, shops)
+
     pkey = ("plan", day)
     if pkey not in _STATE:
+        mc = sum(1 for row in tiles for t in row
+                 if isinstance(t, dict) and t.get("animal") == "COW")
+        mg = sum(1 for row in tiles for t in row
+                 if isinstance(t, dict) and t.get("animal") == "GOOSE")
+        msp = sum(1 for row in tiles for t in row
+                  if isinstance(t, dict) and t.get("animal") == "SHEEP")
+        _bayes_step(tm, day, opp, (mc, mg, msp), float(_g(me, "money", 0) or 0))
         _STATE[pkey] = _daily_plan(tiles, shed, seeds, inv, prices, shops, day, opp,
-                                   float(_g(me, "money", 0) or 0))
+                                   float(_g(me, "money", 0) or 0), tm)
     plan = _STATE[pkey]
 
     fpos = _g(me, "farmer", None) or [board // 2 - 1, board // 2 - 1]
@@ -1267,6 +1224,7 @@ def _agent(obs):
 
     orders = _build_orders(me, shed, seeds, inventories, inv, prices, day,
                            hour, plan, stats, tiles, shops)
+    _tm_orders(tm, orders)
 
     actions = _assign_and_act(units, tasks, tiles, shed, inventories, day,
                               hour, board, seeds)

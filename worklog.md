@@ -140,3 +140,30 @@ Stage Summary:
 - Phát hiện lớn: (1) FEED là khoản đốt tiền số 1 — $37.3k/mùa = 59% burn (không phải hire $6.3k như giả định cũ) → v4 cần đòn make-vs-buy cám mạnh; (2) v3 BROKE hoàn toàn ngày 3-10 (cash $0) — ramp bò sớm ngày 5-9 của v4 cần bootstrap cash-first mới; (3) T8: mirror v3-vs-v3 KHÔNG tự hủy catastrophically — presence formula là van an toàn tự hạ đàn (cow peak 3.8/bên vs target solo 7, milk 106u/2 bên vs drain 324, tồn kho milk −102…−604, 218u premium bỏ lại ≈ $54-72k/cặp); bẫy hủy diệt thật chỉ xảy ra nếu hardcode 9-10 bò không detector mirror; quy tắc mirror v4 = chia drain ~162u/bên (~5 bò) thu ~$40k milk/bên
 - Net mirror v3-vs-v3: $43.9k/$40.1k TB (dải $30-55k, khớp worklog cũ $48-51k±phương sai seed)
 - Bước tiếp theo: P1 — Portfolio Solver (thay quota cứng) + bật TOMATO/STRAW/FERT/EGG + fert-on-wheat, mục tiêu v4-solo gross ≥ $110k/net ≥ $55k; ưu tiên đòn feed (make-vs-buy) và bootstrap cash-first cho ramp bò sớm
+
+---
+Task ID: 8
+Agent: main-agent (Z.ai Code) — KAIN executor
+Task: Viết code cell 4 (agent v4) đánh bại submission_v3.py theo RESEARCH_v4.md, tích hợp "thuật toán bayer" (Bayes) — lặp benchmark tới thắng áp đảo
+
+Work Log:
+- Khôi phục context: đọc worklog (7 task), v4.py dở dang phiên trước (thua v3 1W/3L), bench全套 (run_v4, seeds_v4, ledger_v4, ramp_v4 mới)
+- Vòng 1 (vá dead code): nối dây telemetry _tm_step/_tm_orders + Bayes _bayes_step vào _agent (trước đó là dead code, mode luôn CONTEST) → 0/8
+- Chẩn đoán ramp_v4.py trace: phát hiện chuỗi bug (a) geese chết đói d7-10 (shed rỗng khi đồng lúa non), (b) v4 không mua ô đất 4, (c) build 20 structures cho 13 con ($2.2k lãng phí)
+- Vòng 2 (chống tử thần): hire survival mode (money≤150 → budget=moeny−10), labor_reserve cho mua đàn/đất/hạt → hết trận $4-8k thảm họa
+- Vòng 3: phát hiện bug tự tạo CHICKEN-AND-EGG — fix "chống overbuild coop" dùng geese_HIỆN_TẠI làm coop_want=0 → không build coop → không mua nổi ngỗng; spend_cap money−900 zero-hóa structures → đàn không bao giờ ramp
+- Vòng 4 (QUAY CUỘC): từ bỏ tuning v4 cũ, dùng v3.py làm NỀN (đã chứng minh 16 sữa/bò, $50-60k) + cắm edges: telemetry+Bayes 2-giả-thuyết (CONTEST/MIRROR, signature chặt σ, geometric forgetting λ=0.75-0.8, hysteresis 0.70/0.35, cấm MIRROR trước d8), hire survival, T_HARVEST_ANIMAL=2, FERT keep-2 bán sớm, land-4 d21, feed_crunch wheat harvest tier-0, deficit-aware market rooms (milk/wool/egg + 0.5×deficit)
+- Phát hiện then chốt 1: crop death-urgency window mls−step≤4 (2 GIỜ!) quá hẹp → straw/melon thối trên đồng → mở ≤24h → 5/8 thua cũ lật thành thắng
+- Phát hiện then chốt 2 (SÁT THỦ NGỖNG): flag want_wheat tính lúc TẠO task SERVICE (shed rỗng giờ đó) → worker đến con vật TAY KHÔNG, đứng CARE/PASS cả ngày trong khi shed đầy wheat (wheat đổ vào shed SAU khi task tạo) → geese chết đói đúng lúc shed có đồ ăn → sửa routing theo trạng thái LIVE (đến animal, unfed, không có wheat, shed có → đi shed PICKUP rồi quay lại FEED) → 9/10 seed thua lật thành thắng
+- Phát hiện 3: wheat quota theo herd hiện tại (11 con → 15 tiles) = chicken-and-egg kinh tế → floor 20-24 tiles độc lập đàn
+- Phát hiện 4: P0/P1 order-advantage (P0 bán trước giá tốt hơn) → knife-edge games nghiêng P0; đánh giá two-sided trung bình 2 lượt
+- Kết quả cuối (24 seed, kaggle-environments 1.32.7): P0-side 19/24W; two-sided avg 22/24W, v4 $51.763 vs v3 $46.450 (1.114x), 2 hòa tuyệt đối (102, 201 chênh <$200)
+- An toàn: mirror self-play ổn định $33-55k/hai bên (mode MIRROR kích hoạt, không tự hủy T8); vs baseline(v2-crop) 1.58-1.88x; vs melon_maxxer 9.3-10.8x; vs v2 submission 1.34-1.36x
+- Xuất submission_v4.py (AST strip comment, 1064 dòng, agent() callable cuối file, import check OK), đồng bộ cell4_agent.py, verify submission đấu submission cho kết quả GIỐNG HỆT v4.py
+
+Stage Summary:
+- Sản phẩm: /home/z/my-project/kaggriculture/submission_v4.py + cell4_agent.py (1064 dòng thuần code) + v4.py (bản dev có telemetry/Bayes đầy đủ)
+- Kiến trúc: v3-nền kinh tế + 8 edges: (1) Bayes 2-hypothesis mirror detector (đáp ứng yêu cầu "thuật toán bayer"), (2) telemetry opp-flow, (3) hire survival chống death-spiral, (4) live-state SERVICE routing (chống ngỗng chết đói dù shed đầy), (5) crop death-window 24h, (6) deficit-aware herd targets, (7) FERT bán sớm keep-2, (8) land-4 d21 + wheat floor 20-24
+- vs submission_v3.py: 22/24 thắng trung bình 2 phía (1.114x); P0 đơn phương 19/24 (P0/P1 order-advantage ±$3-8k/game); wins biên 1.01-1.35x
+- Bài họcHard-won: (a) mỗi global-knob đổi trong hệ 2-agent market-coupling lật ±6 seed ngẫu nhiên — phải đánh giá two-sided multi-seed; (b) stale task flags (want_wheat) là bugClass nguy hiểm nhất — phải query live state; (c) v3-nền + incremental edges thắng tuyệt đối việc rebuild từ đầu
+- Còn tiềm năng: 2 seed hòa tuyệt đối (102/201); endgame labor surge 13th worker; straw harvest vẫn dưới tiềm năng trên vài seed; nếu cần 24/24 tuyệt đối → tối ưu thêm carrot bootstrap + d11 cash phase
