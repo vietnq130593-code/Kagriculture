@@ -186,3 +186,21 @@ Stage Summary:
 - Kết luận trung tâm: v4 = thắng lợi kiến trúc gia tăng (nền v3 + 8 edges) chứ không phải bước nhảy lý thuyết; dominance "100% + 2x" không tồn tại vật lý trên knife-edge → chuẩn đo 5 điều kiện mới (≥1.25x TB, ≥90% thắng, không gãy <0.95x, mirror-safe, phủ meta)
 - Đề xuất v5: con đường C (P0 quick wins + P4 make-vs-buy FEED trước, rồi P1 Portfolio Solver + P3 Bayes đầy đủ); giá trị còn lại ước +$15-30k/mùa
 - Chờ user quyết: 5 câu hỏi mở ở mục 6.3 (ưu tiên A/B/C, ngưỡng dừng, refactor hay vá, submission đôi từ P1, rủi ro "ở lại" milk)
+
+---
+Task ID: 10
+Agent: KAIN (main-agent)
+Task: Thảo luận tiền triển khai v5 — viết PLAN_V5.md (kế hoạch triển khai, mục tiêu đánh bại v4 hoàn toàn); trả lời câu hỏi của user về cơ chế quan sát/nhận diện/Bayes dự đoán tương lai/thích ứng của agent hiện tại
+
+Work Log:
+- Kiểm kê OODA v4 bằng grep mã nguồn trực tiếp: Quan sát ✅ (_tm_step telemetry 100%), Định vị ✅ (_forward_absorb), Nhận diện đối thủ ⚠️ 2/5 (_bayes_step chỉ MIRROR/CONTEST, COOP/PASSIVE dead), Dự đoán tương lai ❌ (opp_daily chỉ ghi không đọc — W3 xác nhận bằng grep: chỉ xuất hiện L88/L93), Thích ứng ⚠️ 1/5 núm (mode chỉ đổi mục tiêu đàn L410-426)
+- Xác nhận lens kiến trúc của user (orchestrator + nhân công = sub-agents): đúng bản chất engine — mọi trí tuệ tập trung ở hàm agent, thợ thuê không có trí tuệ riêng; 3 hệ quả thiết kế rút ra (task market Hungarian = hiện thực hóa "điều động nhân công"; thông tin public đầy đủ trừ shed; thang đấu tuần tự cần bảng chiến thuật theo archetype)
+- Viết PLAN_V5.md (214 dòng, 10 chương): chuẩn dominance 5 điều kiện D1-D5 vs v4 (≥1.25x, ≥90% W, tệ nhất ≥0.95x, mirror-safe, phủ meta) + cột mốc pha 1.05→1.10→1.18→1.20→1.25; thiết kế Bayes 4 lớp (L1 archetype posterior 5 giả thuyết + naive Bayes 9 kênh flow + λ=0.8 forgetting + hysteresis 2 đêm; L2 Gamma-Poisson posterior predictive flow thay room tĩnh −30×opp_COW; L3 dự báo đường giá 24h bằng engine + E[opp_sales]; L4 rollout 7 ngày ≤5 quyết định/ngày + DP thanh lý 26-29); bảng chiến thuật 5 archetype; map 8 module → điểm cắm mã v4.py (L119/L367/L473-505/L880/L972); exploit white-box v4 (presence valve tự rút bò khi v5 ramp + stockpile/drip 218u premium; TOMATO quota=0 của v4); thư viện đối thủ 10 archetype + sweep 88 trận; lộ trình P0-P6 với gate nghiệm thu từng pha; 3 quyết định mở cho user
+- QA file: phát hiện và sửa 3 lỗi chữ do lỗi gõ (mglfw economía → có nền kinh tế; 单项 → một núm; y quy trình → y như quy trình); grep xác nhận hết CJK/Cyrillic; cấu trúc 10 chương đầy đủ
+
+Stage Summary:
+- Sản phẩm: /home/z/my-project/kaggriculture/PLAN_V5.md (214 dòng — hợp đồng triển khai v5, bản thảo chờ 3 quyết định)
+- Trả lời trung tâm cho user: v4 CÓ quan sát + định vị (100% chính xác), CÓ nhận diện nhưng chỉ 2/5 lớp, CHƯA CÓ dự đoán Bayes tương lai (opp_daily dead-read — chỉ ghi không dùng), thích ứng mới 1/5 núm (đàn) → v5 xây não 4 lớp Bayes
+- Thiết kế trụ cột: L1-L4 mỗi lớp công thức tường minh + chi phí đo được + bắt buộc consume bởi quyết định (bài học LA-2/LT-3)
+- Khuyến nghị KAIN: thứ tự P0 (nền telemetry+quick wins) → P1 (FEED make-vs-buy) → P2 (Bayes full) → P3 (Solver+forecast) → P4 (labor) → P5 (polish) → P6 (freeze); user có thể chọn "não trước" hoán đổi P1↔P2
+- Chờ user chốt 3 quyết định ở mục 10 PLAN_V5: (1) tiền trước hay não trước, (2) xác nhận chuẩn dominance 1.25x/90%/0.95x làm định nghĩa "đánh bại hoàn toàn", (3) thư viện 3 bot tổng hợp có đủ không
