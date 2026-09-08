@@ -204,3 +204,28 @@ Stage Summary:
 - Thiết kế trụ cột: L1-L4 mỗi lớp công thức tường minh + chi phí đo được + bắt buộc consume bởi quyết định (bài học LA-2/LT-3)
 - Khuyến nghị KAIN: thứ tự P0 (nền telemetry+quick wins) → P1 (FEED make-vs-buy) → P2 (Bayes full) → P3 (Solver+forecast) → P4 (labor) → P5 (polish) → P6 (freeze); user có thể chọn "não trước" hoán đổi P1↔P2
 - Chờ user chốt 3 quyết định ở mục 10 PLAN_V5: (1) tiền trước hay não trước, (2) xác nhận chuẩn dominance 1.25x/90%/0.95x làm định nghĩa "đánh bại hoàn toàn", (3) thư viện 3 bot tổng hợp có đủ không
+
+---
+Task ID: 11
+Agent: KAIN (main-agent)
+Task: Review PLAN_V5.md theo mandate mới của user (v5 = kiếm tiền xuất sắc + hệ phản thân linh hoạt: tự đánh giá hiện trạng, tự tránh kết quả tồi, tự đổi kế hoạch theo đối thủ qua Bayes) và bổ sung phần thiếu
+
+Work Log:
+- Phân tách mandate user thành 5 yêu tố, đối chiếu PLAN_V5 v1.0: kiếm tiền ✅ có; linh hoạt đổi plan theo đối thủ ⚠️ chỉ đổi tham số theo archetype (chưa có strategy switching); tự đánh giá hiện trạng ❌ thiếu hoàn toàn; tránh kết quả tồi ❌ chỉ survival mode sơ sài (LESSONS_V4 vòng 2); tìm phương án tối ưu ⚠️ rollout chưa risk-adjusted
+- Nâng PLAN_V5.md lên v2.0 (260 dòng) qua 2 loạt MultiEdit (~25 thay đổi, đã xác minh từng old_str bằng python trước khi vá do phát hiện 2 mismatch ký tự: "mỗi pha có/một gate" và Ê/Ế trong tiêu đề mục 3):
+  * Não 4 lớp → NÃO 6 LỚP: thêm 4.6 L5 Self-Assessment (sổ KPI đêm + chuẩn đối chiếu P25-P75 offline + điểm sức khỏe H 5 thành phần), 4.7 L6 Risk Guard (thư viện 10 failure mode F1-F10 kèm tín hiệu + playbook 3 cấp + điều kiện THOÁT bắt buộc + nguyên tắc minimax P25 khi entropy cao), 4.8 Meta-Controller (state machine 6 trạng thái S-GROW/HOLD/DEFEND/RECOVER/SURVIVE/LIQUIDATE, dwell 2 đêm, ma trận archetype × trạng thái gán trọn 5 núm), 4.9 Calibration (so dự báo vs thực tế → tự chỉnh λ/quantile, vòng học đóng)
+  * OODA table: +2 hàng (Tự đánh giá ❌ KHÔNG CÓ; Tránh kết quả tồi ⚠️ 1/8) — trả lời trọn mandate
+  * Dominance 5 → 6 điều kiện: D6 phản thân (phát hiện ≤ 24h, hồi phục ≤ 3 ngày); cột mốc từng pha 1.05→1.08→1.10→1.15→1.18→1.20→1.25
+  * Module map: +M-9 SA (P0), M-10 RG (P0 lõi→P1), M-11 CAL (P1), M-12 MC (P1) — 12 module với điểm cắm mã v4.py
+  * Lộ trình đảo theo mandate: P1 = NÃO 6 LỚP đầy đủ (Bayes+MC+RG 10 mode+CAL), P2 = FEED make-vs-buy; P0 thêm SA runtime + RG lõi F1/F2/F3 + gate "không kẹt trạng thái khẩn cấp quá 3 ngày"
+  * Protocol: +2 mục (3 chỉ số phản thân MAE/latency/recovery; stress-test 2 seed nghịch)
+  * Rủi ro: +3 (MC flip-flop, feedback loop calibration, phức tạp 12 module) kèm giảm nhẹ
+  * Quyết định mở: mục 1 gạch chéo đã chốt (não trước), +mục 4 mới (khẩu vị rủi ro minimax P25 vs trung bình P50)
+- QA cuối: 13/13 kiểm tra nhất quán, grep CJK/Cyrillic sạch, cấu trúc 10 chương + 9 tiểu mục 4.1-4.9
+
+Stage Summary:
+- Sản phẩm: PLAN_V5.md v2.0 (260 dòng — hợp đồng triển khai v5 hoàn chỉnh theo mandate kép)
+- Kiến trúc não v5: 6 lớp (L1-L4 hướng ngoại Bayes + L5-L6 hướng nội phản thân) + meta-controller 6 trạng thái — mọi lớp có công thức, chi phí O đo được, đầu ra consume bởi quyết định, fallback tĩnh khi não hỏng
+- Điểm neo thiết kế: dwell 2 đêm chống flip-flop; điều kiện thoát bắt buộc cho trạng thái khẩn cấp (bài học vòng 2 v4); minimax P25 khi mù; λ chặn [0.5, 0.9] chống tự bóp méo
+- 3 quyết định còn mở cho user: (2) xác nhận D1-D6 làm chuẩn "hoàn toàn", (3) thư viện 3 bot tổng hợp đủ chưa, (4) khẩu vị rủi ro minimax P25 (KAIN khuyến nghị) hay trung bình P50
+- Sẵn sàng khởi động P0-v5 khi user chốt
