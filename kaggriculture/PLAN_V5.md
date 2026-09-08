@@ -3,8 +3,8 @@
 **Tác giả:** KAIN (kỹ sư AI · kiến trúc sư hệ thống · chuyên gia thuật toán)
 **Mục tiêu tuyệt đối:** v5 đánh bại v4 một cách hoàn toàn — theo chuẩn dominance 6 điều kiện (mục 1.2), không phải "thua đôi vòng"
 **Nền tảng:** LESSONS_V4.md (27 bài học) · RESEARCH_v4.md v2.0 · p0_results.json (ledger $0 residual) · mã nguồn đầy đủ v2/v3/v4 (lợi thế white-box)
-**Phiên bản:** 2.0 — đã review + bổ sung theo mandate kép của user: *kiếm tiền xuất sắc* + *hệ phản thân linh hoạt* (tự đánh giá hiện trạng · tự nhận diện kết quả tồi để tránh · tự đổi kế hoạch theo chiến lược đối thủ quan sát được qua Bayes)
-**Trạng thái tài liệu:** hợp đồng triển khai — chờ user chốt 2 quyết định mở ở mục 10 trước khi khởi động P0
+**Phiên bản:** 2.1 — đã review + bổ sung theo mandate kép của user: *kiếm tiền xuất sắc* + *hệ phản thân linh hoạt* (tự đánh giá hiện trạng · tự nhận diện kết quả tồi để tránh · tự đổi kế hoạch theo chiến lược đối thủ quan sát được qua Bayes)
+**Trạng thái tài liệu:** hợp đồng triển khai **ĐÃ KÍ CHỐT** — 4 quyết định mở mục 10 đã được user chốt (D1–D6 · minimax · thư viện 3 bot đủ · não trước). Hạ tầng mới: **ARENA OBSERVER UI** (mục 11) để xem trận v4↔v5 từng turn 720 lượt trong quá trình phát triển.
 
 ---
 
@@ -248,12 +248,23 @@ Thứ tự đã chốt theo mandate của user (phiên bản 2.0): **não trư�
 
 ---
 
-## 10. BA QUYẾT ĐỊNH MỞ CHO USER (chốt trước khi khởi động P0)
+## 10. BA QUYẾT ĐỊNH MỞ CHO USER — ĐÃ CHỐT TOÀN BỘ (phiên bản 2.1)
 
-1. ~~Thứ tự ưu tiên~~ — **đã chốt theo mandate user (phiên bản 2.0): não trước** (P1 = Bayes 6 lớp + meta-controller; P2 = FEED).
-2. **Xác nhận chuẩn "hoàn toàn":** D1–D6 với ngưỡng 1.25×/90%/0.95× + phản thân (phát hiện ≤ 24h, hồi phục ≤ 3 ngày) — chấp nhận làm định nghĩa chính thức? *(KAIN: có — 100%/2× là đuổi quỷ ma vật lý)*
-3. **Thư viện đối thủ:** 3 bot tổng hợp (dump/hoarder/wheat-masser) có cần thêm thủ nào từ meta Kaggle thật không? *(KAIN: 3 là đủ để khởi động)*
-4. **Khẩu vị rủi ro khi mù** (entropy posterior cao hoặc H < 0.4): mặc định **minimax — phân vị bi quan P25** (an toàn, đúng mandate "hạ kết quả tồi tối thiểu") hay **trung bình P50** (lợi nhuận kỳ vọng cao hơn nhưng rủi ro biến động lớn hơn)? *(KAIN: minimax)*
+1. ~~Thứ tự ưu tiên~~ — **đã chốt theo mandate user: não trước** (P1 = Bayes 6 lớp + meta-controller; P2 = FEED).
+2. ~~Xác nhận chuẩn "hoàn toàn"~~ — **USER CHỐT "D1-D6 ok, đủ"** (phiên 2025-06): D1–D6 với ngưỡng 1.25×/90%/0.95× + phản thân (phát hiện ≤ 24h, hồi phục ≤ 3 ngày) là định nghĩa chính thức của "đánh bại v4 hoàn toàn".
+3. ~~Thư viện đối thủ~~ — **USER CHỐT "đủ"**: 3 bot tổng hợp (dump/hoarder/wheat-masser) + thư viện hiện có là đủ khởi động; bổ sung thủ từ meta Kaggle thật sau khi có dữ liệu thang đấu.
+4. ~~Khẩu vị rủi ro khi mù~~ — **USER CHỐT "minimax"**: khi entropy posterior cao hoặc H < 4/10 → mặc định phân vị bi quan P25 + ràng buộc an toàn cứng (mục 4.7). Nguyên tắc điều khiển v5: **hạ kết quả tồi xuống thấp nhất trước, tối đa hóa kỳ vọng sau**.
 
 ---
-*KAIN — hết kế hoạch phiên bản 2.0 (đã review + bổ sung theo mandate kép: kiếm tiền xuất sắc + hệ phản thân linh hoạt). File này là hợp đồng triển khai v5; mọi pha P khởi động kèm gate nghiệm thu bằng benchmark, mọi số liệu đối chiếu được với bench/ và worklog.*
+
+## 11. HẠ TẦNG ARENA OBSERVER UI — "QUAN SÁT CẢ 2 BÊN TRIỂN KHAI CHIẾN THUẬT ĐẾN CUỐI" (phiên bản 2.1)
+
+User yêu cầu xem trực tiếp trận v4↔v5 suốt 720 turn (30 ngày × 24 giờ) để rút kinh nghiệm chiến thuật thực chiến. Kiểm chứng: dữ liệu Kaggle (kaggle competitions download) cần xác thực — sandbox không có credential; và gói data chỉ chứa môi trường (đã có sẵn kaggle-environments 1.32.7) chứ **không kèm UI trận đấu** — `env.render(mode="ipython")` chỉ là widget notebook. ⇒ tự xây Arena:
+
+- **run_battle.py** (kaggriculture/arena/): bọc 2 agent bằng recorder, chạy `make("kaggriculture")`, xuất JSONL từng turn ra stdout (obs public + action 2 bên + chẩn đoán nội tâm v5) + kết quả cuối. Nguồn sự thật duy nhất vẫn là engine Kaggle thật.
+- **arena-service** (mini-services/, bun + socket.io, port 3005): nhận lệnh bắt đầu trận, spawn python3, chuyển tiếp JSONL → event socket cho UI; cho phép chạy nhiều trận nối tiếp (seed sweep).
+- **UI tại / ** (Next.js): 2 bảng farm 10×10 trực tiếp (tile cây/tuổi/thú/weed, vị trí farmer/hands), biểu đồ giá 9 mặt hàng + market inventory, timeline scrub 720 turn, event log 2 bên, bảng chẩn đoán nội tâm v5 (posterior archetype · flow dự báo · sức khỏe H · trạng thái meta-controller · failure mode) — nơi user nhìn thấy "não 6 lớp" làm việc thật.
+- **Vai trò trong quy trình:** mọi trận nghiệm thu gate P0–P6 đều chạy qua Arena; user xem v5 thay đổi chiến thuật giữa trận ở đâu và hỏi ngược "tại sao quyết định này" → nguồn câu hỏi điều chỉnh chiến thuật mới đúng tinh thần thực chiến của user.
+
+---
+*KAIN — hết kế hoạch phiên bản 2.1 (đã ký chốt 4 quyết định + hạ tầng Arena Observer). File này là hợp đồng triển khai v5; mọi pha P khởi động kèm gate nghiệm thu bằng benchmark, mọi số liệu đối chiếu được với bench/ và worklog.*

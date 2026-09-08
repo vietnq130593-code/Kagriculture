@@ -229,3 +229,65 @@ Stage Summary:
 - Điểm neo thiết kế: dwell 2 đêm chống flip-flop; điều kiện thoát bắt buộc cho trạng thái khẩn cấp (bài học vòng 2 v4); minimax P25 khi mù; λ chặn [0.5, 0.9] chống tự bóp méo
 - 3 quyết định còn mở cho user: (2) xác nhận D1-D6 làm chuẩn "hoàn toàn", (3) thư viện 3 bot tổng hợp đủ chưa, (4) khẩu vị rủi ro minimax P25 (KAIN khuyến nghị) hay trung bình P50
 - Sẵn sàng khởi động P0-v5 khi user chốt
+
+---
+Task ID: 12
+Agent: KAIN (main-agent)
+Task: Kaggle data check + chốt 3 quyết định mở của PLAN_V5 (D1-D6 / thư viện bot / khẩu vị rủi ro)
+
+Work Log:
+- Cài kaggle CLI vào venv, thử `kaggle competitions download kaggriculture` → "Authentication required" (sandbox không có kaggle.json credential); kết luận cho user: không tải được data, và gói data cuộc thi chỉ chứa môi trường (đã có sẵn kaggle-environments 1.32.7 tại chỗ) chứ không kèm UI trận đấu — env.render(mode="ipython") chỉ là widget notebook
+- Đọc lại PLAN_V5.md v2.0 (260 dòng), nâng lên v2.1: gạch chốt trọn mục 10 (2: D1-D6 "ok, đủ" là chuẩn chính thức; 3: 3 bot tổng hợp "đủ"; 4: "minimax" — phân vị bi quan P25 khi mù/H<0.4), thêm mục 11 HẠ TẦNG ARENA OBSERVER UI (run_battle.py + arena-service + UI tại /)
+
+Stage Summary:
+- PLAN_V5.md v2.1 = hợp đồng ĐÃ KÍ CHỐT toàn bộ 4 quyết định — không còn quyết định mở, P0-v5 được phép khởi động
+- Phát hiện hạ tầng: không cần data Kaggle — engine đã có local; UI tự xây sẽ thấy được cả shed 2 bên (omniscient observer) điều Kaggle không có
+
+---
+Task ID: 13-a
+Agent: KAIN (main-agent)
+Task: Python arena runner — stream JSONL từng turn cho UI quan sát
+
+Work Log:
+- Viết kaggriculture/arena/run_battle.py: load 2 agent module bằng importlib (namespace riêng — 2 bên cùng file vẫn độc lập _STATE), wrap mỗi agent bằng recorder, chạy make("kaggriculture", configuration={seed, episodeSteps}) + env.run([wrapA, wrapB])
+- Bug khó tìm: kaggle_environments bọc MỖI lần gọi agent bằng redirect_stdout(StringIO)/redirect_stderr (core.py L645-648) để thu agent logs → mọi dòng JSON emit từ trong wrapper bị NUỐT. Chẩn đoán bằng test đếm 58 calls nhưng 0 dòng output. Fix: giữ reference `_REAL_OUT = sys.stdout` ngay lúc import, ghi event qua nó
+- Định dạng event: hello (a/b/seed) → 719 turn records (farms public 2 bên + market + town + priv CẢ HAI shed + acts + diag não 2 bên + times ms) → end (rewards/winner/wallS)
+- Diag extractor: hook `_arena_diag(obs)` cho v5 (sẽ thêm), fallback generic đào `_STATE` của v4-family (mode/pm/opp_flows/herd targets/crop_plan/feed_demand)
+- Test: trận v4 vs v3 seed 101 full 720 lượt = 5.8s, 10.4MB JSONL, 719 turn records, kết quả $50.058 vs $49.609 khớp benchmark cũ; smoke 26/30 bước OK
+
+Stage Summary:
+- Sản phẩm: kaggriculture/arena/run_battle.py — nguồn sự thật duy nhất vẫn là engine Kaggle thật, stream từng turn realtime
+- Bài học xương: redirect_stdout của kaggle_environments nuốt mọi stdout từ trong agent call — phải giữ file object gốc từ import time
+- Tốc độ: 1 trận full ≈ 6s → streaming qua socket kịp thời cho UI live
+
+---
+Task ID: 13-b
+Agent: KAIN (main-agent)
+Task: Bun mini-service arena-service (socket.io port 3005) spawn Python + stream events
+
+Work Log:
+- Tạo mini-services/arena-service (bun project riêng, socket.io 4.8.3): nhận battle:start {a,b,seed} → spawn python3 -u run_battle.py → đọc stdout JSONL line-by-line → emit socket; battle:stop kill SIGKILL
+- Batching chống re-render storm: gom turn records theo lô ≤48 event hoặc 80ms → 1 event battle:turns; hello/end/log/error/status events riêng; lưu archive kaggriculture/battles/battle_<ts>.jsonl
+- Chạy service nền port 3005 (`bun --hot` auto-restart), handshake test OK
+- Bản ghi quan trọng về gateway: Caddy nghe ở port 81 (không phải 3000) — curl localhost:3000/?XTransformPort=3005 đi THẲNG vào Next.js (bỏ qua Caddy) nên tưởng "không forward"; đúng là phải qua http://localhost:81/ — frontend socket io('/?XTransformPort=3005') hoạt động chuẩn qua gateway thật (đó là đường user Preview Panel dùng)
+
+Stage Summary:
+- Sản phẩm: mini-services/arena-service/index.ts chạy nền port 3005 — bridge Python↔browser
+- Cổng event đầy đủ: arena:hello (agents+status) / battle:hello / battle:meta / battle:turns (batch) / battle:end / battle:log / battle:error / battle:status / battle:done
+
+---
+Task ID: 14
+Agent: full-stack-developer (UI) + KAIN verify
+Task: Battle Observer UI tại / — quan sát 2 agent 720 turn
+
+Work Log:
+- Subagent full-stack-developer viết 13 files: src/components/arena/{types,constants,helpers,useArena,ControlPanel,EmptyState,ResultBanner,MoneyChart,FarmBoard,MarketPanel,ActionLog,BrainPanel,RunnerLog}.tsx + page.tsx mới (subagent timeout giữa chừng nhưng đã viết xong toàn bộ code; KAIN thay phần verify)
+- Kiến trúc perf: TurnStore ngoài React (719 records ~15-20MB không qua useState); state chỉ scalars (turnCount/viewIndex); playback rAF dt-capped; live mode pin playhead theo đuôi stream; seek tự thoát live
+- Kiểm chứng agent-browser qua gateway :81 (đường user thật): kết nối socket OK → chọn v4 vs v3 seed 42 → trận chạy live 719 lượt (boards 10×10 render cây W/C/T/S/M, thú 🦢🐄🐑 + trạng thái no ♥, H1-H10 hands, shed 2 bên, market 9 mặt hàng, đường đua tiền recharts) → banner "🏆 v4 THẮNG! 1.11×, $59.778 vs $53.756, 18.1s" → pause/scrub (Home key nhảy turn 1) → responsive 390px không scroll ngang + 1280px OK → bun run lint SẠCH
+- Lưu ý nhỏ không chặn: Radix Slider văng setPointerCapture với synthetic click của agent-browser (người dùng chuột thật không gặp); recharts cảnh báo width(0) lúc mount container ẩn; seed input cần sự kiện input thật (type programmatic không kích onChange — đã xác nhận hoạt động qua native event)
+- Nhận diện gateway: test nội bộ phải mở http://localhost:81/ (qua Caddy) chứ localhost:3000 là Next.js trực tiếp sẽ mất socket
+
+Stage Summary:
+- Sản phẩm: UI quan sát trận đấu hoàn chỉnh tại / (footer sticky mt-auto, no indigo/blue, palette emerald/rose/stone)
+- Hạ tầng Arena khép kín: UI ↔ arena-service(3005) ↔ run_battle.py ↔ kaggle-environments — sẵn sàng cho mọi trận v4 vs v5
+- BrainPanel render generic mọi key diag chưa biết trước → sẽ tự hiển thị não 6 lớp của v5 khi v5 xuất hiện
