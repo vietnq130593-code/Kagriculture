@@ -315,3 +315,22 @@ Stage Summary:
 - Điểm mấu chốt kiến trúc: tín hiệu THỊ TRƯỜNG (giá/shop/px_pred) thắng tín hiệu HÀNH VI đối thủ (parity chase fail) — v4 white-box bị khai thác qua 3 kênh: quota cố định (dâu/dưa compete), điệu room reciprocity (animal floor + thứ tự mua), window đóng sớm (late_ext)
 - 20-seed: 1.063×/65% — chưa đạt gate P1 (1.08×); 7 seed thua là vấn đề portfolio cấu trúc → cần P2 FEED (mỏ tiền $8-15k) hoặc P3 Solver
 - Đường dẫn user xem: Preview Panel → chọn v5 vs v4 → start — não 6 lớp hiện trực tiếp trong BrainPanel
+
+---
+Task ID: 16
+Agent: KAIN (main-agent)
+Task: Push toàn bộ mã nguồn dự án lên kho GitHub https://github.com/vietnq130593-code/Train1 theo yêu cầu user (kèm API token)
+
+Work Log:
+- Kiểm tra trạng thái git: 17 commits trên main, working tree sạch, 185 file được track (kaggriculture v5.2 + bench + battles 181MB JSONL nén còn pack 15MB + Next.js arena UI + mini-services/arena-service)
+- Quét rò rỉ token: git grep xác nhận token không xuất hiện trong bất kỳ file nào được track
+- Kiểm tra giới hạn GitHub: không file nào >100MB (max 12MB/battle jsonl), pack tổng 15MB — an toàn
+- Repo đích Train1 đã tồn tại (public) với 1 commit tự sinh chứa LICENSE
+- Fetch remote, merge --allow-unrelated-histories để GIỮ LICENSE (merge commit 8f93ef2) thay vì force-push ghi đè
+- Push main 2f487bd..8f93ef2 thành công; xác minh qua GitHub API: HEAD remote = 8f93ef2, tree đích đủ 185 file
+- Vệ sinh: xóa token khỏi .git/config (set-url về dạng sạch), xóa ref tạm origin-check/main
+
+Stage Summary:
+- Toàn bộ dự án đã live tại https://github.com/vietnq130593-code/Train1 (branch main, HEAD 8f93ef2)
+- Chiến lược push: merge lịch sử không liên quan giữ LICENSE — không mất dữ liệu 2 phía
+- Token GitHub chỉ dùng trong URL push 1 lần rồi dọn khỏi config; không token nào nằm trong file được push
