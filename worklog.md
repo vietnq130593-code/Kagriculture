@@ -334,3 +334,26 @@ Stage Summary:
 - Toàn bộ dự án đã live tại https://github.com/vietnq130593-code/Train1 (branch main, HEAD 8f93ef2)
 - Chiến lược push: merge lịch sử không liên quan giữ LICENSE — không mất dữ liệu 2 phía
 - Token GitHub chỉ dùng trong URL push 1 lần rồi dọn khỏi config; không token nào nằm trong file được push
+
+---
+Task ID: 17
+Agent: KAIN (main-agent)
+Task: Theo lệnh user "kéo P2 theo khuyến nghị, sau đó hoàn thiện L1 archetype + Gamma-Poisson, rồi thảo luận chi tiết trước Phase 5" — triển khai P2 FEED + hoàn thiện L1 5 lớp + L2 Gamma-Poisson trong v5.py
+
+Work Log:
+- Phân tích price-curve wheat (seed 42): glut $22 d5-11 → leo $24-47 d12-29; trace txns thấy cả 2 agent "churn" 110-120u mua + 150u bán/ngày từ d26 — đọc ban đầu là máy nghiền tiền
+- Cài P2-r1 (make-vs-buy: dự báo cung 2 ngày, gate $34, cap 12u/ngày, d26+ ngừng mua) + L1 5-archetype (naive Bayes 9 kênh Poisson) + L2 Gamma-Poisson (_l2_night, E/P25/P75, MAE) → 1.016x/24-40 — TỤT so baseline 1.058x
+- Debug seed 101: posterior MIRROR 0.99 khi đấu v4 (bug scale: kernel ~0.5 × tích Poisson ~1e-10 không nhân chung được) → kiến trúc lại 2 tầng: pm-kernel v5.2 nguyên trạng + flow-softmax 4 giả thuyết τ=5 → r2 1.027x trên 4 seed
+- Full 20 seed r2: 1.016x — vẫn dưới baseline; v4 kiếm MANY hơn khi đấu v5.3-r2 (v5 ngừng mua wheat → giá rơi → cám v4 rẻ hơn)
+- r3: warmup guard (d7 + cum 50u), hysteresis 2 đêm nghiêm ngặt, trend-blend E (0.55×l2 + 0.45×2n) → 1.037x, 30/40 thắng (tỷ lệ cao nhất), nhưng đuôi xấu (101/115/118)
+- Debug seed 111/115: L2 decay-0.8 trễ xu hướng ramp (mất straw_compete d12 → mất $20k dâu) + flow-ll đọc mix wheat của v4 theo seed thành COOP/PASSIVE sai → r4 cổng cấu trúc (PASSIVE chỉ khi P>0.75 hai đêm + money_ratio < 0.45)
+- A/B cô lập P2only (baseline + đúng khối mua mới): **−0.117x/seed** trên 8 seed → KẾT LUẬN ĐẢO NGƯỢC: "churn" wheat là VŨ KHÍ zero-sum (pump giá đánh thuế feedbuy $32-41k của v4, bán self-grown đắt hơn), KHÔNG phải lãng phí — giả định P2 "mỏ tiền tiết kiệm" sai dấu
+- CHỐT v5.3: behavior-frozen (v5.2 nguyên trạng 100% — tái hiện 1.058x/27/40 chính xác từng đô la trên 5/5 seed thử + full 20 seed) + L1 posterior 2 tầng (MIRROR kernel + flow 4-giả-thuyết, warmup, hysteresis 2 đêm, PASSIVE-cấu-trúc dormant) + L2 Gamma-Poisson observer (E/P25/P75 + l2_mae 2-3) + feedbuy ledger (tm + diag "feed") — mọi coupling hành vi đã thử đều đo âm, ghi bài học r1-r4 kèm số liệu
+- PLAN_V5.md mục 13: biên bản v5.3 (bài học đảo ngược P2 → FEED WARFARE, kiến trúc observer, 4 điểm thảo luận Phase 5)
+- Full 20-seed cuối: **1.058x · 27/40 · median 1.045 · P25 1.005 · worst 0.856** — không thua baseline ở bất kỳ seed nào (tái hiện chính xác), giờ có não 5 lớp đo được đầy đủ trong Arena diag (ver v5.3, l1, l2_pred, l2_mae, feed)
+
+Stage Summary:
+- Sản phẩm: v5.py v5.3 (2,264 dòng) — P2 hoàn thiện theo nghĩa ĐÚNG (feed warfare + đo lường), L1 5-archetype đầy đủ (2 tầng an toàn), L2 Gamma-Poisson đầy đủ (predictive + quantiles + calibration MAE)
+- Bài học lớn nhất: giả định kế hoạch có thể SAI DẤU — chỉ benchmark A/B cô lập mới exposed (P2 "tiết kiệm" thực ra là tự giải giáp); benchmark v4 20-seed là byte-level chaotic: mọi coupling hành vi ±0.1-0.2x/seed, cần đóng băng hành vi tốt nhất + observer hóa não mới đo được
+- Cho Phase 5: 4 điểm thảo luận đã ghi PLAN §13.4 (pump điều kiện theo đàn v4, học profile offline, L2 activation theo l2_mae, P3 Solver)
+- Đường dẫn user xem: Arena UI (/) → chọn v5 vs v4 → BrainPanel hiển thị l1 posterior + l2_pred quantiles + feed ledger mỗi ngày

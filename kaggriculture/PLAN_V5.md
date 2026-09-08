@@ -325,3 +325,64 @@ P1 gate 1.08× chưa đạt (1.063×) — thiếu đúng phần P1 đầy đủ 
 
 ---
 *KAIN — hết kế hoạch phiên bản 2.1 (đã ký chốt 4 quyết định + hạ tầng Arena Observer). File này là hợp đồng triển khai v5; mọi pha P khởi động kèm gate nghiệm thu bằng benchmark, mọi số liệu đối chiếu được với bench/ và worklog.*
+
+## 13. BIÊN BẢN v5.3 (P2 FEED + L1 ARCHETYPE + L2 GAMMA-POISSON) — 8 Sep
+
+**Lệnh user:** "Trước tiên kéo P2 theo khuyến nghị sau đó hoàn thiện L1 archetype + Gamma-Poisson. Sau đó thảo luận chi tiết trước khi nâng cấp Phase 5."
+
+### 13.1 Phát hiện đảo ngược giả định P2 (quan trọng nhất của phiên này)
+
+Khuyến nghị mục 12 ("kéo P2 FEED +$8-15k không cần não vì 7 seed thua nhạy chi phí cám")
+đã được kiểm định A/B và **BỊ ĐẢO NGƯỢC**:
+
+- Trace seed 42: từ d26 cả 2 agent rơi vào vòng "mua 110-120u wheat/ngày rồi bán
+  150u cùng ngày" — ban đầu đọc là máy nghiền tiền (mua $45 bán $19).
+- Bản v5.3-r1 cắt hẳn mua (make-vs-buy thuần: gate $34, dự báo cung 2 ngày, d26+
+  ngừng mua) → feedbuy rơi từ ~$31k → ~$2k NHƯNG two-sided 20 seed tụt 1.058→1.016,
+  tệ nhất 0.856→0.738. Bản P2-only (cô lập) mất **−0.12x/seed** (104: 1.115→0.922,
+  106: 1.295→1.081, 111: 1.325→1.070).
+- Cơ chế thật (đã hiểu): "churn" wheat là **VŨ KHÍ zero-sum** — áp lực mua của v5
+  nâng mặt giá wheat (deficit sâu hơn), đánh thuế vào feedbuy $32-41k của v4
+  (net-buyer 1077u/mùa) và bán self-grown 500u+/mùa đắt hơn. Ngừng mua = tự giải
+  giáp + v4 được cám rẻ. Town drain hấp thụ ~35u/ngày BẤT CHẲP giá → ai bán vào
+  drain ở giá cao hơn sẽ thắng.
+- **P2 đúng nghĩa = FEED WARFARE** (giữ nguyên cơ chế mua v5.2 như một vũ khí),
+  không phải feed-thrift. Mục tiêu P2 mới cho Phase 5: đo bằng ledger feedbuy
+  "$ paid premium" của ĐỐI THỦ (thuế thu được) thay vì "tiết kiệm feedbuy của mình".
+
+### 13.2 Kiến trúc v5.3 chốt (behavior-frozen + observers)
+
+Nguyên tắc: **mọi coupling hành vi sớm đều −0.02-0.04x** trên benchmark 20 seed
+(v4 không phân biệt được các giả thuyết flow — mix wheat của v4 khác nhau theo
+seed nên flow-ll đọc nhầm CONTEST/COOP/PASSIVE). Chốt:
+
+- **Hành vi = v5.2 NGUYÊN TRẠNG** (tái hiện 1.058x/27/40 chính xác từng đô la).
+- **L1 (5 archetype)**: 2 tầng — pm twin-kernel (v5.2, kiểm chứng) + flow posterior
+  4-giả-thuyết (naive Bayes 9 kênh Poisson, softmax τ=5, forgetting 0.8, warmup
+  d7+50u, hysteresis 2 đêm nghiêm ngặt). CHỈ MIRROR (kernel) và PASSIVE-cấu-trúc
+  (P>0.75 hai đêm + tiền đối thủ <45% mình) được đổi playbook; COOP/DUMP posterior
+  tính + hiển thị (diag) nhưng không hành động — chờ validation Phase 5.
+- **L2 Gamma-Poisson**: `_l2_night` mỗi sáng — conjugate decay-0.8 (a←0.8a+x,
+  b←0.8b+1), predictive NB: E/P25/P75 + **l2_mae calibration** (M-11). Chạy như
+  OBSERVER (tm["l2_pred"]) — coupling P75 vào milk_sub đã thử, đo âm, revert.
+- **P2 đo lường**: tm["feedbuy"/"feed_units"] + diag "feed" (buy$/units/px_avg)
+  — ledger P2 cho Arena UI mỗi trận.
+- Bài học coupling đã thử và revert (4 bản r1-r4, mỗi bản benchmark đầy đủ):
+  scale-likelihood hỗn hợp kernel×Poisson (posterior MIRROR 0.99 sai khi đấu v4),
+  instant-flip hysteresis, E trend-blend 0.55/0.45, P75 subs, mua theo dự báo
+  cung — tất cả ghi trong worklog Task 17 kèm số liệu.
+
+### 13.3 Kết quả chốt
+
+20-seed two-sided (100-119, mỗi seed 2 ghế): **1.058x · 27/40 (67.5%) · median
+1.045 · P25 1.005 · worst 0.856** — đúng baseline, giờ với não 5 lớp đầy đủ
+đo được (L1 posterior + L2 quantiles + MAE 2-3 + feed ledger) trong Arena UI.
+
+### 13.4 Điểm thảo luận Phase 5 (đã định sẵn cho user)
+
+1. P2 Feed Warfare: đo thuế trên v4 (feedbuy premium) thay vì tiết kiệm — cần
+   thiết kế thí nghiệm "pump có điều kiện" theo đàn v4 (herd ≥ 12?).
+2. L1 activation: học profile offline từ thư viện bot (10 trận/bot như PLAN
+   §4.1 gốc) thay vì profile tay — rồi mới bật coupling PASSIVE/COOP/DUMP.
+3. L2 coupling: chỉ kích hoạt khi l2_mae < 1.5 (đủ tin cậy) — quy tắc tự tin.
+4. M-2 Solver (P3) vẫn là mỏ tiền thật theo đúng plan ($/action + T/2).
