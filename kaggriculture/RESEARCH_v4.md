@@ -1,17 +1,18 @@
 # NGHIÊN CỨU CHIẾN LƯỢC KAGGRICULTURE — TỪ v3 "AGROINDUSTRIAL" ĐẾN v4 ÁP ĐẢO
 
-**Phiên bản:** 1.0 · **Mục tiêu:** thiết kế v4 đánh bại v3 với tỷ lệ thu nhập ≥ 2× trong đối đầu trực tiếp
-**Nguồn:** giải phẫu `submission_v3.py` (911 dòng) + source engine `kaggle_environments 1.32.7` (1086 dòng) + benchmark thực nghiệm + đo đạc giao dịch thị trường từng đơn vị
+**Phiên bản:** 2.0 · **Mục tiêu:** thiết kế v4 đánh bại v3 với tỷ lệ thu nhập ≥ 2× trong đối đầu trực tiếp
+**Nguồn:** giải phẫu `submission_v3.py` (911 dòng) + source engine `kaggle_environments 1.32.7` (1086 dòng) + `upload/README.md` (mô tả chính thức, 373 dòng) + benchmark thực nghiệm + đo đạc giao dịch thị trường từng đơn vị
+**Errata v2.0:** đã tích hợp review KAIN (`RESEARCH_v4_REVIEW.md`) — sửa 6 lỗi L1–L6, bổ 8 thiếu sót T1–T8, hiệu chỉnh số liệu denial bằng `market_price` trực tiếp (MILK 2u · STRAW 7u · WOOL 15u · TOMATO 18u · EGG 77u · CARROT 83u)
 
 ---
 
 ## 0. TÓM TẮT ĐIỀU HÀNH
 
-v3 đã thắng v2 10/10 trận (tỷ lệ 1.34–1.46×), nhưng tự nó mang **5 điểm rò tiền cấu trúc** và bỏ trống **4 thị trường có chiều sâu xác thực được**. Nghiên cứu này chứng minh bằng số liệu rằng:
+v3 đã thắng v2 10/10 trận (tỷ lệ 1.34–1.46×), nhưng tự nó mang **7 điểm rò tiền cấu trúc** và bỏ trống **4 thị trường có chiều sâu xác thực được**. Nghiên cứu này chứng minh bằng số liệu rằng:
 
 1. **Trò chơi thực chất là một bài toán đấu giá dòng chảy (flow auction), không phải bài toán sản xuất.** Thị trường dùng chung có một "cống hút" (drain) cố định theo mặt hàng; giá = hàm của tồn kho tích lũy. Ai điều tiết dòng bán khớp đúng cống hút, người đó thu trọn phần phí khan hiếm (scarcity premium). Ai bán vượt, người đó tự phá giá của chính mình.
 2. **V3 đang "đốt" $61.7k để thu về $41k ròng** (gross $102.8k). Nửa đống chi phí đó là chi phí lao động + tự trồng cám mà một bộ lập kế hoạch tốt hơn có thể cắt 30–40%.
-3. **Chi phí phá giá (denial cost) bất đối xứng cực đoan:** sập giá MILK chỉ tốn ~3 đơn vị thừa, WOOL ~16u, STRAW ~8u, trong khi sập WHEAT cần 2.421u (bất khả thi). Điều này tạo ra một vũ khí rẻ tiền để tước dòng thu $29k/năm của v3 từ sữa + lông cừu.
+3. **Chi phí phá giá (denial cost) bất đối xứng cực đoan:** sập giá MILK chỉ tốn ~2 đơn vị thừa, WOOL ~15u, STRAW ~7u, trong khi sập WHEAT cần 2.421u (bất khả thi). Điều này tạo ra một vũ khí rẻ tiền để tước dòng thu $29k/năm của v3 từ sữa + lông cừu.
 4. **V3 có van tự cứu (pressure valves) làm giảm hiệu quả denial đơn thuần** — bậc thang ngưỡng bán 0.98 → 0.72 → 0.65 → 0.45 → 0.004. V4 phải tấn công bằng **ghim ngưỡng (threshold pinning)** thay vì dump một lần.
 5. **Đòn kết liễu để đạt 2× không phải là denial, mà là "chiếm chỗ rồi khai thác":** chính công thức thích ứng của v3 (`milk_room = absorb − 30×opp_cows − 40`) khiến v3 **tự rút lui** khỏi thị trường khi v4 có đàn đủ lớn. V4 chiếm milk/wool/egg/straw bằng cách tồn tại, rồi khai thác trọn cống hút với hiệu suất lao động cao hơn.
 
@@ -24,6 +25,7 @@ v3 đã thắng v2 10/10 trận (tỷ lệ 1.34–1.46×), nhưng tự nó mang 
 | Nguồn | Cách khai thác |
 |---|---|
 | Source engine `kaggriculture.py` | Đọc từng dòng: công thức giá, lockstep, drain, refresh hàng ngày, decay, hire fib, end-of-day |
+| `upload/README.md` (mô tả chính thức) | Đối chiếu chéo 15 khẳng định nền móng (15/15 khớp) → phát hiện 6 lỗi + 8 thiếu (RESEARCH_v4_REVIEW.md) |
 | `submission_v3.py` / `v3.py` | Giải phẫu 27 vòng phẫu thuật/tuning, phát hiện dead code & quota cứng theo ngày |
 | `bench/diag.py` (instrument `_commit_unit`) | Log mọi giao dịch SELL của cả 2 bên → sales mix, giá trung bình từng mặt hàng |
 | Trận đo mới (v3 vs v2) | v3 net $41.081, gross $102.815; v2 net $34.286, gross $49.732 — tỷ lệ 1.20 seed này |
@@ -34,25 +36,25 @@ v3 đã thắng v2 10/10 trận (tỷ lệ 1.34–1.46×), nhưng tự nó mang 
 
 ---
 
-## 2. "VẬT LÝ" TRÒ CHƠI — 15 LUẬT ĐÃ KIỂM CHỨNG TỪ SOURCE
+## 2. "VẬT LÝ" TRÒ CHƠI — 17 LUẬT ĐÃ KIỂM CHỨNG TỪ SOURCE + README CHÍNH THỨC
 
 Đây là nền tảng bất biến mà cả v3, v4 và mọi đối thủ trên ladder đều chịu chi phối.
 
 ### 2.1 Kinh tế cơ bản
 1. **Tiền khởi đầu $3.000**, bàn 10×10 (góc NW), mở đất theo `LAND_ORDER = [NE, SW, SE]` giá `[$1000, $2000, $4000]` → tối đa 4 quadrant.
-2. **720 step = 29 ngày × 24 giờ.** Game kết thúc tại step 718 (ngày 29, giờ 22). **Không có auto-drop ngày cuối** — hàng tồn trên người vào ngày 29 là rác. Reward = money.
+2. **720 step = 30 ngày × 24 giờ (ngày 0–29).** Game kết thúc tại step 718 (ngày 29, giờ 22) — ngày cuối chỉ có 23 giờ. End-of-day refresh **cuối cùng** chạy vào cuối ngày 28 → **ngày 29 không có refresh**: không sản xuất mới, không sinh weed, không auto-drop — là 23 giờ thu hoạch/bán thuần túy, và **deadline thanh lý thực = giờ 22 ngày 29** (rộng hơn giả định "26–28" của v3). Hàng còn trên người units vào cuối ngày 29 là rác. Reward = money.
 3. **Lao động là dịch vụ thuê NGÀY:** cuối mỗi ngày `hands = []`, `hires_today = 0`, farmer về spawn. Chi phí thuê người thứ k trong ngày = `fib(k)` (1,1,2,3,5,8,13,21,34,55,89,144,233,377). **Thuê 12 người/ngày = $376/ngày ≈ $10.9k/mùa.**
 4. Mỗi unit có **24 action/ngày**, di chuyển chiếm 1 action. Thực đo v2: MOVE chiếm 80–90% lượt → hành động hiệu dụng chỉ ~2.4–4.8/unit/ngày nếu không tối ưu.
 
 ### 2.2 Sinh học cây trồng & vật nuôi
-5. **Cây chết khi 2 ngày liên tiếp không tưới** (ngày trồng đã tính là 1 ngày không tưới → phải tưới ngay hoặc chậm nhất là ngày hôm sau). Cây chết biến thành WEED, phải DIG.
+5. **Cây chết khi 2 ngày liên tiếp không tưới — và cây MỚI TRỒNG KHÔNG có thời gian nới (L1, critical):** hạt trồng ngày D sinh ra với `consecutive_unwatered = 1`; nếu không tưới ngay trong chính ngày D, nó đạt 2 lúc end-of-day refresh và **chết ngay đêm D, trước khi kịp lớn** (README L113: "There is no grace period for fresh plantings"). Quy tắc tưới cách nhật (parity) chỉ áp dụng TỪ ngày hôm sau trở đi, sau khi ngày trồng đã được tưới. → WATER cây vừa PLANT phải là tier 0 (cùng mức cứu đói thú), gộp vào cùng turn với quyết định PLANT — đây chính là dạng "cây chết dây chuyền" mà v1 đã trả giá. Cây chết biến thành WEED, phải DIG.
 6. **Cửa sổ năng suất** (cây một lần: `[⌈(max_yield_day+1)/2⌉, max_yield_day]`): mỗi lần TƯỚI trong cửa sổ +1 yield, **+2 nếu bón phân** — nhưng **bị chặn trên bởi `max_yield`**:
    - WHEAT: 4 (không phân) → 6 (có phân) — phân cho +$78/plant
    - CARROT: 3 → 4 — phân cho +$28/plant
-   - MELON: 6 → 6 — **phân KHÔNG tăng yield**, chỉ rút ngắn thời gian đạt cap (cycle 13 ngày → ~9–10 ngày = +35% sản lượng/tile/mùa)
+   - MELON: 6 → 6 — **phân KHÔNG tăng yield**, chỉ rút thời gian đạt cap (L6): không phân chạm cap 6 ở age 10, có phân ở age 8 (README L27) → cycle ~10,5 → ~8,5 ngày ≈ **+24% sản lượng/tile/mùa** (không phải +35%; CYCLE_LEN = 13 của v3 là hằng số quy hoạch có slack, không phải cycle vật lý)
    - TOMATO/STRAW (ongoing): yield tích lũy +1/ngày sản xuất (+2 nếu tưới + phân ngày đó), cap 4
 7. **Fertilize có hiệu lực 3 ngày** (`fertilized_until_day = day + 2`).
-8. **Vật nuôi:** đói 2 ngày liên tiếp → **bỏ trốn** (mất con, giữ chuồng). Sản xuất theo interval; CARE (+1 pending bonus, chỉ ăn khi ngày sản xuất được FEED). Thực đo: COW 36 sữa (feed+care) vs 12 (không care); GOOSE 56 trứng vs 27. **`max_held` chặn sản xuất nếu không thu hoạch** (goose 4, cow/sheep 6).
+8. **Vật nuôi:** đói 2 ngày liên tiếp → **bỏ trốn** (mất con, giữ chuồng). Con vật MỚI ĐẶT sinh ra với `consecutive_unfed = 0` (T6, README L115) → sống sót ngày đầu không cần feed → **tối ưu đặt thú cuối ngày** (tiết kiệm 1 feed/con), lịch feed tính từ hôm sau. Sản xuất theo interval; CARE (+1 pending bonus, chỉ ăn khi ngày sản xuất được FEED). Thực đo: COW 36 sữa (feed+care) vs 12 (không care); GOOSE 56 trứng vs 27. **`max_held` chặn sản xuất nếu không thu hoạch** (goose 4, cow/sheep 6) — bò đầy stall = sản xuất tự throttle → **`max_held` là kho chứa miễn phí** (10 bò × 6 = 60u + shed 100).
 9. **Mỗi con vật nhả 1 FERTILIZER/ngày miễn phí** (`fertilizer_available = True` trong `_daily_refresh_animals`), thu bằng COLLECT_FERTILIZER.
 10. **Ongoing crop (tomato/straw) chết sau lần sản xuất cuối** (`max_lifespan_step` được set), decay −1 yield mỗi 2 step. Không có cây vĩnh cửu.
 
@@ -64,9 +66,11 @@ v3 đã thắng v2 10/10 trận (tỷ lệ 1.34–1.46×), nhưng tự nó mang 
     ```
     **Bán 1 unit tăng tồn kho 1** → đơn vị kế tiếp bán rẻ hơn. **Mua chỉ cho phép WHEAT & FERTILIZER**, quote tại giá tồn kho sau mua (round-trip trung tính).
 12. **Thị trường là tài nguyên DÙNG CHUNG 2 người chơi** — tồn kho là biến đếm cộng đồng.
-13. **Per-unit lockstep:** mỗi step, order của 2 người thực thi so le từng đơn vị. Ai đặt order trước trong step đó được报价 trước (lợi thế người đi trước). Giá $1 không tăng tồn kho.
+13. **Per-unit lockstep:** mỗi step, order của 2 người thực thi so le từng đơn vị. Ai đặt order trước trong step đó được báo giá trước (lợi thế người đi trước). Giá $1 không tăng tồn kho.
 14. **Cống hút của thị trấn (drain):** mỗi 4 step, mỗi shop instance hút 1u/mặt hàng (shop 1 mặt hàng hút ×2: YARN chỉ WOOL ×2, PET_CAFE chỉ CARROT ×2); mỗi 24 step town center hút 1u của mọi mặt hàng trừ FERTILIZER. **Shop mở 1 cái mỗi 3 ngày, tối đa 8 instance, bốc ngẫu nhiên có hoàn lại** (RNG seed × 1.000.003 ^ day).
 15. **Shed 100 slot (overflow bị HỦY cuối ngày), tối đa 10 order/step, mua động vật cần chỗ shed.**
+16. **PLANT atomicity (T4 — bug câm lặng):** nếu tổng lượt PLANT một crop trong một turn vượt số hạt đang có → **TẤT CẢ** plant của crop đó trong turn bị drop thành PASS (README L56–58, interpreter dòng 920–933). v4 phải kiểm tổng request trên toàn bộ unit trước khi phát lệnh — vi phạm = mất nguyên turn trồng mà không một lỗi nào được báo.
+17. **Weed spawn ngẫu nhiên 0.005/ô trống/ngày** (T7, `weedSpawnChance`) — ở 60–100 ô trống ≈ 0,3–0,5 weed/ngày: chi phí DIG đều đặn nhỏ; giá trị DIG = giữ ô trống không bị chiếm.
 
 ---
 
@@ -109,16 +113,16 @@ v3 đã thắng v2 10/10 trận (tỷ lệ 1.34–1.46×), nhưng tự nó mang 
 
 ### 3.3 Chi phí phá giá (denial cost) — bảng vũ khí
 
-Số đơn vị phải đẩy tồn kho TRÊN I0 để giá tụt xuống dưới ngưỡng:
+Số đơn vị phải đẩy tồn kho TRÊN I0 để giá tụt xuống dưới ngưỡng (v2.0 — kiểm chứng lại trực tiếp bằng `market_price(item, I0+k)`, bảng cũ chênh 1u ở 5 vị trí do rounding):
 
-| Mục tiêu phá | Ngưỡng đối thủ | Cần dumphàng | Doanh thu dump | Giá TB khi dump | Đánh giá |
+| Mục tiêu phá | Ngưỡng đối thủ | Cần dump hàng | Doanh thu dump | Giá TB khi dump | Đánh giá |
 |---|---|---|---|---|---|
-| MILK < 0.98×base ($156.8) | v3 HOLD 0.98 | **3u** | ~$480 | $159 | **Rẻ nhất trò chơi** |
-| STRAWBERRY < 0.90×base ($108) | v3 HOLD 0.90 | **8u** | ~$900 | $114 | Rẻ |
-| WOOL < 0.94×base ($188) | v3 HOLD 0.94 | **16u** | ~$3.000 | $196 | Rẻ |
-| TOMATO < 0.82×base ($49) | v3 HOLD 0.82 | **19u** | ~$1.000 | $53 | Rẻ (nhưng v3 đã bỏ trống) |
-| EGG < 0.86×base ($43) | v3 HOLD 0.86 | 78u | ~$3.400 | $44 | Vừa |
-| CARROT < 0.70×base ($24.5) | v3 HOLD 0.70 | 84u | ~$2.300 | $28 | Vừa |
+| MILK < 0.98×base ($156.8) | v3 HOLD 0.98 | **2u** | ~$320 | $157 | **Rẻ nhất trò chơi** |
+| STRAWBERRY < 0.90×base ($108) | v3 HOLD 0.90 | **7u** | ~$810 | $110 | Rẻ |
+| WOOL < 0.94×base ($188) | v3 HOLD 0.94 | **15u** | ~$2.900 | $190 | Rẻ |
+| TOMATO < 0.82×base ($49) | v3 HOLD 0.82 | **18u** | ~$950 | $50 | Rẻ (nhưng v3 đã bỏ trống) |
+| EGG < 0.86×base ($43) | v3 HOLD 0.86 | 77u | ~$3.300 | $43 | Vừa |
+| CARROT < 0.70×base ($24.5) | v3 HOLD 0.70 | 83u | ~$2.250 | $27 | Vừa |
 | MELON < 0.52×base ($130) | v3 HOLD 0.52 | **110u** | ~$23.100 | $210 | Đắt nhưng **tự hoàn vốn** (v3 vẫn kiếm $11k melon) |
 | WHEAT < 0.76×base ($19) | v3 HOLD 0.76 | **2.421u** | — | — | **BẤT KHẢ THI** — wheat là tiền điện tử ổn định |
 
@@ -200,7 +204,7 @@ Herd ramp chậm + vài ngày bỏ collect → mất ~114u × ~$70 = **$8k/năm*
 Hire quyết theo `money ≥ 1800` và workload thô. Không ai hỏi: *"fib(12) = $144/ngày — người thứ 12 này tạo ra ≥ $144 giá trị hôm nay không?"* Tác vụ của người lao động có giá trị trải từ $242 (thu sữa) đến $10 (tưới lúa ngoài parity). Thiếu bảng xếp hạng $/action → vừa thuê thừa ở ngày nghèo, vừa thiếu tay ở ngày cao điểm thu hoạch.
 
 ### Rò #6 — Không đo được dòng bán của đối thủ (mù thông tin thị trường)
-v3 nhìn **bàn cờ** của đối thủ (đàn thú đang đứng, cây đang trồng) nhưng không nhìn **dòng giao dịch**. Trong khi đó, tồn kho thị trường là public và biến mỗi step: `Δinv = my_sales + opp_sales − drain`. v3 biết chính xác my_sales (order mình đặt) và drain (shops public + công thức) → **dòng bán của đối thủ là đại số sơ cấp, đo được từng giờ, từng mặt hàng.** Đây là sóng ngầm thông tin lớn nhất mà v3 chưa đụng tới.
+v3 nhìn **bàn cờ** của đối thủ (đàn thú đang đứng, cây đang trồng) nhưng không nhìn **dòng giao dịch**. Trong khi đó, tồn kho thị trường là public và biến mỗi step: `Δinv = my_sales + opp_sales − drain`. v3 biết chính xác my_sales (order mình đặt) và drain (shops public + công thức) → **dòng bán của đối thủ là đại số sơ cấp, đo được từng giờ, từng mặt hàng** (chính xác 7/9 mặt hàng; WHEAT/FERT chỉ net-flow vì BUY_PRODUCT của đối thủ cũng trừ tồn kho — chi tiết 8.1). Đây là sóng ngầm thông tin lớn nhất mà v3 chưa đụng tới. Thêm 2 kênh công khai miễn phí (T3): `money` + `hires_today` của đối thủ nằm trong `farms[]` public.
 
 ### Rò #7 — Mô hình 0.85×opp_pipeline tuyến tính hóa đối thủ
 Trừ 0.85 lần pipeline đối thủ trong `room()` cho mọi mặt hàng — nhưng MILK của đối thủ (7 bò × 36 = 252u) với drain 324u thì phần lớn KHÔNG thể bán được ở premium; phần "room thật" nhỏ hơn nhiều. Ngược lại EGG của đối thủ gần như không chiếm chỗ của ai. Hệ số 0.85 đồng nhất = sai ở cả 2 đầu.
@@ -225,21 +229,29 @@ Tổng premium có thể thu = Σ_p [ drain_p × giá_TB(scenario) ]
 
 ### 6.2 Bậc thang nhún nhường của v3 = điểm yếu khai thác được
 
-Công thức đàn thú của v3 (dòng 306–308):
+Công thức đàn thú của v3 (dòng 306–311, đọc lại nguyên văn — L5 critical):
 ```python
-milk_room = absorb − 30×opp_COW − 40      # v3 TỰ RÚT khi đối thủ nhiều bò
+milk_room = absorb − 30×opp_COW − 40
 wool_room = absorb − 28×opp_SHEEP − 20
 egg_room  = absorb − 46×opp_GOOSE − 20
+cow_target   = max(0, min(7, int(milk_room // 30)))   # floor 0
+goose_target = max(4 if day <= 9 else 3, min(5, ...))  # floor 3–4
+sheep_target = max(5, min(6, int(wool_room // 30)))   # FLOOR 5 tuyệt đối
 ```
-→ **v3 đầu hàng thị trường theo số lượng đàn đối thủ, không theo dòng bán thực**. Một đối thủ phô trương 8 con bò (dù cho ăn kém, chỉ bán được ít) đủ khiến v3 đặt `cow_target = 0`. Với drain milk 324u/mùa, 8 bò v4 = 240u "phòng ngừa" trên bàn cờ của v3 — **v4 chiếm milk bằng cách tồn tại, không cần bắn một viên đạn nào.** Đây chính là đòn "chiếm chỗ" (presence warfare) — rẻ hơn denial và không thể chống bởi logic hiện tại của v3.
+→ **v3 đầu hàng thị trường theo số lượng đàn đối thủ, không theo dòng bán thực — nhưng CHỈ BÒ có thể bị "presence" về 0** (floor 0). Cừu không bao giờ dưới 5 con; ngỗng không dưới 3–4. Hệ quả cho thiết kế v4:
+
+- **MILK là chiến trường presence thật:** cần `30×bò_v4 ≥ absorb(day) − 40`; ngày 5–6 absorb(MILK) ≈ 290 → **8 bò đủ zero `cow_target` của v3 ngay từ ngày 5–6** (v3 mua bò trong khung ngày 5–16 — đúng khung bị triệt). 9–10 bò chỉ cần nếu muốn zero từ ngày 0–2 (không cần thiết, đắt tiền vô ích).
+- **WOOL là thị trường HỢP TÁC, không phải chiến trường (C2):** 7–8 cừu v4 + floor 5 cừu v3 ≈ 12 con × ~25–35u ≈ 300–420u > drain 226 → giá $1 cho CẢ HAI — tự sát kép. Tối ưu v4 = **2–3 cừu**, chia drain với 5 cừu cố hữu của v3, giá giữ $180–220, cả hai cùng sống.
+- **EGG vô nghĩa để deny** (thị trường log-sâu) nhưng cũng vô hại — ngỗng scale thoải mái.
+- Một đối thủ phô trương 8 con bò (dù cho ăn kém) vẫn đủ khiến v3 tự đặt `cow_target = 0` — **v4 chiếm milk bằng cách tồn tại, không cần bắn một viên đạn nào.** Đây là đòn "chiếm chỗ" (presence warfare) — rẻ hơn denial và không thể chống bởi logic hiện tại của v3.
 
 ### 6.3 Phân tích cân bằng v4-vs-v3 theo từng mặt hàng
 
 | Mặt hàng | Kịch bản v4 tối ưu | Kết quả cho v3 | Kết quả cho v4 |
 |---|---|---|---|
-| MILK (drain 324) | Chạy 8–9 bò, bán đúng nhịp drain ở ngưỡng 1.3–1.5×base | `cow_target→0`, mất $15.8k, đàn sữa sập | ~$60–80k gross nguyên liệu… thực tế ~280u × ~$220 = $60k? *(xem 7.1 — bị chặn bởi sản lượng thật)* |
-| WOOL (drain 226) | 7–8 cừu | mất $13.7k | ~180u × $210 ≈ $38k cap |
-| EGG (drain ∞) | 9–10 ngỗng, bán tự do $45–55 | giữ mảng $8k (market đủ sâu) | ~500u × $48 ≈ $24k |
+| MILK (drain 324, T 122) | **Ramp sớm 8–10 bò ngày 5–9** + presence; **stockpile + drip**: bán ngưỡng 1.2–1.4×base, tích trên con (max_held 6×10 = 60u) và shed | `cow_target→0` từ ngày ~6, mất dòng $15.8k | ~330u × $180–220 ≈ **$30–50k** (bị chặn bởi ramp + ràng buộc tồn kho premium — 6.5; không phải $60k như bảng cũ) |
+| WOOL (drain 226, T 105) | **HỢP TÁC: 2–3 cừu** (floor 5 của v3 là cố hữu — cừu v4 > 3 = tự sát kép, X1) | giữ ~175u ở giá cao | ~100u × $190–210 ≈ $19–21k |
+| EGG (drain ∞, log-flat) | 9–10 ngỗng, bán tự do $45–55 | giữ mảng $8k (market đủ sâu) | ~500u × $48 ≈ $24k |
 | STRAW (drain 422) | 30–40 ô, bán nhịp 2.2/ngày | v3 vốn đã nhường | ~350u × $180–240 ≈ $70k?? *(bị chặn labor — 7.1)* |
 | MELON | Denial như v3 (110u dump hoàn vốn) | giữ ~$11k | ~$11k |
 | WHEAT | Vùng an toàn vô hạn, tự cân đối cám + bán muộn vào khan hiếm | giữ ~$30k (không thể deny) | +$5–10k từ timing |
@@ -249,9 +261,17 @@ egg_room  = absorb − 46×opp_GOOSE − 20
 
 ### 6.4 Ba chế độ đối đầu (dùng cho benchmark v4)
 
-1. **Chế độ cõm nhau (coop):** đối thủ không chạm thị trường động vật → v4 chạy full portfolio, target gross $110k+.
-2. **Chế độ chia sẻ (mirror / self-play):** cả hai cùng portfolio → v4 phải đối xứng ổn định (mỗi bên tự khớp nửa drain; không được dump phá giá phản chủ). Đây chính là Validation Episode của Kaggle — **điều kiện sống còn là self-play không tự hủy.**
+1. **Chế độ cõng nhau (coop):** đối thủ không chạm thị trường động vật → v4 chạy full portfolio, target gross $110k+.
+2. **Chế độ chia sẻ (mirror / self-play):** cả hai cùng portfolio → v4 phải đối xứng ổn định (mỗi bên tự khớp nửa drain; không được dump phá giá phản chủ). Đây chính là Validation Episode của Kaggle — **điều kiện sống còn là self-play không tự hủy.** ⚠ **BẪY T8 (thiếu sót nghiêm trọng nhất của errata — hủy diệt tương hỗ):** nếu presence-warfare bị hardcode dạng "9–10 bò để zero đàn đối thủ", hai v4 trong mirror sẽ CÙNG zero đàn bò của chính mình → cả hai mất hoàn toàn dòng milk — cân bằng tồi tệ nhất có thể, tự đào hố ngay vòng validation. Module A bắt buộc có **quy tắc mirror**: khi net-flow đối thủ tương quan ≈ 1 với của mình qua 2–3 ngày (hoặc cấu trúc đối thủ đối xứng hoàn toàn) → chuyển chế độ chia drain, giữ floor đàn tối thiểu theo drain-share. Kiểm định bằng 10 trận mirror v3-vs-v3 ở P0.
 3. **Chế độ đấu súng (vs v3):** v4 chiếm chỗ + ghim ngưỡng; v3 tự rút về wheat-only mode. Mục tiêu 2× nằm ở chế độ này.
+
+### 6.5 Định lý kích thước thị trường — quy tắc T/2 (T1, heuristic mạnh nhất của README)
+
+README L220 định nghĩa T của mỗi mặt hàng: *"T is the production capacity of a single 5×5 field over a 24-day window at optimal watering, no fertilizer"* (tổng vật nuôi được trừ trước 30% chi phí cám + 1 ngày build chuồng). Cửa sổ 24 ngày là **chân trời hiệu chuẩn**, cố ý ngắn hơn mùa 30 ngày vì ngày đầu setup-heavy, ít năng suất.
+
+Đây là lời giải thích thống nhất cho mọi "thị trường mỏng premium" mô tả rải rác ở mục 3: premium sập nhanh vì T nhỏ (MILK 122 · WOOL 105 · STRAW 100 · TOMATO 200 · EGG 332 · WHEAT 400 · CARROT 450 · MELON 300) trong khi tổng công suất tối đa một trận ≈ 2 người × 4 quadrant × (29/24) ≈ **9–10× T**.
+
+**QUY TẮC THIẾT KẾ CỨNG cho Portfolio Solver (Module B): khi có đối thủ cùng tranh mặt hàng, tổng cung BÊN MÌNH lên kế hoạch cho mặt hàng đó không vượt ~T/2** (milk ≤ 60 · wool ≤ 52 · straw ≤ 50 · melon ≤ 150 · wheat ≤ 200 …). Vượt T/2 = tự đẩy cả hai ra khỏi vùng giá "được hiệu chỉnh" về phía floor. Quy tắc buộc chặt ở nhóm premium (`above_target ≥ 1.6`: milk/wool/straw/melon); nhóm log-flat (EGG/WHEAT/FERT, `above_target 0.2`) chịu được việc vượt. **LƯU Ý:** khi đối thủ KHÔNG chạm mặt hàng (v3 nhường straw/tomato), ràng buộc nới về "khớp drain" (422u/226u) thay vì T/2.
 
 ---
 
@@ -278,7 +298,7 @@ Một unit = 24 action. Với hire fib, **người thuê thứ 9–12 tốn $55�
 Sản lượng tối đa theo lao động (ước lượng thận trọng, MOVE chiếm 60% sau zoning):
 - 1 công nhân/ngày ≈ 9–12 action hiệu dụng ≈ đủ CARE+FEED 3–4 bò/cừu HOẶC thu hoạch 10–12 melon HOẶC 2.5 cycle lúa.
 
-→ **Farma tối ưu không phải "cày hết bàn 20×20" mà là選 mix có $/action cao nhất trước khi rơi về biên $8–10.** v3 dừng ở ~12 người + 16 thú + ~100 cây: biên của nó đã thấp. v4 cần zoning để đẩy đường biên này ra xa.
+→ **Nông trại tối ưu không phải "cày hết 100 ô" (bàn 10×10 = 4 quadrant 5×5 — L3 sửa từ "20×20" sai) mà là chọn mix có $/action cao nhất trước khi rơi về biên $8–10.** v3 dừng ở ~12 người + 16 thú + ~100 cây: biên của nó đã thấp. v4 cần zoning để đẩy đường biên này ra xa.
 
 ### 7.2 TOMATO — thị trường trống có kiểm chứng (khoảng $3–6k)
 
@@ -313,36 +333,46 @@ Log-flat: 8.124u mới hạ giá xuống 70% base. Kinh tế ngỗng: $300 + ~$7
 ┌────────────────────────────────────────────────────────────────┐
 │  MODULE A: WORLD MODEL (telemetry thị trường + đối thủ)        │
 │    • tracker: inv[p] mỗi step (public)                        │
-│    • đo dòng bán đối thủ: opp_sales[p] = Δinv + drain − my_sales│
+│    • đo dòng đối thủ: opp_net[p] = Δinv + drain − my_sales    │
+│      + my_buys (7/9 mặt hàng chính xác; WHEAT/FERT net-flow)  │
+│    • telemetry money + hires_today đối thủ (public, T3)       │
 │    • phát hiện dump-attack trong 1 step (glut arrival)        │
-│    • phân loại chế độ đối đầu: coop / mirror / contest        │
+│    • phân loại chế độ: coop / mirror / contest                │
+│    • QUY TẮC MIRROR (T8): net-flow tương quan ≈1 qua 2–3 ngày  │
+│      → chia drain, floor đàn theo drain-share — chống hủy    │
+│      diệt tương hỗ trong Validation Episode                   │
 ├────────────────────────────────────────────────────────────────┤
 │  MODULE B: PORTFOLIO SOLVER (thay quota cứng của v3)           │
 │    • input: room[p] = drain_remaining[p] − opp_flow_measured[p]│
 │    • bảng $/action + $/tile-day cho mọi mặt hàng (mục 7)      │
 │    • output: allocation (cây theo loại, đàn theo loại) hằng ngày│
 │    • ràng buộc: tiền mặt ≥ floor động, shed ≤ 100, labor budget│
+│    • ràng buộc cứng T/2 khi đối thủ cùng mặt hàng (mục 6.5)   │
 ├────────────────────────────────────────────────────────────────┤
 │  MODULE C: LABOR LEDGER + ZONING                               │
 │    • layout: wheat-belt cạnh shed (cycle nhanh, đi lại ngắn), │
-│      melon/tomato/straw theo cụm quadrant xa (c cycle dài),   │
+│      melon/tomato/straw theo cụm quadrant xa (cycle dài),    │
 │      COOP/PASTURE dải giữa                                     │
 │    • batch: 1 chuyến = N action liên tiếp cùng loại trong cụm │
 │    • hire: điều kiện fib(k) ≤ marg_value(action kế tiếp)       │
+│    • hire #1 mỗi ngày spawn ô LOCKED (5,4) — tính chi phí     │
+│      di chuyển về đất mở khi phân công đầu ngày (T5)          │
 │    • mục tiêu: MOVE từ 80–90% → ≤ 55%                          │
 ├────────────────────────────────────────────────────────────────┤
 │  MODULE D: MARKET OPS (bán + ghim + thanh lý)                  │
 │    • flow-matching: bán khớp drain, chia đều với đối thủ đo được│
 │    • threshold ladder riêng theo chế độ (coop: cao; mirror: chia)│
 │    • pin engine: giữ giá đối thủ dưới ngưỡng của chúng (nếu contest)│
-│    • liquidation: schedule dump tối ưu ngày 26–29 (tính đạo hàm │
-│      giá từng unit — bán mặt hàng sụp nhanh trước, chậm sau)   │
+│    • liquidation: DP thanh lý theo đạo hàm giá từng unit,      │
+│      chạy đến 22:00 ngày 29 (23 giờ không refresh — T2)      │
 ├────────────────────────────────────────────────────────────────┤
 │  MODULE E: PRESENCE WARFARE (đòn 2× vs v3)                     │
-│    • đàn "cờ": 8 bò + 7 cừu hiện diện từ sớm → v3 tự rút      │
+│    • đàn "cờ": 8–10 bò ramp ngày 5–9 → v3 tự zero cow_target │
+│    • cừu 2–3 con HỢP TÁC (floor 5 của v3 — X1: cừu >3 là tự   │
+│      sát kép wool); ngỗng thoải mái (thị trường log-sâu)      │
 │    • melon denial chuẩn 110u (hoàn vốn $23k)                   │
 │    • KHÔNG denial milk/wool bằng dump (đắt, dễ bị van áp v3)   │
-│      — thay bằng chiếm dòng drain + bán premium               │
+│      — thay bằng ramp sớm + stockpile + drip premium (C1)     │
 ├────────────────────────────────────────────────────────────────┤
 │  MODULE F: SAFETY & VALIDATION (điều kiện sống)                │
 │    • try/except toàn cục như v3, PASS an toàn                  │
@@ -353,20 +383,28 @@ Log-flat: 8.124u mới hạ giá xuống 70% base. Kinh tế ngỗng: $300 + ~$7
 
 ### 8.1 Vì sao Module A là "đòn tiên phong"
 
-Thông tin v3 không có = lợi thế thông tin v4. Thông tin này **miễn phí, chính xác tuyệt đối, cập nhật mỗi giờ**:
+Thông tin v3 không có = lợi thế thông tin v4. Thông tin này **miễn phí, cập nhật mỗi giờ** — chính xác tuyệt đối cho 7/9 mặt hàng (L4):
 
 ```python
 # pseudo — đại số 3 biến thành 1 ẩn duy nhất
 delta_inv[p]     = inv_now[p] − inv_prev[p]        # public
 drain_expected[p]= shop_vector[today] / 4 + center # public + công thức
-my_sales[p]      = chính xác từ order của mình
-opp_sales[p]     = delta_inv[p] + drain_expected[p] − my_sales[p]
+my_sales[p]      = chính xác từ order của mình (riêng các unit chạm sàn $1)
+my_buys[p]       = chính xác từ order của mình (WHEAT/FERT)
+opp_net[p]       = delta_inv[p] + drain_expected[p] − my_sales[p] + my_buys[p]
 ```
+
+**3 ranh giới của phép đo (L4):**
+- **WHEAT/FERTILIZER: chỉ đo được net-flow (sells − buys)** của đối thủ — BUY_PRODUCT của đối thủ cũng trừ tồn kho, không tách nổi chiều nào. May thay net-flow chính là đại lượng cần cho capacity planning (đối thủ mua = làm khan hiếm → có lợi cho giá của mình).
+- **Bán ở sàn $1 không tăng tồn kho** → dump-attack chạm sàn bị "tàng hình" trong Δinv → underestimate khi đối thủ dump. Xử lý: nhận diện qua signature giá rơi thẳng $1 rồi bật lại.
+- 7 mặt hàng còn lại: **đo chính xác tuyệt đối từng giờ** (tồn kho integer, drain tính được từ shops public + step).
+
+**2 kênh telemetry công khai miễn phí (T3):** `money` và `hires_today` nằm trong `farms[]` public (README L291–301) → theo dõi chính xác từng đồng tiền mặt + số hire của đối thủ mỗi giờ. Kết hợp fib công bố → biết trước ngày đối thủ không đủ tiền hire > 8 người → tranh mua drain đi trước ngày đó (K2).
 
 Ứng dụng:
 - Đo v3 đang bán milk bao nhiêu u/ngày → v4 biết chính xác "phần drain còn trống" thay vì đoán bằng 0.85×pipeline.
-- Phát hiện v3 vào chế độ glut-dump (dòng âm đột biến) → v4 tạm ngưng bán mặt hàng đó 2–3 ngày để v3 xả vào đáy rồi quay lại mua lại... (mua không được với milk — nhưng chờ v3 cạn hàng rồi bán lại vào khan hiếm sâu).
-- Mirror mode: opp_sales = my_sales → chia drain đôi, giữ premium cho cả hai → self-play ổn định.
+- Phát hiện v3 vào chế độ glut-dump (dòng âm đột biến) → v4 tạm ngưng bán mặt hàng đó 2–3 ngày để v3 xả vào đáy rồi quay lại (mua không được với milk — nhưng chờ v3 cạn hàng rồi bán lại vào khan hiếm sâu).
+- Mirror mode: opp_net ≈ my_net qua 2–3 ngày → bật quy tắc mirror (T8): chia drain đôi, giữ premium cho cả hai → self-play ổn định.
 
 ### 8.2 Presence Warfare chi tiết (đòn chính cho mục tiêu 2×)
 
@@ -375,11 +413,11 @@ Timeline dự kiến v4 vs v3:
 | Giai đoạn | Hành động v4 | Phản ứng v3 (từ code) | Phản ứng v3 (thực tế đo) |
 |---|---|---|---|
 | Ngày 0–4 | Bootstrap wheat/carrot như v3 + mua land sớm hơn | tương tự | cân bằng |
-| Ngày 3–8 | Mua 8 bò + 7 cừu (nhờ tiết kiệm hire từ zoning) | `milk_room = 324−240−40 < 0 → cow_target = 0` | v3 **tự hủy đàn sữa**, chuyển cờ sang wheat/egg |
-| Ngày 8–20 | Bán milk/wool khớp drain ở $180–240 | v3 không có hàng để cạnh tranh | v4 thu ~$25–35k từ 2 thị trường này |
+| Ngày 3–9 | Ramp 8–10 bò + 2–3 cừu (đặt cuối ngày — T6 tiết kiệm feed) | `milk_room = 290−300−40 < 0 → cow_target = 0` | v3 **tự zero đàn sữa** (chỉ bò có floor 0), giữ 5 cừu floor |
+| Ngày 8–29 | Milk: drip ngưỡng 1.2–1.4×base + stockpile (max_held/shed); wool: chia drain với 5 cừu floor của v3 ở $180–220 | v3 không còn bò, chỉ còn dòng wool floor | v4 thu milk $30–50k + wool $15–20k |
 | Ngày 8–14 | Melon denial 110u + thu $21k dump | v3 giữ hold 0.52 | melon $150 cả hai |
 | Ngày 5–25 | 10 ngỗng + 35 ô straw + 20 ô tomato + FERT max | v3 dừng ở 5 ngỗng, 0 tomato | v4 đơn độc thu EGG $24k, STRAW $10–15k, TOMATO $4k, FERT $20k |
-| Ngày 26–29 | Liquidation schedule chính xác | thanh lý thô | +$2–3k |
+| Ngày 26–29 (đến 22:00 ngày 29 — T2) | DP thanh lý theo đạo hàm giá từng unit | thanh lý thô | +$3–5k |
 
 **Điểm mấu chốt: v4 KHÔNG cần "đánh" v3. V4 chỉ cần tồn tại to hơn ở các thị trường mà v3 dùng công thức rút lui — v3 sẽ tự nhường. Sau đó 2× đến từ chênh lệch năng suất (zoning + portfolio solver), không phải từ denial tốn kém.**
 
@@ -388,10 +426,10 @@ Timeline dự kiến v4 vs v3:
 | Giữ nguyên | Sửa | Bỏ |
 |---|---|---|
 | try/except an toàn | quota cứng → portfolio solver | fert chỉ melon |
-| sticky assignment | 0.85×opp_pipeline → opp_sales đo được | goose cap 5 |
+| sticky assignment | 0.85×opp_pipeline → opp_net đo được | goose cap 5 |
 | SERVICE composite | hire heuristic → labor ledger | parity tưới (giữ, tối ưu thêm zoning) |
 | bootstrap 4 ngày | HOLD tĩnh → threshold ladder theo chế độ | melon quota 14 ngày 8–14 |
-| melon denial | thanh lý 26–28 → schedule đạo hàm | dead code fert_usable |
+| melon denial | thanh lý thô 26–28 → DP đạo hàm đến 22:00 ngày 29 | dead code fert_usable |
 
 ---
 
@@ -399,14 +437,14 @@ Timeline dự kiến v4 vs v3:
 
 | # | Đòn | Δ cho v4 | Δ cho v3 | Mức đóng góp tỷ lệ | Độ tin cậy |
 |---|---|---|---|---|---|
-| E1 | Presence warfare (milk+wool: v3 tự rút) | +$25–33k gross | −$25–28k | **~55%** | Cao (công thức v3 trong source) |
+| E1 | Ramp sớm + presence milk (v3 tự zero đàn bò) + wool hợp tác | +$25–33k gross | −$25–28k | **~55%** | Cao (công thức v3 trong source; floor 0 chỉ có ở bò) |
 | E2 | Zoning + labor ledger (MOVE 80→55%) | +$8–14k | ~0 | ~15% | Trung bình-cao |
 | E3 | FERT max (310u) | +$5–8k | ~0 | ~8% | Cao |
 | E4 | EGG scale 10 ngỗng | +$6–10k | −$1k (giá nhẹ) | ~8% | Cao |
 | E5 | STRAW tranh 35 ô + flow-match | +$8–15k | 0 (đã tự nhường) | ~12% | Trung bình |
 | E6 | TOMATO 20 ô | +$3–5k | 0 | ~5% | Cao |
 | E7 | Fert-on-wheat (100u phân dư) | +$7–8k | 0 | ~10% | Cao |
-| E8 | Liquidation schedule đạo hàm | +$2–3k | 0 | ~3% | Trung bình |
+| E8 | Liquidation DP đến 22:00 ngày 29 (23 giờ không refresh — T2) | +$3–5k | 0 | ~4% | Trung bình-cao |
 | E9 | Wheat make-vs-buy timing | +$2–4k | −$1k | ~4% | Trung bình |
 
 **Tổng hợp kịch bản thận trọng (chỉ tính 70% mỗi đòn E2–E9):**
@@ -424,8 +462,9 @@ Timeline dự kiến v4 vs v3:
 2. **Self-play phải ổn định.** Validation Episode = đấu với bản sao. Module D ở mirror mode phải chia drain đối xứng, không dump phá giá phản chủ (worklog v3 đã đạt self-play $48–51k ổn định — v4 phải benchmark tương tự trước khi nộp).
 3. **Runtime:** v3 episode ~4s. Module A/B nhẹ (O(9 mặt hàng)), zoning O(board²) mỗi ngày 1 lần. Giữ < 15s/episode để an toàn với notebook timeout.
 4. **Phương sai seed:** trận đo mới ra 1.20× trong khi worklog trung bình 1.34–1.46×. Mọi tuyên bố 2× phải qua **N ≥ 50 trận paired-seed** (bench/run.py có sẵn), báo cáo median + IQR, không lấy trận đẹp.
-5. **Mua đất sớm hơn có thể tái tạo "bẫy nghèo"** (bài học đắt nhất của v1: mua đất hút tiền → hạt thiếu → cây chết dây chuyền). Presence warfare cần $4.4k cho 8 bò + 7 cừu — phải chứng minh dòng tiền ngày 5–8 đủ bằng benchmark cash-curve trước khi bật.
+5. **Mua đất sớm hơn có thể tái tạo "bẫy nghèo"** (bài học đắt nhất của v1: mua đất hút tiền → hạt thiếu → cây chết dây chuyền). Presence warfare cần ~$3.9–4.6k cho 8–10 bò + 2–3 cừu — phải chứng minh dòng tiền ngày 5–8 đủ bằng benchmark cash-curve trước khi bật.
 6. **Care scheduling là tối ưu toàn cục:** CARE bò chỉ có giá trị nếu ngày sản xuất được FEED. Lịch CARE phải bám lịch sản xuất (bò: chẵn ngày kể từ đặt; cừu: mỗi 3 ngày; ngỗng: hằng ngày). V3 care hằng ngày mọi con — thực ra chỉ cần care trùng nhịp sản xuất (tiết kiệm ~20% action CARE trên cừu).
+7. **BẪY T8 — hủy diệt tương hỗ trong mirror (điều kiện sống của Validation Episode).** Presence-warfare dạng hardcode "9–10 bò để zero đối thủ" là tự sát khi gặp chính mình: cả hai cùng zero đàn bò của nhau → mất toàn bộ dòng milk. Bộ nhận diện mirror (net-flow tương quan ≈ 1 qua 2–3 ngày) + chế độ chia drain phải được benchmark 10 trận mirror TRƯỚC khi bật presence — đã đưa vào P0. Quy tắc thiết kế: presence chỉ kích hoạt khi nhận diện đúng profile "room-like" (đặc trưng: đối thủ ngừng BUY_ANIMAL sau khi ta mở rộng đàn), KHÔNG bao giờ mặc-định-bật.
 
 ---
 
@@ -433,13 +472,26 @@ Timeline dự kiến v4 vs v3:
 
 | Phase | Việc | nghiệm thu |
 |---|---|---|
-| P0 | Module A (telemetry) + đo opp_sales trong trận v3-vs-v3 hiện có | log đối chiếu 100% với diag instrument |
+| P0 | Telemetry `opp_net` (đối chiếu ground-truth instrument từng step) + **itemized cost ledger** (phân rã $61.7k burn: hire/seed/animal/land/feed theo ngày) + **10 trận mirror v3-vs-v3 kiểm định bẫy T8** | công thức khớp 100% ở 7 mặt hàng (WHEAT/FERT đúng net-flow); ledger khớp sổ tiền ±$0; T8 có số liệu kết luận quy tắc mirror |
 | P1 | Portfolio solver thay quota cứng + TOMATO/STRAW/FERT/EGG/E7-fert-wheat | v4-solo (vs random): gross ≥ $110k, net ≥ $55k |
 | P2 | Zoning + labor ledger | MOVE ≤ 60% (đo bằng instrument bước); net +$5k |
 | P3 | Presence warfare + threshold ladder | vs v3: N=50, tỷ lệ TB ≥ 1.8×, W/L ≥ 90% |
 | P4 | Mirror stability + liquidation | self-play ≥ $45k mỗi bên, 0 tự hủy, 20 trận |
 | P5 | Archetype suite (melon/egg/straw/passive/denial bots) | không có archetype nào thắng v4 > 10% trận |
 | P6 | Strip comment → `submission_v4.py` (thuần code như quy ước Kaggle) + hướng dẫn nộp | syntax + import check + verify benchmark ngang bản dev |
+
+### 11.1 KẾT QUẢ P0 (đã chạy — `bench/p0.py`, 12 trận, 64s)
+
+| Giả thuyết | Kết quả đo | Verdict |
+|---|---|---|
+| Telemetry `opp_net = Δinv + drain − my_sells(>$1) + my_buys` | **5.854/5.854 cell-product-step khớp = 100,00%** (WHEAT/FERT đúng net-flow; 0 unit vô hình — không bên nào chạm sàn $1 trong 12 trận) | ✅ Module A xây được, không cần heuristic |
+| Mô hình drain từ public (`unlocked_shops` + step mod 4/24) | **8.628/8.628 step khớp = 100,00%** | ✅ |
+| Ledger khớp sổ | **residual $0.00** cả 24 bên; burn v3-vs-v2 đo $60.9–61.5k ≡ claim $61.7k cũ | ✅ |
+| Phân rã burn $61.7k (v3 mirror TB) | **feed $37.3k (59%)** · seeds $7.0k · land $7.0k · labor $6.3k · animals $5.2k · fert $0 → đòn E2' (make-vs-buy cám + zoning feed) nhắm feed, KHÔNG phải hire | 🔴 Tìm mới: feed là khoản đốt tiền số 1 |
+| Bẫy T8 (10 trận mirror v3-vs-v3) | Công thức presence đối xứng KHÔNG tự hủy catastrophically: equilibrium an toàn nhưng **đói nghiêm trọng** — cow peak 3,8–3,9/bên (target solo 7), mua bò chậm nhất ngày 11, milk chỉ ~106u/2 bên vs drain 324 → tồn kho milk −102…−604, giá $175–374, **218u premium bỏ lại ≈ $54–72k gross cho cặp** | ⚠ Cơ chế T8 xác nhận: presence formula = "van an toàn" tự hạ đàn; bẫy hủy diệt THẬT chỉ xuất hiện nếu v4 hardcode 9–10 bò không có detector mirror (600u vs drain 324 → $1). Quy tắc mirror cho v4: chia drain ≈ 162u/bên (~5 bò) — thu ~$40k milk/bên thay vì $15k như v3 |
+| Cash curve bootstrap | **v3 về $0 từ ngày 3–10** (broke hoàn toàn) — kế hoạch "ramp 8–10 bò ngày 5–9" của 8.2 cần bootstrap kiểu mới (cash-first), không dùng nhịp chi tiêu v3 | 🔴 Rủi ro #5 được định lượng |
+
+Net mirror v3-vs-v3: TB $43,9k / $40,1k (dải $30–55k). Sales mix mirror: WHEAT 925u×$44 · MILK 35–75u×$244–333 · WOOL 31–74u×$161–253 · STRAW 54u×$255 · MELON 54u×$236 · FERT 145u×$63.
 
 ---
 
@@ -452,8 +504,8 @@ ANIMALS    : GOOSE($300→56 EGG) COW($400→36 MILK) SHEEP($500→~35 WOOL)   [
 MARKET I0  : 10.000 mọi mặt hàng; lockstep per-unit; BUY chỉ WHEAT/FERT
 DRAIN/mùa  : WHEAT 520, STRAW 422, MILK 324, CARROT 324, TOMATO 226,
              EGG 226, WOOL 226, MELON 30, FERT 0
-DENIAL chi phí: MILK 3u · STRAW 8u · WOOL 16u · TOMATO 19u · EGG 78u ·
-             CARROT 84u · MELON 110u · WHEAT 2421u (bất khả thi)
+DENIAL chi phí (v2.0, verify market_price): MILK 2u · STRAW 7u · WOOL 15u ·
+             TOMATO 18u · EGG 77u · CARROT 83u · MELON 110u · WHEAT 2421u (bất khả thi)
 HIRE fib   : 1,1,2,3,5,8,13,21,34,55,89,144 → 12 người/ngày = $376
 v3 HOLD    : MILK .98 WOOL .94 STRAW .90 EGG .86 TOM .82 WHEAT .76
              CARROT .70 MELON .52 FERT .40 + van áp (shed≥80→.72, nghèo→.65, d≥26→.45)
@@ -477,4 +529,4 @@ v3 ROTÒ   : $61.7k chi phí / $102.8k gross (trận đo mới nhất)
 
 ---
 
-*Kết thúc nghiên cứu. Tài liệu này là hợp đồng thiết kế cho v4: mọi module trong mục 8 truy vết về một rò tiền ở mục 5, mọi con số truy vết về engine hoặc benchmark ở mục 2–3. Bước tiếp theo: P0 (Module A telemetry) — viết instrumentation lên bench hiện có, đo `opp_sales` trong 10 trận v3-vs-v3 để kiểm định giả thuyết "đo dòng đối thủ = đại số chính xác 100%".*
+*Kết thúc nghiên cứu (v2.0 — đã tích hợp errata KAIN: 6 lỗi sửa L1–L6, 8 thiếu bổ sung T1–T8, denial kiểm chứng lại trực tiếp bằng `market_price`). Tài liệu này là hợp đồng thiết kế cho v4: mọi module trong mục 8 truy vết về một rò tiền ở mục 5, mọi con số truy vết về engine/README/benchmark ở mục 2–3. Bước tiếp theo: **P0** — telemetry opp_net + itemized cost ledger + 10 trận mirror v3-vs-v3 kiểm định bẫy T8 (công cụ: `bench/p0.py`, kết quả: `bench/p0_results.json`).*

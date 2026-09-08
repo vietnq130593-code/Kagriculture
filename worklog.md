@@ -119,3 +119,24 @@ Stage Summary:
 - Verdict: nghiên cứu 85% đúng; 6 lỗi (L1 fresh-plant watering + L5 sheep/goose floor là critical); 8 thiếu (T8 mirror mutual-destruction là điều kiện sống của Validation Episode); luận đề 2× đứng vững với cơ chế milk viết lại (1.8-2.3×)
 - Quyết định thiết kế mới: wool = hợp tác (2-3 cừu), milk = ramp sớm 8-10 bò + presence + stockpile/drip, quy tắc T/2 làm ràng buộc cứng Portfolio Solver, quy tắc mirror bắt buộc trong Module A
 - Bước tiếp theo: patch errata vào RESEARCH_v4.md, rồi P0 (telemetry + instrument cost ledger + 10 trận mirror kiểm định T8)
+
+---
+Task ID: 7
+Agent: main-agent (Z.ai Code) — thực thi theo errata KAIN
+Task: Patch 6 lỗi (L1–L6) + 8 thiếu sót (T1–T8) vào RESEARCH_v4.md, rồi khởi động P0 (telemetry + itemized cost ledger + 10 trận mirror kiểm định bẫy T8)
+
+Work Log:
+- Đọc RESEARCH_v4_REVIEW.md (errata Task 6), upload/README.md (373 dòng), RESEARCH_v4.md v1.0 (480 dòng)
+- Kiểm chứng lại số denial bằng market_price trực tiếp: MILK 2u · STRAW 7u · WOOL 15u · TOMATO 18u · EGG 77u · CARROT 83u (bảng cũ chênh 1u ở 5 vị trí) + xác nhận floor đàn v3 dòng 309-311 (goose floor 3-4, sheep floor 5, cow floor 0)
+- Patch RESEARCH_v4.md → v2.0 (532 dòng) qua 4 lượt MultiEdit (~25 thay đổi): L1 luật 5 fresh-plant watering; L2 luật 2 ngày 29 23 giờ; L3 10×10; L4/L6 cơ chế; L5 viết lại 6.2/6.3 (wool = hợp tác 2-3 cừu, milk = ramp 8-10 bò); T1 thêm mục 6.5 quy tắc T/2; T2/T3/T4/T5/T6/T7 thành luật 16-17 + Module A/B/C/D/E; T8 vào 6.4 + Module A + rủi ro #7; C1/C2/C4/C6 số liệu hiệu chỉnh; xóa ký tự lạ (報價→báo giá, 選, cõm→cõng, dumphàng)
+- Viết bench/p0.py (~330 dòng): monkeypatch _commit_unit/_do_hire/_do_buy_land/_town_consume/_process_market — log mọi unit transaction, hire/land cost, drain gt+est, giá + đàn + tiền từng step
+- Smoke test 1 trận: telemetry 473/473, drain 719/719, ledger residual $0
+- Chạy full P0: 10 trận mirror v3_a-vs-v3_b (so le đổi bên) + 2 trận v3-vs-baseline, 64s, xuất bench/p0_results.json
+- Thêm mục 11.1 (kết quả P0) vào RESEARCH_v4.md
+
+Stage Summary:
+- Sản phẩm: RESEARCH_v4.md v2.0 (532 dòng, hợp đồng thiết kế v4 hoàn chỉnh) + bench/p0.py + bench/p0_results.json
+- P0 verdict: telemetry opp_net chính xác 100% (5.854/5.854 cell, cả WHEAT/FERT net-flow); drain model 100% (8.628/8.628 step); ledger khớp sổ $0 residual, burn $61.7k xác nhận ($60.9-61.5k)
+- Phát hiện lớn: (1) FEED là khoản đốt tiền số 1 — $37.3k/mùa = 59% burn (không phải hire $6.3k như giả định cũ) → v4 cần đòn make-vs-buy cám mạnh; (2) v3 BROKE hoàn toàn ngày 3-10 (cash $0) — ramp bò sớm ngày 5-9 của v4 cần bootstrap cash-first mới; (3) T8: mirror v3-vs-v3 KHÔNG tự hủy catastrophically — presence formula là van an toàn tự hạ đàn (cow peak 3.8/bên vs target solo 7, milk 106u/2 bên vs drain 324, tồn kho milk −102…−604, 218u premium bỏ lại ≈ $54-72k/cặp); bẫy hủy diệt thật chỉ xảy ra nếu hardcode 9-10 bò không detector mirror; quy tắc mirror v4 = chia drain ~162u/bên (~5 bò) thu ~$40k milk/bên
+- Net mirror v3-vs-v3: $43.9k/$40.1k TB (dải $30-55k, khớp worklog cũ $48-51k±phương sai seed)
+- Bước tiếp theo: P1 — Portfolio Solver (thay quota cứng) + bật TOMATO/STRAW/FERT/EGG + fert-on-wheat, mục tiêu v4-solo gross ≥ $110k/net ≥ $55k; ưu tiên đòn feed (make-vs-buy) và bootstrap cash-first cho ramp bò sớm
