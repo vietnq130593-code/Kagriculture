@@ -167,3 +167,22 @@ Stage Summary:
 - vs submission_v3.py: 22/24 thắng trung bình 2 phía (1.114x); P0 đơn phương 19/24 (P0/P1 order-advantage ±$3-8k/game); wins biên 1.01-1.35x
 - Bài họcHard-won: (a) mỗi global-knob đổi trong hệ 2-agent market-coupling lật ±6 seed ngẫu nhiên — phải đánh giá two-sided multi-seed; (b) stale task flags (want_wheat) là bugClass nguy hiểm nhất — phải query live state; (c) v3-nền + incremental edges thắng tuyệt đối việc rebuild từ đầu
 - Còn tiềm năng: 2 seed hòa tuyệt đối (102/201); endgame labor surge 13th worker; straw harvest vẫn dưới tiềm năng trên vài seed; nếu cần 24/24 tuyệt đối → tối ưu thêm carrot bootstrap + d11 cash phase
+
+---
+Task ID: 9
+Agent: KAIN (main-agent)
+Task: Viết file LESSONS_V4.md — đúc kết toàn bộ bài học, vấn đề triển khai v4; đánh giá điểm mạnh/yếu; hướng khắc phục + đề xuất phát triển v5; mở thảo luận lộ trình v5
+
+Work Log:
+- Khôi phục context: đọc worklog 8 task, RESEARCH_v4.md v2.0, RESEARCH_v4_REVIEW.md, cấu trúc v4.py (1240 dòng: _tm_step/_tm_orders/_bayes_step/_daily_plan MIRROR-CONTEST), p0_results.json (t8_summary + ledger_v3v2 tách khoản)
+- Kiểm chứng lại benchmark v4 vs v3 ngay tại phiên này: 48 trận two-sided seeds 100-123 — P0-side 18/24 (v4 $51.837 vs v3 $48.064, 1.078x, tệ nhất 0.80x seed 113), P1-side 21/24 (v4 $51.871 vs v3 $44.730, 1.159x), gộp 39/48 = 81% @ 1.117x; phát hiện thêm: v4 bất biến thứ tự (±$34) trong khi v3 dao động $3.3k khi đổi vị trí
+- Đối chiếu ledger P0: feedbuy $35.166/mùa = 58% burn $60.945 (tiền MUA wheat cho ăn) — chuẩn hóa cơ chế LE-1 trước khi viết
+- Viết LESSONS_V4.md (303 dòng): 6 chương — kết quả kiểm chứng (bảng 1.1 + 1.4 dominance 5 điều kiện), biên niên sử 4 vòng + 2 phát hiện then chốt (death-window 24h, live-state SERVICE routing) + bảng 9 bug, 27 bài học phân 5 góc nhìn (kiến trúc/thuật toán/kinh tế/engine/quy trình), 8 điểm mạnh + 10 điểm yếu định lượng + đối chiếu RESEARCH vs thực tế (40-50% hiện thực), lộ trình v5 P0-P6 kèm ước lượng giá trị + 7 nguyên tắc + 6 rủi ro, 3 con đường chiến lược + 5 câu hỏi quyết
+- QA file: kiểm ký tự lạ (chỉ còn ký hiệu toán hợp lệ →, σ, λ, Δ, ≈), sửa 2 từ lỗi chính tả + 1 câu cơ chế FEED sai, xác minh cấu trúc 6 chương đầy đủ
+
+Stage Summary:
+- Sản phẩm: /home/z/my-project/kaggriculture/LESSONS_V4.md (303 dòng, bản đọc chính thức cho mọi quyết định v5)
+- Số liệu nền mới kiểm chứng: 39/48 (81%) @ 1.117x hai phía; v4 order-invariant vs v3 order-sensitive $3.3k; 218u milk premium bỏ hoang ≈ $54-72k/cặp; FEED burn $37.3k (59%), trong đó feedbuy $35.2k mua wheat
+- Kết luận trung tâm: v4 = thắng lợi kiến trúc gia tăng (nền v3 + 8 edges) chứ không phải bước nhảy lý thuyết; dominance "100% + 2x" không tồn tại vật lý trên knife-edge → chuẩn đo 5 điều kiện mới (≥1.25x TB, ≥90% thắng, không gãy <0.95x, mirror-safe, phủ meta)
+- Đề xuất v5: con đường C (P0 quick wins + P4 make-vs-buy FEED trước, rồi P1 Portfolio Solver + P3 Bayes đầy đủ); giá trị còn lại ước +$15-30k/mùa
+- Chờ user quyết: 5 câu hỏi mở ở mục 6.3 (ưu tiên A/B/C, ngưỡng dừng, refactor hay vá, submission đôi từ P1, rủi ro "ở lại" milk)
