@@ -98,3 +98,24 @@ Stage Summary:
 - Kết luận trung tâm: 2x vs v3 đạt được (dự phóng 1.8-2.3x) bằng (1) presence warfare buộc v3 tự rút khỏi milk/wool/straw, (2) khai thác 4 thị trường trống (TOMATO/STRAW/FERT/EGG + fert-on-wheat), (3) zoning + labor ledger cắt MOVE 80-90%→≤55%, (4) telemetry opp_sales — KHÔNG dựa vào denial đắt
 - Số liệu nền: v3 gross $102.8k/net $41k (đốt $61.7k); denial cost MILK 3u/STRAW 8u/WOOL 16u/MELON 110u/WHEAT bất khả thi; CARE $220-242 là action đắt nhất; 12 hire = $376/ngày
 - Bước tiếp theo: P0 — instrumentation đo opp_sales trong 10 trận v3-vs-v3 kiểm định giả thuyết telemetry
+
+---
+Task ID: 6
+Agent: KAIN (main-agent, persona reviewer)
+Task: Review kiểm định RESEARCH_v4.md đối chiếu upload/README.md (bản mô tả chính thức Kaggriculture) — tìm lỗi, thiếu sót, điểm cân đối, thuật toán tối ưu cho v4
+
+Work Log:
+- Đọc toàn bộ upload/README.md (373 dòng): bảng object types, actions, care banking, price function + bảng tham chiếu P(I0±T), cấu hình defaults, observation format
+- Đối chiếu chéo 15 khẳng định cốt lõi của RESEARCH_v4.md với README + source engine: 15/15 nền móng vi mô thị trường KHỚP (bảng giá, drain, lockstep, fib hire, cửa sổ năng suất, CARE banking, shed, floor $1)
+- Phát hiện 6 LỖI: (L1) cây mới trồng PHẢI tưới ngay ngày trồng — README L113 "no grace period for fresh plantings" mâu thuẫn luật 5 của nghiên cứu; (L2) 720 step = 30 ngày, ngày 29 cắt 22:00, end-of-day cuối = hết ngày 28 (ngày 29 không refresh — 23 giờ thu hoạch/bán); (L3) "bàn 20×20" sai — full board 10×10=100 ô; (L4) công thức opp_sales chỉ đúng 7/9 mặt hàng — WHEAT/FERT chỉ đo net-flow (BUY_PRODUCT của đối thủ cũng trừ tồn kho); (L5) presence warfare sai cho sheep/goose — v3 có floor: sheep_target = max(5,...), goose = max(4/3,...), chỉ COW floor 0; "7-8 cừu v4" = tự sát wool (12 cừu tổng > drain 226); cần 8 bò từ ngày 5 (absorb ~290) để zero cow_target v3; (L6) fert melon +24% chứ không +35% (README L27: cap age 10 vs 8)
+- Phát hiện 8 THIẾU: (T1) T = 1 quadrant/24 ngày → "định lý kích thước thị trường" + quy tắc thiết kế T/2; (T2) ngày 29 = 23 giờ vàng thanh lý, deadline 22:00; (T3) money + hires_today PUBLIC → telemetry tiền mặt đối thủ; (T4) luật PLANT atomicity (vượt hạt = drop TẤT CẢ plant crop đó trong turn); (T5) hire #1 spawn ô LOCKED (5,4) mỗi ngày; (T6) con vật mới đặt consecutive_unfed=0 (sống ngày đầu không feed); (T7) weed 0.005/ô/ngày; (T8) NGHIÊM TRỌNG: bẫy hủy diệt tương hỗ mirror — hai v4 cùng zero đàn bò của nhau trong Validation Episode → cần quy tắc mirror chia drain
+- CÂN ĐỐI: milk cần cơ chế "stockpile + drip + ramp sớm" (v3 chỉ bán 65u vì ramp trễ ngày 12-16, không phải market đầy; monopolist thực dụng ~330u × $180-220 = $30-50k); wool = thị trường hợp tác (v4 2-3 cừu); E1 giữ +$25-33k nhưng viết lại cơ chế; minor: WOOL denial 15u, STRAW 7u
+- KHAI THÁC thêm: ramp speed là biến milk quyết định; telemetry tiền mặt + fib công bố; E8 nâng +$3-5k nhờ ngày 29; fert bón/bán theo giá động; quy tắc T/2 thành ràng buộc Solver
+- Xếp hạng 7 thuật toán tốt nhất cho v4: (1) rolling-horizon replan + greedy shadow price; (2) Hungarian/auction assignment thay greedy của v3; (3) threshold-ladder inventory policy; (4) flow-telemetry + nearest-centroid archetype classifier; (5) DP thanh lý 26-29; (6) zoning + NN batching (không TSP); (7) fib-threshold hiring. TỰ CHỐI runtime: MCTS/RL/bandit/evolutionary (deterministic + mô hình đã biết → analytic control thắng tuyệt đối trên budget)
+- Viết RESEARCH_v4_REVIEW.md (errata chính thức, giữ nguyên bản gốc)
+
+Stage Summary:
+- Sản phẩm: /home/z/my-project/kaggriculture/RESEARCH_v4_REVIEW.md
+- Verdict: nghiên cứu 85% đúng; 6 lỗi (L1 fresh-plant watering + L5 sheep/goose floor là critical); 8 thiếu (T8 mirror mutual-destruction là điều kiện sống của Validation Episode); luận đề 2× đứng vững với cơ chế milk viết lại (1.8-2.3×)
+- Quyết định thiết kế mới: wool = hợp tác (2-3 cừu), milk = ramp sớm 8-10 bò + presence + stockpile/drip, quy tắc T/2 làm ràng buộc cứng Portfolio Solver, quy tắc mirror bắt buộc trong Module A
+- Bước tiếp theo: patch errata vào RESEARCH_v4.md, rồi P0 (telemetry + instrument cost ledger + 10 trận mirror kiểm định T8)
