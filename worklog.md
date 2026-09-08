@@ -78,3 +78,23 @@ Stage Summary:
 - Chiến lược cốt lõi: chiếm các thị trường đói (milk/wool/straw premium $250-300), melon denial phá nguồn thu lớn nhất của v2, đàn thú 10-16 con nuôi bằng wheat tự trồng + mua rẻ ($<=38), kỷ luật tiền mặt 4 ngày bootstrap (wheat+carrot engine) trước khi mở rộng.
 - Giới hạn vật lý đã xác nhận: thị trường dùng chung 2 người chơi + năng suất lao động ngang nhau (2.4 bước di chuyển/hành động cho cả hai agent) => thu nhập trung bình 1.3-1.5x là tối ưu khi đối thủ là bản sao cũ mạnh; 2x tuyệt đối chỉ đạt ở trận đỉnh hoặc vs đối thủ yếu.
 - v2 vẫn giữ nguyên làm baseline đối chiếu: submission.py (v2) vs submission_v3.py (v3).
+
+---
+Task ID: 5
+Agent: main-agent (Z.ai Code)
+Task: Kaggriculture — viết nghiên cứu phân tích chiến lược (RESEARCH_v4.md) từ bài học submission_v3.py, nền tảng thiết kế v4 đánh bại áp đảo v3 (≥2x)
+
+Work Log:
+- Khôi phục context: đọc submission_v3.py/v3.py (1095 dòng), worklog 4 task trước, bench/diag.py
+- Kiểm chứng lại source engine (kaggle-environments 1.32.7): market I0=10000 mọi mặt hàng, per-unit lockstep, BUY chỉ WHEAT/FERT (quote giá sau mua), shop drain mỗi 4 step (x2 cho shop 1 mặt hàng), town center 1u/ngày, shop unlock mỗi 3 ngày max 8 (RNG seed^day), hire fib resets HÀNG NGÀY (hands=[] cuối ngày — lao động là dịch vụ thuê ngày), plant chết khi 2 ngày liên tiếp không tưới (ngày trồng tính cu=1), phân +2 yield trong cửa sổ nhưng cap max_yield (melon 0 gain, chỉ rút cycle), CARE pending bonus ăn khi ngày sản xuất được feed, max_held chặn sản xuất, ongoing crop chết sau lần sản xuất cuối, overflow shed bị HỦY, kết thúc step 718 không auto-drop
+- Chạy trận diag mới v3 vs v2 (instrument _commit_unit): v3 net $41.081, GROSS $102.815 (WHEAT 898u/$34.9k avg$39, FERT 196u/$15.8k, MILK 65u/$242, WOOL 62u/$220, MELON 73u/$152, EGG 134u/$60, STRAW 6u — nhường v2 bán $312), v2 net $34.286 — phát hiện v3 ĐỐT $61.7k chi phí (hire ~$10k + thú + đất + cám)
+- Tính bảng định lượng bằng engine: đường giá theo offset tồn kho 8 mặt hàng; headroom theo ngưỡng; bảng CHI PHÍ PHÁ GIÁ (MILK sập chỉ cần 3u, STRAW 8u, WOOL 16u, WHEAT 2421u bất khả thi); cống hút kỳ vọng (WHEAT 520/mùa, STRAW 422, MILK 324, MELON CHỈ 30 — không shop nào hút melon, FERT drain=0)
+- Phát hiện lỗ hổng thông tin lớn nhất: tồn kho thị trường public + drain tính được + my_sales biết chính xác → opp_sales = Δinv + drain − my_sales (đo dòng bán đối thủ từng giờ, chính xác tuyệt đối) — v3 chỉ nhìn bàn cờ đối thủ
+- Phát hiện "presence warfare": công thức v3 dòng 306-308 (milk_room = absorb − 30×opp_COW − 40) khiến v3 TỰ RÚT khỏi thị trường khi đối thủ có đàn lớn → v4 chiếm milk/wool bằng tồn tại, không cần denial đắt tiền
+- Viết RESEARCH_v4.md (480 dòng, tiếng Việt): 15 luật vật lý kiểm chứng, cấu trúc vi mô thị trường, giải phẫu v3 + 7 điểm rò tiền (quota cứng theo ngày, dead code fert cây dòng 452-470, FERT 196/310, EGG cap 5 ngỗng, hire không ledger $/action, mù thông tin dòng bán, 0.85×opp_pipeline), lý thuyết common-pool flow auction + 3 chế độ đối đầu, 7 thị trường bỏ trống định lượng (TOMATO/STRAW/FERT/EGG/timing WHEAT/fert-on-wheat +$78/plant), blueprint v4 6 module (World Model telemetry, Portfolio Solver, Labor Ledger + Zoning, Market Ops, Presence Warfare, Safety), bảng giá trị 9 đòn (E1 presence +$25-33k là 55%), lộ trình P0-P6, rủi ro overfit/self-play/phương sai seed
+
+Stage Summary:
+- Sản phẩm: /home/z/my-project/kaggriculture/RESEARCH_v4.md (nghiên cứu chiến lược 480 dòng, hợp đồng thiết kế v4)
+- Kết luận trung tâm: 2x vs v3 đạt được (dự phóng 1.8-2.3x) bằng (1) presence warfare buộc v3 tự rút khỏi milk/wool/straw, (2) khai thác 4 thị trường trống (TOMATO/STRAW/FERT/EGG + fert-on-wheat), (3) zoning + labor ledger cắt MOVE 80-90%→≤55%, (4) telemetry opp_sales — KHÔNG dựa vào denial đắt
+- Số liệu nền: v3 gross $102.8k/net $41k (đốt $61.7k); denial cost MILK 3u/STRAW 8u/WOOL 16u/MELON 110u/WHEAT bất khả thi; CARE $220-242 là action đắt nhất; 12 hire = $376/ngày
+- Bước tiếp theo: P0 — instrumentation đo opp_sales trong 10 trận v3-vs-v3 kiểm định giả thuyết telemetry
