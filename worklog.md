@@ -357,3 +357,20 @@ Stage Summary:
 - Bài học lớn nhất: giả định kế hoạch có thể SAI DẤU — chỉ benchmark A/B cô lập mới exposed (P2 "tiết kiệm" thực ra là tự giải giáp); benchmark v4 20-seed là byte-level chaotic: mọi coupling hành vi ±0.1-0.2x/seed, cần đóng băng hành vi tốt nhất + observer hóa não mới đo được
 - Cho Phase 5: 4 điểm thảo luận đã ghi PLAN §13.4 (pump điều kiện theo đàn v4, học profile offline, L2 activation theo l2_mae, P3 Solver)
 - Đường dẫn user xem: Arena UI (/) → chọn v5 vs v4 → BrainPanel hiển thị l1 posterior + l2_pred quantiles + feed ledger mỗi ngày
+
+---
+Task ID: 18
+Agent: KAIN (main-agent)
+Task: Trả lời câu hỏi thảo luận Phase 5 của user về "tập quy tắc trò chơi" làm nền cho Bayes bậc 1 (P(B|thấy A)) và bậc 2 (P(B|làm A)) — tổng hợp toàn bộ quy tắc đã nắm thành sổ cái duy nhất
+
+Work Log:
+- Khai thác 4 nguồn quy tắc rải rác: upload/README.md (physics engine), LESSONS_V4.md §3.3–3.4 (kinh tế emergent + bug-class máu), PLAN_V5.md §12–13 (knobs v5.2 + bài học v5.3), v5.py v5.3 (_bayes_step PROFILES, _l2_night, _tm_step/_drain_at, feed warfare)
+- Viết kaggriculture/RULES.md v1.0: 63 quy tắc đánh số R1–R63 chia 12 nhóm (A thời gian/lượt, B cây trồng, C vật nuôi, D lao động, E kho/đất, F thị trường giá, G town demand, H bất đối xứng thông tin, I nguồn ngẫu nhiên, J kinh tế emergent, K bug-class, L giới hạn suy luận) — mỗi quy tắc gắn loại [P/S/E/I] + tầng Bayes tiêu thụ + bậc nhân quả Q/C
+- 2 bảng map riêng cho đúng khung user: chuỗi bậc-1 (R42–R44 mắt → R38–R41 drain → R28–R32 đường giá → R61–R63 giới hạn) và chuỗi bậc-2 (R2 → R28–R37 impact → lịch sinh trưởng → R47–R54 phản ứng kinh tế, nhấn quy tắc "đối thủ phản đòn" là quy tắc bậc-2 quan trọng nhất không có trong README)
+- Ghi nhận khám phá v5.3 R37 (feed warfare) là quy tắc bậc-2 chỉ benchmark A/B mới phát hiện — xác nhận phương pháp của user
+- Chỉ ra 6 lỗ hổng chưa biết đủ (gaps): own-price impact chưa thành hàm số, bom tồn kho đối thủ không thấy (shed private), độ trễ phản ứng đối thủ chưa đo, care bonus chưa quantify, posterior shop draw chưa dựng, chi phí weed chưa vào $/action — kèm đề xuất thứ tự ưu tiên Phase 5
+
+Stage Summary:
+- Sản phẩm: kaggriculture/RULES.md — structural causal model tham chiếu duy nhất cho mọi thảo luận Phase 5 (31 P + 2 S + 16 E + 3 I + 11 chi tiết)
+- Trạng thái thảo luận: đang ở pha user yêu cầu "thảo luận chi tiết trước khi nâng cấp Phase 5" — tài liệu này là vật liệu thảo luận
+- Kết luận đối thoại: xác nhận quan điểm user (game rất nhiều quy tắc — 63 đã gom, 6 còn thiếu); bậc 1 ăn vào quy tắc thông tin+drain+curve, bậc 2 ăn vào quy tắc can thiệp+phản ứng đối thủ
