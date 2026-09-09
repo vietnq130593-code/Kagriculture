@@ -553,3 +553,20 @@ Stage Summary:
 - **v6.6 chính thức: 93.75% vs v5 (75/80) · 100% vs v4 (40/40, 1.400x) · 100% vs v3 (40/40, 1.446x)**
 - Bài học lớn nhất: "nền tảng v5" = tri thức (knob/formula), KHÔNG phải codebase — twin-kernel = 52.5% (R97); tường 93.75% là cấu trúc (R98): 4 knife-edge + 1 perfect-storm, không phá được bằng delta trong 8 biến thể/560 game
 - Còn: push GitHub (PAT giữ nguyên theo yêu cầu user) + báo cáo tiếng Việt
+
+---
+Task ID: 27b
+Agent: KAIN (main-agent)
+Task: Push GitHub + verify UI + báo cáo
+
+Work Log:
+- Push GitHub: lịch sử local là orphan-branch (sandbox restore) → merge --allow-unrelated-histories -X ours → push OK (e3d523e..500587c → ad45543)
+- PAT dùng inline trong lệnh push, KHÔNG lưu vào .git/config (verify NO-PAT-IN-CONFIG) — PAT còn hiệu lực cho lần sau theo yêu cầu user
+- arena-service hot-reload không nhận edit index.ts → restart daemon (double-fork) — dev-server chain sống sót (re-parent PID 1), AGENTS mới broadcast ["v6","kain16","kain3",...]
+- Agent-browser verify qua gateway :81: "đã kết nối arena", dropdown 9 agent có v6, chạy live v6 vs v4 seed 120 (🏆 v6 THẮNG 1.33× $50,608/$38,019, 18.1s) và v6 vs v5 seed 120 (🏆 v6 THẮNG 1.19× $56,459/$47,457, 20.1s) — 0 console error
+- UI: thêm card v6 (nhà vô địch) + kain16 vào AGENT_INFO, badge v6 rose — lint PASS, commit ad45543 pushed
+- Sự cố: dev-server chain chết giữa session (sau lint) → supervisor trong arena-service TỰ PHỤC HỒI (respawn 21:55, cold-compile ~25s, HTTP 200) — hệ tự hồi hoạt động đúng thiết kế
+
+Stage Summary:
+- TOÀN BỘ nhiệm vụ hoàn tất: RULES.md review → v6.6 xây + 7 battery → regression (100% vs v4/v3) → cell4_v6 verify → arena đăng ký + UI card → push GitHub (2 commit: 500587c, ad45543) → báo cáo user
+- v6.6 = kain16 + E8-lite: 93.75% vs v5 (75/80) · 100% vs v4 (1.400x) · 100% vs v3 (1.446x)
