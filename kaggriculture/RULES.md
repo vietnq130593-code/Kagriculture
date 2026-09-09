@@ -216,4 +216,49 @@
 - Bảng best-response cần hoàn thiện trong Phase 5 (dạng "đối thủ làm A → ta làm B"): feed pump theo đàn đối thủ · nhượng/sở hữu room theo tín hiệu giá · mirror split drain · passive nuốt room — mỗi ô của bảng phải có số liệu benchmark đứng sau
 
 ---
-*KAIN — RULES.md v1.1 (bổ sung mục P: kiến trúc 3 tầng + mục tiêu 95% + protocol vòng đời quy tắc). Mọi tầng Bayes của v5 tham chiếu đây; quy tắc mới phát hiện phải qua benchmark 20 seed trước khi cấp mã số.*
+
+## Q. BIÊN BẢN PHASE 5 (20 Sep) — QUY TẮC ẨN ENGINE + PHÁN QUYẾT A/B
+
+### Q.1 Kiểm định Arena/engine (audit 3 phía: engine ↔ README ↔ v5)
+
+**Verdict: YELLOW — không sai lệch phá hỏng mô phỏng.** Toàn bộ price curve (9 mặt hàng × 45.000 điểm kiểm số học), lịch crop/thú, shop demand, fib hire, drain timing KHỚP TUYỆT ĐỐI. run_battle.py chỉ truyền seed (+ episodeSteps mặc định) — không override nào. Nhưng audit đào được **các quy tắc ẩn không có trong README**:
+
+| # | Quy tắc ẩn | Loại | Tầng | Bậc |
+|---|---|---|---|---|
+| R64 | Mùa thực sự có **719 lượt chơi được**: ngày 29 chỉ 23 giờ (0–22), KHÔNG có end-of-day refresh cuối ngày 29 — tưới/FEED/CARE ngày 29 = lãng phí thuần; thợ hire d29 chết mang theo inventory; giờ bán cuối = d29 h22; town center vẫn tick d29 h0, shop d29 h20 | P | L4 | C |
+| R65 | **Kho đầy chặn mua**: BUY_PRODUCT/BUY_ANIMAL abort khi shed ≥ 100 (tiền giữ nguyên, lệnh rơi); order bị dừng ở unit fail đầu tiên, không retry | P | Market Ops | C |
+| R66 | RNG mỗi ngày DÙNG CHUNG weed + shop draw: `random.Random((seed·1_000_003) ^ day)` — weed outcomes và shop unlock CÓ TƯƠNG QUAN deterministic theo seed | P | L1 | Q |
+| R67 | SELL rút từ SHED thôi (không từ tay farmer); FEED/FERTILIZE cần wheat/FERT trong tay UNIT đứng cạnh; HARVEST melon trước ngày 10 = no-op im lặng dù yield đã bank; FERTILIZE mở rộng `max(cur, day+2)` không cộng dồn; PLACE-into-shed giữ phần dư trên tay, DROP vứt toàn bộ tràn; HIRE/BUY_LAND nguyên tử chạy trước vòng per-unit theo thứ tự player 0→1; mua seed/animal không chạm market inventory | P | LABOR/Market | C |
+| R68 | v5 hằng nội bộ sai 2 chỗ (đã sửa v5.4): `YIELD_PER_CYCLE WHEAT 5` → thực đo parity-watering **3.0** (428u/~140 cycle từ trace); `CYCLE_LEN MELON 13` → 11 | E | ECON | Q |
+
+### Q.2 Phán quyết A/B 20 seed two-sided (protocol §P — mỗi biến thể đúng 1 delta)
+
+| Biến thể | Nội dung | Ratio | Wins | Worst | Phán quyết |
+|---|---|---|---|---|---|
+| p4a | Sửa hằng số (wheat 3.0, melon 11) | 1.058x | 27/40 | 0.856 | **GIỮ** — đúng đắn, vô hại (đúng baseline từng số) |
+| p4b | +E8-lite drain-aware hold d22–27 + p3_lo (minimax) + px_after/rev_stream/pipe_rest + opp_herd/opp_wnet telemetry | **1.060x** | **27/40** | **0.886** | **GIỮ — bản cuối v5.4** (worst +0.030 = lợi robustness thật) |
+| p4c | p4b + pump wheat điều kiện (opp net-buyer ≤−10u/ng & đàn ≥10) | 1.060x | 26/40 | 0.886 | **REVERT** — bắn 3/40 game: +1201/−504/−1076 = net −$379 |
+| p4e | p4b + TOMATO mở có gate (≤8 tiles) | 1.027x | 23/40 | 0.766 | **REVERT** — mất −0.033x, worst gãy |
+| p4f | p4e + PROFILES học từ số liệu | 1.024x | 23/40 | 0.766 | **REVERT khỏi bản cuối** (≈neutral trên nền tomato; profile giữ làm tư liệu Phase sau) |
+
+**Baseline tham chiếu v5.3: 1.058x · 27/40 · median 1.045 · P25 1.005 · worst 0.856.**
+**v5.4 chính thức: 1.060x · 27/40 · median 1.047 · P25 1.010 · worst 0.886.**
+
+### Q.3 Quy tắc mới cấp mã số (từ các kết quả trên)
+
+| # | Quy tắc | Loại | Bằng chứng |
+|---|---|---|---|
+| R69 | **Wheat-flow của v4 là churn hai chiều** (P25 −9u/ng, P75 +11u/ng, mean 0.7 — profiles_learned.json): "v4 net-buyer 1077u" là hiện tượng THEO SEED (seed 42), không phải thuộc tính cố hữu của archetype → mọi ô best-response "đối thủ làm A → ta làm B" phải gate theo đo lường telemetry sống, cấm theo niềm tin trắng | E | profile_collect 20 trận |
+| R70 | **Cơ hội phí wheat-feed áp đảo mọi kênh cây nhỏ**: mở TOMATO 32u (kể cả gate thị trường đúng) mất −0.033x vì 8 tile × 12 ngày = 96 tile-ngày đất+lao động ăn mất chỗ của wheat/dâu trong nền kinh tế feed $37k — chỉ Solver $/action TOÀN CỤC (P3 đầy đủ) đủ thông tin mở kênh đúng lúc | E | A/B p4e |
+| R71 | **E8 đã gần cạn** (đo trực tiếp): tồn dư cuối trận v5.2 chỉ $250–800 (10 wheat + sót on-hand) — ước tính "+$3–5k" của LESSONS là thời v4; E8-lite drain-aware thu thêm chủ yếu ROBUSTNESS (worst +0.030) chứ không phải mean | E | parse 6 battles + A/B p4b |
+| R72 | **Profile L1 viết tay sai một kênh then chốt**: WHEAT CONTEST tay = 25 vs đo thực 0.7 — mu=25 khi x~±10 cho log-likelihood tệ hơn mọi giả thuyết khác → đây là CỘT GỐC lỗi đọc nhầm archetype r1–r4; profile học đã lưu bench/profiles_learned.json (CONTEST/COOP/PASSIVE/DUMP từ v4/v3/baseline/melon) | E | profile_collect |
+| R73 | **Một núm "đúng lý thuyết" vẫn phải thắng bằng số**: pump (R37/R54 hợp lý 100% trên giấy) bắn đúng 3/40 lần và net âm — lý thuyết trò chơi cho HƯỚNG, benchmark cho PHÁN QUYẾT | E | A/B p4c |
+
+### Q.4 Kết luận Phase 5 cho mục tiêu 95%
+
+- v5.4 vs v4: **1.060x / 67.5% / worst 0.886** — tiến bộ thật nhưng NHỎ (+0.002x, +0.030 worst). Khoảng cách tới 95% (cần mean ~1.16–1.22x) **không thể đóng bằng núm** — mọi núm dễ đã cạn (7 núm v5.2 + 3 thử nghiệm Phase 5 này: 2 revert, 1 giữ).
+- Giá trị Phase 5 thật sự nằm ở **tri thức**: 5 quy tắc ẩn engine (R64–R68), 5 quy tắc kinh tế mới (R69–R73), profile học được, và xác nhận "kho núm đã cạn".
+- **Bước nhảy còn lại = P3 Solver $/action + T/2** (thay bảng quota cứng) — đúng như phán đoán ban đầu của PLAN §7. Mọi thử nghiệm Phase 5 đều hội tụ về kết luận này: cấu trúc danh mục (cây/thú/đất theo $/action thời gian thực) là mỏ cuối.
+
+---
+*KAIN — RULES.md v1.2 (bổ sung mục Q: biên bản Phase 5 — audit engine + 5 quy tắc ẩn + 5 phán quyết A/B + 5 quy tắc mới R64–R73). Mọi tầng Bayes của v5 tham chiếu đây; quy tắc mới phát hiện phải qua benchmark 20 seed trước khi cấp mã số.*

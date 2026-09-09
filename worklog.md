@@ -390,3 +390,24 @@ Stage Summary:
 - RULES.md v1.1 hoàn chỉnh: 63 quy tắc + 6 gaps + kiến trúc 3 tầng + mục tiêu 95% + protocol cập nhật quy tắc
 - Định hướng Phase 5 đã được user tán thành cả 4 hướng — chờ user phát lệnh khởi động cụ thể
 - Nguyên tắc vận hành mới ghi nhận: mọi quy tắc [E] mới phải qua vòng đời 5 bước trước khi encode vào v5
+
+---
+Task ID: 20
+Agent: KAIN (main-agent)
+Task: Triển khai Phase 5 đầy đủ theo lệnh user: kiểm định Arena ↔ README, 4 hướng 5.1–5.5 có gate A/B, battery chính thức vs v4+v3, cập nhật RULES.md/PLAN, chuẩn bị báo cáo+push
+
+Work Log:
+- Audit engine 3 phía bằng subagent (45.000 kiểm số học): YELLOW — engine local == production; 13 hành vi ẩn (d29 23h không refresh cuối, kho đầy chặn mua, RNG chung weed+shop, SELL chỉ từ shed, FEED cần wheat trên tay unit…) → RULES R64–R67
+- Đo E8 thực tế từ battles cũ: tồn dư cuối chỉ $250–800 → ước tính +$3–5k là thời v4; đổi hướng DP thanh lý thành E8-lite
+- Đo sản lượng wheat thực từ trace: 428u/~140 cycle = 3.0u/cycle (parity watering) — hằng YIELD_PER_CYCLE=5 sai 70% → sửa 3.0
+- Viết v5.4 theo tầng: p4a hằng số (1.058x = baseline vô hại) → p4b +E8-lite drain-aware hold d22–27 + p3_lo minimax + _rev_stream/_px_after/_pipe_rest/_shop_slots_left + opp_herd/opp_wnet telemetry (1.060x, worst 0.856→0.886 — GIỮ) → p4c +pump (1.060x, 26/40, net −$379/40 game — REVERT) → p4e +TOMATO gate (1.027x, 23/40, worst 0.766 — REVERT) → p4f +profiles học (≈neutral — REVERT khỏi bản cuối)
+- Tạo bench/profile_collect.py + chạy 20 trận học profile: phát hiện PROFILES tay sai WHEAT CONTEST 25 vs đo 0.7 (cột gốc lỗi L1 r1–r4) → bench/profiles_learned.json làm tư liệu Phase sau
+- Dọn v5.py thành bản chính thức v5.4 (2.403 dòng): giữ p4b + hạ tầng đo pump/tomato (diag p5) + revert sạch có tài liệu
+- Battery chính thức: v5.4 vs v4 = 1.060x/27/40/median 1.047/P25 1.010/worst 0.886; v5.4 vs v3 = 1.161x/38/40 (95.0%)/worst 0.889
+- RULES.md v1.2: mục Q (biên bản Phase 5) — audit verdict, bảng phán quyết A/B 5 biến thể, quy tắc mới R64–R73; PLAN_V5.md mục 14 biên bản đầy đủ
+
+Stage Summary:
+- Sản phẩm: v5.py v5.4 (1.060x vs v4 — +0.002x mean, +0.030 worst; 95.0% vs v3 ĐÚNG mục tiêu user phía cặp này)
+- 3 thí nghiệm âm được revert sạch kèm số liệu (pump, tomato, profiles) — nguyên tắc "benchmark là phán quyết" giữ vững
+- Kết luận chiến lược hội tụ: kho núm cạn, P3 Solver $/action + T/2 là mỏ cuối cho 95% vs v4
+- Còn: xác minh Arena UI (agent-browser) + commit + push GitHub Train1

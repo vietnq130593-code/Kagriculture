@@ -386,3 +386,38 @@ seed nên flow-ll đọc nhầm CONTEST/COOP/PASSIVE). Chốt:
    §4.1 gốc) thay vì profile tay — rồi mới bật coupling PASSIVE/COOP/DUMP.
 3. L2 coupling: chỉ kích hoạt khi l2_mae < 1.5 (đủ tin cậy) — quy tắc tự tin.
 4. M-2 Solver (P3) vẫn là mỏ tiền thật theo đúng plan ($/action + T/2).
+
+## 14. BIÊN BẢN PHASE 5 (20 Sep) — "TRIẾT KHAI THEO 4 HƯỚNG + KIỂM ĐỊNH ARENA"
+
+**Lệnh user:** "Triển khai Phase 5 theo thứ tự bạn đề xuất. sau đó quan sát đối đầu giữa v5 với v4 và v3. Đánh giá kết quả, cập nhật RULES.md nếu có phát hiện mới, nâng cấp v5 nếu có thể. Báo cáo và push. Ngoài ra kiểm tra lại Kaggriculture Arena đã triển khai hoàn toàn chính xác theo upload/README.md chưa."
+
+### 14.1 Kiểm định Arena/engine TRƯỚC khi đụng v5 (đúng mối lo của user)
+
+Audit 3 phía (engine kaggle-environments 1.32.7 ↔ upload/README.md ↔ v5/v4/run_battle.py) bằng subagent + 45.000 phép kiểm số học: **YELLOW — không sai lệch nào phá hỏng mô phỏng** (price curve 9 mặt hàng, lịch crop/thú, shop demand, fib hire, drain timing khớp tuyệt đối; run_battle chỉ truyền seed, không override). Phát hiện 13 hành vi ẩn engine (R64–R67 RULES.md): ngày 29 chỉ 23 giờ không refresh cuối, kho đầy chặn mua, RNG dùng chung weed+shop, SELL rút từ shed thôi, v.v. → đã nhập RULES.md mục Q.
+
+### 14.2 Triển khai Phase 5 theo protocol A/B (mỗi biến thể đúng 1 delta, 20 seed two-sided)
+
+| Bước | Biến thể | Kết quả | Phán quyết |
+|---|---|---|---|
+| 5.1a | Sửa hằng số sai (wheat yield 5→3.0 đo thực, melon cycle 13→11) | 1.058x = baseline | GIỮ |
+| 5.1+5.2 | +E8-lite drain-aware hold d22–27 + p3_lo minimax + px_after/rev_stream/pipe_rest/_shop_slots_left + opp_herd/opp_wnet telemetry | **1.060x, worst 0.856→0.886** | **GIỮ = v5.4** |
+| 5.3 | +pump wheat điều kiện (opp net-buyer & đàn ≥10) | 1.060x, 26/40 | REVERT (net −$379/40 game) |
+| 5.4 | +TOMATO mở có gate | 1.027x, 23/40, worst 0.766 | REVERT (−0.033x) |
+| 5.5 | +PROFILES học offline (profile_collect.py) | ≈neutral | Tư liệu (bench/profiles_learned.json) |
+
+### 14.3 Kết quả chốt v5.4 (battery chính thức, byte-khớp p4b trên 3 seed spot-check)
+
+- **vs v4: 1.060x · 27/40 (67.5%) · median 1.047 · P25 1.010 · worst 0.886** (v5.3: 1.058x/27/40/0.856)
+- **vs v3: 1.161x · 38/40 (95.0%) · median 1.162 · P25 1.099 · worst 0.889** ← MỤC TIÊU 95% ĐẠT phía v3
+- Ghi nhận: E8 đo thực tế đã gần cạn từ v5.2 (tồn dư cuối $250–800) — ước tính "+$3–5k" của LESSONS là thời v4
+
+### 14.4 Bài học then chốt (đầy đủ ở RULES.md mục Q: R64–R73)
+
+1. **R69**: v4 wheat-flow là churn hai chiều (P25 −9/P75 +11) — "net-buyer" là theo-seed, không phải theo-archetype → best-response phải gate bằng telemetry sống
+2. **R70**: cơ hội phí wheat-feed áp đảo mọi kênh cây nhỏ — TOMATO chỉ Solver $/action toàn cục mới mở nổi
+3. **R72**: PROFILES viết tay sai kênh WHEAT (25 vs đo 0.7) — cột gốc lỗi L1 r1–r4; profile học đã lưu
+4. **R73**: núm "đúng lý thuyết 100%" (pump) vẫn thua bằng số — benchmark là phán quyết cuối
+
+### 14.5 Kết luận & hướng tiếp theo
+
+Kho núm dễ ĐÃ CẠN: 7 núm v5.2 + 3 thử Phase 5 (2 revert, 1 giữ) → mọi con đường nhỏ bị đóng, trừ kết luận hội tụ: **P3 Solver $/action + T/2 là mỏ cuối để đạt 95% vs v4** (cần mean ~1.16–1.22x, tức +$5–8k/mùa). v5.4 hiện giữ: 1.060x vs v4 (67.5%) + 95.0% vs v3 + worst ≥0.886 cả 2 cặp.

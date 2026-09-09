@@ -1240,12 +1240,25 @@ def _daily_plan(tiles, shed, seeds, inv, prices, shops, day, opp_farm, money, tm
         quotas["MELON"] = 14 if room("MELON") > -50 else 7
         if day <= 1:
             quotas["MELON"] = 8
-    # A/B 20 Sep: mở TOMATO (≤8 tiles, gate shop/room) = 1.027x/23/40, worst
-    # 0.766 — MẤT −0.033x so baseline → REVERT về TOMATO=0 như v3/v4. Bài học
-    # (RULES R67): cơ hội phí đất+lao động của nền wheat-feed ép bay lợi
-    # nhuận tomato ở quy mô ≤32u; chỉ Solver $/action toàn cục (P3 đầy đủ)
-    # mới đủ thông tin mở kênh này đúng lúc.
-    if 2 <= day <= 16:
+    if 2 <= day <= 11:
+        # v5.4 Phase 5.4 P3-SCOPED: mở TOMATO có điều kiện (W4: TOMATO=0 vĩnh viễn
+        # từ v3). White-box: v3/v4 không trồng tomato → drain town (PIZZA+
+        # FARMERS_MARKET + center ~13u/ngày nếu có shop) KHÔNG ai phục vụ —
+        # window trồng 2-11 để 4 lứa sản xuất d8-21 khớp giữa mùa. Gate kép:
+        # (shop cầu tomato ≥ 1 HOẶC deficit ≥ 80u) VÀ room > 90 — room đã trừ
+        # pipeline 2 bên + headroom giá 0.78 (sq-glut tomato rơi nhanh).
+        # Quota ≤ 8 tiles (32u) — chiếm chỗ carrot, không đụng wheat/dâu.
+        quotas["TOMATO"] = 0
+        try:
+            t_shops = sum(1 for s in (shops or []) if "TOMATO" in SHOPS.get(s, ()))
+            t_deficit = max(0.0, MARKET_I0 - inv.get("TOMATO", MARKET_I0))
+            t_room = room("TOMATO")
+            if (t_shops >= 1 or t_deficit >= 80.0) and t_room > 90:
+                quotas["TOMATO"] = max(0, min(8, int(t_room // 30)))
+                tm["knobs_tom"] = quotas["TOMATO"]
+        except Exception:
+            pass
+    elif 12 <= day <= 16:
         quotas["TOMATO"] = 0
     if 5 <= day <= 14:
         s_room = room("STRAWBERRY")
@@ -2055,12 +2068,10 @@ def _build_orders(me, shed, seeds, inventories, inv, prices, day, hour, plan,
             opp_wnet = sum(float((odh.get(k) or {}).get("WHEAT", 0.0) or 0.0)
                            for k in ks) / len(ks)
         _mode_p = str((tmx.get("mode") or "") if isinstance(tmx, dict) else "")
-        # A/B 20 Sep (3/40 game bắn: +1201/−504/−1076 = net −$379, 1 win-flip)
-        # → REVERT: v4 trên 20 seed chuẩn là churn-hai-chiều (WHEAT P25 −9 /
-        # P75 +11, profiles_learned), KHÔNG phải net-buyer như seed 42 từng ngụ
-        # ý. Giữ hạ tầng đo (opp_wnet/opp_herd) + diag p5 — vũ khí chờ đối thủ
-        # net-buyer thật trên ladder (ô best-response "A→B" chưa đủ chứng cứ).
-        pump = False
+        pump = False and (_mode_p != "MIRROR" and 6 <= day <= 26
+                and opp_wnet <= -10.0
+                and int((tmx.get("opp_herd") if isinstance(tmx, dict) else 0) or 0) >= 10
+                and money >= 1200)
         if isinstance(tmx, dict):
             tmx["pump"] = bool(pump)
             tmx["opp_wnet"] = round(opp_wnet, 1)
@@ -2077,8 +2088,10 @@ def _build_orders(me, shed, seeds, inventories, inv, prices, day, hour, plan,
     if animals > 0 or plan_animals > 0:
         shed_wheat = (shed.get("WHEAT", 0) or 0) if shed else 0
         wheat_want = int(animals * 1.5) + 4
+        if pump:
+            wheat_want = int(wheat_want * 1.6)  # dồn tích thêm để đẩy mặt giá
         if shed_wheat < wheat_want and money >= 400:
-            need = min(10, wheat_want - shed_wheat)
+            need = min(16 if pump else 10, wheat_want - shed_wheat)
             pw = _price("WHEAT", inv.get("WHEAT", MARKET_I0) - 1)
             afford = int((money * 0.35) // pw) if pw > 0 else 0
             n = min(need, afford)
@@ -2086,6 +2099,8 @@ def _build_orders(me, shed, seeds, inventories, inv, prices, day, hour, plan,
             # v5 L6 F2: trả đắt hơn cho cám khi đàn nguy cơ — gate 38/52/62/80 theo level
             f2v = int(rg.get("F2", 0) or 0)
             wgate = 38 if f2v <= 0 else (52 if f2v == 1 else (62 if f2v == 2 else 80))
+            if pump:
+                wgate += 10  # Phase 5.3: chấp nhận mua đắt hơn để duy trì áp lực giá
             if f2v >= 2 and pw > 0:
                 afford = int((money * 0.5) // pw)
                 n = min(need, afford)
@@ -2116,6 +2131,14 @@ def _build_orders(me, shed, seeds, inventories, inv, prices, day, hour, plan,
 
     def _hold(it):
         h = HOLD.get(it, 0.90)
+        # Phase 5.3 pump: đang đẩy mặt giá wheat → không tự phá giá của mình
+        # (chỉ nâng ngưỡng bán wheat lên 0.92×base=$23; d26+ mọi thứ thanh lý)
+        try:
+            if (it == "WHEAT" and day < 26 and isinstance(tmx, dict)
+                    and tmx.get("pump")):
+                h = max(h, 0.92)
+        except Exception:
+            pass
         # v5 L6: thanh lý tồn kho khi kẹt khẩn cấp (lối thoát cưỡng bức)
         if rg.get("liquidate"):
             h = min(h, 0.55)
@@ -2343,6 +2366,7 @@ def _arena_diag(obs):
             "parity_chase": int(tm.get("knobs_parity", 0) or 0),
             "herd_gap": int(tm.get("herd_gap", 0) or 0),
             "pump": bool(tm.get("pump")),
+            "tom_quota": int(tm.get("knobs_tom", 0) or 0),
         }
         fb = float(tm.get("feedbuy", 0.0) or 0.0)
         fu = int(tm.get("feed_units", 0) or 0)
