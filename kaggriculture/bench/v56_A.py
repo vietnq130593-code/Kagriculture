@@ -101,10 +101,9 @@ ANIMAL_CAP = 16
 TOM_QUOTA = 6
 # v5.6 (Task 23 — P1 autopsy 6/6 trận thua chảy máu d19-29): 3 wave, mỗi wave
 # 1 delta theo protocol A/B two-sided 20-seed trước khi mặc định bật.
-V56_LATE_ENGINE = False # Wave A: REVERT theo phán quyết A/B (10-seed dA3=−0.085: trồng muộn dồn cung wheat đè pump giá)
-V56_DEEP_HERD = True    # Wave B: deep-market herd floor + cap đàn nới d≥18 (B2: 1.184x, worst 0.938)
-V56_MICRO = True        # Wave C: T/2 anti-doom (bảo hiểm trung tính, ngưỡng align 29)
-V56_SCARCITY = True     # Wave D: khan hiếm ĐƯỢC GIÁ CHỨNG MINH → quota đầy + hạ floor tiền hạt
+V56_LATE_ENGINE = True  # Wave A: $/action + T/2 kéo dài vòng trồng cuối d19-24
+V56_DEEP_HERD = False    # Wave B: deep-market herd floor + cap đàn nới d≥18
+V56_MICRO = False        # Wave C: T/2 anti-doom (không trồng cây không kịp chín)
 HOLD = {"MILK": 0.98, "WOOL": 0.94, "STRAWBERRY": 0.90, "EGG": 0.86,
         "CARROT": 0.70, "WHEAT": 0.76, "MELON": 0.52, "TOMATO": 0.82, "FERTILIZER": 0.40}
 
@@ -1121,37 +1120,20 @@ def _daily_plan(tiles, shed, seeds, inv, prices, shops, day, opp_farm, money, tm
             milk_shops = sum(1 for s in (shops or [])
                              if s in ("PIZZA_SHOP", "ICE_CREAM_SHOP", "SMOOTHIE_SHOP"))
             yarn_n = sum(1 for s in (shops or []) if s == "YARN_STORE")
-            if milk_shops >= 2 and 4 <= day <= (19 if V56_DEEP_HERD else 16):
+            if milk_shops >= 2 and 4 <= day <= 16:
                 # v5.6 Wave B (P1 autopsy 119/105: v4 phóng 15 thú ăn thị trường
-                # sâu $10-12k sữa+len; floor cũ 6 bò + đóng sớm d16 thua ngay
-                # từ sàn). Deep gate kép: shop cấu trúc + giá còn khỏe (≥0.95×
-                # base) → floor bò 6→9 + kéo dài cửa d19 cho kịp cua cuối;
-                # glut thì giữ floor cũ (38 seed còn lại trung tính).
+                # sâu $10-12k sữa+len; floor cũ 6 bò thua ngay từ sàn). Deep
+                # gate kép: shop cấu trúc + giá còn khỏe (≥0.95×base, không glut)
+                # → floor bò 6 → 9; glut thì giữ floor cũ (38 seed còn lại trung tính).
                 _dm = (V56_DEEP_HERD
                        and float(prices.get("MILK", 0) or 0) >= 0.95 * MARKET_PARAMS["MILK"]["base"])
-                if _dm and tm is not None:
-                    tm["deep_herd"] = True
                 cow_target = max(cow_target,
                                  min(9 if _dm else 6, (3 if _dm else 2) + milk_shops))
-            if yarn_n >= 1 and 4 <= day <= (18 if V56_DEEP_HERD else 15):
+            if yarn_n >= 1 and 4 <= day <= 15:
                 _dw = (V56_DEEP_HERD
                        and float(prices.get("WOOL", 0) or 0) >= 0.95 * MARKET_PARAMS["WOOL"]["base"])
-                if _dw and tm is not None:
-                    tm["deep_herd"] = True
                 sheep_target = max(sheep_target,
                                    min(8 if _dw else 7, (5 if _dw else 4) + yarn_n))
-            # v5.6 Wave B v2: goose floor — 2 tầng (autopsy 107: egg 123 vs
-            # 158u, v4 ngỗng 5-7 vs v5 3-4). (i) shop trứng ≥2 + giá khỏe →
-            # floor 7; (ii) GOOSE-MATCH: trứng ≥ base + v4 ngỗng nhiều hơn →
-            # theo chân +1 (ngỗng $300 rẻ nhất, interval 1 ngày = thu nhanh
-            # nhất — cuộc đua volume giá $50 thắng bằng SỐ LƯỢNG; cap 7).
-            _egg_shops = sum(1 for s in (shops or []) if s in ("BAKERY", "BRUNCH_SPOT"))
-            if V56_DEEP_HERD and _egg_shops >= 2 and 4 <= day <= 14 \
-                    and float(prices.get("EGG", 0) or 0) >= 0.95 * MARKET_PARAMS["EGG"]["base"]:
-                goose_target = max(goose_target, 7)
-                if tm is not None:
-                    tm["deep_herd"] = True
-
     except Exception:
         pass
     if day < 2:
@@ -1208,17 +1190,6 @@ def _daily_plan(tiles, shed, seeds, inv, prices, shops, day, opp_farm, money, tm
     # vì mid-game cap giữ nguyên 0.75×u+2.
     if V56_DEEP_HERD and day >= 18:
         animal_cap = min(ANIMAL_CAP, u_est + 2)
-    # v5.6 Wave B v2: cap giữa-game cho deep market — probe seed 119 cho thấy
-    # floor 9 bò bị cap 11 cắt sạch (owned 11 ≥ cap → target clip về standing)
-    # từ d12 → đàn đứng im trong khi v4 phi d15→15 thú. Deep (shop+giá khỏe,
-    # tm['deep_herd'] stash từ floor) → cap = u_est (13): +2 slot ramp giữa
-    # game, vẫn giữ khung 1 thú/thợ xa ngưỡng chết seed 42 (15 @ 13);
-    # water_debt/F2 siết cap như cũ.
-    try:
-        if V56_DEEP_HERD and 10 <= day < 18 and (tm or {}).get("deep_herd"):
-            animal_cap = max(animal_cap, min(ANIMAL_CAP, u_est))
-    except Exception:
-        pass
 
     # v5.2 TRỌNG TÂM 2 — LAO ĐỘNG LÀ RÀNG BUỘC SỐ 1 CỦA CHIẾN THUẬT:
     # water_crit_late = số lượt tưới-cấp cứu CÒN NỢ lúc hour≥16 hôm qua
@@ -1338,24 +1309,6 @@ def _daily_plan(tiles, shed, seeds, inv, prices, shops, day, opp_farm, money, tm
             s_room = max(s_room, absorb.get("STRAWBERRY", 0.0)
                          - my_pipe.get("STRAWBERRY", 0.0))
             tm["knobs_straw"] = True
-        # ---- v5.6 Wave D: SCARCITY ĐƯỢC GIÁ CHỨNG MINH ----
-        # Probe seed 114: straw px $139→$247 (2×base), inv 230u dưới I0,
-        # v4 đứng 10 cây thắng $1.1k trong khi v5 đứng 6 vì (a) d5-10 tiền
-        # $300 < floor hạt $900, (b) d11+ có $8k nhưng quota s_room//4 = 6
-        # == standing → không bao giờ trồng thêm. Giá ≥1.25×base + deficit
-        # = thị trường tự chứng minh chiều sâu (absorb ước tính 50 vs thực
-        # tế 225) → quota đầy 30 + floor hạt hạ 900→200 (1 hạt $100 đổi
-        # 4u×$160+ = tự trả 6 lần trong 1 lứa).
-        try:
-            spx = float(prices.get("STRAWBERRY", 0) or 0)
-            sinv = float(inv.get("STRAWBERRY", MARKET_I0) or MARKET_I0)
-            if V56_SCARCITY and spx >= 1.25 * MARKET_PARAMS["STRAWBERRY"]["base"] \
-                    and sinv <= MARKET_I0:
-                s_room = max(s_room, want_straw * 4 + 40)
-                if tm is not None:
-                    tm["knobs_scarcity"] = "STRAWBERRY"
-        except Exception:
-            pass
         quotas["STRAWBERRY"] = want_straw if s_room > 100 else max(0, min(want_straw, int(s_room // 4)))
     elif 14 <= day <= 15:
         quotas["STRAWBERRY"] = 6
@@ -1388,20 +1341,20 @@ def _daily_plan(tiles, shed, seeds, inv, prices, shops, day, opp_farm, money, tm
     # → thu d+3/4). $/action = 3u × px_pred(p3) / 4 act — chỉ mở khi dự báo
     # giá đủ ngưỡng $18/act (glut tự động đóng cửa; không phá monopoly pump
     # muộn game vì drain mạnh + feed-war window đóng d26 sẵn).
-    if V56_LATE_ENGINE and 18 <= day <= 26 and n_units and not str((rg or {}).get("state")) == "SURVIVE":
+    if V56_LATE_ENGINE and 19 <= day <= 24 and n_units and not str((rg or {}).get("state")) == "SURVIVE":
         try:
             pxp = (tm or {}).get("px_pred") or {}
             service_load = (animals_now + shed_geese + shed_cows + shed_sheep) * 3
             water_load = int(0.9 * sum(standing.values()))
             idle_a = max(0, n_units * 21 - service_load - water_load - 30)
             for crop, matur, ypc in (("WHEAT", 4, 3.0), ("CARROT", 3, 3)):
-                if day + matur > 29:
+                if day + matur > 28:
                     continue
                 q = pxp.get(crop) or {}
                 p3 = float(q.get("p3", 0) or 0)
                 now_ = float(q.get("now", 0) or 0)
                 px_use = p3 if p3 > 0 else (now_ if now_ > 0 else float(MARKET_PARAMS[crop]["base"]))
-                if ypc * px_use / 4.0 >= 14.0 and idle_a >= 24:
+                if ypc * px_use / 4.0 >= 18.0 and idle_a >= 24:
                     extra = min(12, idle_a // 4, max(0, len(plantable)))
                     q0 = quotas.get(crop, 0) or 0
                     quotas[crop] = max(q0, standing.get(crop, 0) + extra)
@@ -1414,13 +1367,12 @@ def _daily_plan(tiles, shed, seeds, inv, prices, shops, day, opp_farm, money, tm
             pass
 
     # ---- v5.6 Wave C: T/2 anti-doom (phần plan) — không đặt quota kênh
-    # không kịp chín trước d29 sáng (thu + bán trong ngày cuối; align ngưỡng
-    # với Wave A để hai lớp không tự mâu thuẫn) ----
+    # không kịp chín trước d28 (bảo hiểm kép cho các window tĩnh bên trên) ----
     if V56_MICRO:
         try:
             for crop, matur in (("WHEAT", 4), ("CARROT", 3), ("TOMATO", 8),
                                 ("STRAWBERRY", 10), ("MELON", 10)):
-                if day + matur > 29 and quotas.get(crop, 0):
+                if day + matur > 28 and quotas.get(crop, 0):
                     cd = CROPS[crop]
                     if not cd["ongoing"]:
                         quotas[crop] = min(quotas.get(crop, 0), standing.get(crop, 0))
@@ -2165,18 +2117,6 @@ def _build_orders(me, shed, seeds, inventories, inv, prices, day, hour, plan,
                 floor = 80 if crop == "WHEAT" else (150 if crop == "STRAWBERRY" else 220)
                 if crop == "STRAWBERRY":
                     floor = 900
-                    # v5.6 Wave D: khan hiếm đã được giá chứng minh → hạ floor
-                    # hạt dâu — NHƯNG chỉ khi tiền ĐÃ thoải mái (≥$1.5k): trận
-                    # 115/119 cho thấy hút cạn $300 d5-10 cho hạt dâu bồi tụ
-                    # mua thú/lúa mì → vựn thua −$10-17k; trận 114 lật được từ
-                    # trồng d11+ KHI TIỀN ĐÃ CÓ (melon cash d11 → quota 30).
-                    try:
-                        if V56_SCARCITY and (
-                                (tmx.get("knobs_scarcity") if isinstance(tmx, dict) else None) == "STRAWBERRY"
-                                or float(prices.get("STRAWBERRY", 0) or 0) >= 1.25 * MARKET_PARAMS["STRAWBERRY"]["base"]):
-                            floor = 200
-                    except Exception:
-                        pass
                 if crop == "MELON":
                     floor = 700
                 max_afford = max(0, int((money - floor - (animal_reserve if crop == "STRAWBERRY" else 0)) // unit)) if unit > 0 else 0
@@ -2477,20 +2417,13 @@ def _agent(obs):
         _bayes_step(tm, day, opp, (mc, mg, msp), my_money)
         _STATE[pkey] = _daily_plan(tiles, shed, seeds, inv, prices, shops, day, opp,
                                    my_money, tm, _STATE.get("rg"),
-                                   int((tm or {}).get("units_peak", 1) or 1))
+                                   1 + len(_g(me, "hands", None) or []))
     plan = _STATE[pkey]
 
     fpos = _g(me, "farmer", None) or [board // 2 - 1, board // 2 - 1]
     units = [(0, int(fpos[0]), int(fpos[1]))]
     for i, h in enumerate(_g(me, "hands", None) or []):
         units.append((i + 1, int(h[0]), int(h[1])))
-    # v5.6 Wave A: engine materialize lại hands mỗi sáng (h0 hands=[], h1-3 mới
-    # đủ) → n_units lúc hour-0 luôn =1. Stash đỉnh quan sát được để plan sáng
-    # hôm sau dùng số thợ THẬT của chiều qua (hires chỉ tăng, peak = hiện tại).
-    try:
-        tm["units_peak"] = max(int(tm.get("units_peak", 1) or 1), len(units))
-    except Exception:
-        pass
 
     tasks, stats = _build_tasks(tiles, shed, seeds, plan, day, hour, step,
                                 inventories, len(units))

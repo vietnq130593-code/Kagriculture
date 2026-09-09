@@ -453,3 +453,19 @@ Stage Summary:
 - Phát hiện trọng yếu: R80 bẫy get_last_callable — v5.py gốc nếu dán thẳng sẽ $3,000; đã sửa v5.py + mọi số liệu battery cũ xác nhận còn hợp lệ
 - Kết quả v5.5 mang theo: vs v4 1.162x/34/40 (85%), vs v3 1.311x/38/40 (95.0%)
 - Còn: user dán cell4_v5.py vào cell 4 + nộp; bước tiếp theo = P3 Solver $/action T/2 (mỏ cuối cho 95% vs v4) + push GitHub
+
+---
+Task ID: 23-a
+Agent: KAIN (main-agent)
+Task: P1败局解尸 — replay 6 trận thua của v5.5 vs v4 (battery 34/40), dollar-diff ledger theo ngày × kênh
+
+Work Log:
+- Xác định 6 seed thua từ base_v55.json: 104:0 (−$2,005), 105:0 (−$973), 107:0 (−$3,819), 114:0 (−$1,087), 117:1 (−$589), 119:1 (−$6,602) — 4 knife-edge + 2 cấu trúc
+- Chạy bench/autopsy.py cho cả 6 (replay engine thật + wrap agent ghi money theo ngày/units theo kênh/cấu trúc ruộng)
+- Phân tích ledger: 6/6 trận v5 DẪN giữa game (+$2.5k đến +$13.7k @ d14-18) rồi chảy máu d19-29
+
+Stage Summary:
+- Mẫu chết chung #1 (endgame stall): quota v5 đóng hết ≤d24 (WHEAT 24 / CARROT 23 / STRAW 15 / MELON 14) → ruộng rỗng @d27 (standing c2-c25 vs v4 c8-c21), 200+ idle actions/ngày dù v5 có 15 thợ (v4 chỉ 13); wheat cycle 5 ngày vẫn realizable tới d24 trồng→d28 thu
+- Mẫu chết #2 (deep-market herd, seed 119+105): v4 phóng 15 thú ăn thị trường sâu sữa/len ($10-12k), v5 room-logic thấy pipeline v4 → nhượng (vòng lẩn nhau), floor shop-draw chỉ 6 bò
+- Bảng unit-deficit: wheat −75..−194u (4/6 trận), milk −34u + wool −21u (119), wool −38u (105), straw −38u (114)
+- Chẩn đoán → v5.6 3 wave: (A) LATE-ENGINE $/action solver mở quota wheat/carrot d20-25 theo labor-surplus × px_pred; (B) DEEP-HERD floor 9 bò/7 cừu khi absorb sâu + cap đàn nới d≥18; (C) MICRO không trồng/tưới cây không kịp chín trước d29

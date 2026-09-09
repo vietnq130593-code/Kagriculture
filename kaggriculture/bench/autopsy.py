@@ -70,7 +70,7 @@ def run(seed, v5_seat):
             return act
         return fn
 
-    mA = load(os.path.join(ROOT, "v5.py"), "a")
+    mA = load(os.environ.get("V5_PATH") or os.path.join(ROOT, "v5.py"), "a")
     mB = load(os.path.join(ROOT, "v4.py"), "b")
     if v5_seat == 0:
         agents = [wrap(mA, 0), wrap(mB, 1)]
