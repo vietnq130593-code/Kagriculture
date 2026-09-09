@@ -302,3 +302,27 @@ Mục tiêu 95%: **ĐẠT vs v3**; vs v4 đạt 85% (từ 67.5%) — phần còn
 
 ---
 *KAIN — RULES.md v1.3 (mục R: biên bản Task 21 — GT-LAND đường cong đất 4 điểm, GT-Cournot 2 cấp, R74–R79, v5.5 chính thức 1.162x/85% vs v4 + 1.311x/95% vs v3). Quy tắc mới vẫn qua protocol §P 5 bước trước khi encode.*
+
+## S. BIÊN BẢN TASK 22 (21 Sep) — KAGGLE SUBMISSION v5.5 + BẪY get_last_callable
+
+### S.1 Phát hiện bẫy (bug-class mới, mức "chết chóc")
+Khi dựng bản dán Kaggle (cell 4) từ v5.py: battle kiểm chứng cho v5.py $3,000 (đứng yên)
+trong khi bản strip chơi đầy đủ $56–66k. Nguyên nhân: `kaggle_environments.agent.
+get_last_callable` chọn **callable CUỐI CÙNG của file/cell** làm agent (không phải
+theo tên `agent`). v5.5 Task 21 đã append `_gt_s` (trợ giúp diag) SAU `def agent`
+→ mọi lần nạp theo file/cell gọi nhầm `_gt_s(obs)` → exception mỗi lượt → PASS
+mãii → $3,000. Arena không lộ vì run_battle.py nạp importlib entry="agent" tường minh.
+
+### S.2 R80 (quy tắc mới — bug-class, mức submission-infra)
+| # | Quy tắc | Loại | Nguồn |
+|---|---|---|---|
+| R80 | **`def agent` PHẢI là callable cuối cùng của file/cell Kaggle**: kaggle_environments `get_last_callable` lấy `[-1]` các giá trị callable trong namespace exec — hàm diag/helper đặt sau `agent` sẽ bị gọi thay `agent` và agent đứng yên $3,000. Mọi hàm trợ giúp diag (_arena_diag, _gt_s) phải đặt TRƯỚC `agent`; kiểm bằng `ast.parse` lấy tên hàm cuối. Cũng đúng cho battery two_sided (nạp file-path) — kết quả $3,000 bất thường = dấu hiệu Called nhầm | K | Task 22 debug + core.py agent.py L66 |
+
+### S.3 Sản phẩm Task 22
+- `v5.py`: hoán đổi `_gt_s` lên trước `agent` (behavior-neutral với Arena; sửa bẫy cho mọi lần nạp file-path tương lai)
+- `cell4_v5.py` (2.085 dòng, 82.236 bytes, md5 277b2fa5c7b2890134d957d44fb98456): bản cell 4 Kaggle chính thức = v5.5 đầy đủ, bỏ comment/docstring/_arena_diag/_gt_s (dead-code trong Kaggle), chỉ `import math`
+- Kiểm chứng 3 lớp: py_compile ✓; AST dump bằng v5.py (bỏ 2 hàm diag + docstring) ✓; 6 battle (seed 100–102 × 2 ghế) cell4_v5 vs v4 ĐỒNG TỪNG ĐÔ LA với v5.py vs v4 — 6/6 v5 thắng ($56.3k–$66.6k vs $49.5k–$60.9k, khớp hướng 1.162x) ✓
+- Toàn bộ 24 file agent (v2–v5, bench variants) audit last-callable: chỉ v5.py lỗi (đã sửa) — các số liệu battery cũ hợp lệ
+
+---
+*KAIN — RULES.md v1.4 (mục S: biên bản Task 22 — bẫy get_last_callable R80, submission cell4_v5.py, kiểm chứng 3 lớp). Quy tắc mới vẫn qua protocol §P 5 bước trước khi encode.*

@@ -433,3 +433,23 @@ Stage Summary:
 - Kiến trúc GT đúng yêu cầu: 720 micro-cycle (mỗi lượt, _hold modulation) + 30 macro-cycle (mỗi 24 lượt, tín hiệu Cournot từ L2) — lý thuyết cho hướng, benchmark cho phán quyết (R73)
 - Kết quả: vs v4 1.060x/67.5% → 1.162x/85% (+0.102x, t=4.71); vs v3 95.0% ĐẠT mục tiêu user (worst 0.974); còn 85% vs v4 = 4 trận knife-edge + 2 seed cấu trúc không tín hiệu sớm (R79)
 - Còn: push GitHub (token upload/PAT vietnq.rtf), P3 Solver $/action T/2 là mỏ cuối cho 95% vs v4
+
+---
+Task ID: 22
+Agent: KAIN (main-agent)
+Task: Theo lệnh user — giao code v5.5 để dán vào cell 4 Kaggle (nộp bài), phiên bản đầy đủ, không chú thích, chỉ code
+
+Work Log:
+- Phân tích quy ước submission hiện có (submission_v3/v4 = vN.py bỏ comment + compact); đọc v5.py v5.5 (2.481 dòng) + core.py của kaggle_environments để hiểu cách nạp agent file/cell
+- Viết bench/make_cell4_v5.py: tokenize strip 250 comment + ast strip 16 docstring + bỏ _arena_diag/_gt_s (dead-code Kaggle) → cell4_v5.py 2.085 dòng / 82.236 bytes
+- Kiểm chứng 1: py_compile + AST dump bằng v5.py (bỏ 2 hàm diag + docstring hai bên) → BẰNG
+- Kiểm chứng 2 (battle): phát hiện v5.py nạp file-path cho $3,000 — DEBUG ra bẫy get_last_callable (kaggle chọn callable CUỐI file; Task 21 đã append _gt_s sau agent) — nếu dán thẳng v5.py vào Kaggle = $3,000 chắc chắn
+- Sửa v5.py: hoán _gt_s lên trước agent (behavior-neutral, giữ số liệu battery cũ nguyên vẹn); audit 24 file agent: chỉ v5.py dính bẫy
+- Kiểm chứng 3: 6 battle seed 100–102 × 2 ghế: cell4_v5 vs v4 == v5 vs v4 ĐỒNG TỪNG ĐÔ LA (6/6 v5 thắng $56.3k–$66.6k vs $49.5k–$60.9k — khớp hướng battery 1.162x); md5 277b2fa5c7b2890134d957d44fb98456
+- RULES.md v1.4 mục S: bẫy get_last_callable + quy tắc R80 (agent phải là callable cuối cùng của cell/file)
+
+Stage Summary:
+- Sản phẩm: kaggriculture/cell4_v5.py — bản nộp Kaggle chính thức (chỉ import math, không comment, agent cuối file), đã kiểm chứng 3 lớp (compile/AST/battle dollar-identical)
+- Phát hiện trọng yếu: R80 bẫy get_last_callable — v5.py gốc nếu dán thẳng sẽ $3,000; đã sửa v5.py + mọi số liệu battery cũ xác nhận còn hợp lệ
+- Kết quả v5.5 mang theo: vs v4 1.162x/34/40 (85%), vs v3 1.311x/38/40 (95.0%)
+- Còn: user dán cell4_v5.py vào cell 4 + nộp; bước tiếp theo = P3 Solver $/action T/2 (mỏ cuối cho 95% vs v4) + push GitHub

@@ -1,33 +1,3 @@
-# v5 "ORCHESTRATOR" — v5.5 (Task 21, 20 Sep): v5.4 + GT-LAND COURNOT + GT LỚP
-# LY THUYẾT TRÒ CHƠI 2 CẤP (macro 24-lượt / micro mỗi lượt).
-# v5.5 CHANGES (A/B 20-seed two-sided, protocol Task 20):
-#   • GT-LAND: đất tối ưu 50 ô (NW+NE, $1k) — đường cong thực nghiệm
-#     25/50/75/100 ô = 1.078/1.158/1.112/1.060x. Mua SW+SE ($6k) là lãng phí
-#     kép: vốn + lao động + áp lực cung wheat vi phạm monopoly-restraint R37.
-#     50 ô chạy đầy ~100% (wheat 13-20 + dâu 18 + 11 thú + melon sớm).
-#   • GT-COURNOT MACRO (hour 0-1 mỗi 24 lượt): đọc L2 Gamma-Poisson E/P75
-#     mỗi kênh → tín hiệu dump_sig (P75≥8u và ≥1.5×E → front-run ×0.96) /
-#     calm_sig + px_pred rising (→ monopoly restraint ×1.04). tm["gt"] hiển
-#     thị trong Arena diag.
-#   • KẾT QUẢ: vs v4 1.162x/34/40 (85%)/worst 0.879 (từ 1.060x/67.5%);
-#     vs v3 1.311x/38/40 (95.0%)/worst 0.974. Paired vs baseline +0.102x
-#     (t=4.71, p<0.0002, thắng 17/20 seed).
-# v5.3→v5.4 (Task 20): audit engine + E8-lite + px_after + p3_lo minimax +
-#   telemetry opp_herd/opp_wnet + 3 thí nghiệm revert (pump/tomato/profiles).
-# v5.3: P2 FEED MAKE-VS-BUY hoàn chỉnh + L1 ARCHETYPE 5 LỚP + L2 GAMMA-POISSON.
-# Bảy lớp não:
-#   L1 archetype posterior (naive Bayes 9 kênh flow + kernel đàn/tiền MIRROR,
-#   forgetting 0.8, hysteresis 2 đêm) — STRONG/COOP/PASSIVE/DUMP/MIRROR;
-#   L2 Gamma-Poisson E[opp_sales_p] + P25/P75 (thay _flow_pred 3-đêm-tay);
-#   L3-Race E[tiền cuối] gap/tier (EMA+dwell) + L3-Price px_pred +3 ngày;
-#   L5 sổ KPI + L6 risk guard (F1/F2/F3 + GROW/RECOVER/SURVIVE);
-#   L7 núm chiến thuật theo tier/mode.
-# P2 FEED WARFARE (bài học A/B đảo ngược giả định kế hoạch): "churn" wheat
-#   của v5.2 là VŨ KHÍ zero-sum — áp lực mua nâng mặt giá, đánh thuế vào
-#   feedbuy $32-41k của v4 (net-buyer). Ngừng mua = tự giải giáp (−0.12x).
-#   Giữ cơ chế mua v5.2 + cap 12u/ngày + đo feedbuy (ledger P2) + L2
-#   quantile cho subs + L1 posterior 2 tầng.
-# Fallback: mọi lớp não hỏng → nền v4.
 import math
 
 CROPS = {
@@ -74,9 +44,6 @@ SHED_CAP = 100
 LAND_PRICES = [1000, 2000, 4000]
 MAX_SHOP_INSTANCES = 8
 
-# v5.4 (audit 20 Sep): WHEAT 5 là ảo — engine tối đa 4 (tưới đủ window 2-4);
-# đo thực tế từ battle trace: parity-watering cho ~3.0u/cycle (428u / ~140 cycle).
-# CYCLE_LEN MELON 13 → 11 (plant d0 → thu tối ưu d10, decay d13; hằng chết, sửa cho đúng).
 CYCLE_LEN = {"WHEAT": 5, "CARROT": 4, "TOMATO": 12, "STRAWBERRY": 17, "MELON": 11}
 YIELD_PER_CYCLE = {"WHEAT": 3.0, "CARROT": 3, "TOMATO": 4, "STRAWBERRY": 4, "MELON": 6}
 
@@ -103,7 +70,7 @@ HOLD = {"MILK": 0.98, "WOOL": 0.94, "STRAWBERRY": 0.90, "EGG": 0.86,
         "CARROT": 0.70, "WHEAT": 0.76, "MELON": 0.52, "TOMATO": 0.82, "FERTILIZER": 0.40}
 
 _STATE = {}
-_ARCHES = ("CONTEST", "MIRROR")  # v5: P0 — xóa COOP/PASSIVE chết, mở lại ở P1 với 5 lớp
+_ARCHES = ("CONTEST", "MIRROR")
 
 
 def _gauss(x, c, s):
@@ -113,7 +80,7 @@ def _gauss(x, c, s):
 
 def _tm_step(tm, step, inv, shops):
     try:
-        tm["shops"] = list(shops or [])  # v5-P1 FIX: drain town cần shop hiện tại
+        tm["shops"] = list(shops or [])
         prev = tm.get("prev_inv")
         if prev is not None and tm.get("prev_step") == step - 1:
             drain = _drain_at(step - 1, tm.get("shops") or [])
@@ -123,14 +90,14 @@ def _tm_step(tm, step, inv, shops):
             for p in PRODUCTS:
                 delta = inv.get(p, MARKET_I0) - prev.get(p, MARKET_I0)
                 od[p] = od.get(p, 0.0) + delta + drain.get(p, 0.0) - ms.get(p, 0.0) + mb.get(p, 0.0)
-        mds = tm.setdefault("my_day_sales", {})  # v5: L5 — tích lũy bán của tôi theo ngày
+        mds = tm.setdefault("my_day_sales", {})
         ms0 = tm.get("my_sells") or {}
         for p in PRODUCTS:
             mds[p] = mds.get(p, 0.0) + ms0.get(p, 0.0)
         if step % 24 == 0 and step > 0:
             tm.setdefault("opp_daily", {})[step // 24 - 1] = dict(tm.get("opp_day") or {})
             tm["opp_day"] = {}
-            tm.setdefault("my_daily", {})[step // 24 - 1] = dict(tm.get("my_day_sales") or {})  # v5
+            tm.setdefault("my_daily", {})[step // 24 - 1] = dict(tm.get("my_day_sales") or {})
             tm["my_day_sales"] = {}
         tm["prev_inv"] = {p: inv.get(p, MARKET_I0) for p in PRODUCTS}
         tm["prev_step"] = step
@@ -157,23 +124,10 @@ def _tm_orders(tm, orders):
 
 
 def _bayes_step(tm, day, opp_farm, my_herd, my_money):
-    """v5.3 L1 ARCHETYPE POSTERIOR (PLAN §4.1) — 5 giả thuyết đầy đủ:
-    MIRROR (twin bit-identical) · CONTEST/STRONG (dòng v3/v4) · COOP ·
-    PASSIVE · DUMP. Kiến trúc 2 tầng chống lỗi scale (bài học v5.3-r1:
-    kernel MIRROR ~0.5 vs tích Poisson 9 kênh ~1e-10 không nhân chung
-    được → posterior MIRROR vọt 0.99 khi đấu v4 → tắt hết núm compete):
-
-    Tầng 1 (pm — giữ NGUYÊN v5.2 đã kiểm chứng): kernel đàn+tiền phát
-    hiện twin. MIRROR chỉ bật khi pm > 0.70, đàn đối thủ không vượt +2,
-    sau ngày 8. Tầng 2 (flow posterior): naive Bayes 9 kênh Poisson quanh
-    hồ sơ flow kỳ vọng (white-box v3/v4 + traces) — softmax có nhiệt độ
-    τ=5 (một đêm chứng cứ không đập posterior), quên λ=0.8, hysteresis
-    2 đêm P>0.6. O(9×|H|)/đêm."""
     try:
         tm["mode"] = tm.get("mode", "CONTEST")
         od = tm.get("opp_daily") or {}
         xs = (od.get(day - 1) or {}) if day >= 2 else {}
-        # ---- tầng 1: pm twin-kernel (v5.2 NGUYÊN TRẠNG) ----
         oc = og = osp = 0
         opp_tiles = _g(opp_farm, "tiles", None) if opp_farm else None
         if opp_tiles:
@@ -189,7 +143,7 @@ def _bayes_step(tm, day, opp_farm, my_herd, my_money):
                             osp += 1
         opp_money = float(_g(opp_farm, "money", 0) or 0) if opp_farm else 0.0
         mc, mg, msp = my_herd
-        try:  # v5.4 Phase 5.3: lưu đàn đối thủ cho gate pump (feed warfare)
+        try:
             tm["opp_herd"] = oc + og + osp
         except Exception:
             pass
@@ -205,7 +159,6 @@ def _bayes_step(tm, day, opp_farm, my_herd, my_money):
         pm = (pm ** 0.8) * (like_m / (like_m + like_c))
         pm = min(0.99, max(0.005, pm))
         tm["pm"] = pm
-        # ---- tầng 2: flow posterior 4 giả thuyết (softmax τ=5) ----
         PROFILES = {
             "CONTEST": {"WHEAT": 25, "CARROT": 3, "TOMATO": 1, "STRAWBERRY": 2,
                         "MELON": 3, "EGG": 4, "MILK": 2, "WOOL": 1, "FERTILIZER": 5},
@@ -218,9 +171,6 @@ def _bayes_step(tm, day, opp_farm, my_herd, my_money):
         }
         l1 = tm.setdefault("l1f", {h: 0.25 for h in
                                    ("CONTEST", "COOP", "PASSIVE", "DUMP")})
-        # v5.3 WARMUP GUARD (bài học seed 111: flow v4 lúc d2-5 đang ramp —
-        # giống PASSIVE → posterior vọt 0.99 sai → flip mode tắt núm compete).
-        # Chỉ phân loại khi đủ chứng cứ: ngày ≥ 7 VÀ tổng flow quan sát ≥ 50u
         cum = 0.0
         for k, dd in (od or {}).items():
             if isinstance(k, int) and isinstance(dd, dict):
@@ -236,8 +186,6 @@ def _bayes_step(tm, day, opp_farm, my_herd, my_money):
                     x = max(0.0, float(xs.get(p, 0.0)))
                     ll += x * math.log(mu) - mu - math.lgamma(x + 1.0)
                 lls[h] = ll
-            # kênh tiền (trọng số 1:1 với 9 kênh Poisson — mỗi kênh ~0-6 nats):
-            # CONTEST sống ~1:1; PASSIVE tích lũy chậm ~0.55
             lls["PASSIVE"] += math.log(max(1e-6, _gauss(lr, math.log(0.55), 0.5)))
             lls["CONTEST"] += math.log(max(1e-6, _gauss(lr, 0.0, 0.55)))
             m_ll = max(lls.values())
@@ -250,14 +198,6 @@ def _bayes_step(tm, day, opp_farm, my_herd, my_money):
             for h in post:
                 l1[h] = min(0.99, post[h] / s)
             tm["l1f"] = l1
-        # ---- ghép mode: MIRROR (tầng 1) >> flow-mode (tầng 2) ----
-        # v5.3 CỔNG CẤU TRÚC (bài học seed 111/115: cùng là v4 nhưng mix
-        # wheat theo seed khác nhau → flow-ll đọc nhầm PASSIVE/COOP rồi khóa
-        # mode sai cả mùa; v4 không bao giờ thỏa điều kiện cấu trúc dưới).
-        # Mode chỉ rời CONTEST khi CỬA 2 đêm + BẰNG CHỨNG CẤU TRÚC:
-        #   PASSIVE: P>0.75 hai đêm + tiền đối thủ < 45% mình (thật sự yếu)
-        # COOP/DUMP: posterior tính + hiển thị (diag/Phase 5) nhưng KHÔNG
-        # đổi playbook khi đấu v4 — chờ validation trên thư viện bot.
         cand_h = max(l1, key=lambda h: l1[h])
         cand_p = float(l1[cand_h])
         prev_mode = str(tm.get("mode", "CONTEST"))
@@ -272,7 +212,7 @@ def _bayes_step(tm, day, opp_farm, my_herd, my_money):
             if confirmed_2nights:
                 tm["l1_pend"] = None
                 if cand_h == "PASSIVE" and money_ratio < 0.45:
-                    new_mode = "PASSIVE"  # nghèo thật + flow thật sự nhỏ
+                    new_mode = "PASSIVE"
                     tm["mode_note"] = f"PASSIVE cấu trúc (P={cand_p:.2f}, mr={money_ratio:.2f})"
                 else:
                     new_mode = prev_mode if prev_mode != "PASSIVE" else "CONTEST"
@@ -281,7 +221,6 @@ def _bayes_step(tm, day, opp_farm, my_herd, my_money):
                 tm["l1_pend"] = {"h": cand_h, "day": day}
         if new_mode == "MIRROR":
             new_mode = "CONTEST"
-        # MIRROR chỉ khi kernel twin đủ mạnh + đàn đối thủ không vượt + sau d8
         opp_herd_n = oc + og + osp
         my_herd_n = mc + mg + msp
         if day >= 8 and pm > 0.70 and opp_herd_n <= my_herd_n + 1:
@@ -298,21 +237,7 @@ def _bayes_step(tm, day, opp_farm, my_herd, my_money):
         pass
 
 
-# ----------------------------------------------------------------------------
-# v5: L5 SELF-ASSESSMENT ("gương soi") + L6 RISK GUARD lõi F1/F2/F3
-# ----------------------------------------------------------------------------
-
 def _l2_night(tm, day):
-    """v5.3 L2 GAMMA-POISSON (PLAN §4.2): posterior predictive dòng bán đối thủ.
-
-    Quan sát x_p = net-flow bán của đối thủ ngày qua (telemetry $0-residual).
-    Conjugate có suy biến λ=0.8 (geometric forgetting — đối thủ đổi chiến
-    thuật giữa trận):  a ← 0.8·a + x,  b ← 0.8·b + 1.
-    Predictive = Negative Binomial: mean = a/b, var = mean + mean²/b
-    (overdispersion đúng nghĩa count-flow — không còn nhân hệ số tay 1.3).
-    Đưa ra E[x] + P25/P75 — minimax: quota bán dùng P75 (thận trọng), quy
-    hoạch đàn dùng P25. Kèm M-11 calibration: MAE dự báo đêm trước vs thực
-    tế (não tự biết mình sai bao nhiêu). O(9) phép/đêm — rẻ hơn 1 lượt WATER."""
     try:
         od = tm.get("opp_daily") or {}
         l2 = tm.setdefault("l2", {})
@@ -346,13 +271,6 @@ def _l2_night(tm, day):
 
 
 def _flow_pred(tm, day):
-    """v5.3: GIỮ NGUYÊN v5.2 (hành vi đã chứng minh 1.058x) — trung bình 3 đêm
-    với suy biến λ=0.8, nhân hệ số thận trọng 1.3 (minimax). L2 Gamma-Poisson
-    (_l2_night/_flow_q) chạy SONG SONG như OBSERVER: đo lường + calibration
-    MAE + phân vị cho diag — coupling hành vi chờ Phase 5 sau khi học profile
-    offline (bài học v5.3-r1..r4: mọi coupling sớm đều −0.02-0.04x trên 20 seed
-    vì benchmark v4 không phân biệt được các giả thuyếtflow).
-    Trả None khi chưa đủ 3 đêm hoặc tổng dòng < 12 đơn vị."""
     try:
         od = tm.get("opp_daily") or {}
         ks = sorted(k for k in od if isinstance(k, int) and k < day)
@@ -376,8 +294,6 @@ def _flow_pred(tm, day):
 
 
 def _flow_q(tm, day, q):
-    """v5.3 L2: phân vị P25/P75 dòng bán đối thủ (minimax chọn theo quyết
-    định) — None khi l2 chưa sẵn sàng (caller tự fallback E)."""
     try:
         l2 = tm.get("l2_pred")
         if l2 and day >= 5:
@@ -388,16 +304,6 @@ def _flow_q(tm, day, q):
 
 
 def _project(sa, day, money, tm, days_left):
-    """v5.2 L3-Race (trọng tâm 1): BAYES ĐÁNH GIÁ KẾT QUẢ chiến lược hiện tại.
-
-    Từ run-rate doanh thu của TÔI (ledger chính xác) và ĐỐI THỦ (luồng bán
-    quan sát được × giá) — làm MỀM bằng EMA α=0.45 (chống giật tier khi bán
-    theo đợt) — ngoại suy E[tiền cuối mùa] cả 2 bên, trần theo pipeline còn
-    lại. Kết quả: gap + tier LEAD/TIGHT/BEHIND. Tier chỉ đổi khi 2 ĐÊM LIÊN
-    TIẾP cùng tín hiệu (dwell) — v5.1 flip-flop LEAD→BEHIND→LEAD trong 4 đêm
-    làm núm chiến thuật giật liên tục (bài học seed 2). Kèm CALIBRATION: so
-    dự báo E[tiền] đêm trước với tiền thực tế hôm nay → MAE cho não tự biết
-    mình đo sai bao nhiêu (vòng học đóng M-11)."""
     try:
         rh = sa.get("rev_hist") or []
         if len(rh) < 4 or day < 12:
@@ -407,7 +313,6 @@ def _project(sa, day, money, tm, days_left):
         sw = sum(w)
         my_r_now = sum(w[i] * rec[i][1] for i in range(4)) / sw
         op_r_now = sum(w[i] * rec[i][2] for i in range(4)) / sw
-        # v5.2: EMA làm mượt run-rate (bán theo đợt làm run-rate nhảy vọt ±50%)
         ema = sa.setdefault("ema_r", {})
         a = 0.45
         ema["my"] = a * my_r_now + (1 - a) * float(ema.get("my", my_r_now))
@@ -415,7 +320,6 @@ def _project(sa, day, money, tm, days_left):
         my_r = float(ema["my"])
         op_r = float(ema["opp"])
 
-        # v5.2 CALIBRATION: dự báo e_me của ĐÊM TRƯỚC vs tiền thật HÔM NAY
         prev_proj = sa.get("proj") or {}
         if prev_proj.get("e_me") and day >= 13:
             try:
@@ -451,7 +355,6 @@ def _project(sa, day, money, tm, days_left):
             return "LEAD" if rel > 0.08 else ("BEHIND" if rel < -0.08 else "TIGHT")
 
         cand = raw_tier()
-        # v5.2 DWELL 2 ĐÊM: tier chỉ đổi khi tín hiệu lặp lại 2 đêm liên tiếp
         pend = sa.get("pending_tier") or {}
         tier = prev or cand
         if cand == prev or prev is None:
@@ -472,13 +375,6 @@ def _project(sa, day, money, tm, days_left):
 
 
 def _px_pred(tm, day, inv, prices, shops):
-    """v5-P1 L3-Price (trọng tâm 1): dự báo giá mỗi mặt hàng sau ~3 ngày.
-
-    drift/ngày = E[opp net flow] (Bayes, bỏ hệ số thận trọng 1.3) − town absorb
-    trung bình/ngày. inv+3×drift → _price() cho giá tương lai. Đây là "kết quả
-    thị trường" của chiến lược đối thủ nếu họ tiếp tục — đầu vào cho front-run.
-    v5.4 Phase 5.1b: thêm p3_lo (minimax P25 — KHÔNG tin shop tương lai,
-    absorb chỉ từ shop đã mở + town center) để các núm mua có cột mốc bi quan."""
     try:
         fp = _flow_pred(tm, day)
         if not fp:
@@ -507,8 +403,6 @@ def _px_pred(tm, day, inv, prices, shops):
 
 
 def _sa_step(state, day, hour, money):
-    """v5 L5: sổ KPI từng lượt — phân loại mọi biến động tiền thành income/spend
-    (dùng chênh lệch tiền giữa 2 lượt liên tiếp → residual $0)."""
     try:
         sa = state.setdefault("sa", {})
         prev = sa.get("prev_money")
@@ -532,9 +426,6 @@ def _sa_step(state, day, hour, money):
 
 
 def _sa_night(state, day, tm, prices):
-    """v5 L5: tổng KPI cuối ngày + điểm sức khỏe H ∈ [0,1] (4 thành phần có trọng số).
-    v5-P1: thêm rev_hist (doanh thu 2 bên) + L3-Race projection (E[final] gap/tier)
-    + L3-Price dự báo giá → mọi số liệu này là "kết quả dự kiến của chiến lược"."""
     try:
         sa = state.get("sa", {})
         led = sa.setdefault(("ledger", day), {"income": 0.0, "spend": 0.0})
@@ -567,8 +458,6 @@ def _sa_night(state, day, tm, prices):
         sa["H"] = round(H, 3)
         sa["H_parts"] = {"money": round(h_money, 2), "revenue": round(h_rev, 2),
                          "share": round(share, 2), "assets": round(max(0.0, h_assets), 2)}
-        # v5-P1 L3: doanh thu quan sát được 2 bên (tôi: ledger chính xác;
-        # đối thủ: luồng bán × giá hiện tại — ước lượng Bayes)
         px = {p: float(prices.get(p, 0) or 0) for p in PRODUCTS} if prices else {}
         odd_d = odd.get(day) or {}
         opp_rev = sum(max(0.0, float(v)) * px.get(p, 0.0)
@@ -580,7 +469,7 @@ def _sa_night(state, day, tm, prices):
         proj = _project(sa, day, money, tm, max(1, 29 - day))
         sa["proj"] = proj
         if proj:
-            tm["proj"] = proj  # v5-P1: chia sẻ cho _daily_plan/_build_orders/diag
+            tm["proj"] = proj
     except Exception:
         pass
 
@@ -596,8 +485,6 @@ def _rg_note(rg, msg):
 
 
 def _rg_night(state, day, money, tm):
-    """v5 L6 (đêm): F1 death-spiral + F3 crop cascade + meta state GROW/RECOVER/SURVIVE
-    + điều kiện thoát bắt buộc (không được phép kẹt trạng thái khẩn cấp quá 3 ngày)."""
     try:
         sa = state.get("sa", {})
         rg = state.setdefault("rg", {"F1": 0, "F2": 0, "F3": 0, "state": "GROW",
@@ -608,9 +495,6 @@ def _rg_night(state, day, money, tm):
         net2 = float(led2.get("net", 0.0))
         inc1 = float(led1.get("income", 0.0))
         inc2 = float(led2.get("income", 0.0))
-        # v5: chữ ký death-spiral THẬT = thu nhập vắng 2 ngày liền + tiền ghim sát đáy
-        # (giai đoạn bootstrap d8-13 vay nợ sâu là BÌNH THƯỜNG — thu nhập vẫn tăng;
-        # bài học seed 123: F1 bắn nhầm vào bootstrap làm chậm ramp = thua cả trận)
         f1 = 0
         if day >= 10 and money < 100 and inc1 < 80 and inc2 < 80:
             f1 = 1
@@ -623,8 +507,6 @@ def _rg_night(state, day, money, tm):
         rg["F1"] = f1
         risk = state.get(("risk", day - 1), {}) or {}
         wc = int(risk.get("water_crit_late", 0) or 0)
-        # v5: ngưỡng nâng lên 6/10/15 — parity watering của v4 tự xử 3-5 cây crit;
-        # chỉ cascade THẬT (thiếu lao động kéo dài) mới cần throttle
         f3 = 0
         if wc >= 6:
             f3 = 1
@@ -652,7 +534,6 @@ def _rg_night(state, day, money, tm):
 
 
 def _rg_live(state, day, hour, tiles, shed, inventories):
-    """v5 L6 (mỗi lượt): F2 feed crunch — đại lượng vật lý, không cần hysteresis."""
     try:
         rg = state.setdefault("rg", {"F1": 0, "F2": 0, "F3": 0, "state": "GROW",
                                      "state_since": day, "liquidate": False})
@@ -671,9 +552,6 @@ def _rg_live(state, day, hour, tiles, shed, inventories):
             rk["hungry_late"] = max(int(rk.get("hungry_late", 0) or 0), hungry)
         supply = (wheat / animals_n) if animals_n else 99.0
         f2 = 0
-        # v5: chuẩn theo điểm vận hành JIT của v4 (~2 ngày tồn cám là BÌNH THƯỜNG,
-        # không phải tín hiệu khẩn cấp); hết mùa (d>=26) tự cắt — tiết kiệm cám
-        # cho đàn không còn kịp hoàn vốn, đúng nhịp culling ngầm của v4
         if 0 < animals_n and day < 26:
             if supply < 1.2 or (hungry >= 2 and hour >= 14):
                 f2 = 1
@@ -793,11 +671,7 @@ def _above_headroom(item, frac):
     return _ABOVE_CACHE[key]
 
 
-# ---- Phase 5.1a: impact giá chính xác + 5.2 E8-lite + 5.1b shop posterior ----
-
 def _rev_stream(item, inv, k):
-    """Phase 5.1a (RULES R29/R33): doanh thu THẬT khi bán k unit — engine quote
-    từng unit tại pre-sell inventory (đã audit khớp engine 100%). O(k)."""
     tot = 0
     for j in range(int(k)):
         tot += _price(item, inv + j)
@@ -805,15 +679,10 @@ def _rev_stream(item, inv, k):
 
 
 def _px_after(item, inv, k):
-    """Phase 5.1a: giá biên sau khi bán k unit (glut side)."""
     return _price(item, inv + k)
 
 
 def _pipe_rest(tiles, day):
-    """Phase 5.2 E8-lite: nguồn cung CHỜ THU còn lại trước hết mùa (theo item).
-    Ước lượng: cây one-time chua thu ~2u (đã tưới window), ongoing = yu trên
-    cây + số lần hẹn còn × ~1.3; thú = yu + số lần sản xuất còn (theo interval
-    từ placed_day) × ~1.3, cap max_held×2. Chỉ dùng cho gate thanh lý d22-27."""
     out = {it: 0.0 for it in PRODUCTS}
     try:
         if not tiles:
@@ -856,9 +725,6 @@ def _pipe_rest(tiles, day):
 
 
 def _shop_slots_left(shops, day):
-    """Phase 5.1b (RULES R38): số slot unlock còn lại + ngày unlock kế (uniform
-    with replacement, cap 8). P(1 shop cụ thể trong 1 slot) = 1/8 — dùng cho
-    minimax p3_lo (không tin shop tương lai) và confidence knobs."""
     try:
         n_used = len(shops or [])
         n_slots = max(0, MAX_SHOP_INSTANCES - n_used)
@@ -920,8 +786,6 @@ def _forward_absorb(day, hour, shops, expected=True):
                 if t >= u:
                     k += 1
             for it in PRODUCTS:
-                # Phase 5.1b: expected=False → KHÔNG cộng shop tương lai (minimax
-                # P25: chỉ tin shop đã mở thật) — dùng cho p3_lo của px_pred
                 tot[it] += cur[it] + (AVG_SHOP_VEC[it] * k if expected else 0.0)
         if t % 24 == 0:
             for it in TOWN_CENTER_PRODUCTS:
@@ -971,22 +835,12 @@ def _daily_plan(tiles, shed, seeds, inv, prices, shops, day, opp_farm, money, tm
     my_pipe = _pipeline(tiles, shed)
     opp_tiles = _g(opp_farm, "tiles", None) if opp_farm else None
     opp_pipe = _pipeline(opp_tiles, None)
-    pxp_room = (tm or {}).get("px_pred") or {}  # v5.2: room() đọc dự báo giá
+    pxp_room = (tm or {}).get("px_pred") or {}
 
     def room(it):
         deficit = max(0.0, MARKET_I0 - inv.get(it, MARKET_I0))
         r = deficit + absorb.get(it, 0) + _above_headroom(it, 0.78)
-        # v5.2 GIẢI PHÓNG NHƯỢNG TƯỚNG QUÂN (trọng tâm 2, khái quát từ 3 bài
-        # học seed 2/42: dâu, sữa, dưa): hệ số 0.85 mặc định giả định đối thủ
-        # thích nghi + thị trường zero-sum. Nhưng khi L3-Price dự báo giá TĂNG
-        # (p3 ≥ now×1.04), thị trường đang nói "còn chỗ" — đối thủ có pipeline
-        # cũng không làm giá giảm. Khi đó giảm nhượng xuống 0.35 (minimax: vẫn
-        # giữ 1/3 bảo vệ tự glut). White-box v4 trồng quota CỐ ĐỊNH trước →
-        # nếu v5 cứ nhượng, v4 độc chiếm mọi chân khan hiếm (melon seed 42:
-        # 96 vs 48 quả, -$8.4k).
         sub = 0.85
-        # v5.3 L1 PASSIVE (PLAN 4.5): đối thủ yếu đã được posterior xác nhận
-        # → thị trường gần như của mình, chỉ giữ 0.35 chống tự glut
         if mode == "PASSIVE":
             sub = 0.35
         try:
@@ -1032,8 +886,6 @@ def _daily_plan(tiles, shed, seeds, inv, prices, shops, day, opp_farm, money, tm
     mode = (tm or {}).get("mode", "CONTEST")
     fp = _flow_pred(tm, day)
     tm["flow_pred"] = fp
-    # v5-P1 L3: giá trị pipeline còn lại 2 bên (trần doanh thu tương lai) —
-    # lưu vào tm cho _project dùng như ceiling khi ngoại suy E[tiền cuối]
     try:
         pv = 0.0
         for p, u in my_pipe.items():
@@ -1046,17 +898,9 @@ def _daily_plan(tiles, shed, seeds, inv, prices, shops, day, opp_farm, money, tm
     except Exception:
         pass
     days_left = max(1, 29 - day)
-    # v5.3: subs GIỮ v5.2 (fp = 1.3×3n) — L2 P75 chạy như OBSERVER (đo +
-    # diag + calibration; coupling hành vi chờ Phase 5 sau profile offline).
     milk_sub = max(fp.get("MILK", 0.0) * days_left if fp else 0.0, 30.0 * opp_counts["COW"])
     wool_sub = max(fp.get("WOOL", 0.0) * days_left if fp else 0.0, 28.0 * opp_counts["SHEEP"])
     egg_sub = max(fp.get("EGG", 0.0) * days_left if fp else 0.0, 46.0 * opp_counts["GOOSE"])
-    # v5.2 ANIMAL COMPETE (trọng tâm 2 — khuyết cùng họ với strawberry seed 42):
-    # opp_sub (30×bò đối thủ) là "đối thủ sẽ phủ chặng này" — hợp lý với đối thủ
-    # thích nghi, nhưng với v4 white-box + giá đang TĂNG, giá tự nói "thị trường
-    # CHƯA đầy". L3-Price rising → cap opp_sub ở mức thị trường hấp thụ được,
-    # tránh vòng lẩn nhau: v4 mua bò trước → v5 nhượng → v4 độc chiếm sữa
-    # $296 (seed 42: 4 bò v4 = $20.3k milk vs 1 bò v5 = $3.4k, thua 0.700×).
     try:
         pxp_a = (tm or {}).get("px_pred") or {}
 
@@ -1097,7 +941,6 @@ def _daily_plan(tiles, shed, seeds, inv, prices, shops, day, opp_farm, money, tm
         cow_target = max(0, min(8, int(milk_room // 30)))
         sheep_target = max(5, min(7, int(wool_room // 30)))
     elif mode == "PASSIVE":
-        # v5.3 L1 (PLAN 4.5): thị trường trống → max đàn mọi chân
         goose_target = max(4 if day <= 9 else 3, min(7, int(egg_room // 46)))
         cow_target = max(2, min(10, int(milk_room // 30)))
         sheep_target = max(5, min(8, int(wool_room // 30)))
@@ -1105,11 +948,6 @@ def _daily_plan(tiles, shed, seeds, inv, prices, shops, day, opp_farm, money, tm
         goose_target = max(4 if day <= 9 else 3, min(6, int(egg_room // 46)))
         cow_target = max(2, min(9, int(milk_room // 30)))
         sheep_target = max(5, min(7, int(wool_room // 30)))
-    # v5.2 ANIMAL FLOOR THEO SHOP DRAW (tín hiệu sớm nhất — d6, trước px_pred
-    # 6-8 ngày): shop cầu sữa/len mở = thị trường sâu BẤT CHẲP pipeline đối
-    # thủ (tại seed 555: 2 PIZZA d6 + 2 YARN d12 → v4 phóng 15 thú thắng
-    # $25k; room logic của v5 nhượng vì thấy đàn v4 to — vòng lẩn nhau).
-    # Floor chỉ nâng TỐI THIỂU, mua thật vẫn qua cổng tiền/cám/lao động.
     try:
         if mode != "MIRROR":
             milk_shops = sum(1 for s in (shops or [])
@@ -1130,8 +968,6 @@ def _daily_plan(tiles, shed, seeds, inv, prices, shops, day, opp_farm, money, tm
         sheep_target = 0
     elif day < 6:
         sheep_target = 0
-    # v5 L6: kỷ luật đàn khi rủi ro — không mở rộng burn khi đang chết dần (F1),
-    # không nuôi thêm khi thiếu cám (F2), SURVIVE đóng băng tăng trưởng
     if rg:
         f1v = int(rg.get("F1", 0) or 0)
         f2v = int(rg.get("F2", 0) or 0)
@@ -1155,31 +991,22 @@ def _daily_plan(tiles, shed, seeds, inv, prices, shops, day, opp_farm, money, tm
             goose_target = min(goose_target, og + shed_geese)
             cow_target = min(cow_target, oc + shed_cows)
             sheep_target = min(sheep_target, osp + shed_sheep)
-    # v5.2: theo dõi gap đàn cho diag (KHÔNG đuổi đàn — bài học seed 3:
-    # v5 ruộng đầy + đuổi 5 thú = quá tải lao động → ruộng xẹp p24 vs p42)
     try:
         tm["herd_gap"] = int(sum(opp_counts.values())) - int(animals_now + shed_geese + shed_cows + shed_sheep)
         tm["knobs_parity"] = 0
     except Exception:
         pass
     owned_total = animals_now + shed_geese + shed_cows + shed_sheep
-    # v5-P1b: cap đàn theo LAO ĐỘNG. Bài học seed 42: 15 thú @ 13 thợ giết
-    # planting (SERVICE tier-2 chiếm sạch unit) → ruộng trống → thua v4 đang
-    # giữ 9 thú + 39 cây. Quy tắc: ~0.75 thú/thợ + 2.
     u_est = 15 if day >= 26 else (13 if day >= 9 else (12 if day >= 6 else (8 if day >= 1 else 7)))
     animal_cap = min(ANIMAL_CAP, max(4, int(u_est * 0.75) + 2))
 
-    # v5.2 TRỌNG TÂM 2 — LAO ĐỘNG LÀ RÀNG BUỘC SỐ 1 CỦA CHIẾN THUẬT:
-    # water_crit_late = số lượt tưới-cấp cứu CÒN NỢ lúc hour≥16 hôm qua
-    # (đo trực tiếp từ risk ledger L5). Mỗi thú = 3 turn SERVICE/ngày →
-    # khi ruộng đang đói nước, mở rộng đàn = đổi cây lấy thú = tự sát.
     try:
         water_debt = int((_STATE.get(("risk", day - 1)) or {}).get("water_crit_late", 0) or 0)
     except Exception:
         water_debt = 0
     tm["water_debt"] = water_debt
     if water_debt >= 3:
-        animal_cap = max(4, animal_cap - 2)  # siết cap khi nợ nước cao
+        animal_cap = max(4, animal_cap - 2)
 
     if owned_total >= animal_cap:
         goose_target = min(goose_target, animals_now + shed_geese)
@@ -1188,17 +1015,11 @@ def _daily_plan(tiles, shed, seeds, inv, prices, shops, day, opp_farm, money, tm
         sheep_target = min(sheep_target, sum(1 for row in tiles for t in row
                                              if isinstance(t, dict) and t.get("animal") == "SHEEP") + shed_sheep)
 
-    # v5.2 L7 (trọng tâm 2, bản SỬA LỖI): DỰ BÁO THUA → đua lại bằng thông
-    # lượng cây NHANH (wheat cycle 5 ngày) chứ KHÔNG blindly mở đàn. Bài học
-    # máu seed 2: BEHIND ngày 14 → +2 bò +2 cừu +1 ngỗng → 39 turn SERVICE
-    # → ruộng chết giữa mùa → THUA NẶNG HƠN (0.763×). Mở đàn chỉ khi cả 3
-    # điều kiện: nợ nước ≤2 (lao động còn dư), dưới animal_cap, tiền mạnh.
     proj = (tm or {}).get("proj") or {}
     if (mode != "MIRROR" and proj.get("tier") == "BEHIND" and day >= 8
             and sum(standing.values()) >= 22
             and not (rg and str(rg.get("state")) == "SURVIVE")):
         if water_debt <= 2 and owned_total < animal_cap and money >= 2500:
-            # chỉ +1 thú vào chân có room dương nhất (không phải +2/+2/+1)
             for it, add in (("COW", milk_room > 60), ("SHEEP", wool_room > 45), ("GOOSE", egg_room > 80)):
                 if not add:
                     continue
@@ -1212,8 +1033,6 @@ def _daily_plan(tiles, shed, seeds, inv, prices, shops, day, opp_farm, money, tm
                 break
         else:
             tm["knobs_herd"] = False
-        # BEHIND mọi trường hợp (nợ nước hay không): đẩy vòng tiền nhanh —
-        # quota wheat +3 (cây 5 ngày, thu bằng tiền mặt gần như ngay)
         tm["knobs_fastwheat"] = True
     else:
         tm["knobs_fastwheat"] = False
@@ -1224,7 +1043,7 @@ def _daily_plan(tiles, shed, seeds, inv, prices, shops, day, opp_farm, money, tm
     if day <= 2:
         coop_need = min(coop_need, 2)
         past_need = min(past_need, 2)
-    if rg and int(rg.get("F1", 0) or 0) >= 2:  # v5: F1 L2 — không xây thêm khi death-spiral thật
+    if rg and int(rg.get("F1", 0) or 0) >= 2:
         coop_need = 0
         past_need = 0
 
@@ -1256,23 +1075,11 @@ def _daily_plan(tiles, shed, seeds, inv, prices, shops, day, opp_farm, money, tm
         quotas["MELON"] = 14 if room("MELON") > -50 else 7
         if day <= 1:
             quotas["MELON"] = 8
-    # A/B 20 Sep: mở TOMATO (≤8 tiles, gate shop/room) = 1.027x/23/40, worst
-    # 0.766 — MẤT −0.033x so baseline → REVERT về TOMATO=0 như v3/v4. Bài học
-    # (RULES R67): cơ hội phí đất+lao động của nền wheat-feed ép bay lợi
-    # nhuận tomato ở quy mô ≤32u; chỉ Solver $/action toàn cục (P3 đầy đủ)
-    # mới đủ thông tin mở kênh này đúng lúc.
     if 2 <= day <= 16:
         quotas["TOMATO"] = 0
     if 5 <= day <= 14:
         s_room = room("STRAWBERRY")
         want_straw = 30 if day >= 8 else 14
-        # v5.2 CẠNH TRANH DÂU (trọng tâm 2, white-box v4): v4 trồng 30 dâu
-        # trong window cố định 5-13 bất kể ai làm gì. room() trừ 0.85×opp
-        # → v5 tự NHƯỢNG thị trường đúng lúc khan hiếm (seed 2: dâu $265,
-        # v4 bán 74 units $17.8k vs v5 5 cây $4.9k). L3-Price dự báo giá dâu
-        # TĂNG + town ≥2 shop cầu dâu → thị trường đủ sâu cho CẢ HAI →
-        # tính room KHÔNG trừ pipeline đối thủ (minimax: chấp nhận cạnh tranh
-        # khi Bayes xác nhận khan hiếm thật).
         try:
             pxp = (tm or {}).get("px_pred") or {}
             sq = pxp.get("STRAWBERRY") or {}
@@ -1297,11 +1104,9 @@ def _daily_plan(tiles, shed, seeds, inv, prices, shops, day, opp_farm, money, tm
             daily_q = int((animals_now + shed_geese + shed_cows + shed_sheep
                           + goose_target + cow_target + sheep_target) * 1.25) + 3
             quotas["WHEAT"] = min(24, max(20, daily_q))
-        # v5.2: BEHIND + núm fast-wheat → quota +3 (cycle 5 ngày = vòng tiền
-        # nhanh nhất có thể, nhanh hơn bất kỳ con thú nào 4-8 ngày)
         if (tm or {}).get("knobs_fastwheat") and day <= 22:
             quotas["WHEAT"] = min(28, quotas["WHEAT"] + 3)
-    if rg and int(rg.get("F2", 0) or 0) >= 2:  # v5: F2 L2+ — tăng quota wheat tự trồng
+    if rg and int(rg.get("F2", 0) or 0) >= 2:
         quotas["WHEAT"] = min(28, quotas.get("WHEAT", 20) + 2)
     if day <= 23:
         if day <= 2:
@@ -1377,7 +1182,6 @@ def _build_tasks(tiles, shed, seeds, plan, day, hour, step, inventories, n_units
     board = len(tiles)
     if not board:
         return tasks, stats
-    # v5.2: nợ nước hôm qua (L5→L7) — đẩy ưu tiên tưới parity khi đang thâm hụt
     try:
         water_debt = int((_STATE.get("tm") or {}).get("water_debt", 0) or 0)
     except Exception:
@@ -1437,28 +1241,17 @@ def _build_tasks(tiles, shed, seeds, plan, day, hour, step, inventories, n_units
                         tasks.append(_mk(T_WATER_YIELD, x, y, "WATER"))
                         stats["water_yield"] = stats.get("water_yield", 0) + 1
                     elif cu >= 1:
-                        # v5.2 FIX CHẾT CÂY (bản đúng): cu≥1 = HÔM QUA không được
-                        # tưới → hôm nay không tưới là thành cỏ dại (cu→2 tối nay)
-                        # → tier 0 VÔ ĐIỀU KIỆN, bất kể parity. Lỗi elif cũ: ngày
-                        # chẵn (parity-ON) cho cu≥1 xuống tier 3 → bị SERVICE đói
-                        # → cây chết đúng ngày chẵn (chuỗi chết seed 2). Tưới mỗi
-                        # 2 ngày/plant — cùng volume như v4 nhưng ưu tiên đúng.
                         tasks.append(_mk(T_WATER_CRIT, x, y, "WATER"))
                         stats["water_crit"] += 1
                     else:
                         on_day = (x + y + day) % 2 == 0
                         if on_day:
-                            # v5.2: ngày CHẴN của cây — tưới theo parity tier 3,
-                            # nhưng nếu hôm qua có nợ nước (L5 water_debt) → đẩy
-                            # lên tier 2 để không bị SERVICE đói thêm vòng nữa
                             t_w = T_WATER_MAINT if water_debt < 1 else T_SERVICE
                             tasks.append(_mk(t_w, x, y, "WATER"))
                 if yu > 0 and age >= cd["first_yield_day"]:
                     urgent = (mls >= 0 and mls - step <= 24) or (crop == "WHEAT" and feed_crunch)
                     if cd["ongoing"]:
                         ready = yu >= 4 or (mls >= 0 and mls - step <= 6) or day >= 27
-                        # v5: straw/tomato decay window — thu ngân 3+ đơn vị nửa ngày
-                        # trước khi cây chết thành cỏ dại (bài học straw under-harvest)
                         if not ready and yu >= 3 and mls >= 0 and mls - step <= 12:
                             ready = True
                     else:
@@ -1544,7 +1337,6 @@ def _build_tasks(tiles, shed, seeds, plan, day, hour, step, inventories, n_units
         turn_budget = n_units * max(1, 23 - hour)
         water_load = stats.get("water_crit", 0) + stats.get("water_yield", 0)
         safe_plant = int((turn_budget - water_load * 2.0) / 4)
-        # v5 L6 F3: không trồng thêm cây khi không đủ nhân lực tưới giữ mạng sống
         rgq = _STATE.get("rg") or {}
         f3q = int(rgq.get("F3", 0) or 0)
         if f3q >= 1:
@@ -1552,13 +1344,7 @@ def _build_tasks(tiles, shed, seeds, plan, day, hour, step, inventories, n_units
         if f3q >= 2:
             safe_plant = 0
         n_plant = min(len(flat), len(empties), max(0, safe_plant))
-        # v5-P1b: trồng ưu tiên BUỔI SÁNG (tier 3 khi h≤11) — bài học seed 42:
-        # SERVICE/WATER backlog chiếm trọn ngày, PLANT tier-5 không bao giờ
-        # được nhận unit → hạt đã mua mà ruộng trống. v4 ít thú nên trồng được.
         p_tier = 3 if hour <= 11 else T_PLANT
-        # v5.2 WINDOW CLOSING: dưa 10 ngày lớn — d11+ mà chưa trồng là sắp mất
-        # cửa (seed 42: plan MELON 14 ngày 14, mua 11 hạt, trồng 0 = -$8.4k).
-        # Cây có window đóng trong ≤3 ngày → leo lên tier 2 cạnh SERVICE.
         try:
             closing = any(c == "MELON" and 11 <= day <= 15 for (c, _n) in budget) \
                 or any(c == "STRAWBERRY" and 12 <= day <= 14 for (c, _n) in budget)
@@ -1694,7 +1480,7 @@ def _task_action(tk, ux, uy, uinv, tiles, shed, board):
     return [mv] if mv else ["PASS"]
 
 
-def _task_still_valid(tk, tiles, board, shed, uinv, day):  # v5-P1 FIX: thêm day (NameError)
+def _task_still_valid(tk, tiles, board, shed, uinv, day):
     x, y = tk["x"], tk["y"]
     if not (0 <= x < board and 0 <= y < board):
         return False
@@ -1825,8 +1611,8 @@ def _wheat_all(shed, inventories):
 def _build_orders(me, shed, seeds, inventories, inv, prices, day, hour, plan,
                   stats, tiles, shops):
     orders = []
-    rg = _STATE.get("rg") or {}  # v5: L6 risk guard knobs
-    tmx = _STATE.get("tm") or {}  # v5-P1: L3 price/race cho núm bán
+    rg = _STATE.get("rg") or {}
+    tmx = _STATE.get("tm") or {}
     proj = (tmx.get("proj") or {}) if isinstance(tmx, dict) else {}
     tier = proj.get("tier") if isinstance(proj, dict) else None
     money = float(_g(me, "money", 0) or 0)
@@ -1834,8 +1620,6 @@ def _build_orders(me, shed, seeds, inventories, inv, prices, day, hour, plan,
     unlocked = _g(me, "unlocked_quadrants", None) or ["NW"]
     board = len(tiles) if tiles else 10
     shed_total = sum(v for v in (shed or {}).values() if _is_num(v))
-    # Phase 5.2 E8-lite: drain + nguồn chờ thu TẠI GIỜ HIỆN TẠI (chỉ d22+ —
-    # trước đó ladder không áp dụng nên không tốn chu kỳ)
     absorb_rest = {}
     pipe_rest = {}
     if day >= 22:
@@ -1852,15 +1636,10 @@ def _build_orders(me, shed, seeds, inventories, inv, prices, day, hour, plan,
         workload = stats.get("total", 0) + plant_budget
         if day >= 6:
             cap = 13 if ((day >= 9 and money >= 1800) or (day >= 18 and money >= 2500)) else 12
-            # v5: endgame labor surge d26-28 — giá trị biên thu hoạch lấp đầy
-            # vượt chi phí fib thợ (bài học 13th worker trong LESSONS_V4)
             if 26 <= day <= 28 and (stats.get("total", 0) >= 22 or money >= 1500):
                 cap = 15
-            # v5-P1 L7: dự báo thua (BEHIND) → +1 thợ đẩy thông lượng đua lại
             if tier == "BEHIND" and 9 <= day <= 25 and money >= 2200:
                 cap += 1
-            # v5.2: NỢ NƯỚC = thiếu lao động trầm trọng (cây sắp chết) → mua
-            # thêm thợ hôm nay (máy bơm cứu ruộng) — $89-233/ngày rẻ hơn chết cây
             try:
                 wdb = int((tmx.get("water_debt", 0) if isinstance(tmx, dict) else 0) or 0)
             except Exception:
@@ -1874,8 +1653,6 @@ def _build_orders(me, shed, seeds, inventories, inv, prices, day, hour, plan,
             target_units = 7
         target_units = max(target_units, min(11, 1 + int(math.ceil(workload * 2.6 / max(5, 23 - hour)))))
         want = target_units - (1 + len(hands))
-        # v5 L6: F1 L2 mới co biên chế (L1 chỉ chặn mua thú — hire là máy hồi phục);
-        # F3 cấp cứu tưới +1 thợ
         if int(rg.get("F1", 0) or 0) >= 2:
             want = max(0, want - 2)
         if int(rg.get("F3", 0) or 0) >= 2:
@@ -1897,14 +1674,7 @@ def _build_orders(me, shed, seeds, inventories, inv, prices, day, hour, plan,
             k += 1
 
     bought = _STATE.setdefault(("bought", day), {"GOOSE": 0, "COW": 0, "SHEEP": 0, "LAND": 0})
-    # v5-P1b: ĐẤT TRƯỚC TIÊN — bậc thang vốn HIRE > ĐẤT > hạt > thú.
-    # Bài học seed 42: v4 mua 4th quadrant ($4k) ngay d12 → +25 ô trồng
-    # → thắng; v5 cùng lúc dồn $2.9k vào thú + hạt đắt → ruộng không mở
-    # rộng → mất 5 ngày bội số tăng trưởng. Gần đủ tiền đất (≥55% giá)
-    # → hoãn hạt đắt + thú để tích lũy; đủ tiền → BUY_LAND đứng ĐẦU list.
     nq = len(unlocked)
-    # vL5 GT-LAND (đất tối thiểu): chỉ NW+NE (50 ô, $1k) — kiểm định giả
-    # thuyết "đất tối ưu = tối thiểu" khi wheat là monopoly-restraint.
     if nq >= 2:
         nq = 4
     lp = LAND_PRICES[nq - 1] if nq < 4 else None
@@ -1921,10 +1691,6 @@ def _build_orders(me, shed, seeds, inventories, inv, prices, day, hour, plan,
                 and money >= lp + l_buf:
             land_ready = True
         elif day <= l_last and owned_empty <= 14 and money >= lp + l_buf - 800:
-            # v5-P1d: tích lũy CHỈ khi ruộng thật đầy (≤14 ô trống — đúng tín
-            # hiệu mua đất của v4) và thật sự gần đủ (≤$800 nữa). Không bao giờ
-            # dùng ngưỡng tiền thuần — hạt strawberry là mạch doanh thu #1,
-            # chặn nó vài ngày = mất $8-10k (bài học máu seed 7/101/909)
             near_land = True
     if land_ready:
         orders.append(["BUY_LAND"])
@@ -1932,9 +1698,6 @@ def _build_orders(me, shed, seeds, inventories, inv, prices, day, hour, plan,
         money -= lp
 
     seed_spent = 0
-    # v5.2: dự trữ tiền cho 1 lượt mua thú khi L3-Price nói chân đó khan hiếm
-    # (knobs_animal) — tránh hạt trong ngày ăn sạch tiền khiến BUY_ANIMAL đứng
-    # sau trong list luôn fail (seed 42: v5 đứng 1 bò cả mùa vì thiếu $650).
     animal_reserve = 0
     try:
         ka = tmx.get("knobs_animal") if isinstance(tmx, dict) else None
@@ -1951,7 +1714,7 @@ def _build_orders(me, shed, seeds, inventories, inv, prices, day, hour, plan,
     except Exception:
         animal_reserve = 0
     if hour <= 8 and 1 <= day <= 22 and not near_land \
-            and not (rg and int(rg.get("F1", 0) or 0) >= 2):  # v5: F1 L2 ngừng mua thú; P1b: hoãn khi tích lũy đất
+            and not (rg and int(rg.get("F1", 0) or 0) >= 2):
         struct_free = {"COOP": 0, "PASTURE": 0}
         for row in tiles:
             for t in row:
@@ -1967,10 +1730,6 @@ def _build_orders(me, shed, seeds, inventories, inv, prices, day, hour, plan,
                          and t.get("crop") == "WHEAT"
                          and (day - t.get("planted_day", day)) >= 3)
         wt_supply = wt + 0.8 * wheat_ripe
-        # v5.2 LATE-WINDOW GIÁ-CỔNG: giá sản phẩm ≥1.25× base = thị trường sâu
-        # (bài học seed 555: sữa $270 mà cửa sổ mua bò đóng d16 → v4 độc chiếm
-        # 15 thú, v5 đứng 9). Giá cao → nới w1 thêm 2 ngày; bò d18 vẫn kịp
-        # 3-4 lứa sữa ×2 unit × giá cao = hòa vốn $400 trong 3 ngày.
         try:
             px_now = {p: float(prices.get(p, 0) or 0) for p in ("EGG", "MILK", "WOOL")}
             late_ext = {"GOOSE": 2 if px_now.get("EGG", 0) >= 62 else 0,
@@ -1998,10 +1757,6 @@ def _build_orders(me, shed, seeds, inventories, inv, prices, day, hour, plan,
                 bought[animal] = bought.get(animal, 0) + 1
                 money -= ad["cost"]
 
-    # v5.2 THỨ TỰ MUA CÓ ĐIỀU KIỆN: thú chiếm tiền buổi sáng CHỈ khi thị
-    # trường động vật sâu (shop draw hoặc px_pred) — ngược lại hạt được giữ
-    # nguyên vị trí (bài học seed 808/7: mua thú đúng tiền nhưng sai seed →
-    # hạt bị hoãn → volume lúa mì tụt). Lệnh vẫn trong cùng list ≤10.
     _defer_animal = None
     try:
         _milks = sum(1 for s in (shops or []) if s in ("PIZZA_SHOP", "ICE_CREAM_SHOP", "SMOOTHIE_SHOP"))
@@ -2020,7 +1775,7 @@ def _build_orders(me, shed, seeds, inventories, inv, prices, day, hour, plan,
 
     if hour <= 17 and seeds is not None:
         _crop_order = (("WHEAT",) if int(rg.get("F1", 0) or 0) >= 3
-                       else ("WHEAT", "CARROT", "STRAWBERRY", "MELON", "TOMATO"))  # v5: F1 L3 chỉ giữ hạt wheat
+                       else ("WHEAT", "CARROT", "STRAWBERRY", "MELON", "TOMATO"))
         for crop in _crop_order:
             n_tiles = plan.get("crop_tiles", {}).get(crop, 0)
             if not n_tiles:
@@ -2057,15 +1812,6 @@ def _build_orders(me, shed, seeds, inventories, inv, prices, day, hour, plan,
     animals = sum(1 for row in tiles for t in row
                   if isinstance(t, dict) and "animal" in t)
     plan_animals = plan.get("goose_target", 0) + plan.get("cow_target", 0) + plan.get("sheep_target", 0)
-    # v5.4 Phase 5.3 — FEED WARFARE CÓ ĐIỀU KIỆN (RULES R37+R54, ô đầu tiên của
-    # bảng best-response "đối thủ làm A → ta làm B"):
-    # v5.3 đã chứng minh churn wheat là vũ khí zero-sum (ngừng mua = −0.117x/seed).
-    # Nhưng trace mới cho thấy KHÔNG phải trận nào v4 cũng net-buyer (seed 101:
-    # cả 2 bên đều mua 950/bán 1150 = net-seller) → pump chỉ bật khi telemetry
-    # xác nhận đối thủ đang NET-BUY wheat sâu (−10u/ngày trung bình 5 ngày) VÀ
-    # đàn đối thủ ≥ 10 (mua cám dài hạn). Khi đó: mua mạnh hơn (gate 38→48,
-    # cap 10→16u/ngày) để đẩy mặt giá wheat — thuế rơi vào feedbuy của nó,
-    # thu của mình từ self-grown bán đắt hơn. Dừng trước d26 (thanh lý).
     pump = False
     opp_wnet = 0.0
     try:
@@ -2075,25 +1821,12 @@ def _build_orders(me, shed, seeds, inventories, inv, prices, day, hour, plan,
             opp_wnet = sum(float((odh.get(k) or {}).get("WHEAT", 0.0) or 0.0)
                            for k in ks) / len(ks)
         _mode_p = str((tmx.get("mode") or "") if isinstance(tmx, dict) else "")
-        # A/B 20 Sep (3/40 game bắn: +1201/−504/−1076 = net −$379, 1 win-flip)
-        # → REVERT: v4 trên 20 seed chuẩn là churn-hai-chiều (WHEAT P25 −9 /
-        # P75 +11, profiles_learned), KHÔNG phải net-buyer như seed 42 từng ngụ
-        # ý. Giữ hạ tầng đo (opp_wnet/opp_herd) + diag p5 — vũ khí chờ đối thủ
-        # net-buyer thật trên ladder (ô best-response "A→B" chưa đủ chứng cứ).
         pump = False
         if isinstance(tmx, dict):
             tmx["pump"] = bool(pump)
             tmx["opp_wnet"] = round(opp_wnet, 1)
     except Exception:
         pass
-    # v5.3 P2 FEED WARFARE (bản cuối — bài học A/B trên 8 seed):
-    # "churn" wheat của v5.2 KHÔNG phải lãng phí mà là VŨ KHÍ zero-sum —
-    # áp lực mua của v5 nâng mặt giá wheat, đánh thuế vào feedbuy $32-41k
-    # của v4 (net-buyer) và bán self-grown đắt hơn. Ngừng mua (bản
-    # make-vs-buy tiết kiệm) = tự giải giáp: P2only mất −0.12x/seed (104:
-    # 1.115→0.922, 106: 1.295→1.081, 111: 1.325→1.070). Giữ NGUYÊN cơ chế
-    # mua v5.2 (gate 38/52/62/80 theo F2, want 1.5 ngày) + 2 thêm nhẹ:
-    # cap 12u/ngày (chống blitz 120u vô thức) + đo feedbuy cho ledger/diag.
     if animals > 0 or plan_animals > 0:
         shed_wheat = (shed.get("WHEAT", 0) or 0) if shed else 0
         wheat_want = int(animals * 1.5) + 4
@@ -2103,7 +1836,6 @@ def _build_orders(me, shed, seeds, inventories, inv, prices, day, hour, plan,
             afford = int((money * 0.35) // pw) if pw > 0 else 0
             n = min(need, afford)
             acute = shed_wheat < 6
-            # v5 L6 F2: trả đắt hơn cho cám khi đàn nguy cơ — gate 38/52/62/80 theo level
             f2v = int(rg.get("F2", 0) or 0)
             wgate = 38 if f2v <= 0 else (52 if f2v == 1 else (62 if f2v == 2 else 80))
             if f2v >= 2 and pw > 0:
@@ -2112,7 +1844,7 @@ def _build_orders(me, shed, seeds, inventories, inv, prices, day, hour, plan,
             if n >= 1 and (pw <= wgate or (acute and pw <= wgate + 10)):
                 orders.append(["BUY_PRODUCT", "WHEAT", n])
                 money -= n * pw
-                try:  # P2: đo feedbuy cho ledger + diag Arena (KHÔNG đổi hành vi)
+                try:
                     if isinstance(tmx, dict):
                         tmx["feedbuy"] = float(tmx.get("feedbuy", 0.0) or 0.0) + n * pw
                         tmx["feed_units"] = int(tmx.get("feed_units", 0) or 0) + n
@@ -2136,21 +1868,14 @@ def _build_orders(me, shed, seeds, inventories, inv, prices, day, hour, plan,
 
     def _hold(it):
         h = HOLD.get(it, 0.90)
-        # v5 L6: thanh lý tồn kho khi kẹt khẩn cấp (lối thoát cưỡng bức)
         if rg.get("liquidate"):
             h = min(h, 0.55)
         if str(rg.get("state")) == "SURVIVE":
             h = min(h, 0.35)
-        # v5-P1 L7 (trọng tâm 2): tier từ BAYES RACE → uyển chuyển ngưỡng bán.
-        # BEHIND: khóa doanh thu sớm (×0.93) — chắc chắn thu hơn chờ giá đẹp;
-        # LEAD: kiên nhẫn ×1.02 — đang thắng, ép thị trường trả giá cao hơn.
         if tier == "BEHIND":
             h *= 0.93
         elif tier == "LEAD":
             h = min(0.99, h * 1.02)
-        # v5-P1 L3-Price (trọng tâm 1→2): FRONT-RUN theo dự báo giá +3 ngày.
-        # Bayes nói giá DỊCH (p3 ≤ 92% now) → bán NGAY trước cú dội của đối thủ;
-        # Bayes nói giá TĂNG (p3 ≥ 110% now) → nắm chờ đỉnh (chỉ trước endgame).
         pxp = tmx.get("px_pred") if isinstance(tmx, dict) else None
         if pxp and 6 <= day <= 25 and it != "FERTILIZER":
             q = pxp.get(it) or {}
@@ -2169,26 +1894,20 @@ def _build_orders(me, shed, seeds, inventories, inv, prices, day, hour, plan,
                         tmx.setdefault("knobs_hold", set()).add(it)
                     except Exception:
                         pass
-        # ---- Task 21 GT-COURNOT: VÒNG NHỎ (mỗi lượt) — điều chế theo macro ----
         try:
             _gtq = ((tmx.get("gt") or {}).get(it)) or {}
             if _gtq and 6 <= day <= 25:
                 if _gtq.get("dump"):
-                    # Stackelberg front-run: đối thủ sắp dội lumpy (L2 P75 cao
-                    # vượt 1.5×E) → bán NGAY vào sức mua còn nguyên trước sóng
                     h = max(0.85, h * 0.96)
                 elif _gtq.get("calm"):
                     _pxq = (tmx.get("px_pred") or {}).get(it) or {}
                     _now, _p3 = _pxq.get("now"), _pxq.get("p3")
                     if _now and _p3 and _p3 >= _now * 1.05:
-                        # Monopoly restraint: ngày êm + giá leo → nắm chờ đỉnh
                         h = min(0.99, h * 1.04)
         except Exception:
             pass
-        dliq = 1 if tier == "BEHIND" else 0  # v5-P1: BEHIND thanh lý sớm 1 ngày
+        dliq = 1 if tier == "BEHIND" else 0
         if it in glutted:
-            # v5.3 L1 DUMP (PLAN 4.5): không xả vào cú dump của đối thủ —
-            # nâng ngưỡng chờ drain hút lại; mode khác giữ hành vi nền.
             try:
                 _m = str((tmx.get("mode") if isinstance(tmx, dict) else "") or "")
             except Exception:
@@ -2196,9 +1915,6 @@ def _build_orders(me, shed, seeds, inventories, inv, prices, day, hour, plan,
             if _m == "DUMP":
                 return h
             return min(h, 0.40)
-        # Phase 5.2 E8-lite (đo từ battles: v5.2 ladder đã thu gần hết E8, tồn dư
-        # cuối trận chỉ $250-800 — phần còn lại = KHÔNG hạ ngưỡng sớm khi drain
-        # còn đủ hút TOÀN BỘ nguồn chờ bán: bán dần vào drain giá đẹp, d28+ vẫn dump)
         if 22 <= day <= 27 - dliq:
             try:
                 n_pending = float(shed.get(it, 0) or 0) + float(pipe_rest.get(it, 0.0) or 0.0)
@@ -2222,12 +1938,6 @@ def _build_orders(me, shed, seeds, inventories, inv, prices, day, hour, plan,
             return min(h, 0.65)
         return h
 
-    # ---- Task 21 GT-COURNOT: VÒNG TOÀN CỤC (mỗi 24 lượt, đầu ngày) ----
-    # Bậc 1 (quan sát): L2 Gamma-Poisson E/P25/P75 dòng bán đối thủ mỗi kênh.
-    # Bậc 2 (can thiệp): quy về tín hiệu Cournot điều chế ngưỡng bán hôm nay —
-    #   dump_sig → front-run (bán trước cú dội, giá chưa bị dìm);
-    #   calm_sig → monopoly restraint (nắm chờ drain hồi giá).
-    # Micro (mỗi lượt) áp dụng trong _hold() bên dưới. Ghi tm["gt"] cho diag.
     try:
         if hour <= 1 and 6 <= day <= 25:
             l2p = (tmx.get("l2_pred") or {}) if isinstance(tmx, dict) else {}
@@ -2252,7 +1962,7 @@ def _build_orders(me, shed, seeds, inventories, inv, prices, day, hour, plan,
         for it in PRODUCTS:
             if it == "FERTILIZER" and day < 26:
                 nf = shed.get("FERTILIZER", 0) or 0
-                keep = 0 if str(rg.get("state")) == "SURVIVE" else 2  # v5: SURVIVE bán sạch fert
+                keep = 0 if str(rg.get("state")) == "SURVIVE" else 2
                 ffloor = 20 if (rg.get("liquidate") or str(rg.get("state")) == "SURVIVE") else FERT_FLOOR
                 if nf > keep and day >= 1:
                     k = _sell_count("FERTILIZER", nf - keep, inv.get("FERTILIZER", MARKET_I0), ffloor)
@@ -2308,9 +2018,9 @@ def _agent(obs):
     tm = _STATE.setdefault("tm", {})
     _tm_step(tm, step, inv, shops)
     my_money = float(_g(me, "money", 0) or 0)
-    _sa_step(_STATE, day, hour, my_money)  # v5: L5 sổ KPI từng lượt
-    rg = _rg_live(_STATE, day, hour, tiles, shed, inventories)  # v5: L6 F2 live
-    try:  # v5: kênh tiền/thợ đối thủ vào tm (quantitive observability)
+    _sa_step(_STATE, day, hour, my_money)
+    rg = _rg_live(_STATE, day, hour, tiles, shed, inventories)
+    try:
         tm["opp_money"] = float(_g(opp, "money", 0) or 0)
         tm["opp_hands"] = len(_g(opp, "hands", None) or [])
     except Exception:
@@ -2318,14 +2028,14 @@ def _agent(obs):
 
     pkey = ("plan", day)
     if pkey not in _STATE:
-        if day > 0 and hour == 0:  # v5: L5 tổng đêm + L6 F1/F3 trước khi lập kế hoạch
+        if day > 0 and hour == 0:
             _sa_night(_STATE, day - 1, tm, prices)
             _rg_night(_STATE, day, my_money, tm)
-            try:  # v5.3 L2: Gamma-Poisson cập nhật posterior flow từ đêm qua
+            try:
                 _l2_night(tm, day)
             except Exception:
                 pass
-            try:  # v5-P1: L3-Price dự báo giá +3 ngày mỗi sáng
+            try:
                 tm["px_pred"] = _px_pred(tm, day, inv, prices, shops)
             except Exception:
                 pass
@@ -2347,8 +2057,7 @@ def _agent(obs):
 
     tasks, stats = _build_tasks(tiles, shed, seeds, plan, day, hour, step,
                                 inventories, len(units))
-    try:  # v5.2: L6 F3 — nợ tưới-cấp cứu, ghi ĐÈ ở mỗi giờ ≥16 để giá trị
-    # cuối ngày (hour 23) phản ánh đúng số cây sắp chết lúc kết thúc ngày
+    try:
         if hour >= 16:
             rk = _STATE.setdefault(("risk", day), {})
             rk["water_crit_late"] = int(stats.get("water_crit", 0) or 0)
@@ -2365,120 +2074,11 @@ def _agent(obs):
     return {"farmer": actions[0], "hands": actions[1:], "market": orders}
 
 
-def _arena_diag(obs):
-    """v5: xuất trạng thái não cho Arena Observer UI — được run_battle.py gọi sau
-    mỗi lượt. Cấu trúc generic để BrainPanel render mọi key."""
-    try:
-        day = _g(obs, "day", 0) or 0
-        tm = _STATE.get("tm", {}) or {}
-        sa = _STATE.get("sa", {}) or {}
-        rg = _STATE.get("rg", {}) or {}
-        plan = _STATE.get(("plan", day)) or {}
-        led = sa.get(("ledger", day)) or {}
-        income = float(led.get("income", 0) or 0)
-        spend = float(led.get("spend", 0) or 0)
-        proj = sa.get("proj") or tm.get("proj") or {}
-        tier = proj.get("tier") if isinstance(proj, dict) else None
-        pxp = tm.get("px_pred") or {}
-        fr = []
-        hb = []
-        if isinstance(pxp, dict):
-            for p, q in pxp.items():
-                try:
-                    if not isinstance(q, dict):
-                        continue
-                    if q.get("p3", 0) <= q.get("now", 0) * 0.92:
-                        fr.append(p)
-                    elif q.get("p3", 0) >= q.get("now", 0) * 1.10:
-                        hb.append(p)
-                except Exception:
-                    pass
-        knobs = {
-            "tier": tier or "BOOT",
-            "front_run": fr,
-            "hold_back": hb,
-            "herd_expand": bool(tm.get("knobs_herd")),
-            "fast_wheat": bool(tm.get("knobs_fastwheat")),
-            "straw_compete": bool(tm.get("knobs_straw")),
-            "water_debt": int(tm.get("water_debt", 0) or 0),
-            "parity_chase": int(tm.get("knobs_parity", 0) or 0),
-            "herd_gap": int(tm.get("herd_gap", 0) or 0),
-            "pump": bool(tm.get("pump")),
-        }
-        fb = float(tm.get("feedbuy", 0.0) or 0.0)
-        fu = int(tm.get("feed_units", 0) or 0)
-        l1 = tm.get("l1f") or {}
-        return {
-            "ver": "v5.5",
-            "strategy": "S-" + str(rg.get("state", "GROW")),
-            "tier": tier,
-            "tier_cand": (proj.get("cand") if isinstance(proj, dict) else None),
-            "proj": ({"me": proj.get("me"), "opp": proj.get("opp"),
-                      "gap": proj.get("gap"), "rel": proj.get("rel"),
-                      "r_me": proj.get("r_me"), "r_opp": proj.get("r_opp"),
-                      "calib_mae": proj.get("calib_mae")}
-                     if isinstance(proj, dict) and proj else None),
-            "knobs": knobs,
-            "mode": tm.get("mode"),
-            "l1": {h: round(float(v), 2) for h, v in l1.items()} if l1 else None,
-            "l1_top": tm.get("l1_top"),
-            "l2_mae": tm.get("l2_mae"),
-            "pm": round(float(tm.get("pm", 0.0) or 0.0), 3),
-            "health": round(float(sa.get("H", 1.0) or 0.0), 2),
-            "health_parts": sa.get("H_parts"),
-            "flow_pred": ({k: round(v, 1) for k, v in (tm.get("flow_pred") or {}).items()}
-                           if tm.get("flow_pred") else None),
-            "l2_pred": (tm.get("l2_pred") if tm.get("l2_pred") else None),
-            "px_pred": pxp if pxp else None,
-            "opp_flows": ({k: round(v, 1) for k, v in (tm.get("opp_day") or {}).items()}
-                           if tm.get("opp_day") else None),
-            "herd": {k: plan.get(k) for k in ("goose_target", "cow_target", "sheep_target")},
-            "crop_plan": plan.get("crop_tiles"),
-            "feed_demand": plan.get("feed_demand"),
-            "feed": {"buy$": round(fb), "units": fu,
-                     "px_avg": round(fb / fu, 1) if fu else None},
-            "sa": {"income": round(income), "spend": round(spend),
-                   "net": round(income - spend),
-                   "opp_money": round(float(tm.get("opp_money", 0) or 0))},
-            "p5": {"opp_wnet": tm.get("opp_wnet"),
-                   "opp_herd": int(tm.get("opp_herd", 0) or 0),
-                   "pump": bool(tm.get("pump"))},
-            "gt": ({"land": "50 tiles",
-                    "WHEAT": _gt_s(tm, "WHEAT"), "MILK": _gt_s(tm, "MILK"),
-                    "WOOL": _gt_s(tm, "WOOL"), "EGG": _gt_s(tm, "EGG"),
-                    "STRAWBERRY": _gt_s(tm, "STRAWBERRY"),
-                    } if tm.get("gt") else None),
-            "rg": {"F1": int(rg.get("F1", 0) or 0), "F2": int(rg.get("F2", 0) or 0),
-                   "F3": int(rg.get("F3", 0) or 0),
-                   "liquidate": bool(rg.get("liquidate"))},
-            "errs": int(_STATE.get("errs", 0) or 0),
-            "notes": list(rg.get("notes") or [])[-5:],
-        }
-    except Exception:
-        return {"ver": "v5.5"}
-
-
-def _gt_s(tm, item):
-    """Task 21: chuỗi tóm tắt tín hiệu GT-Cournot một kênh cho diag Arena."""
-    try:
-        q = (tm.get("gt") or {}).get(item) or {}
-        e = float(q.get("e", 0) or 0)
-        p75 = float(q.get("p75", 0) or 0)
-        tag = " DUMP→front-run" if q.get("dump") else (" calm→hold" if q.get("calm") else "")
-        return f"E{e:.0f}/P75 {p75:.0f}u{tag}"
-    except Exception:
-        return None
-
-
 def agent(obs):
-    # Task 22 (CRITICAL): hàm này PHẢI là callable cuối cùng của file —
-    # kaggle_environments chọn callable CUỐI làm agent khi nạp file/cell
-    # (get_last_callable). Nếu thêm hàm sau đây, submission Kaggle sẽ gọi
-    # nhầm hàm đó và agent đứng yên ($3,000). _arena_diag/_gt_s đặt TRƯỚC.
     try:
         return _agent(obs)
     except Exception:
-        try:  # v5-P1: đếm lỗi âm thầm để diag quan sát được (không còn mù)
+        try:
             _STATE["errs"] = int(_STATE.get("errs", 0) or 0) + 1
         except Exception:
             pass
