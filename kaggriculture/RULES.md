@@ -173,7 +173,7 @@
 ## N. LỖ HỎNG CÒN THIẾU (gaps — việc Phase 5 cần lấp)
 
 1. **Own-price impact chưa bọc thành mô hình số bán**: có công thức curve (R28–R30) nhưng chưa có hàm `px_after(sell_n)` xấp xỉ vi phân dùng trực tiếp trong DP thanh lý / solver — hiện gọi `room()` heuristic.
-2. **Bom tồn kho đối thủ (R43)**: L1 không thấy shed — chưa có "prior ẩn" cho tồn kho đối thủ (dùng pipeline tiles + flow để ước накоп tụ). Nguy cơ bị dump bất ngờ.
+2. **Bom tồn kho đối thủ (R43)**: L1 không thấy shed — chưa có "prior ẩn" cho tồn kho đối thủ (dùng pipeline tiles + flow để ước lượng tích tụ). Nguy cơ bị dump bất ngờ.
 3. **Độ trễ phản ứng của đối thủ chưa đo**: khi giá đổi, v4 đổi hành vi sau bao lâu? (latency detector cho L4 minimax — hiện chỉ có detector của mình).
 4. **Care bonus (R16) chưa quantify $/action** so với WATER/HARVEST thứ hạng ưu tiên thế nào.
 5. **Posterior shop draw tương lai chưa dựng**: R38 là uniform with replacement — có thể tính chính xác P(YARN còn ra trong 5 slot cuối) để blend vào px_pred + late_ext.
@@ -186,4 +186,34 @@
 - Điểm yếu: quy tắc nằm rải rác → tài liệu này là hợp nhất đầu tiên; 6 lỗ hổng mục N là "tập quy tắc chưa biết đủ" — thứ tự ưu tiên Phase 5 đề xuất: gap 1 (impact giá) và gap 5 (shop posterior) rẻ nhất/lợi nhất, gap 2 (bom tồn kho) cần thiết cho minimax đúng.
 
 ---
-*KAIN — RULES.md v1.0. Mọi tầng Bayes của v5 tham chiếu đây; quy tắc mới phát hiện phải qua benchmark 20 seed trước khi cấp mã số.*
+
+## P. BẬC 3 — TẦNG META: NGƯỜI VIẾT v5 MỚI LÀ TẦNG HỌC THỰC SỰ (user chốt, thảo luận Phase 5)
+
+**Nguyên lý:** v5 KHÔNG tự học, không tự rút kinh nghiệm, không tự thêm quy tắc. Mọi tri thức của nó là tri thức chúng ta đã nén vào (hằng số, profile, knob, ngưỡng). Kiến trúc nhân quả 3 tầng:
+
+| Tầng | Ai | Làm gì | Tri thức |
+|---|---|---|---|
+| **Bậc 1** — P(B \| thấy A) | v5 (in-game) | telemetry + L1 archetype + L2 flow | quy tắc ĐÓNG BĂNG (physics R1–R27 + profile + knob) |
+| **Bậc 2** — P(B \| làm A) | v5 (in-game) | L3 giá + L4 rollout minimax | cũng dùng quy tắc đóng băng để mô phỏng can thiệp + phản đòn đối thủ |
+| **Bậc 3** — phát hiện quy tắc | **CHÚNG TA** (offline) | quan sát Arena → giả thuyết → thí nghiệm → cập nhật RULES.md → encode vào v5 | quy tắc BIẾN ĐỘNG (kinh tế emergent, meta đối thủ) |
+
+**Vòng đời quy tắc (protocol bắt buộc — mọi R# mới của nhóm [E]):**
+1. **Quan sát:** trace trận (Arena UI / JSONL / diag / ledger) phát hiện hiện tượng bất thường
+2. **Giả thuyết:** phát biểu quy tắc dạng "đối thủ làm A → hệ quả B → ta nên làm C" (bảng best-response theo lý thuyết trò chơi)
+3. **Thí nghiệm cô lập:** A/B 20 seed two-sided — đúng 1 biến đổi, giữ mọi thứ khác nguyên trạng
+4. **Phán quyết:** thắng ≥ ngưỡng → cấp R# + encode knob/profile vào v5; thua → ghi BÀI HỌC REVERT kèm số liệu (mẫu: R37 đảo ngược P2, r1–r4 coupling âm)
+5. **Tài liệu:** RULES.md là điểm về duy nhất — phiên bản v5 nào dùng bộ quy tắc nào phải ghi rõ
+
+**Hệ quả kiến trúc:**
+- "Linh hoạt" của v5 = tri thức đã nén sẵn, KHÔNG phải thích ứng online — độ linh hoạt tối đa của nó bằng độ giàu của bảng best-response ta cung cấp
+- M-9 Self-Monitor, `l2_mae`, `calib_mae`, diag feed ledger là **CẢM BIẾN cho tầng 3** — v5 không tự sửa nhưng tự BÁO để ta đọc
+- Arena UI = bàn thí nghiệm của tầng 3 (xem từng turn 2 bên — nơi quy tắc mới lộ ra)
+
+**Mục tiêu chính thức mới (user chốt phiên này): v5 đánh bại hoàn toàn v4 VÀ v3, tỷ lệ thắng ≥ 95%.**
+- Định lượng từ phân phối hiện tại (67.5% @ 1.058x, σ per-game ~0.12 thang log): cần **mean ratio ≈ 1.16–1.22x vs v4** (hoặc 1.16x + σ giảm còn ~0.09 nhờ bớt knife-edge) ≈ **+$5–8k/mùa**
+- vs v3: v5/v3 ≈ 1.058 × 1.117 ≈ 1.18x → ~92% ước tính — sát ngưỡng, Phase 5 bổ thêm để vượt an toàn
+- Ngân sách Phase 5 khả thi: P3 Solver (+$5–12k) + E8 DP thanh lý (+$3–5k) + feed-war coupling có điều kiện (+$2–5k) > khoản cần bù
+- Bảng best-response cần hoàn thiện trong Phase 5 (dạng "đối thủ làm A → ta làm B"): feed pump theo đàn đối thủ · nhượng/sở hữu room theo tín hiệu giá · mirror split drain · passive nuốt room — mỗi ô của bảng phải có số liệu benchmark đứng sau
+
+---
+*KAIN — RULES.md v1.1 (bổ sung mục P: kiến trúc 3 tầng + mục tiêu 95% + protocol vòng đời quy tắc). Mọi tầng Bayes của v5 tham chiếu đây; quy tắc mới phát hiện phải qua benchmark 20 seed trước khi cấp mã số.*

@@ -374,3 +374,19 @@ Stage Summary:
 - Sản phẩm: kaggriculture/RULES.md — structural causal model tham chiếu duy nhất cho mọi thảo luận Phase 5 (31 P + 2 S + 16 E + 3 I + 11 chi tiết)
 - Trạng thái thảo luận: đang ở pha user yêu cầu "thảo luận chi tiết trước khi nâng cấp Phase 5" — tài liệu này là vật liệu thảo luận
 - Kết luận đối thoại: xác nhận quan điểm user (game rất nhiều quy tắc — 63 đã gom, 6 còn thiếu); bậc 1 ăn vào quy tắc thông tin+drain+curve, bậc 2 ăn vào quy tắc can thiệp+phản ứng đối thủ
+
+---
+Task ID: 19
+Agent: KAIN (main-agent)
+Task: Ghi nhận kiến trúc nhân quả 3 tầng do user chốt (bậc 1+2 trong v5, bậc 3 = người viết v5 cập nhật quy tắc qua RULES.md) + mục tiêu mới 95% thắng vs v4 và v3
+
+Work Log:
+- Phân tích thông điệp user: tán thành 4 hướng Phase 5; nhấn mạnh v5 không tự học được — mọi quy tắc "đối thủ làm A → ta làm B" phải do tầng người phát triển phát hiện qua thực nghiệm và nén vào code; RULES.md là nơi cập nhật tri thức mới; bậc 3 nhân quả dành cho người viết v5; mục tiêu 95% thắng cả v4 lẫn v3
+- RULES.md v1.0 → v1.1: thêm mục P "BẬC 3 — TẦNG META" — bảng kiến trúc 3 tầng (bậc 1 in-game quan sát / bậc 2 in-game can thiệp / bậc 3 offline phát hiện quy tắc), protocol vòng đời quy tắc 5 bước (quan sát Arena → giả thuyết best-response → A/B 20 seed cô lập → phán quyết R# hoặc bài học revert → cập nhật tài liệu), hệ quả kiến trúc (M-9/l2_mae/calib = cảm biến cho tầng 3, Arena = bàn thí nghiệm)
+- Định lượng mục tiêu 95%: từ phân phối hiện tại (67.5% @ 1.058x vs v4, σ ~0.12 log) → cần mean 1.16–1.22x vs v4 ≈ +$5–8k/mùa; vs v3 ước ~1.18x ≈ 92% (sát ngưỡng); ngân sách Phase 5 (P3 Solver + E8 DP + feed-war coupling) đủ vượt
+- Sửa 2 lỗi đánh máy/quốc tế ký tự trong RULES.md (CæA→CỦA, накоп tụ→ước lượng tích tụ, tước→giữ suất)
+
+Stage Summary:
+- RULES.md v1.1 hoàn chỉnh: 63 quy tắc + 6 gaps + kiến trúc 3 tầng + mục tiêu 95% + protocol cập nhật quy tắc
+- Định hướng Phase 5 đã được user tán thành cả 4 hướng — chờ user phát lệnh khởi động cụ thể
+- Nguyên tắc vận hành mới ghi nhận: mọi quy tắc [E] mới phải qua vòng đời 5 bước trước khi encode vào v5
