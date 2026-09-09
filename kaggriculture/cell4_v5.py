@@ -66,6 +66,11 @@ FERT_SELL = True
 FERT_FLOOR = 38
 ANIMAL_CAP = 16
 TOM_QUOTA = 6
+V56_LATE_ENGINE = False
+V56_DEEP_HERD = True
+V56_MICRO = True
+V56_SCARCITY = True
+V56_MELON2 = True
 HOLD = {"MILK": 0.98, "WOOL": 0.94, "STRAWBERRY": 0.90, "EGG": 0.86,
         "CARROT": 0.70, "WHEAT": 0.76, "MELON": 0.52, "TOMATO": 0.82, "FERTILIZER": 0.40}
 
@@ -830,7 +835,7 @@ def _struct_reserve(need, unit_cost, money):
     return min(need, r)
 
 
-def _daily_plan(tiles, shed, seeds, inv, prices, shops, day, opp_farm, money, tm=None, rg=None):
+def _daily_plan(tiles, shed, seeds, inv, prices, shops, day, opp_farm, money, tm=None, rg=None, n_units=0):
     absorb = _forward_absorb(day, 0, shops)
     my_pipe = _pipeline(tiles, shed)
     opp_tiles = _g(opp_farm, "tiles", None) if opp_farm else None
@@ -953,10 +958,27 @@ def _daily_plan(tiles, shed, seeds, inv, prices, shops, day, opp_farm, money, tm
             milk_shops = sum(1 for s in (shops or [])
                              if s in ("PIZZA_SHOP", "ICE_CREAM_SHOP", "SMOOTHIE_SHOP"))
             yarn_n = sum(1 for s in (shops or []) if s == "YARN_STORE")
-            if milk_shops >= 2 and 4 <= day <= 16:
-                cow_target = max(cow_target, min(6, 2 + milk_shops))
-            if yarn_n >= 1 and 4 <= day <= 15:
-                sheep_target = max(sheep_target, min(7, 4 + yarn_n))
+            if milk_shops >= 2 and 4 <= day <= (19 if V56_DEEP_HERD else 16):
+                _dm = (V56_DEEP_HERD
+                       and float(prices.get("MILK", 0) or 0) >= 0.95 * MARKET_PARAMS["MILK"]["base"])
+                if _dm and tm is not None:
+                    tm["deep_herd"] = True
+                cow_target = max(cow_target,
+                                 min(9 if _dm else 6, (3 if _dm else 2) + milk_shops))
+            if yarn_n >= 1 and 4 <= day <= (18 if V56_DEEP_HERD else 15):
+                _dw = (V56_DEEP_HERD
+                       and float(prices.get("WOOL", 0) or 0) >= 0.95 * MARKET_PARAMS["WOOL"]["base"])
+                if _dw and tm is not None:
+                    tm["deep_herd"] = True
+                sheep_target = max(sheep_target,
+                                   min(8 if _dw else 7, (5 if _dw else 4) + yarn_n))
+            _egg_shops = sum(1 for s in (shops or []) if s in ("BAKERY", "BRUNCH_SPOT"))
+            if V56_DEEP_HERD and _egg_shops >= 2 and 4 <= day <= 14 \
+                    and float(prices.get("EGG", 0) or 0) >= 0.95 * MARKET_PARAMS["EGG"]["base"]:
+                goose_target = max(goose_target, 7)
+                if tm is not None:
+                    tm["deep_herd"] = True
+
     except Exception:
         pass
     if day < 2:
@@ -999,6 +1021,13 @@ def _daily_plan(tiles, shed, seeds, inv, prices, shops, day, opp_farm, money, tm
     owned_total = animals_now + shed_geese + shed_cows + shed_sheep
     u_est = 15 if day >= 26 else (13 if day >= 9 else (12 if day >= 6 else (8 if day >= 1 else 7)))
     animal_cap = min(ANIMAL_CAP, max(4, int(u_est * 0.75) + 2))
+    if V56_DEEP_HERD and day >= 18:
+        animal_cap = min(ANIMAL_CAP, u_est + 2)
+    try:
+        if V56_DEEP_HERD and 10 <= day < 18 and (tm or {}).get("deep_herd"):
+            animal_cap = max(animal_cap, min(ANIMAL_CAP, u_est))
+    except Exception:
+        pass
 
     try:
         water_debt = int((_STATE.get(("risk", day - 1)) or {}).get("water_crit_late", 0) or 0)
@@ -1073,8 +1102,8 @@ def _daily_plan(tiles, shed, seeds, inv, prices, shops, day, opp_farm, money, tm
     quotas = {}
     if 8 <= day <= 14:
         quotas["MELON"] = 14 if room("MELON") > -50 else 7
-        if day <= 1:
-            quotas["MELON"] = 8
+    elif V56_MELON2 and 15 <= day <= 16:
+        quotas["MELON"] = 12 if room("MELON") > -50 else 6
     if 2 <= day <= 16:
         quotas["TOMATO"] = 0
     if 5 <= day <= 14:
@@ -1094,6 +1123,16 @@ def _daily_plan(tiles, shed, seeds, inv, prices, shops, day, opp_farm, money, tm
             s_room = max(s_room, absorb.get("STRAWBERRY", 0.0)
                          - my_pipe.get("STRAWBERRY", 0.0))
             tm["knobs_straw"] = True
+        try:
+            spx = float(prices.get("STRAWBERRY", 0) or 0)
+            sinv = float(inv.get("STRAWBERRY", MARKET_I0) or MARKET_I0)
+            if V56_SCARCITY and spx >= 1.25 * MARKET_PARAMS["STRAWBERRY"]["base"] \
+                    and sinv <= MARKET_I0:
+                s_room = max(s_room, want_straw * 4 + 40)
+                if tm is not None:
+                    tm["knobs_scarcity"] = "STRAWBERRY"
+        except Exception:
+            pass
         quotas["STRAWBERRY"] = want_straw if s_room > 100 else max(0, min(want_straw, int(s_room // 4)))
     elif 14 <= day <= 15:
         quotas["STRAWBERRY"] = 6
@@ -1116,6 +1155,42 @@ def _daily_plan(tiles, shed, seeds, inv, prices, shops, day, opp_farm, money, tm
         else:
             quotas["CARROT"] = 4 if room("CARROT") > 60 else 0
 
+    if V56_LATE_ENGINE and 18 <= day <= 26 and n_units and not str((rg or {}).get("state")) == "SURVIVE":
+        try:
+            pxp = (tm or {}).get("px_pred") or {}
+            service_load = (animals_now + shed_geese + shed_cows + shed_sheep) * 3
+            water_load = int(0.9 * sum(standing.values()))
+            idle_a = max(0, n_units * 21 - service_load - water_load - 30)
+            for crop, matur, ypc in (("WHEAT", 4, 3.0), ("CARROT", 3, 3)):
+                if day + matur > 29:
+                    continue
+                q = pxp.get(crop) or {}
+                p3 = float(q.get("p3", 0) or 0)
+                now_ = float(q.get("now", 0) or 0)
+                px_use = p3 if p3 > 0 else (now_ if now_ > 0 else float(MARKET_PARAMS[crop]["base"]))
+                if ypc * px_use / 4.0 >= 14.0 and idle_a >= 24:
+                    extra = min(12, idle_a // 4, max(0, len(plantable)))
+                    q0 = quotas.get(crop, 0) or 0
+                    quotas[crop] = max(q0, standing.get(crop, 0) + extra)
+                    if tm is not None:
+                        try:
+                            tm.setdefault("knobs_late", set()).add(crop)
+                        except Exception:
+                            pass
+        except Exception:
+            pass
+
+    if V56_MICRO:
+        try:
+            for crop, matur in (("WHEAT", 4), ("CARROT", 3), ("TOMATO", 8),
+                                ("STRAWBERRY", 10), ("MELON", 10)):
+                if day + matur > 29 and quotas.get(crop, 0):
+                    cd = CROPS[crop]
+                    if not cd["ongoing"]:
+                        quotas[crop] = min(quotas.get(crop, 0), standing.get(crop, 0))
+        except Exception:
+            pass
+
     if day <= 1:
         quotas["WHEAT"] = 10
         quotas["CARROT"] = 8
@@ -1128,6 +1203,11 @@ def _daily_plan(tiles, shed, seeds, inv, prices, shops, day, opp_farm, money, tm
         order = ["WHEAT", "STRAWBERRY", "TOMATO", "MELON", "CARROT"]
     else:
         order = ["MELON", "STRAWBERRY", "TOMATO", "WHEAT", "CARROT"]
+    melon2_open = (V56_MELON2 and 8 <= day <= 16
+                   and quotas.get("MELON", 0) > standing.get("MELON", 0)
+                   and day + 10 <= 29)
+    if melon2_open:
+        order = ["MELON", "STRAWBERRY", "WHEAT", "TOMATO", "CARROT"]
     crop_tiles = {}
     remaining = len(plantable)
     for crop in order:
@@ -1136,6 +1216,8 @@ def _daily_plan(tiles, shed, seeds, inv, prices, shops, day, opp_farm, money, tm
             continue
         have = standing.get(crop, 0)
         need = max(0, want - have)
+        if melon2_open and crop == "MELON":
+            need = min(need, 12)
         take = min(remaining, need)
         if take > 0:
             crop_tiles[crop] = take
@@ -1346,7 +1428,7 @@ def _build_tasks(tiles, shed, seeds, plan, day, hour, step, inventories, n_units
         n_plant = min(len(flat), len(empties), max(0, safe_plant))
         p_tier = 3 if hour <= 11 else T_PLANT
         try:
-            closing = any(c == "MELON" and 11 <= day <= 15 for (c, _n) in budget) \
+            closing = any(c == "MELON" and 11 <= day <= (16 if V56_MELON2 else 15) for (c, _n) in budget) \
                 or any(c == "STRAWBERRY" and 12 <= day <= 14 for (c, _n) in budget)
         except Exception:
             closing = False
@@ -1742,6 +1824,15 @@ def _build_orders(me, shed, seeds, inventories, inv, prices, day, hour, plan,
                                        ("SHEEP", plan.get("sheep_target", 0), 4, 15),
                                        ("COW", plan.get("cow_target", 0), 5, 16)):
             w1 = w1 + late_ext.get(animal, 0)
+            try:
+                if V56_DEEP_HERD and 15 <= day <= 19:
+                    if animal == "COW" and sum(1 for s in (shops or [])
+                                               if s in ("PIZZA_SHOP", "ICE_CREAM_SHOP", "SMOOTHIE_SHOP")) >= 2:
+                        w1 += 2
+                    elif animal == "SHEEP" and sum(1 for s in (shops or []) if s == "YARN_STORE") >= 1:
+                        w1 += 2
+            except Exception:
+                pass
             owned = sum(1 for row in tiles for t in row
                         if isinstance(t, dict) and t.get("animal") == animal)
             owned += (shed.get(animal, 0) or 0) if shed else 0
@@ -1793,6 +1884,13 @@ def _build_orders(me, shed, seeds, inventories, inv, prices, day, hour, plan,
                 floor = 80 if crop == "WHEAT" else (150 if crop == "STRAWBERRY" else 220)
                 if crop == "STRAWBERRY":
                     floor = 900
+                    try:
+                        if V56_SCARCITY and (
+                                (tmx.get("knobs_scarcity") if isinstance(tmx, dict) else None) == "STRAWBERRY"
+                                or float(prices.get("STRAWBERRY", 0) or 0) >= 1.25 * MARKET_PARAMS["STRAWBERRY"]["base"]):
+                            floor = 200
+                    except Exception:
+                        pass
                 if crop == "MELON":
                     floor = 700
                 max_afford = max(0, int((money - floor - (animal_reserve if crop == "STRAWBERRY" else 0)) // unit)) if unit > 0 else 0
@@ -2047,13 +2145,18 @@ def _agent(obs):
                   if isinstance(t, dict) and t.get("animal") == "SHEEP")
         _bayes_step(tm, day, opp, (mc, mg, msp), my_money)
         _STATE[pkey] = _daily_plan(tiles, shed, seeds, inv, prices, shops, day, opp,
-                                   my_money, tm, _STATE.get("rg"))
+                                   my_money, tm, _STATE.get("rg"),
+                                   int((tm or {}).get("units_peak", 1) or 1))
     plan = _STATE[pkey]
 
     fpos = _g(me, "farmer", None) or [board // 2 - 1, board // 2 - 1]
     units = [(0, int(fpos[0]), int(fpos[1]))]
     for i, h in enumerate(_g(me, "hands", None) or []):
         units.append((i + 1, int(h[0]), int(h[1])))
+    try:
+        tm["units_peak"] = max(int(tm.get("units_peak", 1) or 1), len(units))
+    except Exception:
+        pass
 
     tasks, stats = _build_tasks(tiles, shed, seeds, plan, day, hour, step,
                                 inventories, len(units))

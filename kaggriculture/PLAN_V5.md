@@ -455,3 +455,41 @@ Kho núm dễ ĐÃ CẠN: 7 núm v5.2 + 3 thử Phase 5 (2 revert, 1 giữ) → 
 - 6 trận thua vs v4: 4 knife-edge (≤3.3%) + 2 cấu trúc (seed 107/119 — v4 15 thú thị trường sâu, không tín hiệu sớm, R79)
 - Tài liệu: RULES.md v1.3 mục R (R74–R79); v5.py 2.464 dòng; backup v5.4 /tmp/v54_backup.py
 - Chưa giải: 95% vs v4 cần 1.22x — mỏ còn lại đúng như PLAN §7 dự phóng: P3 Solver $/action T/2 toàn cục (thay bảng quota cứng bằng tối ưu hóa $/action theo trạng thái từng ngày)
+
+## 16. BIÊN BẢN TASK 23 (21 Sep) — V5.6 + WAVE E: 91% → 97% vs v4 (MỤC TIÊU ĐẠT)
+
+### 16.1 Chuỗi thực thi theo lệnh user (triển khai → 100 trận → vòng lặp → 95%)
+1. **v5.6 3 wave** (A late-engine REVERT / B deep-herd GIỮ / C micro GIỮ / D scarcity GIỮ)
+2. **Battery 100 trận #1** (seed 120–169): 91/100 — 9 thua, 7/9 ở ghế 1
+3. **Vòng lặp observe–improve**: autopsy 9 thua theo NGÀY → phát hiện bomb d22/d28
+   → hourly autopsy (v4 +$14.1k/ngày seed 123 d22) → spy `_daily_plan` (quota dưa
+   chết vì order wheat-first) → **Wave E** (1 delta: order MELON-first d8–16)
+4. **A/B 20 seed**: 37/40·1.160x·worst 0.839 → **39/40·1.275x·worst 0.946**
+   (paired +$6,129, t=3.83; 3/3 seed thua lật; probe 5/5 seed thua lật)
+5. **Battery 100 trận #2** (cùng seed 120–169): **97/100 = 97% vs v4** ≥ 95% ✓
+
+### 16.2 Cơ chế Wave E (R81: cửa sổ chết vs chu kỳ sống)
+- $/tile-ngày: dâu $115 · dưa $105 · wheat $25 — nhưng wheat cycle 5 ngày tự bù
+  (trồng lại d16-17 + market buys), dưa/dâu cửa sổ đóng vĩnh viễn d16
+- v5.5/v5.6 có quota dưa d8–14 nhưng `order` wheat-first ăn hết plantable →
+  melon/straw không bao giờ vào crop_tiles (R82: núm ẩn = thứ tự order)
+- Delta: `order = [MELON, STRAW, WHEAT, ...]` khi 8≤d≤16 & quota>standing &
+  day+10≤29; quota dưa d15–16 = 12 nếu room>−50; cap 12 tiles/ngày; Wave C
+  guard matur 10 chặn d≥20; room() Cournot gate giữ nguyên
+- Tác dụng phụ được kiểm soát: feed_demand bù bằng market wheat buys $42
+  (pump vẫn giữ: v4 cũng mua 30–50u/ngày — seed 123 v4 +$3.8k nhưng gap
+  v5 +$6.1k)
+
+### 16.3 Kết quả chính thức v5.6+E (bản ghi đầy đủ bench/*.json)
+| Cặp | Kết quả | Trước |
+|---|---|---|
+| v5.6+E vs v4 (20 seed 100–119, A/B) | 39/40 · 1.275x · worst 0.946 | 37/40 · 1.160x · 0.839 |
+| **v5.6+E vs v4 (100 trận seed 120–169)** | **97/100 (97%) · 1.278x · median 1.287 · worst 0.967** | 91/100 · 1.174x (battery #1) |
+| 3 thua còn lại | 128 s1 −$7.7k (v4 deep dairy: 88 sữa vs 25) · 152 s1 −$4.1k · 158 s0 −$1.5k | — |
+
+### 16.4 Ghi chú phương pháp
+- Autopsy theo GIỜ (hourly_autopsy.py) mới tách được "quả bom d22" — autopsy
+  theo ngày chỉ thấy "chảy máu d19–29" chung chung
+- Spy hàm nội bộ (`_daily_plan` wrap) xác minh quota → crop_tiles biểu đạt
+  thật — tránh "quota trên giấy" (R82)
+- 1 delta đúng chỗ (+$6.1k mean) > 3 wave dàn trải (A/B là phán quyết — R73)

@@ -105,6 +105,8 @@ V56_LATE_ENGINE = False # Wave A: REVERT theo phán quyết A/B (10-seed dA3=−
 V56_DEEP_HERD = True    # Wave B: deep-market herd floor + cap đàn nới d≥18 (B2: 1.184x, worst 0.938)
 V56_MICRO = True        # Wave C: T/2 anti-doom (bảo hiểm trung tính, ngưỡng align 29)
 V56_SCARCITY = True     # Wave D: khan hiếm ĐƯỢC GIÁ CHỨNG MINH → quota đầy + hạ floor tiền hạt
+V56_MELON2 = True       # Wave E: đợt dưa 2 (d8-16) ưu tiên TRƯỚC wheat — $105/tile-ngày
+                        # vs wheat $25; wheat cycle 5 ngày tự bù sau bằng market buys
 HOLD = {"MILK": 0.98, "WOOL": 0.94, "STRAWBERRY": 0.90, "EGG": 0.86,
         "CARROT": 0.70, "WHEAT": 0.76, "MELON": 0.52, "TOMATO": 0.82, "FERTILIZER": 0.40}
 
@@ -1305,8 +1307,10 @@ def _daily_plan(tiles, shed, seeds, inv, prices, shops, day, opp_farm, money, tm
     quotas = {}
     if 8 <= day <= 14:
         quotas["MELON"] = 14 if room("MELON") > -50 else 7
-        if day <= 1:
-            quotas["MELON"] = 8
+    elif V56_MELON2 and 15 <= day <= 16:
+        # Wave E: nới cửa sổ dưa đợt-2 thêm 2 ngày (trồng d16 → thu d26-28,
+        # masih realizable trước d29; Wave C guard matur 10 chặn d≥20)
+        quotas["MELON"] = 12 if room("MELON") > -50 else 6
     # A/B 20 Sep: mở TOMATO (≤8 tiles, gate shop/room) = 1.027x/23/40, worst
     # 0.766 — MẤT −0.033x so baseline → REVERT về TOMATO=0 như v3/v4. Bài học
     # (RULES R67): cơ hội phí đất+lao động của nền wheat-feed ép bay lợi
@@ -1439,6 +1443,19 @@ def _daily_plan(tiles, shed, seeds, inv, prices, shops, day, opp_farm, money, tm
         order = ["WHEAT", "STRAWBERRY", "TOMATO", "MELON", "CARROT"]
     else:
         order = ["MELON", "STRAWBERRY", "TOMATO", "WHEAT", "CARROT"]
+    # ---- v5.6 Wave E: ĐỢT DƯA 2 ƯU TIÊN TRƯỚC WHEAT ----
+    # P1/100-battery autopsy (seed 123/169 seat1): d22 v4 +$14.1k/ngày từ đợt
+    # dưa trồng d11 (9 tiles) + d28 22 dâu — v5 có quota dưa d8-14 nhưng
+    # order wheat-first ăn hết plantable → melon/straw KHÔNG BAO GIỜ được
+    # trồng (spy: plan d8-11 không có MELON). $/tile-ngày: melon $105, dâu
+    # $115, wheat $25 — wheat cycle 5 ngày TỰ BÙ SAU (d16-17 trồng lại đủ
+    # quota) còn cửa sổ dưa/dâu đóng vĩnh viễn. Đổi order + cap 12 tiles/ngày
+    # (tránh spike lao động 1 buổi). room() Cournot gate giữ nguyên.
+    melon2_open = (V56_MELON2 and 8 <= day <= 16
+                   and quotas.get("MELON", 0) > standing.get("MELON", 0)
+                   and day + 10 <= 29)
+    if melon2_open:
+        order = ["MELON", "STRAWBERRY", "WHEAT", "TOMATO", "CARROT"]
     crop_tiles = {}
     remaining = len(plantable)
     for crop in order:
@@ -1447,6 +1464,8 @@ def _daily_plan(tiles, shed, seeds, inv, prices, shops, day, opp_farm, money, tm
             continue
         have = standing.get(crop, 0)
         need = max(0, want - have)
+        if melon2_open and crop == "MELON":
+            need = min(need, 12)  # Wave E: cap 12 tiles/ngày — trải trồng
         take = min(remaining, need)
         if take > 0:
             crop_tiles[crop] = take
@@ -1676,7 +1695,7 @@ def _build_tasks(tiles, shed, seeds, plan, day, hour, step, inventories, n_units
         # cửa (seed 42: plan MELON 14 ngày 14, mua 11 hạt, trồng 0 = -$8.4k).
         # Cây có window đóng trong ≤3 ngày → leo lên tier 2 cạnh SERVICE.
         try:
-            closing = any(c == "MELON" and 11 <= day <= 15 for (c, _n) in budget) \
+            closing = any(c == "MELON" and 11 <= day <= (16 if V56_MELON2 else 15) for (c, _n) in budget) \
                 or any(c == "STRAWBERRY" and 12 <= day <= 14 for (c, _n) in budget)
         except Exception:
             closing = False

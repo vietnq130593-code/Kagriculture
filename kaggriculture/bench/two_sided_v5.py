@@ -3,7 +3,8 @@ sys.path.insert(0, '/home/z/my-project/kaggriculture')
 sys.path.insert(0, '/home/z/my-project/kaggriculture/bench')
 from kaggle_environments import make
 
-SEEDS = list(range(100, 116))
+import os as _os
+SEEDS = list(range(int(_os.environ.get("SEED_LO", 100)), int(_os.environ.get("SEED_HI", 120))))
 ROOT = '/home/z/my-project/kaggriculture'
 
 

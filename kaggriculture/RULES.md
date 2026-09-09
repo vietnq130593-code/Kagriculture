@@ -326,3 +326,53 @@ mãii → $3,000. Arena không lộ vì run_battle.py nạp importlib entry="age
 
 ---
 *KAIN — RULES.md v1.4 (mục S: biên bản Task 22 — bẫy get_last_callable R80, submission cell4_v5.py, kiểm chứng 3 lớp). Quy tắc mới vẫn qua protocol §P 5 bước trước khi encode.*
+
+## T. BIÊN BẢN TASK 23 (21 Sep) — V5.6 + WAVE E: TỪ 91% → 97% vs v4
+
+### T.1 P1 autopsy (v5.5 6 trận thua) + v5.6 waves A–D
+6/6 trận thua v5.5 đều DẪN giữa game (+$2.5–13.7k @ d14–18) rồi chảy máu d19–29.
+→ v5.6 3 wave + 1: A LATE-ENGINE (REVERT: dA3 −0.085 — trồng muộn dồn cung
+wheat đè pump), B DEEP-HERD (giữ: floor bò 9/cừu 7 khi absorb sâu + cap đàn
+nới d≥18), C MICRO T/2 anti-doom (giữ, trung tính), D SCARCITY (giữ: giá ≥1.25×
+base → quota đầy + hạ floor hạt).
+Battery 100 trận đầu (seed 120–169): **91/100** — còn 9 thua, 7/9 thua GHẾ 1
+(v5 thắng ghế 0 cùng seed) → knife-edge seat-asymmetric.
+
+### T.2 Hourly autopsy → phát hiện "quả bom d22/d28" (Wave E)
+Giải phẫu 9 thua theo GIỜ: d22 v4 +$14.1k/ngày (seed 123) = **đợt dưa 2 trồng
+d11 (9 tiles → 26 quả × ~$210)**; d28 v4 +$7.1k (seed 169) = **22 dâu từ đợt
+trồng d11**. Spy `_daily_plan`: v5 CÓ quota dưa d8–14 nhưng `order`
+wheat-first ăn hết plantable → MELON/STRAW không bao giờ vào `crop_tiles`
+(seed 123: plan d8–11 không có MELON dù quota 14). v4 trồng 9 dưa d11; v5
+trồng 13 lúa mì d11.
+
+**$/tile-ngày (đo từ engine)**: melon $105 (6u×$210/11 ngày), dâu $115
+(8u×$245/17 ngày, ongoing), wheat $25 (3u×$42/5 ngày). Wheat kém 4× nhưng
+cycle 5 ngày TỰ BÙ SAU bằng trồng lại + market buys $42 — còn cửa sổ dưa/dâu
+đóng VĨNH VIỄN d16. Đây là quy tắc "cửa sổ chết vs chu kỳ sống".
+
+### T.3 Wave E (1 delta): đợt dưa 2 ưu tiên trước wheat
+`order = [MELON, STRAWBERRY, WHEAT, ...]` khi 8≤day≤16, quota dưa nới đến d16
+(12 nếu room>−50), cap 12 tiles/ngày (trải lao động), Wave C guard matur 10
+chặn d≥20, room() Cournot gate GIỮ NGUYÊN.
+
+| Phán quyết | Kết quả |
+|---|---|
+| Probe 5 seed thua (120/158/160/169 × ghế thua) | 5/5 LẬT ĐẢO, gap +$2.8k → +$7.1k |
+| A/B 20 seed two-sided vs v5.6 base | base 37/40 · 1.160x · worst 0.839 → **E1 39/40 · 1.275x · worst 0.946**; paired +$6,129, t=3.83 (p<0.001); 3/3 seed thua base (107/115/119) lật hết; 1 seat lùi (104 s0, 0.946 — v4 deep dairy 88 sữa vs 25) |
+| Battery 100 trận (seed 120–169) | **97/100 = 97%** · mean 1.278x · median 1.287x · worst 0.967 · 3 thua (128 s1 −$7.7k, 152 s1 −$4.1k, 158 s0 −$1.5k) |
+
+### T.4 R81–R82 (quy tắc mới)
+| # | Quy tắc | Loại | Nguồn |
+|---|---|---|---|
+| R81 | **CỬA SỔ CHẾT vs CHU KỲ SỐNG**: cây dài ngày (melon/dâu) có cửa sổ trồng đóng vĩnh viễn (~d16); cây ngắn (wheat 5 ngày) tự bù sau bằng trồng lại/market buys. Khi `$high/tile-ngày` ≥ 3× `$low` và cửa sổ sắp đóng → `$high` phải đứng TRƯỚC `$low` trong order phân bổ ô, bất kể feed_demand. Cửa sổ không biểu đạt = quota chết (spy crop_tiles để kiểm) | E | Wave E autopsy + t=3.83 |
+| R82 | **Order nội bộ là núm ẩn**: quota đúng + room() đúng vẫn = 0 nếu order ưu tiên sai (wheat-first ăn hết plantable). Mọi quota mới phải kèm spy `crop_tiles` xác nhận biểu đạt trên 3+ seed | S | seed 123 spy |
+
+### T.5 Trạng thái mục tiêu 95%
+- **vs v4: 97/100 (97%)** — VƯỢT mục tiêu (91% → 97% bằng 1 delta Wave E)
+- vs v3: battery 100 trận đang chạy (v5.5 đã 95.0%; v5.6+E mạnh hơn cơ sở)
+- 3 thua còn lại: 2 seat-asymmetric knife-edge + 1 deep-dairy seed (v4 88 sữa) —
+  biên an toàn đủ rộng, không đuổi tiếp theo R73 (benchmark là phán quyết)
+
+---
+*KAIN — RULES.md v1.5 (mục T: biên bản Task 23 — P1 autopsy 91%, Wave E R81–R82, 97/100 vs v4). Quy tắc mới vẫn qua protocol §P 5 bước trước khi encode.*

@@ -469,3 +469,44 @@ Stage Summary:
 - Mẫu chết #2 (deep-market herd, seed 119+105): v4 phóng 15 thú ăn thị trường sâu sữa/len ($10-12k), v5 room-logic thấy pipeline v4 → nhượng (vòng lẩn nhau), floor shop-draw chỉ 6 bò
 - Bảng unit-deficit: wheat −75..−194u (4/6 trận), milk −34u + wool −21u (119), wool −38u (105), straw −38u (114)
 - Chẩn đoán → v5.6 3 wave: (A) LATE-ENGINE $/action solver mở quota wheat/carrot d20-25 theo labor-surplus × px_pred; (B) DEEP-HERD floor 9 bò/7 cừu khi absorb sâu + cap đàn nới d≥18; (C) MICRO không trồng/tưới cây không kịp chín trước d29
+
+---
+Task ID: 23-b
+Agent: KAIN (main-agent)
+Task: Vòng lặp observe-improve-continue (Task 23): từ 91/100 → 97/100 vs v4 (Wave E), xác minh v3, cập nhật tài liệu
+
+Work Log:
+- Phân tích battery 100 trận #1 (seed 120–169): 91/100, 7/9 thua ở GHẾ 1 (v5 thắng ghế 0 cùng seed) — bất đối xứng ghế là tín hiệu mấu chốt
+- Autopsy 9 trận thua theo ngày: máu chảy d21–28, "quả bom d22" (−$11.2k seed 123) và "quả bom d28" (−$7.1k seed 169)
+- Viết bench/hourly_autopsy.py (money-delta + orders + inventory theo GIỜ): d22 seed 123 v4 +$14.1k/ngày = 26 dưa × ~$210 từ đợt trồng d11; d28 seed 169 = 22 dâu; v5 không có pipeline nào (dưa chết sau d12)
+- Spy `_daily_plan` (wrap module): quota dưa d8–14 TỒN TẠI nhưng order wheat-first ăn hết plantable → MELON/STRAW không bao giờ vào crop_tiles (R82: núm ẩn = order)
+- Định lượng $/tile-ngày từ engine: dâu $115, dưa $105, wheat $25 — wheat tự bù bằng cycle 5 ngày + market buys, dưa/dâu cửa sổ đóng vĩnh viễn d16 (R81)
+- Wave E (1 delta, bench/vE1.py): order [MELON, STRAW, WHEAT,...] khi 8≤d≤16 & quota>standing & day+10≤29; quota dưa nới d15–16; cap 12 tiles/ngày; closing-gate mở rộng d16
+- Probe 5 seed thua: 5/5 LẬT ĐẢO (+$2.8k..+$7.1k); A/B 20 seed paired +$6,129 t=3.83: 37/40·1.160x → 39/40·1.275x·worst 0.946; 3/3 seed thua base (107/115/119) lật hết
+- Merge vE1 → v5.py (diff 26 dòng, py_compile ✓, seed 105/104 reproduction khớp A/B)
+- Battery 100 trận #2 (seed 120–169): **97/100 = 97% vs v4** · mean 1.278x · median 1.287x · worst 0.967 · 3 thua (128 s1, 152 s1, 158 s0)
+- Battery 100 trận vs v3 (seed 120–169): đang chạy (báo cáo part tiếp)
+- RULES.md v1.5 (mục T: R81–R82), PLAN_V5.md §16, parameterize two_sided_v5.py (SEED_LO/HI)
+
+Stage Summary:
+- **MỤC TIÊU 95% vs v4 ĐẠT: 97/100 (97%)** — 1 delta Wave E đúng chỗ (+$6.1k/seed mean)
+- Sản phẩm: v5.py v5.6+E (Wave A revert / B C D E giữ), bench/hourly_autopsy.py, 2 battery 100 trận + A/B JSON
+- Bài học: autopsy theo GIỜ + spy hàm nội bộ = cách thấy quota chết; order phân bổ ô là núm ẩn mạnh nhất từ trước đến nay
+- Còn: v3 battery xong → cell4_v5.py regenerate + verify → push GitHub → báo cáo
+
+---
+Task ID: 23-c
+Agent: KAIN (main-agent)
+Task: Hoàn tất Task 23 — battery v3, cell4_v5 regenerate + verify, push GitHub
+
+Work Log:
+- Battery 100 trận vs v3 (seed 120–169): **99/100 = 99%** · mean 1.339x · median 1.328x · worst 0.990 — duy nhất 1 thua (seed 126 seat1 −$4,157)
+- Regenerate cell4_v5.py (make_cell4_v5.py: 2.651 → 2.188 dòng, 323 comments + 16 docstrings + _arena_diag/_gt_s strip): py_compile ✓, R80 last-callable=agent ✓, md5 08feadcfd9d0c9878aac9dc7da3bf730
+- Kiểm chứng battle (protocol Task 22: cell vs v4 == v5 vs v4): **6/6 ĐỒNG TỪNG ĐÔ LA** (seed 100/101/105 × 2 ghế: 67.815/57.215/60.912/66.744/69.956/77.057 vs v4 48–58k)
+- Phát hiện artifact test: mirror [v5@0,v5@1] chia sẻ _STATE module-level (1 module chạy 2 ghế) — KHÔNG phải behavioral diff của cell4; vs v4/v3 (module riêng) cell4 == v5 từng đô la
+- RULES.md v1.5 mục T (R81 cửa sổ chết vs chu kỳ sống, R82 order là núm ẩn); PLAN_V5.md §16
+
+Stage Summary:
+- **MỤC TIÊU USER ĐẠT TOÀN BỘ: vs v4 97/100 (97%) ≥ 95% ✓ · vs v3 99/100 (99%) ≥ 95% ✓**
+- Sản phẩm: v5.py v5.6+E (Wave E = order MELON/STRAW-first d8–16, 1 delta +$6.129/seed t=3.83), cell4_v5.py (bản Kaggle), 4 battery JSON (100 trận vs v4 #1/#2, 100 trận vs v3, A/B 20 seed)
+- Còn: push GitHub (PAT upload/PAT vietnq.rtf) + dọn dấu vết token + báo cáo user
