@@ -549,3 +549,23 @@ Stage Summary:
 - Đổi bundler dev sang webpack là bắt buộc trên máy 4 GB (Turbopack = OOM kill 100%); NODE_OPTIONS --max-old-space-size=1024
 - Golden path verify agent-browser: render + socket + battle 720 lượt + kết quả THẮNG — sạch lỗi console
 - Task 23 (95% goal + push GitHub) đã hoàn tất ở session trước; session này thuần hạ tầng UI
+
+---
+Task ID: 25
+Agent: KAIN (main-agent)
+Task: Phase 2 — KAIN đổi vai làm ĐỐI THỦ của v5 (user directive): chế agent tấn công, đấu v5, đúc kết RULES.md, tìm chiến lược mới cho v6
+
+Work Log:
+- Đọc lại RULES.md v1.5 (82 quy tắc), run_battle.py, two_sided_v5.py, kiến trúc v4 (daily_plan/_build_orders) + room() của v5
+- KAIN-1 "DEEP DAIRY BLITZ" (fork v4, target 15→12 bò, cap 22, window d19, gate wheat 1.0, feedbuy $48, bỏ đất SE): smoke seed 100 lộ 2 lỗi vận hành (pasture sprawl + capital starvation: d10 còn $325) → chỉ giao 4–8 bò; battery 20 seed: **2/40 (5%) 0.816x worst 0.442 REJECT**; phát hiện vàng: v5 KHÔNG BAO GIỜ counter-scale sữa (px $331 vẫn giữ 3-4 bò), v5 đọc kain1 là COOP 0.99 → tự thu nhỏ đàn
+- KAIN-2 "WAVE COLLIDER" (fork v4, 4 delta: melon d0-7 quota 14, dâu 30 từ d5, HOLD melon 0.45/straw 0.80, mở mua seed dưa d3-7): smoke seed 100 THẮNG đầu tiên ($64.5k vs $59k); battery 100-119: **21/40 52.5% 1.029x**; kiểm chứng chéo 120-139: **21/40 52.5% 0.984x** (tái lập); attribution vs v4: **34/40 1.128x** (cải tiến tổng quát)
+- Autopsy seed 115 (v5 thua $32.8k): kain bán dưa d11 @avg $232, v5 dội 132 quả d12+ vào $131 rồi $4; v5 ĐÓNG BĂNG thu nhập d22→d25 ($13.7k→$13.5k); seed 107 (v5 thắng): v5 ra dưa d10 trước kain d11 — first-mover quyết định
+- KAIN-3 "COLLIDER + DAIRY FLOOR" (kain2 + 1 delta: cow_target max(6,...) vô điều kiện): **27/40 67.5% 1.087x** (100-119) + **27/40 67.5% 1.064x** (120-139 chéo) + **36/40 1.165x vs v4** — 54/80 tổng vs v5, từ parity lên áp đảo ngược
+- RULES.md v2.0: mục U (Phase 2) — quy tắc mới **R83 First-Mover Premium / R84 Escape-Hatch Trap / R85 Income-Freeze / R86 Sữa mù quan sát / R87 Target≠Herd** + 4 trụ v6 + bảng tiến hóa KAIN
+- Đăng ký kain1/kain2/kain3 vào arena/run_battle.py AGENTS + arena-service (bun --hot tự nạp) — user xem trực tiếp `kain3 vs v5` trên Observer UI; battery JSON lưu bench/kain*.json (7 file)
+- App health vẫn 200 (webpack dev + supervisor Task 24 nguyên vẹn)
+
+Stage Summary:
+- **Kết quả Phase 2 vòng 1: v5 từ 97% thống trị rơi xuống 32.5% thắng suất trước kain3 (54/80 thua)** — 5 quy tắc mới R83-R87, 4 trụ v6 đề xuất: (1) front-run schedule melon/dâu sớm, (2) collision detector tắt escape-hatch khi opp thu hoạch trước, (3) income smoothing wheat mid-game, (4) floor 6-8 bò + gate mở rộng
+- Bài học phương pháp: fork v4 + đúng 1 vector/agent = attribution sạch; battery 20 seed × 2 dải + autopsy 2 chiều (thắng lớn + thua) = cơ chế tách được khỏi may rủi
+- KAIN-4 (threshold-siege: giữ giá dưới ngưỡng HOLD của v5 bằng dump biên) là vector kế tiếp nếu user muốn tiếp vòng lặp

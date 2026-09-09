@@ -376,3 +376,85 @@ chặn d≥20, room() Cournot gate GIỮ NGUYÊN.
 
 ---
 *KAIN — RULES.md v1.5 (mục T: biên bản Task 23 — P1 autopsy 91%, Wave E R81–R82, 97/100 vs v4). Quy tắc mới vẫn qua protocol §P 5 bước trước khi encode.*
+
+---
+
+## U. BIÊN BẢN PHASE 2 / TASK 25 — KAIN LÀM ĐỐI THỦ CỦA v5 (22 Sep)
+
+**Đổi vai theo chỉ thị user:** từ Task 25, RULES.md không còn là bài học v5-vs-v4. KAIN (kỹ sư AI, kiến trúc sư, chuyên gia thuật toán) **tự chế tạo agent đối thủ** (series `kainN.py`, fork v4 — mỗi agent = đúng 1 vector tấn công, mọi thứ khác nguyên trạng để quy công trình) → đấu v5 → đúc kết → tìm chiến lược mới cho v6.
+
+### U.1 KAIN-1 "DEEP DAIRY BLITZ" — fork v4, vector đàn sữa sâu
+
+7 delta (target 4 ngỗng/15→12 bò/2 cừu cố định, ANIMAL_CAP 22, cửa bò d5→19, gate wheat 1.3→1.0, feedbuy ≤$48, nhịn đất SE, quota wheat 30-tile rồi revert). Kết quả 20 seed two-sided (100–119):
+
+| Phiên bản | vs v5 | Ghi chú |
+|---|---|---|
+| kain1 (15 bò) | chỉ đặt được **4 bò** cuối trận | target chết vì capital curve |
+| kain1c (12 bò + window d19) | 8 bò, 93 sữa (v5: 51) — vẫn thua seed 100 |
+| **kain1c battery** | **2/40 (5%) · 0.816x · worst 0.442x** | REJECT làm vũ khí |
+
+**Bài học phụ (quý hơn kết quả):** (a) v5 **không bao giờ counter-scale sữa** — kể cả giá sữa $331 (129% base, inv 9613 dưới I0) v5 vẫn giữ 3–4 bò; kênh sữa sâu trả ~$20–32k cho người ở lại nhưng không đủ bù engine cây; (b) v4-machinery chỉ **giao được 4–8 bò** dù target 12–15 (vốn về d15+, cửa mua đóng d16, buy 2/day, wheat cap 24 tiles = 14.4u/ng vs đàn 21 cần 21u/ng) — "target ≠ herd".
+
+### U.2 KAIN-2 "WAVE COLLIDER" — front-run Wave-E của v5 (PHÁT HIỆN CHÍNH)
+
+4 delta từ v4: melon d0–7 quota 14 (v4: 8 d0–1, 0 d2–7) → thu hoạch d11–18 **trước sóng v5 d19+ 6 ngày**; dâu 30 tiles từ d5 (v4 ramp 14 đến d8); HOLD MELON 0.52→0.45, STRAW 0.90→0.80 (bán ngay khi chín, không ôm chờ premium).
+
+| Đối thủ | Kết quả | Ý nghĩa |
+|---|---|---|
+| **vs v5 (seed 100–119, 40 game)** | **21/40 (52.5%) · 1.029x · worst 0.737** | phá đổ độ thống trị 97% của v5 |
+| **vs v5 (seed 120–139, 40 game — kiểm chứng chéo)** | **21/40 (52.5%) · 0.984x · worst 0.699** | tái lập đúng tỉ lệ thắng |
+| **vs v4 (seed 100–119, 40 game)** | **34/40 (85%) · 1.128x** | cải tiến TỔNG QUÁT, không phải exploit đơn thuần |
+| (tham chiếu) v5 vs v4 | 97/100 · 1.278x | |
+
+Tổng 80 game vs v5: **42/80 (52.5%)** — v5 từ vị thế áp đảo rơi xuống **parity đồng xu**.
+
+**Cơ chế (autopsy seed 115: kain2 $67.2k vs v5 $34.4k; seed 107: ngược lại $42.9k vs $58.2k):**
+- Kênh premium chạy theo sóng ngày cố định → **người thu hoạch-bán TRƯỚC thu ~1.5–2× $/unit** của người đến sau (kain bán dưa d11 @ avg $232; v5 dội 132 quả d12+ vào giá $131 rồi sàn $4).
+- v5 thua lớn nhất khi **đóng băng thu nhập giữa game**: seed 115 d22→d25 money $13.7k→$13.5k (sáu mươi lượt không thu nhập — sóng đã bán hết vào giá sập, không còn wave phục hồi).
+- Seed v5 thắng (107/116/119): v5 tự ra dưa sớm hơn (d10 < kain d11) + wheat churn 918u — **cuộc đua first-mover quyết định**, không phải va chạm thuần运气.
+
+### U.3 Quy tắc mới cấp mã số (R83–R87)
+
+| # | Quy tắc | Loại | Bằng chứng |
+|---|---|---|---|
+| R83 | **FIRST-MOVER PREMIUM (định luật va chạm sóng)**: kênh premium có sóng trồng theo ngày → người bán trước thu 1.5–2× $/unit; lịch sóng CÔNG KHAI (R42 thấy tiles + tuổi cây) = có thể tính chính xác ngày thu hoạch đối thủ → front-run trồng sớm 2–6 ngày = chiếm kênh. Wave-E của v5 (d8–16, quota dán cứng) là mục tiêu đoán được | E | kain2 42/80 vs v5, seed 115 autopsy |
+| R84 | **ESCAPE-HATCH TRAP**: hatch "giá đang tăng → sub 0.35" (chống over-yield từ v5.2) giữ v5 Ở LẠI đúng lúc phải rút: front-runner chưa bán → giá vẫn tăng → v5 thấy "tăng giá + pipeline đối thủ" → giữ quota đầy → dội vào sàn do chính đối thủ tạo. **Mỗi núm sửa 1 lỗ hổng phải re-audit với lớp kịch bản đối thủ mới** (bài học 2 tầng: vá over-yield mở cửa under-retreat) | E | cơ chế seed 115 + mã v5 L1000–1006 |
+| R85 | **INCOME-FREEZE SAU CRASH**: v5 hết sóng + đàn nhỏ + thị trường sập = 0 thu nhập nhiều ngày liền (d22–25 seed 115); thiếu tầng income-smoothing (sóng phục hồi nhanh — wheat 5 ngày luôn mở) | E | money-path seed 115 |
+| R86 | **SỮA MÙ QUAN SÁT (R48 thời v5-vs-v4 còn đúng, giờ mở rộng)**: v5 KHÔNG BAO GIỜ counter-scale đàn sữa — px $331/inv 9613 vẫn giữ 3–4 bò; kênh sữa sâu trả $20–32k (kain2 thu 110u $31.9k seed 115 nhờ v5 nhường) nhưng thuần dairy không thắng được engine cây (kain1 2/40) | E | kain1 battery + seed 115 |
+| R87 | **TARGET ≠ HERD (R82 cho vật nuôi)**: mục tiêu đàn không kèm tuần tự vốn (vốn về d15+, cửa mua d5–16, buy 2/day, wheat cap 24 tiles) thì target 15 bò giao 4–8; mọi target đàn mới phải kèm đếm `BUY_ANIMAL` thực thi trên 3+ seed (spy crop_tiles tương đương phía cây) | E | kain1 15→4 bò, kain1c 12→8 bò |
+
+### U.4 Hướng v6 (4 trụ từ bài học KAIN — mọi trụ phải qua protocol §P 20 seed)
+
+1. **FRONT-RUN SCHEDULE** (R83): melon d0–7 14 tiles (thu d11–18), dâu 30 từ d5, ngưỡng bán dưa 0.45/dâu 0.80 — ăn trọn phần first-mover thay vì bị chiếm.
+2. **COLLISION DETECTOR** (R84): khi opp pipeline kênh premium lớn VÀ ngày thu hoạch ước tính của opp < của mình → không được giữ quota đầy (hatch phải tắt khi "giá tăng" là tín hiệu PRE-DUMP: opp standing × yield > drain còn lại). Ưu tiên A: bán biên sớm; B: rút về floor hợp tác.
+3. **INCOME SMOOTHING** (R85): sóng wheat 5-ngày giữa game làm dòng tiền nền khi premium sập (chống đóng băng d22–25).
+4. **MILK COUNTER-SCALE** (R86): px sữa ≥ 1.1× base + opp đàn ≤ 4 → scale lên 7–9 bò ngay trong cửa d5–16 (điều kiện ngưỡng để không rơi vào bẫy parity-chase R50).
+
+### U.5 Trạng thái
+
+- kain1.py (dairy, 2/40) và kain2.py (collider, 42/80) đã đăng ký arena (`--a kain2 --b v5` xem trực tiếp trên Observer UI); battery JSON lưu `bench/kain*.json`.
+- Vòng lặp KAIN tiếp theo: KAIN-3 = collider + dairy hybrid (giả thuyết: 110u sữa tự nhiên của kain2 seed 115 + collider là combo > v5 rõ ràng); sau đó KAIN-4 threshold-siege (giữ giá dưới ngưỡng HOLD của v5 bằng dump biên) nếu cần thêm vector.
+
+---
+*KAIN — RULES.md v2.0 (mục U: Phase 2 Task 25 — KAIN đổi vai làm đối thủ v5; KAIN-1 dairy REJECT 2/40 nhưng phát hiện v5 mù sữa; KAIN-2 WAVE COLLIDER 42/80 parity phá đổ 97% + R83–R87 + 4 trụ v6). Quy tắc mới vẫn qua protocol §P 5 bước trước khi encode.*
+
+### U.6 KAIN-3 "COLLIDER + DAIRY FLOOR" — vòng lặp thứ ba (cùng Task 25)
+
+1 delta từ kain2: `cow_target = max(6, min(9, milk_room//30))` — cam kết 6 bò vô điều kiện (nhẹ, tốn vốn ít, trái ngược kain1's 12 bò chết đói vốn).
+
+| Đối thủ | Kết quả |
+|---|---|
+| vs v5 (seed 100–119) | **27/40 (67.5%) · 1.087x · worst 0.710** |
+| vs v5 (seed 120–139, chéo) | **27/40 (67.5%) · 1.064x · worst 0.758** |
+| vs v4 (seed 100–119) | **36/40 (90%) · 1.165x · worst 0.907** |
+
+Tổng 80 game vs v5: **54/80 (67.5%)** — từ parity (kain2 52.5%) lên thế áp đảo ngược. Floor 6 bò biến phần sữa v5 nhường (R86) thành dòng thu nền ~$10–15k/game mà không kích hoạt đói vốn của kain1 (R87). Bảng tiến hóa KAIN:
+
+| Agent | vs v5 (80 game) | vs v4 | Vai trò |
+|---|---|---|---|
+| v4 (baseline) | ~15% | — | tham chiếu |
+| kain1 (dairy 12 bò) | 2/40 | — | REJECT — bài học vận hành |
+| kain2 (collider) | 42/80 (52.5%) | 34/40 (85%) | phá parity |
+| **kain3 (collider + floor 6 bò)** | **54/80 (67.5%)** | **36/40 (90%)** | **đối thủ mạnh nhất tới nay** |
+
+Trụ v6 #4 (MILK COUNTER-SCALE) nâng cấp từ "gate px" thành "floor 6–8 bò vô điều kiện + gate px để mở rộng 9–12" — kain3 là bằng chứng floor đơn thuần đã +15 điểm thắng.
