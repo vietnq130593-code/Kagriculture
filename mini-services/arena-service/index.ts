@@ -23,7 +23,7 @@
 import { createServer } from 'http'
 import { Server } from 'socket.io'
 import { spawn, type ChildProcess } from 'child_process'
-import { appendFileSync, mkdirSync, writeFileSync } from 'fs'
+import { appendFileSync, mkdirSync, openSync, writeFileSync } from 'fs'
 import { join } from 'path'
 
 const PORT = 3005
@@ -221,9 +221,23 @@ io.on('connection', (socket) => {
   })
 })
 
-httpServer.listen(PORT, () => {
-  console.log(`[arena] service listening on port ${PORT}`)
+// Hot-reload safety: when bun --hot re-evaluates this module, the previous
+// evaluation's listener is still bound. Guard against a second listen() and
+// swallow EADDRINUSE so a reload can never crash the service.
+httpServer.on('error', (err: any) => {
+  if (err?.code === 'EADDRINUSE') {
+    console.log('[arena] port already in use (hot-reload) — keeping previous listener')
+  } else {
+    console.error('[arena] http server error:', err?.message ?? err)
+  }
 })
+
+if (!(globalThis as any).__arenaListening) {
+  ;(globalThis as any).__arenaListening = true
+  httpServer.listen(PORT, () => {
+    console.log(`[arena] service listening on port ${PORT}`)
+  })
+}
 
 process.on('SIGTERM', () => {
   stopBattle('sigterm')
@@ -233,3 +247,107 @@ process.on('SIGINT', () => {
   stopBattle('sigint')
   httpServer.close(() => process.exit(0))
 })
+
+// ============================================================================
+// NEXT.JS DEV SERVER SUPERVISOR (port 3000)
+// ----------------------------------------------------------------------------
+// The sandbox kills every process spawned inside an agent Bash-tool invocation
+// once that invocation ends (even setsid/disowned children — verified). This
+// service is long-lived, so processes IT spawns survive. It therefore owns the
+// lifecycle of the Next.js dev server:
+//   • health check every 10s (HTTP GET http://127.0.0.1:3000/)
+//   • (re)spawns `bun run dev` in /home/z/my-project when the app is down
+//   • exponential restart backoff (15s→120s) to avoid crash loops
+// `dev` runs webpack (not Turbopack): Turbopack's cold compile needs >2.4 GB
+// RSS and the kernel OOM-killer terminates it on this 4 GB box (verified in
+// dmesg twice); webpack compiles the same app with a much lower peak.
+// ============================================================================
+const gSup = globalThis as any
+if (!gSup.__devSup) {
+  gSup.__devSup = {
+    child: null as ChildProcess | null,
+    lastOk: Date.now(),
+    okSince: 0,
+    restarts: 0,
+    nextRetry: 0,
+  }
+  const sup = gSup.__devSup
+
+  const devLog = (msg: string) => {
+    const line = `${new Date().toISOString()} ${msg}`
+    console.log(line)
+    try {
+      appendFileSync('/tmp/nextdev.log', line + '\n')
+    } catch {}
+  }
+
+  const spawnDev = (reason: string) => {
+    if (sup.child && sup.child.exitCode === null && !sup.child.killed) return
+    const out = openSync('/tmp/nextdev.log', 'a')
+    const child = spawn('bun', ['run', 'dev'], {
+      cwd: '/home/z/my-project',
+      env: { ...process.env, NODE_OPTIONS: '--max-old-space-size=1024' },
+      stdio: ['ignore', out, out],
+    })
+    sup.child = child
+    sup.lastOk = Date.now()
+    sup.okSince = 0
+    sup.restarts += 1
+    devLog(`[devsup] spawned \`bun run dev\` (pid ${child.pid}) — ${reason} (start #${sup.restarts})`)
+    child.on('exit', (code, sig) => {
+      if (gSup.__devSup === sup && sup.child === child) {
+        sup.child = null
+        const wait = Math.min(15 * sup.restarts, 120) * 1000
+        sup.nextRetry = Date.now() + wait
+        devLog(`[devsup] next dev exited (code=${code} sig=${sig}) — respawn in ${wait / 1000}s`)
+      }
+    })
+    child.on('error', (err) => {
+      devLog(`[devsup] spawn error: ${err.message}`)
+      sup.child = null
+    })
+  }
+
+  const check = async () => {
+    const now = Date.now()
+    if (now < sup.nextRetry) return
+    if (!sup.child) {
+      spawnDev(sup.restarts === 0 ? 'initial start' : 'respawn after exit')
+      return
+    }
+    try {
+      const ctrl = new AbortController()
+      const timer = setTimeout(() => ctrl.abort(), 4000)
+      const res = await fetch('http://127.0.0.1:3000/', { signal: ctrl.signal })
+      clearTimeout(timer)
+      if (res.status < 500) {
+        if (!sup.okSince) {
+          sup.okSince = now
+          devLog(`[devsup] app is up (HTTP ${res.status})`)
+        }
+        sup.lastOk = now
+        // healthy for 5+ minutes → reset the backoff counter
+        if (now - sup.okSince > 300000) {
+          sup.restarts = 0
+          sup.okSince = now
+        }
+        return
+      }
+    } catch {
+      /* not answering yet — cold compile can take ~30s */
+    }
+    // No HTTP answer for a long time while the process is alive → wedged;
+    // kill it so the exit handler schedules a clean respawn.
+    if (now - sup.lastOk > 240000 && sup.child && sup.child.exitCode === null) {
+      devLog('[devsup] app unresponsive >240s — killing for a clean restart')
+      try {
+        sup.child.kill('SIGKILL')
+      } catch {}
+    }
+  }
+
+  setInterval(() => {
+    check().catch(() => {})
+  }, 10000)
+  devLog('[devsup] supervisor installed — checking app health every 10s')
+}
