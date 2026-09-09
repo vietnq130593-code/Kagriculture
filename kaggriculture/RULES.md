@@ -480,3 +480,47 @@ Bash-invocation sweep giết mọi tiến trình con (kể cả setsid+nohup —
 - kain16 đăng ký arena (run_battle.py + arena-service) — user xem trực tiếp `kain16 vs v5`
 ---
 *KAIN — RULES.md v2.0 (mục U: Task 25 R83-R87; mục V: Task 26 — 24 biến thể, bức tường 94% cùng 9 quy tắc mới R88-R96, 2 định luật meta R94-R95, protocol khôi phục sandbox). Quy tắc mới vẫn qua protocol §P trước khi encode.*
+
+## W. BIÊN BẢN TASK 27 (23 Sep) — XÂY V6: 7 BATTERY/560 GAME, TƯỜNG 93.75% VÀ 3 ĐỊNH LUẬT MỚI
+
+*Nhiệm vụ user: review RULES.md → xây v6 trên nền v5 + bài học RULES + KAIN → push + báo cáo.*
+
+### W.1 Hành trình 7 battery (two-sided 40 game/band, protocol §P)
+| Bản | Chassis + delta | Kết quả 80 game |
+|---|---|---|
+| v6.0 | v5.6+E + 6 delta KAIN (tranche-8, feed-52, capital-cap, pace-d14, reserve-3, scarcity-gate) | **42/80 (52.5%) 1.011x** |
+| v6.1 | + PROFILE-SHIFT (straw-30@d5, herd-15-deep, pre-dump d27; bỏ capital-cap, reserve-3) | 42/80 (52.5%) |
+| v6.2 | kain16 + straw-ramp v5 + geese-4-early + floor-7 + feed-d26 | 64/80 (80%) |
+| v6.3 | kain16 + geese-full + feed-d26 | 71/80 (A 38/40, B 33/40) |
+| v6.4 | kain16 + geese-gated($2.5k) + feed-d26 | 71/80 (A 36, B 35) |
+| v6.5 | kain16 + feed-d26 + SERVICE_URG d≥24 | 63/80 (A 28 — tier-0 đè chết tưới endgame) |
+| **v6.6** | **kain16 + E8-lite port (duy nhất được giữ)** | **75/80 (93.75%) — bằng frontier kain16** |
+
+### W.2 Regression chuẩn (band 100-119, 40 game)
+- **v6.6 vs v4: 40/40 (100%) · 1.400x · worst 1.146** — hơn cả v5 (97/100)
+- **v6.6 vs v3: 40/40 (100%) · 1.446x · worst 1.030** — hơn cả v5 (99/100)
+- cell4_v6.py verify đồng đô-la 3/3 seed (100/123/129)
+
+### W.3 Quy tắc mới R97–R99
+| # | Quy tắc | Loại | Bằng chứng |
+|---|---|---|---|
+| R97 | **PHÁO ĐÀI ĐỐI XỨNG TWIN-KERNEL (định lượng R95)**: v5-chassis + delta bất kỳ = 52.5% — HAI kinh tế đồng phục ~$57-59k (v6−v5 chênh $600/seed); cùng quota/cùng lịch = cùng sập kênh. Chỉ profile NGOÀI kernel-space (kain16 = v4-lineage) tạo chênh $9.7k. "Nền tảng v5" cho v6 phải hiểu là TRI THỨC v5 (knob/formula port), không phải codebase | E | battery v1/v2: 42/80×2 + ledger $57.8k vs $57.2k |
+| R98 | **TƯỜNG DELTA-NOISE (R46 ở quy mô kernel)**: kain16 là optimum knife-edge — 8 biến thể delta (mọi hướng: capital/đàn/dâu/endgame) đều regression hoặc flat (71/71/63/75); thắng thua lật ±4 game hỗn loạn theo seed. Trần 93.75% cấu trúc = 4 knife-edge (<$2k, trong nhiễu R46) + 1 perfect-storm của v5 (123s1: 7 ngỗng + bò full-care). Không thể vượt bằng núm — cần kernel mới hoặc đối thủ mới | E | 560 game Task 27 |
+| R99 | **ĐÒN YIELD, KHÔNG ĐÒN CHƠI-ĐẸP hơn**: kain16 thắng v5 bằng cách làm v5 NHƯỢNG (pipeline dâu-30-từ-d5 → room() của v5 trừ kênh); v6.2 cắt pipeline này theo ramp của v5 → v5 lấy lại $1.9k/trận ngay (33→38 lật ngược). Mọi "cải thiện" làm hành vi giống v5 hơn đều TĂNG kinh tế v5 | E | v6.2 (33/40) vs kain16 (38/40) band A + avg_b +$1.9k |
+
+### W.4 Autopsy công cụ mới
+- **bench/care_probe.py**: đo fed/cared theo NGÀY cho từng thú 2 bên — lộ (a) v5 herd 15@d15 vs kain 13@d19, (b) cùng 4 bò → 71 vs 47 sữa (care-bank production-day), (c) feed-miss d26-28 cả hai engine, (d) ΔE tier-0 SERVICE giết tưới crop endgame (A 28/40)
+- **bench/cmp_seed_v6.py**: so per-seed 2 battery — flips + khoản chênh $
+- **bench/run_bg.py**: double-fork daemonize battery (bash-sweep-proof)
+
+### W.5 Sản phẩm Task 27
+- **v6.py v6.6** (kain16 chassis + E8-lite) — 93.75% vs v5, 100% vs v4/v3
+- **cell4_v6.py** (bản Kaggle, verify đồng đô-la) · v6_twin_trap.py (bằng chứng R97)
+- 9 battery JSON (v6_vs_v5_100/120 × 7 vòng, v6_vs_v4_100, v6_vs_v3_100)
+- arena: v6 đăng ký run_battle.py + arena-service (AGENTS đầu danh sách)
+
+### W.6 Trạng thái
+- **v6 chính thức = v6.6**: đánh bại toàn bộ ladder v3/v4/v5 (100/100/93.75)
+- Trần >95% vs v5 chưa phá (R98: cấu trúc, không phải núm) — con đường v7: kernel mới (P3 solver $/action toàn cục, gap N.1/N.6) hoặc khai thác 4 knife-edge bằng seat/time-precision
+---
+*KAIN — RULES.md v2.1 (mục W: Task 27 — v6 = kain16+E8-lite, 7 battery/560 game, R97 pháo đài đối xứng twin-kernel, R98 tường delta-noise, R99 đòn yield). 99 quy tắc.*

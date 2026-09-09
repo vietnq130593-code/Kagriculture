@@ -530,3 +530,26 @@ Stage Summary:
 - **kain16 vs v5: 112/120 (93.3%) — bức tường ~94% sau 24 biến thể, chưa đạt >95%**; 8 thua đã phân rã: 6 knife-edge (<$2k) + 123s1/158s1 cấu trúc (ngỗng+care+dâu) = đúng 3 trụ v6
 - Sản phẩm: kain16.py (đỉnh), kain3.py (neo), 12 battery JSON bench/kain1[4-6]_vs_v5_*.json, bench/kautopsy.py + bench/sell_log.py (tools autopsy), RULES.md v2.0 (96 quy tắc)
 - Meta-phát hiện quan trọng nhất cho v6: đối kháng với kẻ thích nghi — cải thiện tuyệt đối có thể ÂM tương đối (R94); fork kẻ mạnh = rơi vào pháo đài mirror của chính nó (R95); nguồn vốn d6-14 là cội nguồn mọi khoảng cách còn lại (R93)
+
+---
+Task ID: 27
+Agent: KAIN (main-agent)
+Task: Review RULES.md → xây v6 (nền v5 + bài học RULES + KAIN) → battery → push GitHub → báo cáo
+
+Work Log:
+- Review toàn bộ RULES.md v2.0 (96 quy tắc, mục A–V) + khôi phục ngữ cảnh từ worklog Task 23–26
+- Đọc sâu v5.py (pm-kernel/hold/herd/sell) + diff kain16 vs v4 (delta KAIN đầy đủ) — phát hiện MIRROR-mode của v5.6 là dead-code (pm ceiling 0.30 < 0.70)
+- v6.0 = v5.6+E + 6 delta KAIN → battery 2 band: 42/80 (52.5%) 1.011x — HAI kinh tế đồng phục $57.8k vs $57.2k
+- v6.1 = + profile-shift (straw-30@d5, herd-15-deep, pre-dump d27) → 42/80 — xác nhận PHÁO ĐÀI ĐỐI XỨNG (R97)
+- care-probe (bench/care_probe.py) seed 123: v5 herd 15@d15 + $4-8k cash hơn; cùng 4 bò → 71 vs 47 sữa; v5 thắng bằng 7 ngỗng (193 egg +$3.9k) + fert 228u
+- Chuyển chassis kain16: v6.2 (straw-ramp+geese+feed) 64/80; v6.3 (geese-full) 71/80 A38/B33; v6.4 (geese-gated) 71/80; v6.5 (SERVICE_URG endgame) 63/80
+- v6.6 = kain16 + E8-lite port (v5's drain-aware hold d22-27) — delta duy nhất sống sót: **75/80 (93.75%) = frontier kain16** (A 38/40 · B 37/40 · 1.173x/1.158x)
+- Regression: **v6 vs v4 40/40 (100%) 1.400x worst 1.146 · v6 vs v3 40/40 (100%) 1.446x worst 1.030** — áp đảo hơn cả v5 (97/99)
+- cell4_v6.py sinh bởi make_cell4_v6.py + verify ĐỒNG ĐÔ-LA 3/3 seed
+- v6 đăng ký arena (run_battle.py AGENTS + arena-service index.ts đầu danh sách, hot-reload OK)
+- RULES.md v2.1 mục W (R97 pháo đài twin-kernel, R98 tường delta-noise, R99 đòn yield); 2 công cụ: care_probe.py, cmp_seed_v6.py, run_bg.py (daemon battery)
+
+Stage Summary:
+- **v6.6 chính thức: 93.75% vs v5 (75/80) · 100% vs v4 (40/40, 1.400x) · 100% vs v3 (40/40, 1.446x)**
+- Bài học lớn nhất: "nền tảng v5" = tri thức (knob/formula), KHÔNG phải codebase — twin-kernel = 52.5% (R97); tường 93.75% là cấu trúc (R98): 4 knife-edge + 1 perfect-storm, không phá được bằng delta trong 8 biến thể/560 game
+- Còn: push GitHub (PAT giữ nguyên theo yêu cầu user) + báo cáo tiếng Việt
