@@ -98,7 +98,9 @@ export interface AgentDesc {
 }
 
 export const AGENT_INFO: AgentDesc[] = [
-  { name: 'v5', desc: 'Não 6 lớp Bayes (đang phát triển)', tag: 'đang phát triển' },
+  { name: 'v6', desc: 'ORCHESTRATOR-K · 93.75% vs v5, 100% vs v4/v3', tag: 'nhà vô địch' },
+  { name: 'kain16', desc: 'Đối thủ KAIN — 24 biến thể, tường 94%', tag: 'KAIN' },
+  { name: 'v5', desc: 'Não 6 lớp Bayes (97% vs v4)', tag: 'đối thủ chuẩn' },
   { name: 'v4', desc: 'Orchestrator nền v3 + 8 edges', tag: 'hiện tại' },
   { name: 'v3', desc: 'Bản nền kinh tế ($50-60k hai phía)', tag: 'bản cũ' },
   { name: 'v2', desc: 'Bản cũ — crop engine đơn giản', tag: 'bản cũ' },
