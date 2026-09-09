@@ -1,21 +1,5 @@
-# v5 "ORCHESTRATOR" — v5.5 (Task 21, 20 Sep): v5.4 + GT-LAND COURNOT + GT LỚP
-# LY THUYẾT TRÒ CHƠI 2 CẤP (macro 24-lượt / micro mỗi lượt).
-# v5.5 CHANGES (A/B 20-seed two-sided, protocol Task 20):
-#   • GT-LAND: đất tối ưu 50 ô (NW+NE, $1k) — đường cong thực nghiệm
-#     25/50/75/100 ô = 1.078/1.158/1.112/1.060x. Mua SW+SE ($6k) là lãng phí
-#     kép: vốn + lao động + áp lực cung wheat vi phạm monopoly-restraint R37.
-#     50 ô chạy đầy ~100% (wheat 13-20 + dâu 18 + 11 thú + melon sớm).
-#   • GT-COURNOT MACRO (hour 0-1 mỗi 24 lượt): đọc L2 Gamma-Poisson E/P75
-#     mỗi kênh → tín hiệu dump_sig (P75≥8u và ≥1.5×E → front-run ×0.96) /
-#     calm_sig + px_pred rising (→ monopoly restraint ×1.04). tm["gt"] hiển
-#     thị trong Arena diag.
-#   • KẾT QUẢ: vs v4 1.162x/34/40 (85%)/worst 0.879 (từ 1.060x/67.5%);
-#     vs v3 1.311x/38/40 (95.0%)/worst 0.974. Paired vs baseline +0.102x
-#     (t=4.71, p<0.0002, thắng 17/20 seed).
-# v5.3→v5.4 (Task 20): audit engine + E8-lite + px_after + p3_lo minimax +
-#   telemetry opp_herd/opp_wnet + 3 thí nghiệm revert (pump/tomato/profiles).
-# v5.3: P2 FEED MAKE-VS-BUY hoàn chỉnh + L1 ARCHETYPE 5 LỚP + L2 GAMMA-POISSON.
-# Bảy lớp não:
+# v5 "ORCHESTRATOR" — v5.3 (PLAN_V5.md §7): v5.2 + P2 FEED MAKE-VS-BUY hoàn chỉnh
+# + L1 ARCHETYPE 5 LỚP + L2 GAMMA-POISSON. Bảy lớp não:
 #   L1 archetype posterior (naive Bayes 9 kênh flow + kernel đàn/tiền MIRROR,
 #   forgetting 0.8, hysteresis 2 đêm) — STRONG/COOP/PASSIVE/DUMP/MIRROR;
 #   L2 Gamma-Poisson E[opp_sales_p] + P25/P75 (thay _flow_pred 3-đêm-tay);
@@ -1180,6 +1164,26 @@ def _daily_plan(tiles, shed, seeds, inv, prices, shops, day, opp_farm, money, tm
     tm["water_debt"] = water_debt
     if water_debt >= 3:
         animal_cap = max(4, animal_cap - 2)  # siết cap khi nợ nước cao
+
+    # vH GT-HERD (Task 21) — best-response Cournot ĐÀN: đối thủ phóng đàn lớn
+    # (telemetry công khai ≥13 con, ví dụ seed 119 v4 chạy 15) VÀ giá sữa/len
+    # thực ≥ 0.85×base (cả hai vẫn bán được giá cao = thị trường CHỨNG MINH
+    # đủ sâu — bậc 1) → đáp trả số lượng: nới cap +3 (bậc 2). Feed bù bằng
+    # wheat mua thị trường (thuế pump R37 tiếp tục chạy). Gate an toàn: không
+    # nợ nước ≥3, tiền mặt ≥ $2.5k, window d8-20.
+    try:
+        _oh = int((tm or {}).get("opp_herd", 0) or 0)
+        _mp = float((prices or {}).get("MILK", 0) or 0)
+        _wp = float((prices or {}).get("WOOL", 0) or 0)
+        if (mode != "MIRROR" and 8 <= day <= 20 and _oh >= 13
+                and (_mp >= 0.85 * MARKET_PARAMS["MILK"]["base"]
+                     or _wp >= 0.85 * MARKET_PARAMS["WOOL"]["base"])
+                and water_debt < 3 and money >= 2500):
+            animal_cap = min(ANIMAL_CAP, animal_cap + 3)
+            if tm:
+                tm["gt_herd"] = True
+    except Exception:
+        pass
 
     if owned_total >= animal_cap:
         goose_target = min(goose_target, animals_now + shed_geese)
@@ -2409,7 +2413,7 @@ def _arena_diag(obs):
         fu = int(tm.get("feed_units", 0) or 0)
         l1 = tm.get("l1f") or {}
         return {
-            "ver": "v5.5",
+            "ver": "v5.4",
             "strategy": "S-" + str(rg.get("state", "GROW")),
             "tier": tier,
             "tier_cand": (proj.get("cand") if isinstance(proj, dict) else None),
@@ -2443,11 +2447,6 @@ def _arena_diag(obs):
             "p5": {"opp_wnet": tm.get("opp_wnet"),
                    "opp_herd": int(tm.get("opp_herd", 0) or 0),
                    "pump": bool(tm.get("pump"))},
-            "gt": ({"land": "50 tiles",
-                    "WHEAT": _gt_s(tm, "WHEAT"), "MILK": _gt_s(tm, "MILK"),
-                    "WOOL": _gt_s(tm, "WOOL"), "EGG": _gt_s(tm, "EGG"),
-                    "STRAWBERRY": _gt_s(tm, "STRAWBERRY"),
-                    } if tm.get("gt") else None),
             "rg": {"F1": int(rg.get("F1", 0) or 0), "F2": int(rg.get("F2", 0) or 0),
                    "F3": int(rg.get("F3", 0) or 0),
                    "liquidate": bool(rg.get("liquidate"))},
@@ -2455,7 +2454,7 @@ def _arena_diag(obs):
             "notes": list(rg.get("notes") or [])[-5:],
         }
     except Exception:
-        return {"ver": "v5.5"}
+        return {"ver": "v5.4"}
 
 
 def agent(obs):
@@ -2467,15 +2466,3 @@ def agent(obs):
         except Exception:
             pass
         return {"farmer": ["PASS"], "hands": [], "market": []}
-
-
-def _gt_s(tm, item):
-    """Task 21: chuỗi tóm tắt tín hiệu GT-Cournot một kênh cho diag Arena."""
-    try:
-        q = (tm.get("gt") or {}).get(item) or {}
-        e = float(q.get("e", 0) or 0)
-        p75 = float(q.get("p75", 0) or 0)
-        tag = " DUMP→front-run" if q.get("dump") else (" calm→hold" if q.get("calm") else "")
-        return f"E{e:.0f}/P75 {p75:.0f}u{tag}"
-    except Exception:
-        return None

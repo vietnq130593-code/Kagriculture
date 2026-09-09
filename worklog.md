@@ -411,3 +411,25 @@ Stage Summary:
 - 3 thí nghiệm âm được revert sạch kèm số liệu (pump, tomato, profiles) — nguyên tắc "benchmark là phán quyết" giữ vững
 - Kết luận chiến lược hội tụ: kho núm cạn, P3 Solver $/action + T/2 là mỏ cuối cho 95% vs v4
 - Còn: xác minh Arena UI (agent-browser) + commit + push GitHub Train1
+
+---
+Task ID: 21
+Agent: KAIN (main-agent)
+Task: Theo lệnh user: (1) dùng token upload/PAT vietnq.rtf, (2) trả lời 2 câu hỏi "đất trống nhiều — mua đất lãng phí? chiến lược tối ưu đất + phân bổ tài nguyên?", (3) áp dụng Lý thuyết trò chơi ở bậc nhân quả 2 với kiến trúc 720 lượt = 720 vòng nhỏ + mỗi 24 lượt = 1 vòng toàn cục 2 bậc, (4) giám sát Arena, cập nhật tài liệu, push
+
+Work Log:
+- Định lượng đất trống từ 36 battles JSONL: v5 trống TB 48/100 ô (v4: 52); quadrant analysis: NE ($1k) đầy, SW ($2k) 15.7/25 cây, SE ($4k) 18.9/25 — hai đất đắt 60-76% trống; lao động bão hòa 91% (PASS 3%, di chuyển NORTH/SOUTH/EAST/WEST ~60%)
+- Chuỗi A/B 20-seed two-sided (protocol Task 20, mỗi biến thể 1 delta): vL1 lấp đất (quota wheat 34 + cap 15 thợ) = 0.886x/4/40 — REVERT thảm họa (R75: tăng cung wheat phá monopoly pump R37); vL2 bỏ SE = 1.112x/30/40 (t=2.33); vL5 bỏ SW+SE (50 ô) = 1.158x/34/40 — paired +0.102x, t=4.71, p<0.0002; vL6 25 ô = 1.078x → đường cong U ngược đỉnh 50 ô (R74)
+- Thử "dung lượng theo trạng thái" (mua đất có điều kiện theo tín hiệu d12): milk_shop/đàn v4/giá sữa KHÔNG tách được 2 nhóm seed → kết luận tĩnh tối ưu (R76)
+- Lớp GT-Cournot 2 cấp (vG): macro mỗi 24 lượt (hour 0-1) đọc L2 Gamma-Poisson E/P75 → dump_sig (P75≥8u & ≥1.5×E → front-run ×0.96) / calm_sig + px_pred rising (→ hold ×1.04); micro mỗi lượt áp vào _hold; tm["gt"] + diag "gt" hiển thị Arena BrainPanel = 1.162x/34/40/P25 1.096
+- vH best-response đàn (opp_herd≥13 → cap+3): wash +0.003 vs v4 / −0.005 vs v3 → REVERT (R78: v4 phóng đàn d16-20 sau khi cửa mua v5 đóng)
+- Quảng bá vG → v5.py v5.5 (2.482 dòng, backup v5.4); tái hiện khớp battery từng đô la (seed 104: $58,757/$60,762)
+- Battery chính thức v5.5: vs v4 1.162x/34/40 (85%)/median 1.138/P25 1.096/worst 0.879; vs v3 1.311x/38/40 (95.0%)/worst 0.974 (mọi trận ≥0.974)
+- RULES.md v1.3 (mục R: R74-R79); PLAN_V5.md §15; BrainPanel thêm nhãn "GT-Cournot (macro/ngày)" + PRIORITY
+- Verify Arena UI qua gateway :81 (phát hiện localhost:3000 trực tiếp bypass Caddy → "mất kết nối" chỉ là artifact test): trận seed 104 khớp battery từng đô la, seed 112 v5 thắng 1.33× ($64,917 vs $48,877); GT panel render E/P75 từng kênh; 50 tiles locked SW/SE đúng; footer mt-auto + safe-area; 390px không h-scroll; không lỗi console/dev.log
+
+Stage Summary:
+- Sản phẩm: v5.py v5.5 — câu trả lời định lượng 2 câu hỏi đất: (Q1) CÓ, mua SW+SE ($6k) là lãng phí kép (vốn + lao động + áp lực cung); (Q2) tối ưu = 50 ô chạy đầy ~100% (wheat 13-20 + dâu 18 + 11 thú + melon sớm, carrot tự loại khỏi mix theo logic Cournot)
+- Kiến trúc GT đúng yêu cầu: 720 micro-cycle (mỗi lượt, _hold modulation) + 30 macro-cycle (mỗi 24 lượt, tín hiệu Cournot từ L2) — lý thuyết cho hướng, benchmark cho phán quyết (R73)
+- Kết quả: vs v4 1.060x/67.5% → 1.162x/85% (+0.102x, t=4.71); vs v3 95.0% ĐẠT mục tiêu user (worst 0.974); còn 85% vs v4 = 4 trận knife-edge + 2 seed cấu trúc không tín hiệu sớm (R79)
+- Còn: push GitHub (token upload/PAT vietnq.rtf), P3 Solver $/action T/2 là mỏ cuối cho 95% vs v4

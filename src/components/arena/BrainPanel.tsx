@@ -25,6 +25,7 @@ interface Props {
 const PRIORITY = [
   'strategy',
   'mode',
+  'gt',
   'health',
   'H',
   'pm',
@@ -47,6 +48,7 @@ const KEY_LABEL: Record<string, string> = {
   opp_flows: 'Luồng đối thủ (u/ngày)',
   crop_plan: 'Kế hoạch cây trồng',
   feed_demand: 'Nhu cầu thức ăn',
+  gt: 'GT-Cournot (macro/ngày)',
 }
 
 function Row({ label, children }: { label: string; children: React.ReactNode }) {

@@ -1,21 +1,5 @@
-# v5 "ORCHESTRATOR" — v5.5 (Task 21, 20 Sep): v5.4 + GT-LAND COURNOT + GT LỚP
-# LY THUYẾT TRÒ CHƠI 2 CẤP (macro 24-lượt / micro mỗi lượt).
-# v5.5 CHANGES (A/B 20-seed two-sided, protocol Task 20):
-#   • GT-LAND: đất tối ưu 50 ô (NW+NE, $1k) — đường cong thực nghiệm
-#     25/50/75/100 ô = 1.078/1.158/1.112/1.060x. Mua SW+SE ($6k) là lãng phí
-#     kép: vốn + lao động + áp lực cung wheat vi phạm monopoly-restraint R37.
-#     50 ô chạy đầy ~100% (wheat 13-20 + dâu 18 + 11 thú + melon sớm).
-#   • GT-COURNOT MACRO (hour 0-1 mỗi 24 lượt): đọc L2 Gamma-Poisson E/P75
-#     mỗi kênh → tín hiệu dump_sig (P75≥8u và ≥1.5×E → front-run ×0.96) /
-#     calm_sig + px_pred rising (→ monopoly restraint ×1.04). tm["gt"] hiển
-#     thị trong Arena diag.
-#   • KẾT QUẢ: vs v4 1.162x/34/40 (85%)/worst 0.879 (từ 1.060x/67.5%);
-#     vs v3 1.311x/38/40 (95.0%)/worst 0.974. Paired vs baseline +0.102x
-#     (t=4.71, p<0.0002, thắng 17/20 seed).
-# v5.3→v5.4 (Task 20): audit engine + E8-lite + px_after + p3_lo minimax +
-#   telemetry opp_herd/opp_wnet + 3 thí nghiệm revert (pump/tomato/profiles).
-# v5.3: P2 FEED MAKE-VS-BUY hoàn chỉnh + L1 ARCHETYPE 5 LỚP + L2 GAMMA-POISSON.
-# Bảy lớp não:
+# v5 "ORCHESTRATOR" — v5.3 (PLAN_V5.md §7): v5.2 + P2 FEED MAKE-VS-BUY hoàn chỉnh
+# + L1 ARCHETYPE 5 LỚP + L2 GAMMA-POISSON. Bảy lớp não:
 #   L1 archetype posterior (naive Bayes 9 kênh flow + kernel đàn/tiền MIRROR,
 #   forgetting 0.8, hysteresis 2 đêm) — STRONG/COOP/PASSIVE/DUMP/MIRROR;
 #   L2 Gamma-Poisson E[opp_sales_p] + P25/P75 (thay _flow_pred 3-đêm-tay);
@@ -1303,6 +1287,22 @@ def _daily_plan(tiles, shed, seeds, inv, prices, shops, day, opp_farm, money, tm
             quotas["WHEAT"] = min(28, quotas["WHEAT"] + 3)
     if rg and int(rg.get("F2", 0) or 0) >= 2:  # v5: F2 L2+ — tăng quota wheat tự trồng
         quotas["WHEAT"] = min(28, quotas.get("WHEAT", 20) + 2)
+    # vL1 GT-LAND (Task 21): lấp đất trống bằng wheat. Đo thực 36 trận: SW+SE
+    # ($6k) chạy 60-75% trống suốt d13-24; ô trống = tài sản chết. Wheat có
+    # 3 lối ra (feed thú / bán ở giá pump R37 / tồn kho chờ giá) nên không
+    # glut kiểu melon. Gate: ruộng THẬT trống >=20 ô (tính cả ô chờ thu hôm nay).
+    try:
+        _empty_now = sum(1 for row in tiles for t in row if t is None)
+    except Exception:
+        _empty_now = 0
+    if 13 <= day <= 24 and _empty_now >= 20 and money >= 1200:
+        _fill = min(14, (_empty_now - 16) // 2)
+        quotas["WHEAT"] = max(quotas.get("WHEAT", 20),
+                              min(34, quotas.get("WHEAT", 20) + _fill))
+        try:
+            tm["gt_fill"] = _fill
+        except Exception:
+            pass
     if day <= 23:
         if day <= 2:
             quotas["CARROT"] = 12
@@ -1852,6 +1852,15 @@ def _build_orders(me, shed, seeds, inventories, inv, prices, day, hour, plan,
         workload = stats.get("total", 0) + plant_budget
         if day >= 6:
             cap = 13 if ((day >= 9 and money >= 1800) or (day >= 18 and money >= 2500)) else 12
+            # vL1 GT-LAND: LAO ĐỘNG là ràng buộc chặt (đo d15-25: 91% slot dùng,
+            # PASS 3%) → khi ruộng còn >=15 ô trống, nâng biên 15: chi fib biên
+            # ~$377+$610/ngày đổi ~10-20 turn hiệu dụng/tile $50+ = lời.
+            try:
+                _empty_h = sum(1 for row in tiles for t in row if t is None)
+            except Exception:
+                _empty_h = 0
+            if 12 <= day <= 25 and _empty_h >= 15 and money >= 3200:
+                cap = 15
             # v5: endgame labor surge d26-28 — giá trị biên thu hoạch lấp đầy
             # vượt chi phí fib thợ (bài học 13th worker trong LESSONS_V4)
             if 26 <= day <= 28 and (stats.get("total", 0) >= 22 or money >= 1500):
@@ -1903,10 +1912,10 @@ def _build_orders(me, shed, seeds, inventories, inv, prices, day, hour, plan,
     # rộng → mất 5 ngày bội số tăng trưởng. Gần đủ tiền đất (≥55% giá)
     # → hoãn hạt đắt + thú để tích lũy; đủ tiền → BUY_LAND đứng ĐẦU list.
     nq = len(unlocked)
-    # vL5 GT-LAND (đất tối thiểu): chỉ NW+NE (50 ô, $1k) — kiểm định giả
-    # thuyết "đất tối ưu = tối thiểu" khi wheat là monopoly-restraint.
-    if nq >= 2:
-        nq = 4
+    # vL2 GT-LAND: bỏ quadrant 4 (SE $4k) — đo thực: SE chạy 76% trống,
+    # ROI âm khi lao động bão hòa; $4k giữ lại nuôi thợ/thú/hạt.
+    if nq >= 3:
+        nq = 4  # khóa: lp=None → không bao giờ mua tiếp
     lp = LAND_PRICES[nq - 1] if nq < 4 else None
     land_ready = False
     near_land = False
@@ -2169,22 +2178,6 @@ def _build_orders(me, shed, seeds, inventories, inv, prices, day, hour, plan,
                         tmx.setdefault("knobs_hold", set()).add(it)
                     except Exception:
                         pass
-        # ---- Task 21 GT-COURNOT: VÒNG NHỎ (mỗi lượt) — điều chế theo macro ----
-        try:
-            _gtq = ((tmx.get("gt") or {}).get(it)) or {}
-            if _gtq and 6 <= day <= 25:
-                if _gtq.get("dump"):
-                    # Stackelberg front-run: đối thủ sắp dội lumpy (L2 P75 cao
-                    # vượt 1.5×E) → bán NGAY vào sức mua còn nguyên trước sóng
-                    h = max(0.85, h * 0.96)
-                elif _gtq.get("calm"):
-                    _pxq = (tmx.get("px_pred") or {}).get(it) or {}
-                    _now, _p3 = _pxq.get("now"), _pxq.get("p3")
-                    if _now and _p3 and _p3 >= _now * 1.05:
-                        # Monopoly restraint: ngày êm + giá leo → nắm chờ đỉnh
-                        h = min(0.99, h * 1.04)
-        except Exception:
-            pass
         dliq = 1 if tier == "BEHIND" else 0  # v5-P1: BEHIND thanh lý sớm 1 ngày
         if it in glutted:
             # v5.3 L1 DUMP (PLAN 4.5): không xả vào cú dump của đối thủ —
@@ -2221,31 +2214,6 @@ def _build_orders(me, shed, seeds, inventories, inv, prices, day, hour, plan,
         if money < 250:
             return min(h, 0.65)
         return h
-
-    # ---- Task 21 GT-COURNOT: VÒNG TOÀN CỤC (mỗi 24 lượt, đầu ngày) ----
-    # Bậc 1 (quan sát): L2 Gamma-Poisson E/P25/P75 dòng bán đối thủ mỗi kênh.
-    # Bậc 2 (can thiệp): quy về tín hiệu Cournot điều chế ngưỡng bán hôm nay —
-    #   dump_sig → front-run (bán trước cú dội, giá chưa bị dìm);
-    #   calm_sig → monopoly restraint (nắm chờ drain hồi giá).
-    # Micro (mỗi lượt) áp dụng trong _hold() bên dưới. Ghi tm["gt"] cho diag.
-    try:
-        if hour <= 1 and 6 <= day <= 25:
-            l2p = (tmx.get("l2_pred") or {}) if isinstance(tmx, dict) else {}
-            gt = {}
-            for it in PRODUCTS:
-                if it in ("FERTILIZER",):
-                    continue
-                q = l2p.get(it) or {}
-                _e = float(q.get("e", 0) or 0)
-                _p75 = float(q.get("p75", 0) or 0)
-                dump_sig = (_p75 >= 8.0 and _p75 >= 1.5 * max(1.0, _e))
-                calm_sig = (_p75 <= 3.0 or (_e > 0 and _p75 < _e * 1.15 + 2.0))
-                gt[it] = {"e": round(_e, 1), "p75": round(_p75, 1),
-                          "dump": bool(dump_sig), "calm": bool(calm_sig)}
-            if isinstance(tmx, dict):
-                tmx["gt"] = gt
-    except Exception:
-        pass
 
     cands = []
     if shed:
@@ -2409,7 +2377,7 @@ def _arena_diag(obs):
         fu = int(tm.get("feed_units", 0) or 0)
         l1 = tm.get("l1f") or {}
         return {
-            "ver": "v5.5",
+            "ver": "v5.4",
             "strategy": "S-" + str(rg.get("state", "GROW")),
             "tier": tier,
             "tier_cand": (proj.get("cand") if isinstance(proj, dict) else None),
@@ -2443,11 +2411,6 @@ def _arena_diag(obs):
             "p5": {"opp_wnet": tm.get("opp_wnet"),
                    "opp_herd": int(tm.get("opp_herd", 0) or 0),
                    "pump": bool(tm.get("pump"))},
-            "gt": ({"land": "50 tiles",
-                    "WHEAT": _gt_s(tm, "WHEAT"), "MILK": _gt_s(tm, "MILK"),
-                    "WOOL": _gt_s(tm, "WOOL"), "EGG": _gt_s(tm, "EGG"),
-                    "STRAWBERRY": _gt_s(tm, "STRAWBERRY"),
-                    } if tm.get("gt") else None),
             "rg": {"F1": int(rg.get("F1", 0) or 0), "F2": int(rg.get("F2", 0) or 0),
                    "F3": int(rg.get("F3", 0) or 0),
                    "liquidate": bool(rg.get("liquidate"))},
@@ -2455,7 +2418,7 @@ def _arena_diag(obs):
             "notes": list(rg.get("notes") or [])[-5:],
         }
     except Exception:
-        return {"ver": "v5.5"}
+        return {"ver": "v5.4"}
 
 
 def agent(obs):
@@ -2467,15 +2430,3 @@ def agent(obs):
         except Exception:
             pass
         return {"farmer": ["PASS"], "hands": [], "market": []}
-
-
-def _gt_s(tm, item):
-    """Task 21: chuỗi tóm tắt tín hiệu GT-Cournot một kênh cho diag Arena."""
-    try:
-        q = (tm.get("gt") or {}).get(item) or {}
-        e = float(q.get("e", 0) or 0)
-        p75 = float(q.get("p75", 0) or 0)
-        tag = " DUMP→front-run" if q.get("dump") else (" calm→hold" if q.get("calm") else "")
-        return f"E{e:.0f}/P75 {p75:.0f}u{tag}"
-    except Exception:
-        return None

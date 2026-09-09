@@ -262,3 +262,43 @@
 
 ---
 *KAIN — RULES.md v1.2 (bổ sung mục Q: biên bản Phase 5 — audit engine + 5 quy tắc ẩn + 5 phán quyết A/B + 5 quy tắc mới R64–R73). Mọi tầng Bayes của v5 tham chiếu đây; quy tắc mới phát hiện phải qua benchmark 20 seed trước khi cấp mã số.*
+
+## R. BIÊN BẢN TASK 21 (20 Sep) — GT-LAND + LỚP LÝ THUYẾT TRÒ CHƠI 2 CẤP (v5.5)
+
+### R.1 Câu hỏi của user → câu trả lời định lượng (36 trận parse + 7 battery A/B)
+
+**Quan sát user: "lượng đất trống tương đương khu đất cuối cùng thậm chí hơn — mua đất có lãng phí? chưa tìm ra chiến lược tối ưu đất + phân bổ tài nguyên?"** → Đo thực (36 trận v5.4 vs v4, d10–28): v5 trống TB **48/100 ô**, v4 trống 52/100. Phân tích quadrant: NW đầy, NE ($1k) gần đầy (30.9 cây/ô-đo), **SW ($2k) chỉ 15.7/25, SE ($4k) chỉ 18.9/25** — hai đất đắt chạy 60–76% trống. Lao động bão hòa 91% slot (PASS 3%, MOVE 60% do NORTH/SOUTH/EAST/WEST) → đất trống = **tài sản chết**: vốn + lao động + cơ hội phí 3 tầng.
+
+### R.2 Đường cong phân bổ đất (mỗi điểm = 40 game two-sided 20 seed)
+
+| Đất (quadrant) | Vốn đất | Ratio vs v4 | Wins | Worst | Phán quyết |
+|---|---|---|---|---|---|
+| 25 ô (chỉ NW) | $0 | 1.078x | 28/40 | 0.858 | Thiếu không gian cho chuỗi feed + dâu + thú |
+| **50 ô (NW+NE)** | **$1k** | **1.158x** | **34/40** | **0.879** | **ĐỈNH — v5.5 chốt** (paired vs baseline +0.102x, t=4.71, p<0.0002, 17/20 seed) |
+| 75 ô (+SW) | $3k | 1.112x | 30/40 | 0.831 | SW lãi mỏng, đuôi xấu |
+| 100 ô (+SE) | $7k | 1.060x | 27/40 | 0.886 | Baseline v5.4 — lãng phí kép |
+
+Nông trại 50 ô chạy **đầy ~100%** (empty 1–14): wheat 13–20 + dâu 18 + 11 thú (pasture/coop) + melon window sớm; carrot tự loại khỏi mix (cây biên bị cắt đúng logic Cournot). Vốn tiết kiệm $6k nằm trong tiền cuối (tiền = điểm).
+
+### R.3 Quy tắc mới cấp mã số
+
+| # | Quy tắc | Loại | Bằng chứng |
+|---|---|---|---|
+| R74 | **Đất tối ưu = 50 ô (NW+NE)**: đường cong U ngược 25/50/75/100 = 1.078/1.158/1.112/1.060x. Mua đất chỉ đúng khi ruộng đang đầy (gate owned_empty ≤ 14 của v5.4 đúng tín hiệu) nhưng lấp đầy ruộng mới phụ thuộc LAO ĐỘNG — không thuê thêm thì mua đất = chôn vốn | E | 4 battery 40 game |
+| R75 | **Lấp đất trống bằng wheat = tự sát (−0.174x, 0.886x, 4/40)**: tăng cung wheat vi phạm monopoly-restraint R37 — giá pump rơi → thuế feedbuy của v4 giảm + biên churn của mình ép. Đất trống ở trạng thái cân bằng Cournot KHÔNG phải lãng phí hành vi — nó là hành vi tối ưu với tài nguyên đã phí (bài học 2 tầng: phí nằm ở MUA, không ở KHÔNG TRỒNG) | E | A/B vL1 vs baseline, 20/20 seed âm |
+| R76 | **Dung lượng theo trạng thái KHÔNG khả thi**: 5 seed "75 ô tốt hơn" (102/104/106/117/119) không tách được khỏi nhóm "50 ô tốt hơn" bằng tín hiệu quan sát được d12 (milk_shop 1–2 vs 1–2, đàn v4@12 3–9 vs 4–6, giá sữa 213–252 vs 195–243 chồng lấn) → chọn tĩnh theo trung bình; benchmark byte-chaotic nuốt mọi gating mịn | E | parse 10 trận tín hiệu |
+| R77 | **GT-Cournot 2 cấp (macro/micro)**: macro mỗi 24 lượt (hour 0–1) đọc L2 Gamma-Poisson E/P75 mỗi kênh → dump_sig (P75 ≥ 8u và ≥ 1.5×E → front-run ×0.96 — bán TRƯỚC cú dội vì lãi 1 ngày trước > nắm chờ khi o > drain) / calm_sig + px_pred rising (→ monopoly restraint ×1.04); micro mỗi lượt áp vào ngưỡng `_hold`. Hiệu ứng trung tính-dương (+0.004x, P25 +0.004) — giá trị chính là KIẾN TRÚC 2 bậc nhân quả đúng yêu cầu (mỗi lượt = vòng nhỏ, mỗi 24 lượt = vòng toàn cục) | E | A/B vG vs vL5 |
+| R78 | **Best-response đàn kích hoạt quá muộn**: v4 phóng đàn d16–20 (đến 15 con), v5 mua thú window đóng d16–22 → tín hiệu opp_herd ≥ 13 chỉ đến d18–20 khi cap đã chốt; nới cap +3 (vH) = wash (+0.003x vs v4, −0.005x vs v3, 4 seed kich hoạt: +0.08/+0.06/−0.04/−0.02). Muốn đón đầu đàn muộn phải dựa shop draw d6–12 (đã có knobs_animal) — telemetry đàn là tín hiệu TRỄ | E | A/B vH + trace seed 119 |
+| R79 | **95% đạt ở cặp v3 (95.0%), cặp v4 dừng 85% (34/40)**: 6 trận thua chia 2 nhóm — 4 knife-edge (gap ≤ 3.3%) + 2 cấu trúc (seed 107: −$3.8k, seed 119: v4 15 thú ăn $24k sữa + $12k len trên thị trường sâu 100 ô). Nhóm cấu trúc = đúng các seed mà 100 ô của v4 thắng 50 ô — đối xứng với R76: không tín hiệu sớm, không có cửa | E | phân tích 6 trận thua |
+
+### R.4 Bảng kết quả chính thức v5.5 (battery 20 seed two-sided, 40 game mỗi cặp)
+
+| Cặp | v5.4 (baseline) | v5.5 | Δ |
+|---|---|---|---|
+| **vs v4** | 1.060x · 27/40 (67.5%) · median 1.047 · P25 1.010 · worst 0.886 | **1.162x · 34/40 (85%) · median 1.138 · P25 1.096 · worst 0.879** | +0.102x (t=4.71) · +7 wins · P25 +0.086 |
+| **vs v3** | 1.161x · 38/40 (95.0%) · worst 0.889 | **1.311x · 38/40 (95.0%) · P25 1.244 · worst 0.974** | +0.150x · worst +0.085 (mọi trận ≥ 0.974) |
+
+Mục tiêu 95%: **ĐẠT vs v3**; vs v4 đạt 85% (từ 67.5%) — phần còn lại là R79 (knife-edge + seed cấu trúc không tín hiệu). Protocol giữ: mỗi thay đổi 1 delta + 20 seed two-sided + revert cái không dứt khoát (vL1/vL3/vH đều revert có tài liệu; vL2/vL5/vG giữ).
+
+---
+*KAIN — RULES.md v1.3 (mục R: biên bản Task 21 — GT-LAND đường cong đất 4 điểm, GT-Cournot 2 cấp, R74–R79, v5.5 chính thức 1.162x/85% vs v4 + 1.311x/95% vs v3). Quy tắc mới vẫn qua protocol §P 5 bước trước khi encode.*

@@ -421,3 +421,37 @@ Audit 3 phía (engine kaggle-environments 1.32.7 ↔ upload/README.md ↔ v5/v4/
 ### 14.5 Kết luận & hướng tiếp theo
 
 Kho núm dễ ĐÃ CẠN: 7 núm v5.2 + 3 thử Phase 5 (2 revert, 1 giữ) → mọi con đường nhỏ bị đóng, trừ kết luận hội tụ: **P3 Solver $/action + T/2 là mỏ cuối để đạt 95% vs v4** (cần mean ~1.16–1.22x, tức +$5–8k/mùa). v5.4 hiện giữ: 1.060x vs v4 (67.5%) + 95.0% vs v3 + worst ≥0.886 cả 2 cặp.
+
+## 15. BIÊN BẢN TASK 21 — GT-LAND + LỚP LÝ THUYẾT TRÒ CHƠI 2 CẤP (v5.5, 20 Sep)
+
+**Lệnh user:** dùng token `upload/PAT vietnq.rtf` cho push; quan sát "đất trống nhiều bằng khu cuối" → 2 câu hỏi (mua đất lãng phí? chiến lược tối ưu đất + tài nguyên?); yêu cầu áp dụng Lý thuyết trò chơi ở **bậc nhân quả 2** với kiến trúc **720 lượt = 720 vòng tính nhỏ, mỗi 24 lượt = 1 vòng toàn cục 2 bậc**.
+
+### 15.1 Chẩn đoán đất (trước khi đổi code)
+- Parse 36 trận v5.4 vs v4: v5 trống TB 48/100 ô, v4 52/100 — đúng quan sát user
+- Quadrant: NW đầy · NE ($1k) 30.9 cây · **SW ($2k) 15.7/25 · SE ($4k) 18.9/25** — 60–76% trống trên đất đắt
+- Lao động: 91% slot dùng (PASS 3%) → **đất trống = ràng buộc lao động + quota, không phải quên trồng**
+- Mua đất theo gate owned_empty ≤ 14 (ruộng đầy mới mua) — tín hiệu đúng nhưng lấp không kịp
+
+### 15.2 Chuỗi thí nghiệm A/B (protocol Task 20: 1 delta, 20 seed two-sided = 40 game)
+
+| Biến thể | Delta | vs v4 | Phán quyết |
+|---|---|---|---|
+| vL1 | Lấp đất: quota wheat 34 + cap 15 thợ khi trống ≥ 20 | 0.886x / 4/40 / worst 0.702 | **REVERT — thảm họa −0.174x, 20/20 seed âm** (R75: tăng cung wheat phá pump R37) |
+| vL2 | Bỏ quadrant SE ($4k) | 1.112x / 30/40 / worst 0.831 | GIỮ tạm (+0.052x, t=2.33) nhưng đuôi xấu |
+| vL3 | vL2 + lấp | 1.091x smoke | Bỏ (thành phần lấp độc hại) |
+| vL5 | **Đất tối thiểu 50 ô (bỏ SW+SE, tiết kiệm $6k)** | **1.158x / 34/40 / worst 0.879** | **GIỮ — paired +0.102x, t=4.71, p<0.0002** |
+| vL6 | Cận dưới 25 ô | 1.078x / 28/40 | Đỉnh xác nhận ở 50 (đường cong U ngược R74) |
+| vG | **vL5 + GT-Cournot 2 cấp** | **1.162x / 34/40 / P25 1.096** | **GIỮ — v5.5 chính thức** (+95.0% vs v3, worst 0.974) |
+| vH | vG + best-response đàn (opp_herd≥13 → cap+3) | 1.165x / 34/40 | **REVERT — wash** (+0.003 vs v4, −0.005 vs v3, R78: tín hiệu đàn đến muộn) |
+
+### 15.3 Lớp GT-Cournot 2 cấp (đúng kiến trúc user yêu cầu)
+- **Macro (mỗi 24 lượt, hour 0–1)**: đọc L2 Gamma-Poisson E/P25/P75 dòng bán đối thủ mỗi kênh → tín hiệu Cournot: `dump_sig` (P75 ≥ 8u và ≥ 1.5×E — lumpy) / `calm_sig`; ghi `tm["gt"]` cho diag Arena
+- **Micro (mỗi lượt)**: điều chế ngưỡng `_hold`: dump_sig → ×0.96 (Stackelberg front-run — bán trước cú dội vì inv +o > drain làm giá mai thấp hơn); calm + px_pred rising → ×1.04 (monopoly restraint)
+- Cơ sở: đường cong đất 4 điểm CHÍNH LÀCournot capacity (R74–R75) — lý thuyết trò chơi cho hướng (capacity restraint, monopoly markup, front-run), benchmark cho phán quyết (R73)
+
+### 15.4 Kết quả chính thức v5.5
+- vs v4: **1.162x · 34/40 (85%) · median 1.138 · P25 1.096 · worst 0.879** (v5.4: 1.060x/67.5%/0.886)
+- vs v3: **1.311x · 38/40 (95.0%) · P25 1.244 · worst 0.974** (v5.4: 1.161x/95.0%/0.889)
+- 6 trận thua vs v4: 4 knife-edge (≤3.3%) + 2 cấu trúc (seed 107/119 — v4 15 thú thị trường sâu, không tín hiệu sớm, R79)
+- Tài liệu: RULES.md v1.3 mục R (R74–R79); v5.py 2.464 dòng; backup v5.4 /tmp/v54_backup.py
+- Chưa giải: 95% vs v4 cần 1.22x — mỏ còn lại đúng như PLAN §7 dự phóng: P3 Solver $/action T/2 toàn cục (thay bảng quota cứng bằng tối ưu hóa $/action theo trạng thái từng ngày)
