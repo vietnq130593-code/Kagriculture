@@ -1,12 +1,12 @@
 # RULES — SỔ CÁI QUY TẮC KAGGRICULTURE (MÔ HÌNH NHÂN QUẢ CẤU TRÚC CỦA GAME)
 
-**Tác giả:** KAIN · **Phiên bản:** 2.6 (sau Task 32: 4 luật cứng top-Kaggle — kain33 6/8 probe 1.283x; mục AA R111-R113)
+**Tác giả:** KAIN · **Phiên bản:** 2.8 (sau Task 35: kain40 FULL-PRESSURE 93/100 (1.271x) KỶ LỤC — luật lấp đất 85% + R121-R127; mục AC)
 **Mục đích:** Bậc-1 (P(B | thấy A) — dự đoán từ quan sát) và bậc-2 (P(B | làm A) — dự đoán từ can thiệp) đều cần tập quy tắc làm mô hình cấu trúc. Tài liệu này là **bảng tham chiếu duy nhất** gom toàn bộ quy tắc ta đã nắm, mỗi quy tắc đánh số R#, phân loại + gắn tầng Bayes nào tiêu thụ nó.
 **Nguồn đối chiếu:** `upload/README.md` (vật lý engine) · `LESSONS_V4.md` §3.3–3.4 (kinh tế + bug-class máu) · `PLAN_V5.md` §12–13 (núm v5.2 + bài học v5.3) · `v5.py` (v5.6+E) · `v6.py` v6.6 (nhà vô địch hiện tại) · `cell4_v6.py` (bản Kaggle) · `bench/` + `battles/` (bằng chứng) · tools autopsy: `land_probe.py` `care_probe.py` `autopsy.py` `sell_log.py` `cmp_seed_v6.py` `two_sided_v5.py`.
 
 **Trạng thái ladder (sau Task 31):** v6.6 vẫn là nhà vô địch đăng ký — NHƯNG KAIN kain31 đã phá tường R104: **55/100 vs v6 (0.998x, median 1.016)** sau khi vá 2 leak tự gây (noon-replan hiến đất dâu + nhượng kênh sữa). Lộ trình thách đấu: kain25-29 31-40% → kain30 29% (P3-lite + fortress 8-9 ngỗng) → kain31 55% (bỏ replan + milk-commit + fortress 7 + mix cân bằng). Frontier còn: care-collapse d26-28 + 5 seed thua nặng (126/122/137/141/105s1). Hướng v7: lý thuyết cam kết + kernel P3 (RESEARCH_V7.md).
 
-**Index mục (append-only biên bản):** A–P nền v1.0 (R1–R63) · Q Phase 5 audit (R64–R73) · R Task 21 GT-LAND (R74–R79, v5.5) · S Task 22 bẫy submission (R80) · T Task 23 Wave E (R81–R82, v5.6+E 97%) · U–V KAIN đối đầu v5 (R83–R96) · W Task 27 xây v6 (R97–R99) · X Task 28 KAIN đối đầu v6 + giả thuyết 75-đất (R100–R105) · Y Task 30 dọn dẹp kho xóa v1/v2/v3 (không luật mới) · Z Task 31 KAIN phá tường R104 (R106–R110) · AA Task 32 4 luật cứng top-Kaggle + plan-cache fix (R111–R113).
+**Index mục (append-only biên bản):** A–P nền v1.0 (R1–R63) · Q Phase 5 audit (R64–R73) · R Task 21 GT-LAND (R74–R79, v5.5) · S Task 22 bẫy submission (R80) · T Task 23 Wave E (R81–R82, v5.6+E 97%) · U–V KAIN đối đầu v5 (R83–R96) · W Task 27 xây v6 (R97–R99) · X Task 28 KAIN đối đầu v6 + giả thuyết 75-đất (R100–R105) · Y Task 30 dọn dẹp kho xóa v1/v2/v3 (không luật mới) · Z Task 31 KAIN phá tường R104 (R106–R110) · AA Task 32 4 luật cứng top-Kaggle + plan-cache fix (R111–R113) · AB Task 34 tối ưu nguồn lực lấp đất (R114–R120) · AC Task 35 luật lấp đất 85% + tomato channel (R121–R127).
 
 **Phân loại mỗi quy tắc:**
 - **[P] PHYSICS** — cứng, deterministic, đúng 100% mọi trận (engine white-box)
@@ -741,3 +741,48 @@ Bash-invocation sweep giết mọi tiến trình con (kể cả setsid+nohup —
 
 ---
 *KAIN — RULES.md v2.7 (mục AB: Task 34 — chẩn đoán 3 tầng đất trống; 5 vòng lặp kain34→38; kain38 BATTERY 90/100 (1.223x, worst 0.890x) KỶ LỤC MỚI; đòn giá kain39 âm tính; R114-R120. 120 quy tắc).*
+
+## AC. BIÊN BẢN TASK 35 — LUẬT LẤP ĐẤT 85%: FILL-LAW + TOMATO-CHANNEL (kain40 FULL-PRESSURE)
+
+### AC.1 Chẩn đoán đất trống kain38 (fill_analysis2.py — MAX%/ngày + skip-last, 4 trận browser)
+- **3 tầng trống**: (1) valley d5-9 = 29-58% — vốn $116 sau NE + seed-floor $220-2300 chặn mọi hạt khi tiền $100-250; (2) spike d10-11 = 45-78% — mở 25-50 ô mới, vật lý lao động 1-2 ngày trồng; (3) mạn tính d15-28 = 30-41% — quota design chỉ nhắm ~50/75 ô (wheat 21-24 + straw chết d21 + carrot 0-4) với $10-55k nhàn rỗi.
+- **Giá cuối game** (4 trận h12): WHEAT $21 valley → $49-51 (v6 hút 150-240u/ngày d11-25; d26-29 order 1200-1300u/ngày nhưng fail sạch tiền) · CARROT $35→$72 · **TOMATO $60→$155 KHÔNG AI TRỒNG (kênh 0 đối thủ)** · MELON sập $270→$110 sau dump v6.
+- **Lao động là trần cứng**: 12-13 units = 52-67 acts/ngày, 71% thời gian ĐI BỘ (mỗi harvest ~5 turns vì phải vác về shed); fill 75 ô cần ~89 acts/ngày → BẤT KHẢ THI với chassis v6 + đàn 16. Fill thực tế ~60-66 ô (80-88%) = đúng quy luật 85% top-Kaggle.
+
+### AC.2 Vòng lặp kain40 (v1→v5 — mỗi bản 1 autopsy)
+- **v1 FULL-PRESSURE** (ΔA-F: fill-law carrot-20/wheat-all d≤26, tomato 10/8/6 d17-19, melon-late d17-18, hire-14, window carrot/wheat d≤26): seed 100 valley 62%→1.6% NHƯNG 146/132 SỤP −27k/−8.5k.
+- **Autopsy 146 v1**: fill wheat mua $100 hạt để lại $16 → hands bị SA THẢI cuối ngày + sáng mai không thuê nổi (fib 8 hands = $54) → units 0 → farm chết d6-9. **R121 ra đời.**
+- **Autopsy 132 v1**: straw-partial $300 mua TRƯỚC NE (floor $200 quá thấp khi nq=1) → ăn vốn $1150. **R122 ra đời.**
+- **v2 (fix R121+R122)**: probe 10 seed khó nhất (9 seed thua kain38 + 100) = **19/20** — 146 từ 0.657x lật 2/2 thắng 53.9k/61.6k.
+- **Autopsy 102 (seed giàu-engine)**: fill wheat bán tốt (808u) NHƯNG dâu chỉ bán 22u/88u (yield ngồi trên ô — harvest chờ yu≥4 quá muộn) + milk −26u (care banking đứt chuỗi) = −33% vs kain38. Carrot fill 12 ô = $20/act ROI lao động tệ nhất. **R123-R125 ra đời.**
+- **v3/v4 (carrot 8/14 cố định)**: 102 sửa được nhưng 146/103 sụt — bớt carrot = thêm wheat = **subsidy feed cho bò v6 (R113 tái xuất)**. Hai lớp seed muốn carrot ĐỐI NGHỊCH → **R126: cap carrot THEO standing dâu** (dâu <12 ô = engine nghèo → carrot 20 bootstrap; dâu ≥12 = engine khỏe → carrot 8 né máy).
+- **v5 cuối**: FIX-1 straw harvest yu≥3 + FIX-2 wheat decay-urgent 36h + FIX-3/4 adaptive carrot.
+
+### AC.3 Quy tắc mới R121–R127
+- **R121 [P]** Hands bị sa thải cuối ngày, thuê lại fib từ đầu mỗi sáng → mọi seed-buy PHẢI giữ buffer ≥$120 (d5-13) nếu không farm chết (146 v1: units 0, −27k). Sinh tồn > lấp đầy.
+- **R122 [E]** Seed đắt (straw $100) trước cửa mua đất = ăn vốn (kain37 R116 + kain40 132): floor straw phải = 200 + giá đất còn thiếu khi nq=1.
+- **R123 [E]** Ongoing crop yield sitting on tile = tiền chết: harvest yu≥3 (không đợi 4) — 102 mất $7.4k dâu ngồi trên ô tới hết game.
+- **R124 [E]** Wheat non-ongoing decay: urgent-harvest phải báo trước 36h (không phải 24h) — decay trừ 1u mỗi 2 giờ sau mls.
+- **R125 [E]** ROI lao động từng cây: straw-harvest $240/u > wheat-fill $42/act > carrot-fill $20/act — fill phải theo thứ tự này, không theo giá hạt.
+- **R126 [E]** Fill carrot là con dao 2 lưỡi theo lớp seed: engine nghèo (dâu <12) → carrot-20 = mồi vốn không-subsidy; engine khỏe (dâu ≥12) → carrot-8 + wheat = giữ harvest/care cho dâu+sữa.
+- **R127 [E]** Labor-saturation là trần thật của luật 85%: feed+care 32 acts + straw water 15 + fill = 89 > 67 capacity → fill chỉ nên target 60-66 ô; 15% đều tuyệt đối cần kernel lao động mới (v7).
+
+### AC.4 Battery 100 game hai ghế (seed 100-149) — phán quyết
+| Bản | Thắng | Ratio | Avg | Worst | Ghi chú |
+|---|---|---|---|---|---|
+| kain38 FILL-SMART | 90/100 | 1.223x | $57.4k | 0.890x | 10 thua knife-edge |
+| **kain40 FULL-PRESSURE** | **93/100** | **1.271x** | **$58.0k** | 0.772x | **KỶ LỤC MỚI**; 7 thua: 102/108/127/129/148/149 (5 knife-edge 0.87-0.98x + 108 0.772x) |
+
+### AC.5 Fill profile kain40 vs kain38 (probe 146 + 100)
+- Valley d5-9 (ngay sau nâng 50): 58% → **14-25%** (v6: 28-46%)
+- Sau nâng 75 (d10-12): 45-78% → 2-3 ngày về 12-19%
+- Cuối game (d20-28): 41% → **19-25%** (v6: 44-73%)
+- Còn 15% tuyệt đối: d4 (36% — chu kỳ harvest-replant 1 ngày) + d10-11 (spike mở đất, vật lý) + d20-23 (dâu chết tuổi) — **trần lao động R127**, không phải lỗi thiết kế.
+
+### AC.6 Sản phẩm Task 35
+- `kain40.py` (FULL-PRESSURE — **fighter mới 93/100, 1.271x**) · công cụ `bench/fill_analysis2.py` (MAX%/ngày, generic target, fill-time)
+- Battery `bench/kain40_vs_v6_100.json` (93/100) · battles probe: k40 s100/s132/s146/s102 + k38 s102 (autopsy)
+- Mục tiêu 100%: còn 7 thua — 108 (0.772x) cần autopsy riêng; 102 = lớp seed giàu-engine (bẫy carrot R126 đã giam nhưng noise ±$10k quanh ngưỡng)
+
+---
+*KAIN — RULES.md v2.8 (mục AC: Task 35 — chẩn đoán 3 tầng đất trống kain38 + giá cuối game + trần lao động 71% đi bộ; kain40 FULL-PRESSURE BATTERY 93/100 (1.271x) KỶ LỤC MỚI; fill valley 58→14-25%, cuối game 41→19-25%; R121-R127. 127 quy tắc).*

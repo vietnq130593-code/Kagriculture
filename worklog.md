@@ -802,3 +802,48 @@ Stage Summary:
 - Task 34 HOÀN TẤT: kain38 FILL-SMART 90/100 (1.223x, worst 0.890x) — nhà thách đấu mạnh nhất lịch sử vs v6.6
 - Mục tiêu 100%/$90-110k chưa đạt: 10 trận thua đều knife-edge 0.89-0.99x; $90k+ một mình vẫn đòi hỏi v6 sập <$40k (AA.5)
 - Hướng còn lại: kernel lao động mới (v7 — R98/AB.5) để vừa hold giá vừa sản xuất
+---
+Task ID: 35 (phần 1 — chẩn đoán + kain40 FULL-PRESSURE)
+Agent: KAIN (main-agent)
+Task: Đo đất trống kain38/39 theo thời kỳ → giảm tỷ lệ trống về max 15% (trừ ngày cuối) + giữ chiến lược kinh doanh (user Task 35)
+
+Work Log:
+- Đo fill_analysis2.py (nâng cấp: MAX%/ngày + skip-last + generic target) trên 4 trận browser kain38: d5-9 = 29-58% trống (valley vốn), d10-11 vọt 45-78% (mở ô mới), d15-28 MẠN TÍNH 30-41% trống với $10-55k tiền nằm chết — quota design chỉ nhắm ~50/75 ô; v6 trống còn tệ hơn (43-67%)
+- Verify engine: CROPS 5 cây + town drain (mỗi shop ăn 6u/ngày) + ongoing 4-event rồi zombie cần nước + không cây nào chết hạn trong 2 trận check (kernel water-crit xoay vòng tốt)
+- Đo giá theo ngày (4 trận): WHEAT $21 valley → $49-51 cuối (v6 hút 150-240u/ngày d11-25 + mua hụt 1300u/ngày d26-29); CARROT $35→$72; TOMATO $60→$155 KHÔNG AI TRỒNG; MELON sập $270→$110 sau dump v6
+- Đo lao động: 12 units chỉ làm 52 acts/ngày, 71% thời gian ĐI BỘ; capacity fill 75 ô cần ~89 acts/ngày → BẤT KHẢ THI với chassis v6 + đàn 16 — fill thực tế ~60-66 ô (80-88%)
+- Truy tiền d0-12: d0 hạt $2240 (melon 25 = $2000) → d5 NE mua xong còn $116; d6-8 DOANH THU 0 (chu kỳ wheat)
+- kain40 v1 "FULL-PRESSURE" (ΔA-F: fill-law carrot-20/wheat-all d≤26, tomato 10/8/6 d17-19, melon-late d17-18, hire-14, carrot/wheat window d≤26): seed 100 valley 62%→1.6%, NHƯNG probe 18 game trên 9 seed thua của kain38 = 7/18 — 146/132 SỤP (-27k/-22k, -8.5k/-11.6k)
+- Autopsy 146 v1: fill wheat mua $100 hạt để lại $16 → hands bị sa thải cuối ngày + không thuê lại được sáng mai (fib 8 hands = $54) → farm chết d6-9 (units 0, 66% trống). Autopsy 132 v1: straw-partial $300 ăn vốn NE TRƯỚC khi mua đất (floor $200 quá thấp khi nq=1) + wheat đứng 21 chết d16-20 vì decay/labor
+- kain40 v2 (2 fix): ΔB-fix1 floor wheat seed $120 khi d5-13 sau NE (đủ thuê 9-10 hands); ΔB-fix2 floor straw $1350 khi nq=1 d5-13 (không ăn vốn NE $1150); tomato quota hạ 8/6/4
+- Probe v2 trên 10 seed khó nhất (9 seed thua kain38 + 100): **19/20 THẮNG** (146: 0.657x → 2/2 thắng 53.9k/61.6k; 132/103/145: 2/2 thắng; 118/119/135/147/100: 2/2) — mất duy nhất 129s1 0.880x
+- Fill profile v2 trên 146: valley d5-7 58%→14-22%, cuối game 41%→19-25% (v6: 44-73%); limit còn lại = LAO ĐỘNG bão hòa (feed+care 32 acts + straw water 15 + wheat fill) — đất 15% cần kernel v7
+- Battery 100 game kain40 vs v6 (seed 100-149, two-sided, run_bg daemon) đang chạy → bench/kain40_vs_v6_100.json
+- Đăng ký arena: kain40 vào run_battle.py + arena-service/index.ts + UI constants.ts
+
+Stage Summary:
+- Chẩn đoán 3 tầng đất trống: (1) valley vốn $116 sau NE + seed-floor thiết kế chặn mọi hạt; (2) spike mua đất d10-11 = vật lý lao động (25 ô cần 1-2 ngày trồng); (3) mạn tính d15-28 = quota ~50 ô + $55k nhàn rỗi → fill-law + kênh tomato ($155, 0 đối thủ) + endgame dump
+- 2 bài học sandbox-engine lớn: hands bị SA THẢI cuối ngày → tiền sáng hôm sau quyết định sống chết (floor $120); straw-partial trước NE = ăn vốn đất (floor $1350)
+- kain40 v2 = 19/20 trên hard set — đợi battery 100 để phán quyết vs kỷ lục kain38 90/100
+
+---
+Task ID: 35 (phần 2 — vòng lặp autopsy v1→v5 + BATTERY 93/100 + RULES v2.8)
+Agent: KAIN (main-agent)
+Task: Khắc phục regression của kain40 v1 + battery 100 game + đóng gói
+
+Work Log:
+- Battery v2 (bị hủy giữa chừng vì edit code) → nhận ra kaggle_environments nạp file agent MỖI match → chạy lại sạch
+- Autopsy 102 (seed giàu-engine, kain38 thắng $63.6k): kain40 thua vì fill ăn acts thu hoạch/chăm sóc — dâu 22 ô đứng nhưng chỉ BÁN 22u/88u (yield ngồi trên ô, harvest tier 5 thua service/water), milk 53u vs 79u (care banking đứt), carrot fill 12 ô = $20/act ROI lao động tệ nhất
+- v3 (FIX-1 straw harvest yu>=3 + FIX-2 wheat decay-urgent 36h + carrot 8): 102 LẬT thắng $56.1k NHƯNG 146/103 sụt — bớt carrot = thêm wheat = subsidy feed cho bò v6 (R113 tái xuất)
+- v4 (carrot 14): tệ hơn cả v2 và v3 — nhận ra 2 LỚP SEED muốn carrot ĐỐI NGHỊCH (146 nghèo muốn 20, 102 giàu muốn 8) + R98 delta-noise (probe 10 game không phân biệt được)
+- v5 (FIX-1+2 + carrot THÍCH ỨNG theo standing dâu: <12 ô → 20 bootstrap, ≥12 ô → 8 né máy): 146 giữ 2/2 thắng lớn, 102 knife-edge 0.94-0.98x
+- BATTERY 100 game kain40 v5 vs v6 (seed 100-149 two-sided, run_bg daemon): **93/100 (1.271x, median 1.237, P25 1.128, worst 0.772x, avg $58.0k vs $45.6k)** — KỶ LỤC MỚI (kain38: 90/100, 1.223x, worst 0.890x)
+- 7 thua: 102s0 0.982x, 108s0 0.772x (worst, cần autopsy riêng), 127s0 0.939x, 129s1 0.870x, 148s0 0.968x, 149s1 0.926x — 5/7 knife-edge
+- RULES.md v2.7 → v2.8: mục AC (AC.1 chẩn đoán 3 tầng + giá cuối game + trần lao động, AC.2 vòng lặp v1→v5, AC.3 R121-R127, AC.4 battery, AC.5 fill profile, AC.6 sản phẩm); header + index cập nhật
+- Đăng ký arena: kain40 vào 3 registry (run_battle.py + arena-service/index.ts + src/components/arena/constants.ts)
+
+Stage Summary:
+- kain40 FULL-PRESSURE = nhà vô địch thách đấu mới: 93/100 vs v6.6 (kỷ lục +3 thắng so kain38)
+- Quy luật fill 85% top-Kaggle được triệu chứng hóa: valley 58→14-25%, cuối game 41→19-25% (v6: 44-73%); 15% tuyệt đối bị chặn bởi trần lao động (R127) — 71% unit-turns là đi bộ, harvest vác về shed 5 turns/act
+- 3 quy tắc sandbox-engine mới quan trọng nhất: R121 (hands sa thải cuối ngày — buffer $120), R123 (ongoing harvest yu>=3), R126 (carrot fill 2 lưỡi theo lớp seed)
+- Còn lại: autopsy 108 + browser verify + restart arena-service + commit/push + báo cáo user
