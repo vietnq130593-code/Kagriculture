@@ -45,6 +45,7 @@ AGENTS = {
     "v6": (os.path.join(ROOT, "v6.py"), "agent"),
     "kain3": (os.path.join(ROOT, "kain3.py"), "agent"),
     "kain16": (os.path.join(ROOT, "kain16.py"), "agent"),
+    "kain25": (os.path.join(ROOT, "kain25.py"), "agent"),
     "melon": (os.path.join(BENCH, "melon.py"), "melon_maxxer"),
     "baseline": (os.path.join(BENCH, "baseline.py"), "agent"),
 }

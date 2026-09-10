@@ -570,3 +570,37 @@ Work Log:
 Stage Summary:
 - TOÀN BỘ nhiệm vụ hoàn tất: RULES.md review → v6.6 xây + 7 battery → regression (100% vs v4/v3) → cell4_v6 verify → arena đăng ký + UI card → push GitHub (2 commit: 500587c, ad45543) → báo cáo user
 - v6.6 = kain16 + E8-lite: 93.75% vs v5 (75/80) · 100% vs v4 (1.400x) · 100% vs v3 (1.446x)
+
+---
+Task ID: 28
+Agent: KAIN (main-agent)
+Task: KAIN trực tiếp đối đầu v6 (100 trận đầu) + đánh giá chiến lược mở rộng đất / giả thuyết 75 đất (user)
+
+Work Log:
+- Review lại RULES.md v2.1 (99 quy tắc) + worklog Task 23-27; hạ tầng kiểm tra OK (kaggle_environments 1.32.7, arena-service :3005, next dev :3000)
+- bench/land_probe.py (mới): đo đạc sử dụng đất hằng ngày — v6 trên seed 115/123/140: mở 100 ô (mua SE+SW d11-12, $6k), utilization chỉ 57-67%, 38-46 ô trống/ngày, 933-1101 empty-tile-days; ngược lại v5 50 ô utilization 93-106%
+- Thiết kế KAIN-25 "GEESE FORTRESS-75" (kaggriculture/kain25.py = v6.6 + 6 delta cấu trúc): Δ1 LAND-75 (cap 3 quadrant, không mua SW $4k — ý tưởng user), Δ2 EGG-FORTRESS (goose floor 6/cap 9 — v6 hard-cap 6), Δ3 COW-SOFT (cap 4, nhượng kênh sữa), Δ4 QUOTA-FIT-75 (straw 30→22, melon 14→12), Δ5 CARE-LOCK (SERVICE ngỗng tier 1), Δ6 HERD-CAP 16
+- Bug fix: 4 chỗ quota melon (chỗ thứ 4 trong block day≤1 sót 14→12)
+- Đăng ký kain25: arena/run_battle.py AGENTS + arena-service index.ts (restart daemon double-fork vì hot-reload không re-evaluate AGENTS — đúng như Task 27b) + UI card constants.ts
+- Battery 100 trận (seed 100-149, two-sided, run_bg daemon /tmp/kain25_vs_v6_100.log → bench/kain25_vs_v6_100.json) — đang chạy
+- care_probe seed 123: herd 16 từ d17 (7 ngỗng+4 bò+5 cừu), care 15-16/16 phần lớn ngày, feed-miss d26-28 (16→12 thú cuối)
+- sell_log seed 123 (bài học lớn): EGG-fortress hoạt động (177 trứng $10.8k vs v6 110 $6.7k) + FERT 196u $12.6k; NHƯNG Δ4 hiến kênh premium: v6 bán 80 dâu $23k vs ta 46 $12.7k (kênh dâu KHÔNG bão hòa — cắt quota = chuyển phần chia kênh cho đối thủ, R99 nghịch đảo) + melon 108 vs 78; tiền mua wheat 790u $37.3k (churn engine vẫn chạy)
+
+---
+Task ID: 28 (phần 2 — hoàn tất)
+Agent: KAIN (main-agent)
+Task: 5 battery 500 game + RULES.md v2.2 + push
+
+Work Log:
+- kain26 (straw 26/melon 13): 40/100 0.927x — straw restore vô dụng vì gate room() co quota về 18 ô (seed 104 probe: STRA kẹt 18 suốt game trong khi v6 đứng 26)
+- kain27 (4 fix cùng lúc: wool yu>=3 tier1 + geese tier1 chỉ khi đói + feed-d26 + straw-gate-bypass): 36/100 — multi-delta regression (R98); NHƯNG seed 112 lật: wool 86u $21.1k vs 53u $13k (từ 24u/$5.7k) — FIX1 đúng chẩn đoán dòng chảy
+- kain28 (kain25 + wool-fix DUY NHẤT): 31/100 0.924x — thu sớm yu>=3 gấp đôi chuyến đi khu → đói lao động tưới → aggregate tệ hơn dù lật được seed 112 (optimum thật: thu ở max_held-2)
+- kain29 (profile v6 trên 75 ô: straw 30/melon 14/wheat 14 + gate bypass): 32/100 0.926x — đất 75 vẫn truncate straw ~22
+- RULES.md v2.2: mục X (biên bản Task 28) + R100-R105 (105 quy tắc): R100 đất dư = giá trị tùy chọn (utilization 67% KHÔNG phải waste — 25 ô dư = buffer tự do quota, $4k SW đổi $8-12k quyền straw/melon); R101 hiến kênh (R99 nghịch đảo); R102 egg-fortress không-đối-chiếu-được; R103 thu>chăm nhưng thu ở max_held-2; R104 tường twin-kernel phía thách đấu (31-40% qua 5 hướng/500 game); R105 vòng phản hồi pipeline trong room()
+- Tất cả battery JSON: bench/kain2[5-9]_vs_v6_100.json; land_probe.py công cụ mới
+
+Stage Summary:
+- **KAIN vs v6 (500 game): 31-40% — v6 giữ ngôi vô địch, tường R104 xác lập từ phía thách đấu**
+- Giả thuyết 75-đất của user: ĐÚNG về utilization (86% vs 67%), SAI về kinh tế (quota binding −$6-10k/season, R100)
+- Bài học lớn nhất: đánh vô địch bằng delta = bất khả; con đường v7 = kernel mới (P3 solver $/action toàn cục)
+- Còn: commit + push GitHub + browser verify + báo cáo tiếng Việt

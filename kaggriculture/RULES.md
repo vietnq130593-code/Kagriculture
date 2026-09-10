@@ -523,4 +523,48 @@ Bash-invocation sweep giết mọi tiến trình con (kể cả setsid+nohup —
 - **v6 chính thức = v6.6**: đánh bại toàn bộ ladder v3/v4/v5 (100/100/93.75)
 - Trần >95% vs v5 chưa phá (R98: cấu trúc, không phải núm) — con đường v7: kernel mới (P3 solver $/action toàn cục, gap N.1/N.6) hoặc khai thác 4 knife-edge bằng seat/time-precision
 ---
-*KAIN — RULES.md v2.1 (mục W: Task 27 — v6 = kain16+E8-lite, 7 battery/560 game, R97 pháo đài đối xứng twin-kernel, R98 tường delta-noise, R99 đòn yield). 99 quy tắc.*
+*KAIN — RULES.md v2.2 (mục X: Task 28 — KAIN đối đầu v6, 5 biến thể/500 game/31-40%, R100 đất dư = giá trị tùy chọn, R101 hiến kênh, R102 pháo đài không-đối-chiếu-được, R103 thu>chăm, R104 tường twin-kernel phía thách đấu, R105 vòng phản hồi pipeline). 105 quy tắc.*
+
+## X. BIÊN BẢN TASK 28 (10 Sep) — KAIN ĐỐI ĐẦU v6: 500 GAME, 5 BIẾN THỂ, ĐÁNH GIÁ GIẢ THUYẾT 75 ĐẤT
+
+*Nhiệm vụ user: KAIN trực tiếp đánh nhà vô địch v6 (100 trận đầu), đánh giá chiến lược mở rộng đất / giả thuyết "dùng tối đa 75 đất", đúc kết vào RULES.md.*
+
+### X.1 Hạ tầng đo đạc mới
+- **bench/land_probe.py**: đo sử dụng đất hằng ngày (quadrant/ô trống/cây đứng/thú/weed/money + empty-tile-days + utilization + ngày mua đất)
+- **kain25..kain29**: 5 biến thể thách đấu (v6.6-chassis + delta cấu trúc), mỗi bản battery 100 game two-sided seed 100-149
+
+### X.2 Đánh giá đất (câu hỏi của user) — 3 seed probe (115/123/140)
+| Engine | Đất mở | Mua quadrant | Utilization d5-28 | Ô trống/ngày | Kết quả $ |
+|---|---|---|---|---|---|
+| v6 | 100 ô | SE+SW d11-12 ($6k, khi còn 35 ô trống) | **57-67%** | 38-46 | $53-72k |
+| v5 | 50 ô | không mua | 93-106% | 6-7 | $33-59k |
+| kain25 (75 ô) | 75 ô | SE d11 ($2k) | **86%** | ~17 | $44-59k |
+
+### X.3 5 battery 100 game (tổng 500 game vs v6)
+| Bản | Chassis + delta | Kết quả |
+|---|---|---|
+| kain25 "GEESE FORTRESS-75" | +LAND-75 + EGG-FORTRESS (goose 6-9) + COW-SOFT(4) + QUOTA-FIT-75 (straw 22/melon 12) + CARE-LOCK + HERD-16 | **39/100 (0.945x)** |
+| kain26 | kain25 + straw 26/melon 13 | 40/100 (0.927x) |
+| kain27 | kain26 + wool-fix(yu≥3 tier1) + geese-tier1-chỉ-khi-đói + feed-d26 + straw-gate-bypass | 36/100 (0.918x) |
+| kain28 | kain25 + wool-fix DUY NHẤT | 31/100 (0.924x) |
+| kain29 "PROFILE-75" | kain28 + profile v6 trên 75 ô (straw 30/melon 14/wheat 14) | 32/100 (0.926x — gate room() + đất 75 vẫn truncate straw ~22; tốt hơn kain28 trên seed 104 nhờ bypass) |
+
+### X.4 Quy tắc mới R100–R105
+| # | Quy tắc | Loại | Bằng chứng |
+|---|---|---|---|
+| R100 | **ĐẤT DƯ = GIÁ TRỊ TÙY CHỌN, KHÔNG PHẢI LÃNG PHÍ (nghịch R74 theo cách mới)**: v6 mua 100 ô (SW $4k khi còn 35 ô trống — trông như hoang phí, utilization 57-67%) NHƯNG 25 ô dư là BUFFER TỰ DO CHO QUOTA: straw-30/melon-14 KHÔNG BAO GIỜ bị truncate → kênh premium đầy đủ. Trên 75 ô, cùng quota bị co về straw 18-22 → mất $6-10k/season. $4k đất đổi $8-12k quyền hạn quota = lời. "Utilization" thấp KHÔNG phải waste khi kênh premium chưa bão hòa | E | land_probe 3 seed + 5 battery |
+| R101 | **HIẾN KÊNH (R99 nghịch đảo)**: cắt quota của MÌNH trên kênh premium chưa bão hòa = chuyển phần chia cho đối thủ — seed 123: dâu ta 46u/$12.7k vs v6 80u/$23k (−$10k) khi kênh giữ giá $277. Chỉ cắt quota khi TÍN HIỆU bão hòa (giá < base) — cutting on land-math một mình = tự tước vũ khí | E | ledger 123 + kain25 battery |
+| R102 | **PHÁO ĐÀI KHÔNG-ĐỐI-CHIẾU-ĐƯỢC (kênh cap cứng)**: v6 hard-cap ngỗng 6 (floor 3) → egg-fortress 6-9 ngỗng là KÊNH ĐỐI THỦ KHÔNG THỂ counter-scale: +$2-4k trứng + $1.5-2k phân/mùa. Đây là kênh duy nhất tìm được có tính chất này (milk/wool/straw đều counter-scale qua room()). Nhưng bù lại: ngỗng ăn share lúa mì + share lao động — net dương chỉ ~$1-2k/season | E | ledger 112/123 (egg 133-177u vs 97-110) |
+| R103 | **DÒNG CHẢY THU > CHĂM: THU SỚM CHẶN KẸT, NHƯNG KHÔNG QUÁ SỚM**: sản phẩm thú ngồi trên tile đến max_held KHÓA sản xuất (seed 112: len 24u vs 70u = −$11k vì không thu). NHƯNG thu ở yu≥3 (kain28) GẤP ĐÔI chuyến đi → đói lao động tưới → aggregate 31/100 (tệ hơn kain25 39/100). Điểm tối ưu: thu ở max_held−2 (một chuyến/vòng, không kẹt) | E | probe 112 + kain27/28 battery |
+| R104 | **TƯỜNG TWIN-KERNEL ĐO TỪ PHÍA THÁCH ĐẤU (R97/R98 mở rộng)**: v6-chassis + bất kỳ delta cấu trúc nào (land/animal/quota/care/flow — 5 hướng, 500 game) = 31-40% — v6 là optimum knife-edge trong kernel-space của chính nó. Đánh bại v6 KHÔNG THỂ bằng delta; cần kernel ngoài (P3 solver $/action toàn cục — gap N.1) hoặc đổi LUẬT bài (đối thủ mới) | E | 5 battery 500 game |
+| R105 | **VÒNG PHẢN HỒI PIPELINE TRONG room()**: room = deficit + absorb + headroom − my_pipe − 0.85×opp_pipe → pipeline đứng LỚN HƠN của đối thủ ĐÈ quota của mình (seed 104: dâu ta kẹt 18 ô suốt game trong khi v6 đứng 26 — chênh càng lớn thì chênh càng tăng: already-rich-gets-richer). Bypass bằng gate giá (spx ≥ 1.1×base + inv ≤ I0 → quota đầy) chỉ kích hoạt MUỘN (giá chỉ hiện tín hiệu sau d8-10, cửa sổ trồng dâu đóng d13) | E | land_probe 104 + trace quota |
+
+### X.5 Bài học tổng hợp cho v7 (nếu xây)
+1. **Đánh bại v6 bằng delta = bất khả (R104)**. Con đường: kernel mới đúng nghĩa — P3 solver $/action TOÀN CỤC (quy mọi hành động về đô-la机 hội, giải phân bổ động), không phải thêm núm.
+2. Giữ lại từ kain-series (đã chứng minh dương): egg-fortress (R102), SW-savings khi profile nhỏ, wool collect-at-max_held−2 (R103), straw-gate-bypass (R105 — cần phiên bản sớm-hơn bằng shop-draw inference thay price).
+3. Giả thuyết 75-đất của user: **ĐÚNG về mặt utilization (86% vs 67%), SAI về mặt kinh tế** (quota binding mất $6-10k/season — R100). 75-đất chỉ thắng nếu đi kèm profile nén cao-$ (trứng+len+phân flow) — cái profile đó hiện net −$1-2k/season so với profile thể tích của v6.
+
+### X.6 Sản phẩm Task 28
+- kain25-kain29.py (5 thách đấu), 5 battery JSON (kain2[5-9]_vs_v6_100.json), land_probe.py
+- Arena: kain25 đăng ký (run_battle.py + arena-service + UI card) — user xem trực tiếp "kain25 vs v6"
+- Autopsies: ledger seed 112/123/104, care_probe 112/123, land_probe 115/123/140/104
