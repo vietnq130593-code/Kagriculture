@@ -678,3 +678,22 @@ Work Log:
 Stage Summary:
 - Hai leak cấu trúc của kain30 đã xác định bằng plan-dump: noon-replan = tự hiến đất dâu; capital lệch geese = tự hiến kênh sữa
 - Bài học GT quan trọng nhất: đối thủ accommodate → AI COMMIT SỚM kênh sâu giữ phần chia (9 bò vs 4 = $16.7k); mix đàn tối ưu vs v6 = cân bằng (ngỗng 7-8 + bò 6 + cừu 4), KHÔNG all-in trứng
+
+---
+Task ID: 31 (phần 3 — hoàn tất)
+Agent: KAIN (main-agent)
+Task: Battery kain31 + RULES v2.5 + arena + push + verify UI
+
+Work Log:
+- Battery kain31 vs v6 (100 game seed 100-149): 55/100 THẮNG (0.998x, median ratio 1.016, worst 0.695x) — 28 seed lật lên / 9 xuống so kain30; seat0 31/50 + seat1 24/50; worst còn: 126s1 (-20.3k), 122s1, 137, 141, 105s1
+- RESEARCH_V7.md hoàn thiện (điền kết quả 2 battery + hướng v7: lý thuyết cam kết là trục chính, P3 graded-quota giữ, micro-sell solver là bước sau, frontier = care d26-28 + 5 seed)
+- RULES.md v2.4 -> v2.5: header + trạng thái ladder + index +Z; mục Z (Z.1 bảng 2 battery, Z.2 autopsy 146, Z.3 R106-R110, Z.4 bài học GT 5 điều, Z.5 sản phẩm) — 110 quy tắc
+- Arena: kain30 + kain31 đăng ký 3 registry (run_battle.py / index.ts / constants.ts) + restart daemon double-fork
+- Verify agent-browser qua gateway :81: UI render OK, dropdown 9 agent có kain31/kain30, live match kain31 vs v6 seed 146 chạy end-to-end (v6 thắng ghế 1 $68.2k vs $55.6k — knife-edge, khớp cấu hình ghế battery), 0 console error; mobile 390px không h-scroll, footer đáy màn hình; dev.log sạch; lint PASS
+- Git: commit fe66385 (kain30/31 + 2 battery JSON + RESEARCH_V7.md + RULES v2.5 + registry + battles) — push GitHub OK, PAT dùng inline KHÔNG lưu .git/config
+
+Stage Summary:
+- **KAIN PHÁ TƯỜNG R104: kain31 55/100 vs v6.6** (trước đó 5 hướng/500 game chỉ 31-40%)
+- Chìa khóa: autopsy plan-dump chỉ đích danh 2 leak tự gây (noon-replan hiến đất + nhượng kênh sữa) — "tường cấu trúc" hóa ra là tổng leak (R109)
+- Deliverable nghiên cứu: RESEARCH_V7.md (kiến trúc v6 bậc 1/2 + toàn cục 24 turn + GT + 8 seam) + RULES.md v2.5 (R106-R110) + 2 battery JSON
+- v7 direction: commitment theory (milk floor + không replan xuống + pháo đài cân bằng) + kernel P3 mở rộng; frontier: care-collapse d26-28, 5 seed thua nặng, micro-sell solver
