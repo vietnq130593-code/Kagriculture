@@ -747,3 +747,44 @@ Work Log:
 Stage Summary:
 - Task 32 hoàn tất: 4 luật cứng top-Kaggle triển khai 2 đường (kain33 fighter 68/100 KỶ LỤC, kain32 research)
 - Mục tiêu 100%/$90-110k chưa đạt — phân tích tầng sâu AA.5 (vốn hóa thị trường 1v1 ~$110-135k tổng; một mình $90k+ = v6 phải sập <$40k) + hướng v7 (kernel lao động mới + đòn zero-sum có hệ thống)
+
+---
+Task ID: 34 (phần 1 — chẩn đoán + kain38)
+Agent: KAIN (main-agent)
+Task: Phân tích đất trống kain33 theo thời kỳ → chẩn đoán nguyên nhân → tối ưu nguồn lực (lấp đất nhanh) → kain38
+
+Work Log:
+- Đo empty% qua 15 trận (9 browser battles + 6 trận trace mới seeds 100-102): kain33 d5-9 = 62% TRỐNG suốt 5 ngày (fill-time 8-9 ngày sau NE), d15-24 = tier starvation, d25-28 = 28-31% (quota đóng)
+- Tạo kain33t (trace variant, /tmp/kain33t_trace.jsonl): ghi plan/seed-info/plant-throttle/orders từng giờ
+- Chẩn đoán 3 root cause: (1) d5-9 plan giao 30 ô cho dâu nhưng floor $900 chặn mua hạt khi money $400-600 → KHÔNG fallback cây rẻ + death spiral tiền mặt (mua NE $1102 → còn $102 → 5 ngày không doanh thu → $16, không mua nổi hạt nào); (2) d15-24 PLANT tier 5 thua SERVICE/WATER tier 2-3 triệt để (n_plant=16 tasks/ngày nhưng 0 hành động trồng, 13 units đi bộ 65% thời gian); (3) d25-28 wheat d≤24/carrot d≤23 đóng hết
+- kain34 "FILL-EVERYTHING" (wheat flood + tier-4 plant + hire-10 + carrot d24): empty d5-9 62→13.6% NHƯNG 2/6 thua, v6 +$17.6k — wheat flood = SUBSIDY feed cho engine bò v6 (R113), v6 mua 4290u vs 3796u
+- kain35 (straw-partial + carrot redirect + late-straw d16-19): 6/6 thắng nhưng d20-28 tệ hơn (bug cap 4 hạt/ngày chặn cả ngày giàu)
+- kain36 (bỏ cap, fill-carrot 14): 2/8 trên mẫu khó — d5-9 vẫn 61% vì money $102 < mọi floor; seed 114 v6 ép cả wheat lẫn straw
+- kain37 (land-buffer 1350 + cheap-seed-always + late-wheat 16): empty d5-9 5.6% NHƯNG seed 100 thua — KHÔNG MUA ĐƯỢC NE (LOCKED 75 đến d12): straw-partial tự ăn vốn + gate $1350 + fallback có khoảng hở (lỡ NE thì nhánh SW không chạy → kẹt 25 ô vĩnh viễn)
+- kain38 (NE gate 1000+150 liền mạch d5-9 + escape hatch d10+ money≥1150 + SW 10-16 gate 2250 + Δ9 spend-discipline: partial/fill/floor-phẳng CHỈ khi nq≥2): **7/8 thắng, $54.6k vs $47.3k (1.153x)** trên mẫu gồm 3 seed thua đôi của kain33 (111: 0.875→1.25/1.36x; 114: 0.999→1.20/1.23x; 103: 0.891→0.92/1.13x)
+- Battery 100 game kain38 vs v6 (seed 100-149, two-sided) đang chạy qua run_bg daemon
+
+Stage Summary:
+- KAIN-38 = kain33 + 9 delta tối ưu nguồn lực: empty d5-9 62%→~16%, 3 seed thua đôi lật thành thắng
+- Bài học lớn #1: zero-sum 1v1 — lấp đất bằng wheat = nuôi đối thủ (wheat là feed của engine bò v6); lấp bằng carrot/straw-partial/late-wheat (d17+ giá $40-49 khi v6 đã no)
+- Bài học lớn #2: death spiral tiền mặt — mua đất phải kèm buffer + spend-discipline (trước khi mua đất: không tốn đồng nào vào hạt đắt)
+- Bài học lớn #3: fallback mua đất phải LIỀN MẠCH + escape hatch (khoảng hở d10+ = kẹt 25 ô vĩnh viễn)
+- Công cụ mới: bench/fill_analysis.py (đo empty theo thời kỳ + fill-time), kain33t/kain36t trace variants
+
+---
+Task ID: 34 (phần 2 — battery + đòn tấn công + đóng gói)
+Agent: KAIN (main-agent)
+Task: Battery kain38/kain39 + đòn tấn công chiến lược + RULES v2.7
+
+Work Log:
+- BATTERY kain38 vs v6 (100 game, seed 100-149, two-sided): **90/100 (1.223x, worst 0.890x)** — KỶ LỤC MỚI (kain33: 68/100, 1.145x, worst 0.737x); kain38 $57.4k vs v6 $47.0k trung bình
+- 10 trận thua của kain38 đều knife-edge 0.89-0.99x (seed 103/118/119/129/132/135/145/146/147) — không còn trận thua sập
+- Phase 2 đòn tấn công: kain39 "PRICE-BLADE" = E1 wheat-hold 1.35 (chỉ bán ≥$33.75 dưới gate $38 của v6 — siết margin arbitrage feed) + E2 egg-fortress-8 — probe 8 game trên seed thua: trái chiều (2 lật/2 tệ/2 không đổi) → battery đầy đủ: **89/100 (1.200x) — ÂM TÍNH vs kain38** → kain38 giữ ngôi
+- Cơ chế engine xác nhận: con vật bỏ chạy nếu consecutive_unfed >= 2 (nhưng v6 tự trồng được wheat nên embargo không giết được đàn — chỉ từ chối arbitrage, không đáng giá)
+- RULES.md v2.6 → v2.7: mục AB (AB.1 chẩn đoán 3 tầng, AB.2 vòng lặp kain34→38, AB.3 R114-R120, AB.4 battery, AB.5 phán quyết Phase-2, AB.6 sản phẩm)
+- Đăng ký arena: kain38/kain39 vào run_battle.py + arena-service/index.ts + UI constants.ts (AGENT_INFO card đầy đủ desc)
+
+Stage Summary:
+- kain38 FILL-SMART = nhà thách đấu mạnh nhất lịch sử vs v6.6: 90/100 (1.223x)
+- Xác nhận luận điểm user: tối ưu nguồn lực (lấp đất) là mấu chốt; đòn chiến lược giá cả chỉ khả thi với kernel lao động dư (v7)
+- Phần còn lại: restart arena-service + browser verify + commit/push + báo cáo tiếng Việt

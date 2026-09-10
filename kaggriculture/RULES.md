@@ -689,3 +689,55 @@ Bash-invocation sweep giết mọi tiến trình con (kể cả setsid+nohup —
 
 ---
 *KAIN — RULES.md v2.6 (mục AA: Task 32 — 4 luật cứng top-Kaggle triển khai 2 đường; autopsy 5 tầng kain32; chìa khóa plan-cache R112; feed-arbitrage R113; kain33 BATTERY 68/100 — KỶ LỤC MỚI vs v6.6. 113 quy tắc).*
+
+## AB. BIÊN BẢN TASK 34 — TỐI ƯU NGUỐN LỰC: LẤP ĐẤT TRỐNG (kain34→38) + ĐÒN GIÁ (kain39)
+
+*Nhiệm vụ user: kain33 mua đất 50/75 xong nhưng đất trống KHÔNG được lấp đầy — kiểm tra lượng đất trống qua các thời kỳ, tìm nguyên nhân, giải pháp tăng tốc độ lấp đầy. Ưu tiên 1: tối ưu nguồn lực. Ưu tiên 2 (sau đó): đòn tấn công chiến lược vs v6.*
+
+### AB.1 Chẩn đoán 3 root cause (fill_analysis + trace nội bộ kain33t/36t, 15 trận)
+| Thời kỳ | Triệu chứng | Nguyên nhân gốc (trace) |
+|---|---|---|
+| **d5-9** | 60-64% trống suốt 5 ngày (fill-time 8-9 ngày) | (1) plan giao 30 ô cho dâu nhưng floor hạt $900 > money $400-600 → mua 0 hạt, KHÔNG fallback cây rẻ; (2) **death spiral tiền mặt**: mua NE $1102 → còn $102 → 5 ngày không doanh thu (melon chín d12+, dâu d15+) → tiền rơi $16 → không mua nổi hạt nào; (3) land_reserve chặn cả hạt wheat/carrot rẻ |
+| **d15-24** | 16-19 ô trống dù có hạt + $15k | **PLANT tier starvation**: PLANT tier 5 thua SERVICE/WATER tier 2-3 triệt để — trace: `n_plant=16` tasks tạo ra/ngày, 13 units đi bộ 65% thời gian (200-214 MOVE/ngày), `pl={}` (0 hành động trồng) từ d15; budget=[WHEAT 14] có sẵn hạt vẫn không trồng |
+| **d25-28** | 23 ô trống + $36k tiền | **Cửa sổ quota đóng**: wheat d≤24, carrot d≤23, straw S3b d≤15 — plan `ct={}` → không trồng gì dù tiền đầy |
+
+### AB.2 Vòng lặp kain34→38 (mỗi bản = 1 thí nghiệm + 1 autopsy)
+| Bản | Thí nghiệm | Kết quả (probe 6-8 game seeds 100-102/103/111/114) | Bài học |
+|---|---|---|---|
+| kain34 FILL-EVERYTHING | wheat-flood lấp tất + PLANT tier-4 + hire-10 + carrot d24 | empty d5-9 62→13.6% NHƯNG **2/6, v6 +$17.6k** (wheat bán $22-31 → v6 mua 4290u vs 3796u → bò sữa $187→319) | **R114: wheat-flood = SUBSIDY engine bò đối thủ** |
+| kain35 FILL-SMART | straw-partial + carrot redirect + late-straw d16-19 | 6/6 thắng nhưng d20-28 tệ hơn | bug cap 4 hạt/ngày chặn cả ngày giàu (d11 $3415 vẫn mua 4) |
+| kain36 | bỏ cap, fill-carrot 14 | 2/8 khó — d5-9 vẫn 61% | money $102 < mọi floor — death spiral là gốc |
+| kain37 | land-buffer 1350 + floor phẳng + late-wheat 16 | empty d5-9 5.6% NHƯNG seed 100 thua: **NE KHÔNG BAO GIỜ được mua** (LOCKED 75 đến d12!) — straw-partial tự ăn vốn $300 + gate $1350 + **fallback có khoảng hở** (lỡ NE d5-9 → nhánh SW nq==2 không chạy → kẹt 25 ô vĩnh viễn) | **R115/R116** |
+| **kain38** | NE gate 1000+150 liền mạch d5-9 + escape hatch d10+ (≥1150) + SW 10-16 (≥2250) + **Δ9 spend-discipline** (partial/fill/floor-phẳng CHỈ khi nq≥2) | **7/8** — 3 seed thua đôi của kain33 lật (111: 0.875→1.25/1.36x; 114: 0.999→1.20/1.23x) | land-first + spend-discipline |
+
+### AB.3 Quy tắc mới R114–R120
+| # | Quy tắc | Loại | Bằng chứng |
+|---|---|---|---|
+| R114 | **FILL ZERO-SUM: lấp đất bằng wheat-để-bán = nuôi đối thủ** — wheat là feed của engine bò v6 (gate mua $38/$52/$62); lấp thung lũng bằng CARROT (không phải feed) + straw-partial; wheat chỉ lấp cuối game d17+ khi giá $40-49 và đàn v6 đã no | E | kain34: 2/6, v6 $37.5k→$55.1k trên cùng seed; kain38 (carrot/straw): v6 giữ $47k |
+| R115 | **DEATH SPIRAL TIỀN MẶT KHI MUA ĐẤT**: mua đất phải kèm (a) buffer $150+ sau mua, (b) spend-discipline — TRƯỚC khi mua đất không tốn đồng nào vào hạt đắt/thú (chỉ hạt rẻ giữ reserve); không = $102 → $16, 5 ngày không mua nổi hạt | E | kain36t trace: m=$102→$16 d5-8, sd seeds đóng băng, em=29-34 |
+| R116 | **FALLBACK MUA ĐẤT PHẢI LIỀN MẠCH + ESCAPE HATCH**: khoảng hở giữa cửa sổ (lỡ NE d5-9) và nhánh SW (nq==2) = farm kẹt 25 ô VĨNH VIỄN — mọi nhánh fallback phải phủ liền từ d5 đến cuối + nhánh cứu hộ muộn (d10+, tiền ≥1150) | E | kain37 s100: LOCKED 75 đến d12, thua 0.971x dù empty "5.6%" (ảo ảnh mẫu 25 ô) |
+| R117 | **PLANT TIER STARVATION**: với đàn 16+ con vật, PLANT (tier 5) không bao giờ thắng SERVICE/WATER (tier 2-3) — 13 units đi bộ 65% thời gian; khi trống >10 ô từ d12: nâng PLANT lên tier 4 | E | kain33 trace d15-24: n_plant=16/ngày, pl={} suốt 10 ngày |
+| R118 | **CỬA SỔ LATE-STRAW d16-19**: engine dâu 2 bên chết ở tuổi 17 → d21-28 kênh dâu thiếu cung, giá $180-303; trồng d16-17 (2 event d26-28) quota 8, d18-19 (1 event) quota 5 khi marg ≥0.82 | E | giá dâu s100: d20 $272, d26 $303; kain38 giữ standing 22 + thêm late |
+| R119 | **STRAW-PARTIAL BUFFER-BASED**: khi nghèo, mua hạt dâu từng phần theo buffer (money−200)//100 — KHÔNG cap cứng (cap 4 chặn cả ngày giàu); dâu ROI ~19x (4 event × 4u × $150-250/hạt $100) | E | kain35 bug cap: straw standing 16 vs 30 → d20-28 empty +12% |
+| R120 | **LATE-WHEAT FILLER d17-22**: wheat cuối game $40-49 (T=400, thị trường khan) — filler 8→16 ô khi d≥17; đây là engine đóng khoảng cách d22-26 vs v6 (v6 +$18.1k vs ta +$12.6k trên seed 103 nhờ wheat 100 ô) | E | seed 103 autopsy: kain33 d22-26 +$12.6k vs v6 +$18.1k |
+
+### AB.4 Battery 100 game hai ghế (seed 100-149)
+| Bản | Thắng | Ratio | Worst | Ghi chú |
+|---|---|---|---|---|
+| kain33 (đối chứng) | 68/100 | 1.145x | 0.737x | kế thừa AA.5 |
+| **kain38 FILL-SMART** | **90/100** | **1.223x** | **0.890x** | +22 thắng; 10 trận thua đều knife-edge 0.89-0.99x |
+| kain39 PRICE-BLADE | 89/100 | 1.200x | 0.881x | E1 wheat-hold 1.35 (d6-16) + E2 geese-8: **thu hoạch âm** −1 thắng/−0.023x — đòn giá cả vs v6 không trả lời bằng tối ưu nguồn lực |
+
+### AB.5 Phán quyết Phase-2 (đòn tấn công chiến lược)
+- **E1 WHEAT-HOLD** (chỉ bán ≥$33.75, dưới gate $38 của v6): battery 89/100 — v6 tự thích nghi (trồng wheat riêng trên đất trống 74% cuối game của nó), hold làm trễ doanh thu của ta; **BỎ**.
+- **E2 EGG-FORTRESS-8** (geese floor 7→8): nằm trong kain39, không isolate được dương tính trên battery — **giữ floor 7 của kain38**.
+- Kết luận của user được xác nhận: **tối ưu nguồn lực (lấp đất) > đòn tấn công chiến lược** ở tầng hiện tại; đòn giá chỉ khả thi khi có kernel lao động dư (v7) để vừa hold vừa sản xuất.
+- 10 seed thua của kain38 đều 0.89-0.99x — khoảng cách còn lại là knife-edge, cần kernel lao động mới (hướng v7: R98/AA.2.4) chứ không phải thêm luật.
+
+### AB.6 Sản phẩm Task 34
+- `kain38.py` (FILL-SMART — **fighter mới 90/100**) · `kain39.py` (PRICE-BLADE — thí nghiệm đòn giá, âm tính) · kain34-37 (artifacts autopsy)
+- Công cụ: `bench/fill_analysis.py` (empty%/fill-time theo thời kỳ) · trace variants kain33t/kain36t (plan/seed/throttle nội bộ)
+- Batteries: `bench/kain38_vs_v6_100.json` (90/100) · `bench/kain39_vs_v6_100.json` (89/100)
+
+---
+*KAIN — RULES.md v2.7 (mục AB: Task 34 — chẩn đoán 3 tầng đất trống; 5 vòng lặp kain34→38; kain38 BATTERY 90/100 (1.223x, worst 0.890x) KỶ LỤC MỚI; đòn giá kain39 âm tính; R114-R120. 120 quy tắc).*
