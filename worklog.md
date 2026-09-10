@@ -788,3 +788,17 @@ Stage Summary:
 - kain38 FILL-SMART = nhà thách đấu mạnh nhất lịch sử vs v6.6: 90/100 (1.223x)
 - Xác nhận luận điểm user: tối ưu nguồn lực (lấp đất) là mấu chốt; đòn chiến lược giá cả chỉ khả thi với kernel lao động dư (v7)
 - Phần còn lại: restart arena-service + browser verify + commit/push + báo cáo tiếng Việt
+
+---
+Task ID: 34 (phần 3 — đóng gói cuối)
+Agent: KAIN (main-agent)
+Task: Browser verify + commit + push GitHub
+
+Work Log:
+- Browser verify qua gateway :81: dropdown có kain38/kain39 (restart arena-service + bun --hot); trận live kain38 vs v6 seed 100 chạy end-to-end — kết quả [59109, 52187] kain38 THẮNG, khớp CHÍNH XÁC battery seat0; 0 console error; mobile 390px no h-scroll; dev.log sạch; lint PASS
+- Git commit 0137d19 (kain34-39 + 2 battery JSON + RULES v2.7 + fill_analysis + trace variants + 11 battles + 3 registry) — push GitHub OK
+
+Stage Summary:
+- Task 34 HOÀN TẤT: kain38 FILL-SMART 90/100 (1.223x, worst 0.890x) — nhà thách đấu mạnh nhất lịch sử vs v6.6
+- Mục tiêu 100%/$90-110k chưa đạt: 10 trận thua đều knife-edge 0.89-0.99x; $90k+ một mình vẫn đòi hỏi v6 sập <$40k (AA.5)
+- Hướng còn lại: kernel lao động mới (v7 — R98/AB.5) để vừa hold giá vừa sản xuất
