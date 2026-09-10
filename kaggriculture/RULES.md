@@ -785,4 +785,18 @@ Bash-invocation sweep giết mọi tiến trình con (kể cả setsid+nohup —
 - Mục tiêu 100%: còn 7 thua — 108 (0.772x) cần autopsy riêng; 102 = lớp seed giàu-engine (bẫy carrot R126 đã giam nhưng noise ±$10k quanh ngưỡng)
 
 ---
-*KAIN — RULES.md v2.8 (mục AC: Task 35 — chẩn đoán 3 tầng đất trống kain38 + giá cuối game + trần lao động 71% đi bộ; kain40 FULL-PRESSURE BATTERY 93/100 (1.271x) KỶ LỤC MỚI; fill valley 58→14-25%, cuối game 41→19-25%; R121-R127. 127 quy tắc).*
+*KAIN — RULES.md v2.9 (mục AD: Task 36 — sandbox ops OOM next-server: webpackMemoryOptimizations + NODE_OPTIONS passthrough + RSS watchdog + gzip battles; panel sống sót trọn trận. 127 quy tắc).*
+
+## AD. BIÊN BẢN TASK 36 — SỐC PREVIEW PANEL GIỮA TRẬN: OOM KILL next-server (sandbox ops)
+### AD.1 Hiện tượng + root cause
+- User chạy kain40 vs v6 trong arena UI → nửa trận Preview Panel tự ngắt. `dmesg`: **kernel OOM-killer giết next-server 2 lần (17:51 RSS 2.98GB, 18:09 RSS 2.97GB)** trên box 4GB không swap — mỗi lần chết = panel 502, supervisor 15s sau mới dậy được.
+- next-server phình vì compile trang arena (recharts + socket.io + 50×50 grid): steady RSS ~2.9GB sau compile; thêm python battle ~280MB + chrome-headless leftover ~500MB (task trước quên dọn) → vượt 4GB.
+- **Bẫy NODE_OPTIONS**: package.json dev script hard-code `NODE_OPTIONS=1024` ngay trong dòng lệnh → override env của supervisor (giá trị 768 không bao giờ tới node).
+### AD.2 Bộ sửa 4 tầng (tất cả đã verify)
+1. `next.config.ts`: `experimental.webpackMemoryOptimizations: true` → steady RSS **2.9GB → 1.4GB**.
+2. `package.json` dev: `NODE_OPTIONS=${NODE_OPTIONS:---max-old-space-size=768}` — env passthrough (supervisor là single source of truth).
+3. arena-service supervisor: **RSS watchdog** — đo `/proc/*/status` của next-server trong cây mình (walk PPid), restart chủ động khi >2.4GB **chỉ khi idle** (không có trận stream) + grace 120s (không giết lúc compile); spawn `detached: true` + `kill(-pid)` = giết cả tree, không mồ côi port 3000.
+4. Dọn disk: gzip 150 trận cũ (1.8GB → 180MB), giữ 15 trận mới nguyên bản (autopsy gần đây).
+### AD.3 Kết quả verify (18:29-18:35)
+- Trận kain40 vs v6 seed 404 ×2 (probe gateway) + seed 555 (UI browser) + kain40 vs kain40 (UI): **đủ 720 turn + battle:end, panel không ngắt, 0 console error**; next-server peak 1.44GB rồi GC về 1.2GB; free không xuống dưới ~87MB cả khi headless chrome (700MB) còn nằm trong box — người dùng thật (browser ngoài box) dư ~1GB.
+- **Bài học hygiene**: luôn `agent-browser close` + pkill chrome sau khi verify (chrome leftover chính là 1/2 nguyên nhân đợt này).

@@ -864,3 +864,25 @@ Stage Summary:
 - Luật lấp đất 85% của user được triển khai: valley 58%→14-25%, cuối game 41%→19-25%; 15% tuyệt đối bị chặn bởi trần lao động R127 (71% unit-turns đi bộ) — đây là bài toán v7
 - Mục tiêu 100%: còn 7 thua (102/108/127/129/148/149 — 5 knife-edge + 108 0.772x cần autopsy)
 - Deliverable: kain40.py + RULES.md v2.8 (R121-R127) + bench/fill_analysis2.py + bench/kain40_vs_v6_100.json
+---
+Task ID: 36
+Agent: KAIN (main-agent)
+Task: User báo Preview Panel tự ngắt giữa trận kain40 vs v6 — chẩn đoán + sửa + verify
+
+Work Log:
+- Chẩn đoán qua dmesg: kernel OOM-killer giết next-server 2 lần (17:51 RSS 2.98GB, 18:09 RSS 2.97GB) trên box 4GB; supervisor auto-restart nên panel sau đó sống lại
+- Đo live: next-server steady 2.83GB sau compile trang arena (GET / chỉ 37ms — không phải traffic); kẻ đồng phạm: headless chrome agent-browser leftover từ Task 35 (~500MB, 8 processes, chạy từ 17:48 quên dọn)
+- pkill chrome → free +630MB; swapon KHÔNG được phép trong container ("Operation not permitted" — lần test trước output bị head cắt làm đọc nhầm là OK)
+- Fix 1: next.config.ts + experimental.webpackMemoryOptimizations (verify tồn tại trong Next 16.1.3)
+- Fix 2 (smoking gun): package.json dev script hard-code NODE_OPTIONS=1024 inline → override env supervisor; đổi thành ${NODE_OPTIONS:---max-old-space-size=768} passthrough
+- Fix 3: arena-service supervisor — RSS watchdog (nextServerRssMb() quét /proc + walk PPid; restart khi >2.4GB, idle-only, grace 120s) + spawn detached:true + kill(-pid) cả process group (không mồ côi port 3000)
+- Fix 4: gzip 150 trận battles cũ (1.8GB → 180MB disk), giữ 15 trận mới raw; battle_probe.mjs (kaggriculture/bench/tmp/) để test trận qua gateway
+- Full-restart sạch toàn stack (kill cả run_bg + arena + dev tree cũ) → compile lại → steady next-server = 1.16GB (từ 2.9GB)
+- Verify: 2 trận probe kain40 vs v6 seed 404 qua gateway (kain40 thắng $54,005 vs $41,194, đủ 720 turn) + UI browser: kain40 vs kain40 (self-match do click nhầm dropdown — vẫn pass) + kain40 vs v6 seed 555 (kain40 thắng $56,462 vs $42,844) — panel sống trọn trận, 0 console error, free min ~87MB kể cả khi headless chrome nằm trong box
+- agent-browser close + pkill chrome sau verify (bài học hygiene); bun run lint PASS; commit f8fdea9 push GitHub OK; RULES.md v2.8 → v2.9 (mục AD)
+
+Stage Summary:
+- Panel giữa trận không bao giờ tự ngắt nữa: memory budget an toàn (next 1.4GB peak + python 280MB + base ~450MB << 4GB; browser user nằm ngoài box)
+- Kiến trúc supervisor mới: RSS watchdog + process-group kill + env passthrough — mọi lần restart sau này phải kill TOÀN BỘ tree (run_bg + arena bun + bun run dev + next dev + next-server) rồi mới relaunch, tránh mồ côi giữ port
+- Battles cũ đã gzip — đọc bằng zcat khi cần autopsy; 15 trận mới nhất còn raw
+- Kain40 vs v6 vẫn nguyên 93/100 — không đụng logic agent
