@@ -967,3 +967,44 @@ Stage Summary:
 - Headline: 2 trận top-3 đều quyết định ở NGÀY CUỐI (d29) — SpaTaro dẫn sau d28 cả 2 trận rồi thua vì thanh lý kém (danh mục cuối mùa + slot rác + hết hàng sớm)
 - Tools tái sử dụng cho v7: tool-results/r2_godreplay.py (harness engine thật) + r2_god_M1/M2.json (719 snapshot đầy đủ vị trí/shed/tiles từng giờ) + r2_analyze.py
 - Chưa triển khai v7/kain41 theo chỉ thị của user
+
+---
+Task ID: 40
+Agent: KAIN (main-agent)
+Task: Vòng phản cảnh (counterfactual) + hoàn thiện TOP3_REPLAY_ANALYSIS.md + xây v7 (kain41)
+
+Work Log:
+- Xây counterfactual harness (tool-results/cf_harness.py): nạp engine thật + bơm 719 action đã ghi của cả 2 người, phẫu thuật state/action của target BÊN TRONG wrapper interpreter (bài học: core.env structify state mỗi bước — mutation ngoài interpreter không tồn tại). NULL-test = +$0.00 trên cả 2 trận
+- Chạy 10 thí nghiệm phản cảnh: CF1 (+6 ngỗng M1 land-safe: −$449), CF7 (+10 ngỗng: −$118), CF4 (wave-2 dâu +20 ô d12: −$17.1k, kênh dâu ròng −$1.3k vì giá sập), CF4b (wave-2 d8: KHÔNG NỔI — $44 < $1,500 hạt), CF4c (d11: −$20.4k, milk −$9k do feed displacement), CF5 (tomato +10 ô: −$2.5k), S1/S2 (cừu→ngỗng cash-matched: −$40.9k/−$58.4k)
+- Debug 5 lớp trong quá trình (mỗi lần = 1 phát hiện): (1) structify clone — phải mổ trong interpreter; (2) mua ngỗng khi tiền âm → hỏng HIRE → sụp lao động; (3) egg/fert chiếm shed 100 slot → melon dump bị DISCARD; (4) bán fert shed chung → cướp pipeline bón → dâu sụp; (5) feed mua thị trường d1-6 → giết BUY_SEED dâu d5-6 → giết SW d8 → domino −$40k
+- PHÁT HIỆN LỚN NHẤT (R147): kinh tế top-3 là domino tiền mặt sớm — $300 chi sai chỗ trước cửa sổ đất = hủy diệt $37-87k (3 thí nghiệm độc lập cùng cơ chế); mọi câu hỏi "nếu thêm X thì sao" đều bị chặn bởi ràng buộc tiền-tố-tiền-hậu
+- Trả lời nhân-quả 4 câu thiết kế: ngỗng trên farm đầy ≈ break-even (giá trị = f(đất trống) — đúng cho kain40 có 25-50% trống); wave-2 dâu post-wall = âm (kênh ròng −$0.5-1.3k), pre-wall không tài chính nổi → phải đấu vốn từ melon-window, event ≤ d23; giá egg không sập ở 10 con (ceiling = chi phí đất); tomato 10 ô neutral
+- Nâng cấp TOP3_REPLAY_ANALYSIS.md → V3.0: thêm PHẦN 11 (vòng phản cảnh — phương pháp NULL-validated, bảng kết quả, Q-A/B/C/D, R147-R150, hàm ý v7 sửa lại, phán quyết vòng 4 = KHÔNG cần thêm vòng)
+- Xây kain41.py = kain40 + Δ1 STRAW-CONTINUUM (quota dâu d14-17 nâng 26/26/10 theo marg — đứng liên tục thay 8/6) + Δ2 FERT-DISCIPLINE (collect-trước-care, task T_COLLECT riêng tier 2 cho thú đã serviced, FERTILIZE dâu/tomato NGÀY EVENT +2u thay +1, reserve fert shed 8u thay 2)
+- Verify: kain41 import OK; probe 3 seed khó (100/132/146): 3/3 thắng (1.434/1.271/1.213); COLLECT_FERTILIZER 249 lệnh/trận (kain40 ~173); FERTILIZE 9-20 lệnh (kain40 = 0!)
+- Phóng battery 100 trận kain41 vs v6 (2 ghế × 50 seed) nền
+
+Stage Summary:
+- TOP3_REPLAY_ANALYSIS.md V3.0 hoàn thành với vòng phản cảnh nhân-quả (harness tái sử dụng được)
+- Quy tắc mới R147-R150 (dao tiền mặt sớm / shed 100 slot / fert là vật tư / thứ tự feed) — trực tiếp hóa thành thiết kế kain41
+- kain41 = v7-M1 theo lộ trình RESEARCH_V7 (M1: kain40 + Trụ 1 + Trụ 2); battery đang chạy — kết quả quyết định giữ/rollback
+
+---
+Task ID: 40 (tiếp)
+Agent: KAIN (main-agent)
+Task: Xây v7 từ TOP3_REPLAY_ANALYSIS.md — vòng lặp build → differential → validate
+
+Work Log:
+- kain41a (Trụ 1+2 đầy đủ: dâu 26/26/10 + fert discipline 4 mảnh): battery 67/100, 1.097x — THUA kain40 (93/100, 1.271x) → cổng M1 hỏng
+- Autopsy s142: đồng tiền giống nhau tới d16, gap −$3.8k nổ d22 — Δ2c (bón event 21 ô × 3 unit-hours) cướp lao động thu hoạch; Δ1 bị safe_plant chặn hoàn toàn (water_load cao ngày event → planting = 0)
+- Differential 6 biến thể trên 10 seed khó (A/B/D/Q/L/AH/ABQ): B (T_COLLECT tier 2) = −$7.9k s110; Δ2c = −$3.8k; L (floor 9-10 hands) = −$21.5k; D (fert reserve) = ±$5k nhiễu; Q = $0 (MELON order nuốt ô) rồi âm khi fix; H (thu hết d28+) = 0; A (collect-first) = +518/−266/−37 duy nhất dương
+- R151 [E] — CỔ CHAI LAO ĐỘNG: kernel kain40 chạy 52-67 lệnh hữu ích/ngày vs top-3 90-105 → mọi tác vụ thêm = trừ lao động thu hoạch; playbook top-3 cần kernel v8 hiệu suất-lao động mới (đi bộ ngắn + tựa ô + dump cuối ngày), không phải patch
+- kain41-final = kain40 + ΔA collect-first (COLLECT_FERTILIZER trước CARE — R149; CARE chờ 1 giờ không mất gì, flag fert không tích lũy)
+- Battery 100 cuối (2 ghế × 50 seed): **96/100, ratio 1.278x, avg $57,972 vs $45,372, worst 0.898x** — vượt cổng M1 (≥95/100); so kain40: 93/100, 1.271x, worst 0.772x
+- v7.py = kain41-final (1747 dòng) — nhà vô địch mới, smoke test seed 100 = 1.622x
+- Cập nhật RESEARCH_V7.md mục 12 (bảng biến thể + R151 + trạng thái 6 trụ) + TOP3_REPLAY_ANALYSIS.md 11.7 (phụ lục triển khai)
+
+Stage Summary:
+- v7.py SHIP: 96/100 vs v6, 1.278x, worst-case 0.898x (từ 0.772x — kernel chắc chắn hơn đáng kể)
+- Bài học vòng lặp: phân tích → phản cảnh → thiết kế → differential từng mảnh → chỉ giữ mảnh thắng — 6/7 ý tưởng hay bị cổ chai lao động bác bỏ (R151), 1 mảnh sống và là nâng cấp thật
+- Bàn giao v8: kernel task-scheduler mới (hiệu suất đi bộ + tựa ô + 90-105 acts/ngày) là điều kiện cần cho toàn bộ playbook top-3 (fert 406u, dâu liên tục, đàn lớn)

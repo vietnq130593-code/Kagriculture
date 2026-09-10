@@ -363,3 +363,39 @@ Download từ trang cạnh trận top-1 cho file JSON chuẩn kaggle_environment
 
 ---
 *KAIN — RESEARCH_V7.md Phần II (Task 38). Nguồn: RULES.md v2.10 (130 quy tắc, mục AC), battery kain40_vs_v6_100.json (93/100), upload/107559251.json + upload/107573831.json (replay top-3, trích xuất bench/top_replay_extract.py).*
+
+---
+
+## 12. POST-MORTEM TRIỂN KHAI v7-M1/M2 (Task 40) — R151 VÀ BẢNG BIẾN THỂ
+
+### 12.1 Bảng differential (10 seed khó 100-146, ghế 0, vs kain40 cùng ghế)
+
+| Biến thể | Nội dung | Kết quả | Phán quyết |
+|---|---|---|---|
+| kain41a (đầy đủ) | Δ1 dâu 26/26/10 + Δ2a/b/c/d | **67/100, 1.097x** (kain40: 93/100, 1.271x) | HỦY — sai cổ chai |
+| B (T_COLLECT riêng tier 2) | task thu fert cho thú đã serviced | s110: **−$7,880** | HỦY — tier-2 cướp lao động feed/harvest |
+| Δ2c (bón dâu ngày event tier 3) | +2u thay +1 cho 21 ô | s142: −$3,774 (d22) | HỦY — 21 ô × 3 unit-hours = cướp thu hoạch |
+| Q (dâu standing 22/14 + exemption) | quota + priority + plant exemption | **$0 tác động** (order MELON nuốt ô); fix priority → âm | HỦY |
+| L (floor 9-10 hands) | top-3 labor sustain | **−$21,464/10 seed** (±$13k biến thiên) | HỦY — valley fib $88-143 không trả lời đủ |
+| D (fert reserve 8u) | giữ working stock | ±$5,100 nhiễu theo đường giá | HỦY — không ổn định |
+| H (thu hết d28-29) | liquidation harvest | ≈ 0 (flow thường đã thu sạch) | neutral — không cần |
+| **A (collect-first)** | COLLECT_FERTILIZER trước CARE cùng visit | +518/−266/−37 | **CHỌN — duy nhất trung tính-dương** |
+
+### 12.2 R151 [E] — CỔ CHAI LAO ĐỘNG CỦA KERNEL (phát hiện kiến trúc)
+
+Kernel kain40 (v6.6-chassis) chạy **52-67 lệnh hữu ích/ngày**; top-3 chạy **90-105**. Hệ quả đã đo bằng differential: MỌI tính năng học từ replay top-3 — thu fert 406u/mùa, dâu tái trồng liên tục, bón đúng ngày event, đàn 14-22 con — đều là các TÁC VỤ THÊM. Trong kernel bão hòa, task mới = trừ lao động khỏi thu hoạch/bán (tier cạnh tranh). 6 biến thể trên đều âm hoặc 0 — không phải vì ý tưởng sai (phản cảnh V3.0 đã chứng minh giá trị của chúng trong môi trường đúng), mà vì **kernel không có thặng dư lao động để chứa chúng**.
+
+Đường thoát (v8, KHÔNG phải patch v7): viết lại task-scheduler theo mô hình top-3 — (a) ưu tiên địa lý (đi bộ ngắn: 48-52% quãng đường của top-3 so với ta — đo từ god replay), (b) tựa ô chờ việc thay vì về kho (R133 dump cuối ngày), (c) 90-105 acts/ngày từ efficiency chứ không phải thêm hands (L đã chứng minh thêm hands = âm). Đây là mục tiêu M0 của v8.
+
+### 12.3 Trạng thái 6 trụ cột sau vòng triển khai
+
+| Trụ | Trạng thái | Ghi chú |
+|---|---|---|
+| 1 STRAW-CONTINUOUS | **BỊ CHẶN bởi R151** | giá trị đã đo +$3-4k trên đất trống (CF) nhưng kernel không trồng nổi (safe_plant chặn + tier thua) |
+| 2 FERT-DISCIPLINE | **1/4 lời (ΔA)** | collect-first giữ; T_COLLECT riêng + event-fert + reserve đều hủy |
+| 3 LABOR-SUSTAIN | **HỦY** (−$21.5k) | thêm hands không thay thế efficiency |
+| 4 FEED-BUY đảo ngược | chưa thử riêng | KAIN-11 của kain40 đã có version gate — đủ dùng |
+| 5 LIQUIDATION | **đã có sẵn** | E8-lite + d28 hold 0.004 ≈ tuyệt đối (ΔH = 0 tác động) |
+| 6 ĐÀN/NGỖNG | **đã có sẵn** | egg-fortress S1 + deliver đã trong kain40 |
+
+**kain41 (v7) = kain40 + ΔA.** Battery xác nhận chạy. Mọi tham vọng lớn hơn chuyển thành bản thiết kế v8 (kernel lao động mới).
