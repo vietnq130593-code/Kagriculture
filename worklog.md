@@ -924,3 +924,23 @@ Stage Summary:
 - Luật của user được verify bởi đỉnh thật: NE d3-6 / SW d8-10 (khớp d5-7/d10-12), dừng 75 tiles (không ai mua SE), empty 0-7% d9-27 — 4 hard rule đều khớp meta top
 - Sản phẩm lấp đất trống = STRAWBERRY tái trồng + CARROT muộn d24-27 (không phải tomato/melon); tomato chỉ gia vị 7-12 ô
 - Bước tiếp theo chờ user duyệt: M1 kain41 = kain40 + Trụ 1 (dâu vòng 2) + Trụ 2 (fert discipline)
+
+---
+Task ID: 38-b (tiếp tục Task 38 — vòng phân tích sâu replay top-3)
+Agent: KAIN (main-agent)
+Task: Lượt phân tích đầu tiên 2 file replay top-3 (107559251/107573831) — học chiến thuật + quy tắc, lưu .md, đối chiếu RULES.md
+
+Work Log:
+- Xác minh quy ước replay bằng trace từng đô-la (M1 steps 144-156): steps[t].observation = trạng thái SAU action[t]; BUY_PRODUCT chỉ thực thi WHEAT/FERTILIZER (engine L598), đơn hàng khác bị drop âm thầm — SpaTaro spam 248-260 lệnh vô hiệu (bug bot top-3)
+- Viết bộ tool phân tích đầy đủ trong tool-results/: replay_analyze.py (extract per-day tiles/herd/money/empty), replay_ledger.py (sổ cái doanh thu theo kênh với tái dựng giá từ MARKET_PARAMS gốc), q1-q7 (land timing, daily profile, giá theo ngày, shop timeline, inventory I0, sell-hour histogram, PLANT schedule, FERTILIZE, waste cuối game)
+- Phát hiện + sửa bug extractor: ngỗng nằm trên tile kind=COOP (không phải PASTURE) — đếm lại đàn đúng 100%
+- Trích xuất engine đầy đủ từ package local: CROPS/ANIMALS/MARKET_PARAMS/LAND_ORDER/SHOPS + semantics FEED/CARE/COLLECT_FERTILIZER/WATER/HARVEST (mỗi lệnh = 1 animal/tile) + _drop_inventories_to_shed end-of-day + _town_consume (shop mỗi 4 turn, center mỗi 24 turn)
+- Phân tích 4 lượt chơi: land timing (NE d3-6, SW d8-10, không ai mua SE), empty 0-7% d7-26 (Otter 0% tuyệt đối d11-27), revenue theo kênh (điều hòa sổ cái ±20%), cấu trúc đàn (người thắng 14-22 con vs SpaTaro 7-13), lao động 189-344 action/ngày (vs 52-67 của engine ta), FERTILIZE 92-186 lần/mùa, thanh lý d29 ($4.4-11.6k/ngày, tồn cuối <$300)
+- Giải mã M1 milk crash: SMOOTHIE chỉ mở d15/d24 → sữa +73 above-I0 → $8; người thắng UMG đọc shop draw (BAKERY+BRUNCH×3 = egg 4 instance) → 6 ngỗng thay vì mở rộng bò — phát hiện game theory lớn nhất
+- Viết kaggriculture/TOP3_REPLAY_ANALYSIS.md (293 dòng): 8 phần — nguồn & phương pháp, blueprint 30 ngày, sổ cái kênh, 4 luật cứng verify, lao động & logistics, shop-draw game theory, thanh lý, ĐỐI CHIẾU RULES.md (xác nhận 12 + mâu thuẫn 7 + mới đề xuất R131-R138), hàm ý v7, câu hỏi vòng 2
+
+Stage Summary:
+- File mới: kaggriculture/TOP3_REPLAY_ANALYSIS.md (vòng phân tích 1 — tài liệu học tập chiến thuật top-3)
+- Phát kiến cấu trúc lớn nhất: (1) R133 shed end-of-day dump = đòn bẩy lao động 2-3× (top-3 fill 75/75 ở 0% empty — phá trần R127 của ta); (2) R131 FERT-funded bootstrap ($300-600/ngày từ d1 tài trợ mua đất); (3) R132 đọc shop draw quyết định cấu trúc đàn (thắng M1 nhờ 6 ngỗng theo egg-shops, thua M1 vì 4 bò vào kênh sữa chết); (4) R138 liquidation-day $4-11.6k; (5) R137 fertilize dâu 90-190 lần = +100% yield kênh #1
+- RULES.md bị mâu thuẫn ở 3 luật: R74 (top-3 dùng 75 ô không phải 50), R127 (trần lao động 85% là trần kernel v6, không phải vật lý), R75/R114 (wheat-FEED machine 24-41 ô khác wheat-flood bán rẻ) — 4 luật cứng của user được xác nhận toàn bộ
+- Chưa triển khai v7/kain41 theo chỉ thị; câu hỏi mở vòng 2 đã ghi cuối file
