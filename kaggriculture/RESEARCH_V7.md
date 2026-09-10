@@ -228,7 +228,7 @@ Mức tiền này **gấp 1.6-1.9× kain40** (avg $58.0k). Quan trọng hơn s�
 | d29 | 68% (đã bán sạch) | 70.7% | 58.7% | — |
 
 **Kết luận ① — lấp đầy bãi trống bằng gì:** top-3 KHÔNG dùng tomato/melon làm filler chính. Công thức của họ là **STRAWBERRY TÁI TRỒNG LIÊN TỤC + CARROT MUỘN (d24-27)**:
-- **Strawberry là xương sống**: SpaTaro giữ 31-41 ô dâu suốt d12-21, bán 313-413u/trận; Otter Vibe 28 ô, bán 224-313u. Họ **tái trồng dâu sau khi cây cũ hết 4 lần sản xuất** (dâu sống tới d15-17 nếu trồng d5-7 → trồng vòng 2 d14-17) — khác hẳn kain40 (quota 30 chốt d5-13 rồi để dâu chết d17-21, đất bỏ trống).
+- **Strawberry là xương sống**: SpaTaro giữ 31-41 ô dâu suốt d12-21, bán 313-413u/trận; Otter Vibe 28 ô, bán 224-313u. Họ **tái trồng dâu sau khi cây cũ hết 4 lần sản xuất** (dâu trồng d5-7 → chết d21-24 → trồng vòng 2 d11-15 khi giá còn cao) — khác hẳn kain40 (quota 30 chốt d5-13 rồi để dâu chết d17-21, đất bỏ trống).
 - **Carrot là filler cuối game**: d24-27 cả 3 đều chuyển 15-29 ô sang carrot (chu kỳ 3 ngày, giá cuối $72) — trồng d24 chín d26-27, kịp thu trước giờ chốt.
 - **Wheat vừa là thu nhập vừa là feed**: bán 351-904u, nhưng SpaTaro còn **MUA 449u wheat thị trường** để nuôi bò — giải phóng đất cho dâu. Đây là đảo ngược triết lý "tự trồng feed" của v6-lineage (feed_demand = (đàn+target)×(29-d) ô wheat).
 - **Tomato chỉ là gia vị**: Otter Vibe giữ 7-12 ô (bán 78-100u), 2 người kia gần như bỏ. Kênh $155 của ta là thật nhưng dải hẹp — giữ quota 8-10 của kain40 là đúng, không tăng.
@@ -264,7 +264,7 @@ Mức tiền này **gấp 1.6-1.9× kain40** (avg $58.0k). Quan trọng hơn s�
 
 **Nguyên tắc 2 bước quy kết (giữ nguyên):** Bước 1 = tối ưu nguồn lực/lấp đầy (trụ 1-5) — chỉ khi đã lấp tối ưu mà vẫn thua kinh tế mới quy kết bước 2 (chiến lược tấn công). Không trộn 2 bước trong 1 vòng thử.
 
-### Trụ 1 — STRAW-CONTINUOUS (vòng 2 dâu) — dự kiến +$12-15k
+### Trụ 1 — STRAW-CONTINUOUS (vòng 2 dâu) — dự kiến +$12-30k (tùy độ phủ fert)
 - Khi dâu sống hiện có giảm (cây vòng 1 vào event 3-4) + giá dâu biên ≥ $150 → trồng tiếp hạt dâu ngay trên ô trống (floor vốn R122 chỉ buộc khi chưa đủ 3 quadrant; từ d14 thường đã có NE+SW).
 - **Số học cửa sổ (trọng yếu)**: dâu trồng dX → 4 event rơi dX+10, +12, +14, +16. Vòng 2 trồng **d11-13** = đủ cả 4 event trước d29; d14-15 = 3 event (d24-29) — chấp nhận; d16-17 = 2 event (d26/27-29) — chỉ khi giá bên ≥ $150 và không có carrot tốt hơn; ≥ d18 cấm (event đầu đã vượt d28).
 - Điều tiết theo room()/anti-yield (R101): nếu đối thủ đứng dâu lớn → cap 22-26 ô, phần còn lại cho carrot.
@@ -283,7 +283,7 @@ Mức tiền này **gấp 1.6-1.9× kain40** (avg $58.0k). Quan trọng hơn s�
 - Điều kiện vệ sinh R113: KHÔNG áp dụng khi ta là người bán wheat chính (đỡ trợ cấp feed cho bò v6 — trang bị telemetry check opp cow trước khi bật).
 
 ### Trụ 5 — ENDGAME LIQUIDATION TUYỆT ĐỐI (d27-29)
-- Từ d27 h0: mọi act = thu + bán; bỏ tưới/bón/care; DIG cây chết để nhặt weed? Không — thu những gì còn yield, bán sạch shed + túi trước h22 d29 (R3).
+- Từ d27 h0: mọi act = thu + bán; bỏ tưới/bón/care; không DIG weed (act vô ích cuối game); thu những gì còn yield, bán sạch shed + túi trước h22 d29 (R3 — đồ chưa bán = $0).
 - Tile trống d27-29 KHÔNG tính vào chỉ số 15% (luật user: ngày cuối miễn trừ).
 
 ### Trụ 6 — ĐÀN LỚN HƠN (bò 8-11 + ngỗng 6-8) SAU khi trụ 1-4 ổn
