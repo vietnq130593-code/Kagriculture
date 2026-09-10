@@ -904,3 +904,23 @@ Stage Summary:
 - BÀI HỌC QUAN TRỌNG NHẤT: sandbox có thể bị platform rollback bất kỳ lúc nào — GitHub push sau MỖI task là bảo hiểm sống còn (lần này cứu 100% công việc Tasks 24-36)
 - BẢO HIỂM MỚI CẦN NHỚ: pip packages KHÔNG nằm trong git — sau rollback phải `python3 -m pip install kaggle_environments` lại trước khi chạy battle
 - Sau mọi dấu hiệu "về bản cũ": kiểm tra `git log` + `ls kaggriculture/kain40.py` → nếu mất: fetch + reset --hard origin/main, rồi cài lại pip package, rồi kill hết process cũ và relaunch arena-service
+
+---
+Task ID: 38
+Agent: KAIN (main-agent)
+Task: Cập nhật RESEARCH_V7.md với kế hoạch triển khai v7 + tìm 2 file replay user tải lên
+
+Work Log:
+- Tìm thấy 2 file upload tại /home/z/my-project/upload/: 107559251.json (32.4MB) + 107573831.json (33MB) — user không thấy vì upload/ là mount root ẩn (Jan 1 1970, sống sót rollback — PAT rtf ngày 9 Sep vẫn còn); giới hạn 10 files là quota platform (folder hiện 4 files)
+- Xác định 2 replay = 3 đội top rank: R1 SpaTaro $93.281 vs Unknown Mother-Goose $99.793 (seed 1620414037); R2 SpaTaro $107.329 vs Otter Vibe $109.084 (seed 896878425) — format kaggle_environments chuẩn 720 step đầy đủ observation
+- Viết bench/top_replay_extract.py (json.load từng file + gc): trích/day money-nq-hands-empty%-crops-animals + land-buy timing + toàn bộ market orders (sells/buys/hires) + final tiles → bench/top_replay_analysis.json (git-tracked, sống sót rollback dù upload/ không vào git)
+- Phát hiện CHÍNH từ replay (đối chiếu kain40): top-3 giữ empty 0-6.7% d9-27 (Otter Vibe 0.0% liền 18 ngày! SpaTaro 1.3%) vs kain40 14-25%; dâu tái trồng vòng 2 (SpaTaro mua 55 hạt, bán 413u > trần 1 đời 320u); Mother-Goose thu 406 fertilizer (≈$15-20k) vs kain40 piggyback sau CARE (leak thứ tự code: `if not cared: CARE` bỏ qua flag hôm trước); 272-293 hires = 9-10 hands đều 30/30 ngày kể cả khi tiền $12-1.2k (kain40 budget-driven sụp valley); mua wheat feed 134-449u (giải phóng đất cho dâu); liquidation d27-29 sạch (empty% vọt 58-70%); đàn 11-12 bò + 6-8 ngỗng
+- Cập nhật RESEARCH_V7.md: giữ nguyên Phần I (Task 31 lịch sử) + thêm Phần II (mục 7-11): ① 6 thiếu sót kain40 theo thứ tự tiền (dâu không tái trồng $12-30k > fert leak $8-15k > đất mạn tính > đàn nhỏ > lao động không bền > liquidation); ② phương án 6 trụ cột + cổng đo từng trụ + rủi ro RULES (R98/R95/R113/R127); ③ inventory 14 chiến lược tấn công A1-A14 hiện có; ④ câu trả lời replay top-1 CÓ giá trị (đã kiểm chứng 30 phút); ⑤ lộ trình M1-M5 (kain41 = +Trụ 1+2 → M3 kain43 = 100/100 $85k+)
+- Sửa đồng bộ RULES.md: header v2.8→v2.10 (footer đã ghi v2.10 từ Task 37 nhưng header quên nâng), dòng ladder "sau Task 31"→"sau Task 35" (kain40 93/100)
+- Dọn ký tự lạ rơi vào văn bản (微观/дисциплина/综上/里程碑/落地) + sửa số học cửa sổ dâu vòng 2 (trồng dX → event dX+10/12/14/16 → d11-13 đủ 4 event, d14-15 được 3, ≥d18 cấm)
+
+Stage Summary:
+- RESEARCH_V7.md hoàn chỉnh 2 phần: nền lý thuyết (Task 31) + kế hoạch triển khai v7 hiện hành (Task 38) dựa trên dữ liệu thật top-3, không còn suy đoán
+- Luật của user được verify bởi đỉnh thật: NE d3-6 / SW d8-10 (khớp d5-7/d10-12), dừng 75 tiles (không ai mua SE), empty 0-7% d9-27 — 4 hard rule đều khớp meta top
+- Sản phẩm lấp đất trống = STRAWBERRY tái trồng + CARROT muộn d24-27 (không phải tomato/melon); tomato chỉ gia vị 7-12 ô
+- Bước tiếp theo chờ user duyệt: M1 kain41 = kain40 + Trụ 1 (dâu vòng 2) + Trụ 2 (fert discipline)
