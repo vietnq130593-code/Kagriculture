@@ -886,3 +886,21 @@ Stage Summary:
 - Kiến trúc supervisor mới: RSS watchdog + process-group kill + env passthrough — mọi lần restart sau này phải kill TOÀN BỘ tree (run_bg + arena bun + bun run dev + next dev + next-server) rồi mới relaunch, tránh mồ côi giữ port
 - Battles cũ đã gzip — đọc bằng zcat khi cần autopsy; 15 trận mới nhất còn raw
 - Kain40 vs v6 vẫn nguyên 93/100 — không đụng logic agent
+---
+Task ID: 37
+Agent: KAIN (main-agent)
+Task: User thấy Preview Panel về bản cũ (chỉ còn v2/v3/v4/v5, không có kain40) — chẩn đoán rollback + khôi phục
+
+Work Log:
+- Chẩn đoán: TOÀN BỘ workspace bị platform rollback về snapshot cũ (~era trước khi v6 ra đời): git HEAD về Task-23-era + UUID auto-commits; v6.py/kain38.py/kain40.py biến mất; worklog/RULES.md về bản cũ; arena registries về Task-14-era (v2/v3/baseline); battles về raw .jsonl (không còn .gz) — nhưng các process platform tự dậy lại 18:44 bằng mã cũ
+- Cứu cánh: GitHub remote còn NGUYÊN cab3750 (commit cuối Task 36 — kain40 + RULES v2.9 + worklog Task 34-36 + OOM fixes). Do Task 33/35/36 đều push đúng lịch nên mất mát = 0
+- Khôi phục: git fetch (PAT) + git reset --hard FETCH_HEAD → kain40.py (75KB) + v6.py (57KB) + kain38.py + RULES v2.9 + 150 battles .gz + registries (arena-service AGENTS + run_battle.py + UI constants) tất cả trở lại; diff .env/.gitignore chỉ là mode 644→755 (không mất nội dung)
+- Phát hiện phụ sau restore: pip package kaggle_environments cũng bị rollback quét mất → runner exit code 1 ("No module named") → python3 -m pip install kaggle_environments (1.32.7) → runner chạy lại bình thường
+- Kill toàn bộ process cũ (bun --hot ×2 + bun run dev + next dev + next-server) → relaunch arena-service (supervisor Task 36: RSS watchdog + NODE_OPTIONS passthrough) → next-server steady 1.24GB (cấu hình Task 36 vẫn có tác dụng sau restore)
+- Verify end-to-end: runner trực tiếp kain40 vs v6 seed 2024 (thắng $62.681 vs $36.381, 720 lượt, wallS 6s) + UI browser qua gateway :81 cùng trận (khớp chính xác $62.681/$36.381) + battery sanity 4 cặp seed 105-108 (ratio 1.36/1.33/1.19/0.94 — khớp hồ sơ 93/100, seed 108 s0 thua knife-edge đúng RULES) + dropdown đủ 14 agent (v6, kain40, kain39, kain38...)
+- agent-browser close + pkill chrome sau verify; commit + push GitHub
+
+Stage Summary:
+- BÀI HỌC QUAN TRỌNG NHẤT: sandbox có thể bị platform rollback bất kỳ lúc nào — GitHub push sau MỖI task là bảo hiểm sống còn (lần này cứu 100% công việc Tasks 24-36)
+- BẢO HIỂM MỚI CẦN NHỚ: pip packages KHÔNG nằm trong git — sau rollback phải `python3 -m pip install kaggle_environments` lại trước khi chạy battle
+- Sau mọi dấu hiệu "về bản cũ": kiểm tra `git log` + `ls kaggriculture/kain40.py` → nếu mất: fetch + reset --hard origin/main, rồi cài lại pip package, rồi kill hết process cũ và relaunch arena-service

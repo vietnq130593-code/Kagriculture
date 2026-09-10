@@ -785,7 +785,7 @@ Bash-invocation sweep giết mọi tiến trình con (kể cả setsid+nohup —
 - Mục tiêu 100%: còn 7 thua — 108 (0.772x) cần autopsy riêng; 102 = lớp seed giàu-engine (bẫy carrot R126 đã giam nhưng noise ±$10k quanh ngưỡng)
 
 ---
-*KAIN — RULES.md v2.9 (mục AD: Task 36 — sandbox ops OOM next-server: webpackMemoryOptimizations + NODE_OPTIONS passthrough + RSS watchdog + gzip battles; panel sống sót trọn trận. 127 quy tắc).*
+*KAIN — RULES.md v2.10 (mục AD.4: Task 37 — platform rollback snapshot; khôi phục 100% từ GitHub; R128-R130: pip package ngoài git + playbook khôi phục 5 bước. 130 quy tắc).*
 
 ## AD. BIÊN BẢN TASK 36 — SỐC PREVIEW PANEL GIỮA TRẬN: OOM KILL next-server (sandbox ops)
 ### AD.1 Hiện tượng + root cause
@@ -800,3 +800,10 @@ Bash-invocation sweep giết mọi tiến trình con (kể cả setsid+nohup —
 ### AD.3 Kết quả verify (18:29-18:35)
 - Trận kain40 vs v6 seed 404 ×2 (probe gateway) + seed 555 (UI browser) + kain40 vs kain40 (UI): **đủ 720 turn + battle:end, panel không ngắt, 0 console error**; next-server peak 1.44GB rồi GC về 1.2GB; free không xuống dưới ~87MB cả khi headless chrome (700MB) còn nằm trong box — người dùng thật (browser ngoài box) dư ~1GB.
 - **Bài học hygiene**: luôn `agent-browser close` + pkill chrome sau khi verify (chrome leftover chính là 1/2 nguyên nhân đợt này).
+
+### AD.4 Task 37 — PLATFORM ROLLBACK SNAPSHOT + PLAYBOOK KHÔI PHỤC (bài học ops quan trọng nhất)
+- **Hiện tượng**: Preview Panel bỗng về UI thời Task-14 (dropdown v2/v3/v4/v5/baseline, không có kain*/v6) — toàn bộ workspace bị platform restore về snapshot cũ (HEAD về era Task 23; v6.py/kain40.py/RULES v2.8-2.9/worklog Task 24+ biến mất).
+- **Cứu cánh**: mọi task đều push GitHub đúng lịch → `git fetch + reset --hard origin/main` khôi phục 100% (kain40 93/100, RULES v2.9, 150 battles .gz, registries, OOM fixes Task 36). **MẤT MÁT = 0.**
+- **R128 (mới)**: pip packages KHÔNG nằm trong git snapshot — sau rollback bắt buộc `python3 -m pip install kaggle_environments` trước khi chạy battle/battery, nếu không runner exit 1 với ModuleNotFoundError.
+- **R129 (mới)**: sau mọi dấu hiệu rollback (UI về bản cũ / thiếu file agent): ① `git log` + `ls kaggriculture/kain40.py` xác nhận → ② fetch + reset --hard origin/main → ③ cài lại pip package → ④ kill TOÀN BỘ process cũ (bun --hot + bun run dev + next*) rồi relaunch arena-service → ⑤ verify bằng 1 trận kain40 vs v6 qua UI (dropdown phải có đủ 14 agent).
+- **R130 (mới)**: diff `.env`/`.gitignore` sau restore thường chỉ là mode 644→755 — không cần lo nội dung; KHÔNG bao giờ tin `--help` test cho python tool (bug argparse `%` từ trước) — test bằng tham số thật.
