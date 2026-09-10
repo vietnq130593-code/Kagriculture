@@ -1,12 +1,12 @@
 # RULES — SỔ CÁI QUY TẮC KAGGRICULTURE (MÔ HÌNH NHÂN QUẢ CẤU TRÚC CỦA GAME)
 
-**Tác giả:** KAIN · **Phiên bản:** 2.5 (sau Task 31: KAIN phá tường R104 — kain31 55/100 vs v6; mục Z R106-R110)
+**Tác giả:** KAIN · **Phiên bản:** 2.6 (sau Task 32: 4 luật cứng top-Kaggle — kain33 6/8 probe 1.283x; mục AA R111-R113)
 **Mục đích:** Bậc-1 (P(B | thấy A) — dự đoán từ quan sát) và bậc-2 (P(B | làm A) — dự đoán từ can thiệp) đều cần tập quy tắc làm mô hình cấu trúc. Tài liệu này là **bảng tham chiếu duy nhất** gom toàn bộ quy tắc ta đã nắm, mỗi quy tắc đánh số R#, phân loại + gắn tầng Bayes nào tiêu thụ nó.
 **Nguồn đối chiếu:** `upload/README.md` (vật lý engine) · `LESSONS_V4.md` §3.3–3.4 (kinh tế + bug-class máu) · `PLAN_V5.md` §12–13 (núm v5.2 + bài học v5.3) · `v5.py` (v5.6+E) · `v6.py` v6.6 (nhà vô địch hiện tại) · `cell4_v6.py` (bản Kaggle) · `bench/` + `battles/` (bằng chứng) · tools autopsy: `land_probe.py` `care_probe.py` `autopsy.py` `sell_log.py` `cmp_seed_v6.py` `two_sided_v5.py`.
 
 **Trạng thái ladder (sau Task 31):** v6.6 vẫn là nhà vô địch đăng ký — NHƯNG KAIN kain31 đã phá tường R104: **55/100 vs v6 (0.998x, median 1.016)** sau khi vá 2 leak tự gây (noon-replan hiến đất dâu + nhượng kênh sữa). Lộ trình thách đấu: kain25-29 31-40% → kain30 29% (P3-lite + fortress 8-9 ngỗng) → kain31 55% (bỏ replan + milk-commit + fortress 7 + mix cân bằng). Frontier còn: care-collapse d26-28 + 5 seed thua nặng (126/122/137/141/105s1). Hướng v7: lý thuyết cam kết + kernel P3 (RESEARCH_V7.md).
 
-**Index mục (append-only biên bản):** A–P nền v1.0 (R1–R63) · Q Phase 5 audit (R64–R73) · R Task 21 GT-LAND (R74–R79, v5.5) · S Task 22 bẫy submission (R80) · T Task 23 Wave E (R81–R82, v5.6+E 97%) · U–V KAIN đối đầu v5 (R83–R96) · W Task 27 xây v6 (R97–R99) · X Task 28 KAIN đối đầu v6 + giả thuyết 75-đất (R100–R105) · Y Task 30 dọn dẹp kho xóa v1/v2/v3 (không luật mới) · Z Task 31 KAIN phá tường R104 (R106–R110).
+**Index mục (append-only biên bản):** A–P nền v1.0 (R1–R63) · Q Phase 5 audit (R64–R73) · R Task 21 GT-LAND (R74–R79, v5.5) · S Task 22 bẫy submission (R80) · T Task 23 Wave E (R81–R82, v5.6+E 97%) · U–V KAIN đối đầu v5 (R83–R96) · W Task 27 xây v6 (R97–R99) · X Task 28 KAIN đối đầu v6 + giả thuyết 75-đất (R100–R105) · Y Task 30 dọn dẹp kho xóa v1/v2/v3 (không luật mới) · Z Task 31 KAIN phá tường R104 (R106–R110) · AA Task 32 4 luật cứng top-Kaggle + plan-cache fix (R111–R113).
 
 **Phân loại mỗi quy tắc:**
 - **[P] PHYSICS** — cứng, deterministic, đúng 100% mọi trận (engine white-box)
@@ -646,3 +646,46 @@ Bash-invocation sweep giết mọi tiến trình con (kể cả setsid+nohup —
 
 ---
 *KAIN — RULES.md v2.5 (mục Z: Task 31 — 2 battery/200 game + autopsy plan-dump: kain30 29/100 → kain31 55/100 VỠ TƯỜNG R104; R106 bẫy replan, R107 đòn commit kênh sâu, R108 pháo đài cân bằng, R109 tường = tổng leak tự gây, R110 P3 graded-quota. 110 quy tắc).*
+
+## AA. BIÊN BẢN TASK 32 — 4 LUẬT CỨNG TOP-KAGGLE + KAIN ĐỐI ĐẦU v6 (kain32/kain33)
+
+*Nhiệm vụ user: quan sát top Kaggle → 4 quy luật: (1) nâng đất 25→50 ngày 5-7, (2) nâng 50→75 ngày 10-12, (3) KHÔNG nâng lên 100, (4) đất trống luôn 0-15%. Đưa thành THIẾT LẬP CỨNG, rồi đối đầu v6 với mục tiêu $90-110k + 100% thắng.*
+
+### AA.1 Hai đường triển khai
+| Bản | Thiết kế | Kết quả probe seed 100 |
+|---|---|---|
+| kain32 "LAND-LABOR ENGINE" | 4 luật đầy đủ + wheat-machine (tự trồng feed thay mua) + watchdog 85% + straw bulk d11-16 + pha đàn | $17-40k — 5 vòng lặp fix, mỗi vòng lộ tầng lỗi mới (dao động SELL/BUY, bẫy nghèo-hire, fill-all wheat-monster, weeds 20-32, đàn chết d15-21) |
+| kain33 "KAGGLE-4-LAWS" | kain31 NGUYÊN VẸN + CHỈ 3 luật đất cứng (NE d5-7 / SW d10-12 / không SE) + land-first reserve + plan-cache fix | seed 100: $54.9k vs v6 $39k — 4-seed: 6/8 (1.283x) — **BATTERY 100 GAME: 68/100 (1.145x)** — KỶ LỤC MỚI (kain31: 55/100); v6 sập $55.1k → $45.3k trung bình |
+
+### AA.2 Chuỗi autopsy kain32 (phương pháp R109 — mỗi fix một chẩn đoán)
+1. **Land-first + quỹ dự trữ**: v6 mua đất d0 khi tiền dồi dào; luật d5-7 đụng cửa sổ vốn đói — SELL wheat d5h01 về tiền SAU khi geese/straw-seeds ăn sạch quỹ → đất phải đứng ĐẦU hàng đợi lệnh + mọi lệnh chi khác giữ reserve $1150/$2150 trong cửa sổ.
+2. **Dao động SELL2/BUY2**: wheat_want (mua) ≠ wheat_reserve (bán) → bán 2 mua lại 2 lặp cả ngày, mất spread; fix: want = reserve.
+3. **Mua wheat $34k/mùa của v6 = LABOR ARBITRAGE, không phải ngu**: $44 mua feed đổi lấy nhân công cho kênh $250-280; tự trồng 100% feed làm ĐÔI lao động nông trại → weeds 20-31 + đàn 14 con đói chết d18-22. Fix: feed-lai (trồng 13-18 ô + mua phần thiếu).
+4. **Đất trống = BỘ ĂN XÔ LAO ĐỘNG của kernel v6** (nghịch R100 ở tầng lao động): 85% util trên 75 ô = 64 ô dịch vụ vs kernel vận hành thoải mái ~55-60 ô — vượt = chết nước → chết đàn. Watchdog 85% chỉ khả thi với kernel labor-mới (v7).
+5. **Wheat 1.2 action/ngày/ô vs straw 0.8 vs carrot ~0.9**: mix 84%-util phải theo tỷ lệ v6 (straw-heavy), wheat-heavy = weeds.
+
+### AA.3 Chìa khóa kain33 — PLAN-CACHE INVALIDATION (leak lớn nhất Task 32)
+- Plan ngày d5 được dựng lúc h0 **TRƯỚC** khi BUY_LAND h01-02 → 25 ô NE không tồn tại trong plan cả ngày → d6+ cửa sổ tưới melon [6,12] ăn hết lao động → NE trống trắng tới d11 (thung lũng vốn: money $400-500 suốt d5-10, thua seed 100/103).
+- Fix 1 dòng: `_STATE.pop(("plan", day), None)` sau BUY_LAND → plan dựng lại trong chiều d5, nông trại đang rảnh (0 thú + melon chưa vào window) → wheat-machine phủ NE ngay d5-6.
+- Kết quả: seed 100 từ $48.2k → $54.9k (v6 sập $39k); 4-seed từ 3/8 (1.013x) → **6/8 (1.283x)**.
+
+### AA.4 Quy tắc mới R111–R113
+| # | Quy tắc | Loại | Bằng chứng |
+|---|---|---|---|
+| R111 | **CỬA SỔ VỐN LUẬT ĐẤT CỨNG**: mua đất theo lịch (d5-7/d10-12) chỉ khả thi nếu lệnh mua đất đứng ĐẦU hàng đợi + mọi lệnh chi khác tôn trọng quỹ dự trữ (thú/hạt/nhân) trong cửa sổ — bằng không vĩnh viễn khoá 25 ô vì vốn đến SAU chi phí | E | trace seed 100 d5h01: geese+straw ăn $900 → land không bao giờ mua (kain32 bản đầu) |
+| R112 | **PLAN CACHE PHẢI VÔ HIỆU HÓA KHI ĐẤT MỚI**: hành động thay đổi không gian (BUY_LAND) mà plan đã dựng trong ngày → pop cache, plan phải thấy ô mới TRONG CHIỀU — trì hoãn tới ngày sau = mất cả ngày cửa sổ lao động nhàn rỗi | E | kain33 seed 100: $48.2k → $54.9k (1 dòng); 4-seed 3/8 → 6/8 |
+| R113 | **MUA FEED = ARBITRAGE LAO ĐỘNG (tầng 2 của R100)**: v6 mua $34k wheat/mùa không phải lãng phí — đổi tiền lấy nhân công cho kênh $250-280; tự trồng feed toàn phần làm đôi lao động nông trại = weeds + đàn chết. Tối ưu: trồng 13-18 ô wheat + mua phần thiếu khi đàn > 8 | E | kain32 feed-tự-trồng: đàn 14 chết d18-22, weeds 31; v6 cùng seed: 15-16 thú feed+care+collect đủ 100% |
+
+### AA.5 Đối chiếu mục tiêu user ($90-110k, 100% vs v6) — battery kain33_vs_v6_100.json
+- **kain33: 68/100 (seat0 35/50, seat1 33/50, ratio 1.145x, worst 0.737x)** — kỷ lục mới so với kain31 55/100; 26/50 seed thắng cách >15%.
+- Tiền: kain33 $51.8k trung bình (min 33.2 / max 65.0) vs v6 $45.3k (min 31.7 / max 65.0) — 4 luật cứng + plan-cache fix ĐÃ ÉP v6 sập $10k (từ $55.1k ở battery kain31).
+- Vốn hóa kênh max đã đo: tổng doanh thu thị trường game 1v1 ~$110-135k — **$90-110k MỘT mình chỉ khả thi nếu v6 sập dưới $40k** (đã thấy ở 8-10 seed khi kain33 ăn share: v6 $33-39k) — tức cần đòn zero-sum khai thác điểm yếu có hệ thống, không phải "chơi tốt hơn".
+- Kết luận hướng v7: (a) giữ kain33 làm chassis luật cứng; (b) kernel lao động MỚI để chịu 85% util (AA.2.4); (c) đòn ép giá feed-wheat (đối thủ phụ thuộc mua $34k — bơm wheat供应 khi giá cao? ngược lại khan hiếm...) — cần nghiên cứu thêm; (d) mục tiêu 100% = tương đương "v6 phải thua mọi cấu hình ghế + seed" — chưa đạt, khoảng cách hiện tại là các seed knife-edge (0.85-0.97x).
+
+### AA.6 Sản phẩm Task 32
+- `kain32.py` (LAND-LABOR — research artifact 4 luật đầy đủ + watchdog) · `kain33.py` (KAGGLE-4-LAWS — fighter)
+- Công cụ mới: `bench/money_profile.py` (doanh thu theo kênh), `bench/spend_profile.py` (chi phí theo danh mục — phát hiện $34k mua wheat), `bench/early_trace.py` (vốn + orders theo giờ), `bench/labor_day.py` (phân bổ hành động/ngày — phát hiện PASS-48 và nhịp nước 2-ngày của v6)
+- Battery `bench/kain33_vs_v6_100.json` (seed 100-149 hai ghế)
+
+---
+*KAIN — RULES.md v2.6 (mục AA: Task 32 — 4 luật cứng top-Kaggle triển khai 2 đường; autopsy 5 tầng kain32; chìa khóa plan-cache R112; feed-arbitrage R113; kain33 BATTERY 68/100 — KỶ LỤC MỚI vs v6.6. 113 quy tắc).*

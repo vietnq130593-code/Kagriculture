@@ -697,3 +697,40 @@ Stage Summary:
 - Chìa khóa: autopsy plan-dump chỉ đích danh 2 leak tự gây (noon-replan hiến đất + nhượng kênh sữa) — "tường cấu trúc" hóa ra là tổng leak (R109)
 - Deliverable nghiên cứu: RESEARCH_V7.md (kiến trúc v6 bậc 1/2 + toàn cục 24 turn + GT + 8 seam) + RULES.md v2.5 (R106-R110) + 2 battery JSON
 - v7 direction: commitment theory (milk floor + không replan xuống + pháo đài cân bằng) + kernel P3 mở rộng; frontier: care-collapse d26-28, 5 seed thua nặng, micro-sell solver
+
+---
+Task ID: 32
+Agent: KAIN (main-agent)
+Task: Đưa 4 quan sát top-Kaggle (mua đất 25→50 d5-7, 50→75 d10-12, không lên 100, đất trống ≤15%) thành thiết lập cứng rồi đối đầu v6 — mục tiêu $90-110k + 100% thắng (user Task 32)
+
+Work Log:
+- Khôi phục ngữ cảnh: worklog Task 1-31 + RULES.md v2.5 + LS kho; đọc engine kaggriculture.py (LAND_ORDER NE$1k/SW$2k/SE$4k, CROPS/watering window [ceil(max/2), max_yield_day] +1u/lần tưới non-ongoing, FEED 1 wheat/đút, CARE+FED cộng dồn bonus, shop unlock mỗi 3 ngày tối đa 8)
+- Phân tích kinh tế bằng 3 công cụ mới: money_profile.py (doanh thu kênh: v6 wheat $35k/milk $22k/straw $21k/melon $19k) + spend_profile.py (chi phí: PHÁT HIỆN buyprod_WHEAT $34k/mùa — chi phí #1 của v6!) + labor_day.py (v6 ~20 WATER/ngày nhịp 2-ngày, đàn 15 feed+care+collect 100%, PASS 1-19)
+- kain32 "LAND-LABOR ENGINE" (4 luật đầy đủ + wheat-machine tự trồng feed + watchdog 85%): 5 vòng lặp fix qua early_trace/plan-dump — (1) land-first + reserve $1150/$2150 (vốn d5 đến sau chi phí), (2) dao động SELL2/BUY2 (want=reserve), (3) poverty-hire giữ (hand $1-8 cứu machine), (4) straw bulk d11-16 + melon 14 1 đợt, (5) feed-lai sau khi thấy tự-trồng 100% = weeds 31 + đàn chết d18-22 → tối đa $40k seed 100 — kernel lao động v6 KHÔNG chịu nổi 84% util
+- kain33 "KAGGLE-4-LAWS" (kain31 nguyên vẹn + 3 luật đất cứng + land-first reserve): seed 100 $48.2k; 4-seed 3/8 (1.013x) — thung lũng vốn d5-10 (33 ô NE trống)
+- CHÌA KHÓA: plan-cache invalidation — plan d5 dựng h0 TRƯỚC BUY_LAND h01 → NE không tồn tại trong plan cả ngày; fix 1 dòng _STATE.pop(("plan", day)) sau mua đất → seed 100 $54.9k vs v6 $39k; 4-seed 6/8 (1.283x)
+- Thử tier-1 plant-priority trên kain33 → TỆ hơn (1/8, ăn nước melon) → hoàn tác — mỗi kernel có hệ ưu tiên riêng, fix phải đo lại từng bản
+- Đăng ký arena: kain32+kain33 vào run_battle.py + arena-service/index.ts (restart daemon) + constants.ts 2 card mới
+- RULES.md v2.5→v2.6: mục AA (AA.1-6) + R111 cửa sổ vốn luật đất / R112 plan-cache vô hiệu khi mua đất / R113 mua feed = arbitrage lao động; header + index cập nhật
+- Battery 100 game kain33 vs v6 (seed 100-149, two-sided, daemon run_bg) đang chạy
+
+Stage Summary:
+- 4 luật cứng hoạt động cơ khí: NE d5, SW d10-12, không SE (75 ô tối đa), utilization 84% đo được trên kain32 / tự nhiên 75-85% trên kain33
+- kain33 = kain31 + 3 luật đất + plan-cache fix: 6/8 probe 1.283x (so kain31 55/100) — LUẬT ĐẤT TOP-KAGGLE KHÔNG TỐN KỸNH khi làm đúng (từ 3/8 → 6/8 chỉ bằng 1 dòng pop cache)
+- Mục tiêu $90-110k: vốn hóa thị trường 1v1 tổng ~$110-135k → một mình $90k+ đòi hỏi v6 sập <$40k (đã thấy seed 100/102/113 khi kain33 ăn share) — là đòn zero-sum có hệ thống, chưa phải trạng thái bền
+- Bài học sâu nhất: v6 mua wheat $34k = ARBITRAGE LAO ĐỘNG (R113); đất trống của v6 = bộ ăn xô lao động; 85% util cần kernel lao động mới (hướng v7)
+
+---
+Task ID: 32 (phần 2 — hoàn tất)
+Agent: KAIN (main-agent)
+Task: Battery kain33 vs v6 + RULES v2.6 + browser verify
+
+Work Log:
+- Battery kain33 vs v6 (100 game seed 100-149 two-sided): **68/100 (1.145x)** — KỶ LỤC MỚI so với kain31 55/100; seat0 35/50 + seat1 33/50; worst 0.737x; 26/50 seed thắng >15%
+- Tiền: kain33 $51.8k trung bình vs v6 $45.3k — v6 SẬP $9.9k so với battery kain31 ($55.1k): 4 luật + plan-cache fix là đòn zero-sum có thật
+- RULES.md v2.6 hoàn tất: battery numbers vào AA.1/AA.5 + footer; 113 quy tắc, 689 dòng
+- Arena: kain32/kain33 đăng ký 3 registry; arena-service restart daemon — browser verify tiếp theo
+
+Stage Summary:
+- kain33 = nhà thách đấu mạnh nhất từng có vs v6.6: 68/100
+- Còn lại: browser verify UI + commit/push GitHub + báo cáo tiếng Việt cho user

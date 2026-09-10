@@ -41,6 +41,8 @@ AGENTS = {
     "v6": (os.path.join(ROOT, "v6.py"), "agent"),
     "kain30": (os.path.join(ROOT, "kain30.py"), "agent"),
     "kain31": (os.path.join(ROOT, "kain31.py"), "agent"),
+    "kain32": (os.path.join(ROOT, "kain32.py"), "agent"),
+    "kain33": (os.path.join(ROOT, "kain33.py"), "agent"),
     "v4": (os.path.join(ROOT, "v4.py"), "agent"),
     "v5": (os.path.join(ROOT, "v5.py"), "agent"),
     "kain3": (os.path.join(ROOT, "kain3.py"), "agent"),
