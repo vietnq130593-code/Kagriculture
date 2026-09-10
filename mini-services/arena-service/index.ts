@@ -31,7 +31,7 @@ const RUNNER = '/home/z/my-project/kaggriculture/arena/run_battle.py'
 const BATTLE_DIR = '/home/z/my-project/kaggriculture/battles'
 const PYTHON = 'python3'
 
-const AGENTS = ['v6', 'kain25', 'kain16', 'kain3', 'v5', 'v4', 'v3', 'v2', 'melon', 'baseline']
+const AGENTS = ['v6', 'kain25', 'kain16', 'kain3', 'v5', 'v4', 'melon']
 
 mkdirSync(BATTLE_DIR, { recursive: true })
 
@@ -303,3 +303,5 @@ process.on('SIGINT', () => {
   stopBattle('sigint')
   httpServer.close(() => process.exit(0))
 })
+
+// touch-reload Task 30: registry v1/v2/v3 cleanup

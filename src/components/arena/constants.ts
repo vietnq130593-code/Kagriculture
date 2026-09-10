@@ -102,11 +102,8 @@ export const AGENT_INFO: AgentDesc[] = [
   { name: 'kain25', desc: 'KAIN thách đấu v6 — Geese Fortress 75 đất', tag: 'KAIN' },
   { name: 'kain16', desc: 'Đối thủ KAIN — 24 biến thể, tường 94%', tag: 'KAIN' },
   { name: 'v5', desc: 'Não 6 lớp Bayes (97% vs v4)', tag: 'đối thủ chuẩn' },
-  { name: 'v4', desc: 'Orchestrator nền v3 + 8 edges', tag: 'hiện tại' },
-  { name: 'v3', desc: 'Bản nền kinh tế ($50-60k hai phía)', tag: 'bản cũ' },
-  { name: 'v2', desc: 'Bản cũ — crop engine đơn giản', tag: 'bản cũ' },
+  { name: 'v4', desc: 'Orchestrator + 8 edges (97% bị v5 áp đảo)', tag: 'bản cũ' },
   { name: 'melon', desc: 'Bot đơn giản — dưa hấu chậm', tag: 'bot đơn giản' },
-  { name: 'baseline', desc: 'Bot đơn giản — starter tutorial', tag: 'bot đơn giản' },
 ]
 
 export const SPEED_OPTIONS: { value: number; label: string }[] = [

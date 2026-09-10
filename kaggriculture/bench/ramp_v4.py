@@ -1,10 +1,10 @@
-# Daily herd ramp + cash trace: v4 vs v3
+# Daily herd ramp + cash trace: A vs B (argv)
 import sys
 sys.path.insert(0, '/home/z/my-project/kaggregiculture' if False else '/home/z/my-project/kaggriculture')
 from kaggle_environments import make
 
 A = sys.argv[1] if len(sys.argv) > 1 else "/home/z/my-project/kaggriculture/v4.py"
-B = sys.argv[2] if len(sys.argv) > 2 else "/home/z/my-project/kaggriculture/v3.py"
+B = sys.argv[2] if len(sys.argv) > 2 else "/home/z/my-project/kaggriculture/v5.py"
 
 env = make("kaggriculture", debug=False)
 env.run([A, B])

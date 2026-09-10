@@ -623,3 +623,23 @@ Stage Summary:
 - RULES.md v2.3 hoàn tất: mọi dữ kiện then chốt đã được đối chiếu nguồn (engine source + battery JSON + probe tái chạy) — không thêm/bỏ luật nào, chỉ hiệu đính độ chính xác
 - Bài học meta: quy tắc [E] viết tay vẫn có thể sai NHÃN dữ kiện (quadrant) dù đúng bản chất — review phải verify về source engine, không chỉ nội bộ nhất quán
 - Lỗi duy nhất còn lại trong v2.3: không có — 105 quy tắc nguyên vẹn, cấu trúc biên bản A-X chuẩn
+
+---
+Task ID: 30
+Agent: KAIN (main-agent)
+Task: Dọn dẹp kho — xóa toàn bộ phiên bản v3 đổ về trước (user: "Tiến hành xóa từ phiên bản v3 đổ về trước, các phiên bản này đều lạc hậu cả rồi")
+
+Work Log:
+- Liệt kê + soi nội dung toàn bộ ứng viên: vA/vB chỉ khác v2 đúng 3 dòng target đàn (diff verify); cell4_agent.py = submission_v4.py từng byte (GIỮ — bản v4); kain3.py = KAIN-lineage tổ tiên của kain15/16 → v6.6 (GIỮ — không phải engine v3)
+- rg tham chiếu chéo toàn repo trước khi xóa: chỉ 11 file Python tham chiếu engine cũ, tất cả nằm trong tập xử lý
+- XÓA 20 mục: submission.py (v1), v2.py, v3.py, submission_v3.py · bench/{baseline, baseline_a, baseline_b, v2_a, v2_b, v3_a, v3_b, vA, vB}.py (bản sao/biến thể v2/v3) · bench/{run, run2, diag, run_v4, seeds_v4, diag_v4}.py (harness chỉ chạy được với engine đã xóa — kết quả đã lưu JSON + LESSONS_V4.md) · __pycache__/v3.cpython-312.pyc
+- GIỮ nguyên tắc "xóa phiên bản, giữ tri thức": toàn bộ ~40 evidence JSON (v6_vs_v3_100, vE2v3, p0_results, profiles_learned...), toàn bộ .md, engine v4→v6 + kain3→kain29, melon.py, p0.py (thư viện Inst cho ledger_v4)
+- Cập nhật registry đồng bộ: arena/run_battle.py AGENTS bỏ v2/v3/baseline (còn 7: v4/v5/v6/kain3/kain16/kain25/melon) + sửa ví dụ docstring; arena-service/index.ts AGENTS còn 7 tên (hot-reload); constants.ts AGENT_INFO bỏ 3 card v3/v2/baseline, v4 tag 'hiện tại'→'bản cũ'
+- Sửa default opponent: ledger_v4.py + ramp_v4.py default B v3.py→v5.py; profile_collect.py BOTS bỏ v3/baseline (docstring ghi chú profile lịch sử còn trong profiles_learned.json)
+- RULES.md v2.3→v2.4: mục Y biên bản dọn dẹp (Y.1 phạm vi, Y.2 giữ lại, Y.3 registry, Y.4 bài học quản trị); index mục +Y; sửa typo kautopsy.py→autopsy.py ở nguồn đối chiếu
+- py_compile 5 file Python đã sửa OK
+
+Stage Summary:
+- Kho sau dọn dẹp: engine ladder sống = v4 → v5 → v6 (nhà vô địch) + dòng KAIN kain3→kain29 + melon; 105 quy tắc RULES.md nguyên vẹn với đầy đủ chuỗi bằng chứng JSON
+- Lịch sử v1/v2/v3 vẫn đọc được qua git remote (đã push Task 23/27) + battery JSON + LESSONS_V4/RESEARCH_v4
+- Arena UI dropdown còn 6 card: v6, kain25, kain16, v5, v4, melon (kain3 có ở backend registry nhưng không có card UI — như trước)

@@ -21,7 +21,7 @@ Protocol (stdout, one JSON object per line):
 Usage:
   python3 run_battle.py --a v4 --b v5 --seed 101
   python3 run_battle.py --a v5 --b v4 --seed 102          # swapped seats
-  python3 run_battle.py --a v4 --b v3 --seed 7 --max-steps 48   # 2-day smoke test
+  python3 run_battle.py --a v4 --b v5 --seed 7 --max-steps 48   # 2-day smoke test
 """
 import argparse
 import importlib.util
@@ -38,8 +38,6 @@ sys.path.insert(0, BENCH)
 
 # name -> (file, entry function)
 AGENTS = {
-    "v2": (os.path.join(ROOT, "v2.py"), "agent"),
-    "v3": (os.path.join(ROOT, "v3.py"), "agent"),
     "v4": (os.path.join(ROOT, "v4.py"), "agent"),
     "v5": (os.path.join(ROOT, "v5.py"), "agent"),
     "v6": (os.path.join(ROOT, "v6.py"), "agent"),
@@ -47,7 +45,6 @@ AGENTS = {
     "kain16": (os.path.join(ROOT, "kain16.py"), "agent"),
     "kain25": (os.path.join(ROOT, "kain25.py"), "agent"),
     "melon": (os.path.join(BENCH, "melon.py"), "melon_maxxer"),
-    "baseline": (os.path.join(BENCH, "baseline.py"), "agent"),
 }
 
 

@@ -1,12 +1,12 @@
 # RULES — SỔ CÁI QUY TẮC KAGGRICULTURE (MÔ HÌNH NHÂN QUẢ CẤU TRÚC CỦA GAME)
 
-**Tác giả:** KAIN · **Phiên bản:** 2.3 (hiệu đính sau Task 28: review toàn văn, đối chiếu engine + battery JSON + probe tái chạy)
+**Tác giả:** KAIN · **Phiên bản:** 2.4 (sau Task 30: dọn dẹp kho — xóa engine v1/v2/v3, giữ nguyên 105 quy tắc + chuỗi bằng chứng)
 **Mục đích:** Bậc-1 (P(B | thấy A) — dự đoán từ quan sát) và bậc-2 (P(B | làm A) — dự đoán từ can thiệp) đều cần tập quy tắc làm mô hình cấu trúc. Tài liệu này là **bảng tham chiếu duy nhất** gom toàn bộ quy tắc ta đã nắm, mỗi quy tắc đánh số R#, phân loại + gắn tầng Bayes nào tiêu thụ nó.
-**Nguồn đối chiếu:** `upload/README.md` (vật lý engine) · `LESSONS_V4.md` §3.3–3.4 (kinh tế + bug-class máu) · `PLAN_V5.md` §12–13 (núm v5.2 + bài học v5.3) · `v5.py` (v5.6+E) · `v6.py` v6.6 (nhà vô địch hiện tại) · `cell4_v6.py` (bản Kaggle) · `bench/` + `battles/` (bằng chứng) · tools autopsy: `land_probe.py` `care_probe.py` `kautopsy.py` `sell_log.py` `cmp_seed_v6.py` `two_sided_v5.py`.
+**Nguồn đối chiếu:** `upload/README.md` (vật lý engine) · `LESSONS_V4.md` §3.3–3.4 (kinh tế + bug-class máu) · `PLAN_V5.md` §12–13 (núm v5.2 + bài học v5.3) · `v5.py` (v5.6+E) · `v6.py` v6.6 (nhà vô địch hiện tại) · `cell4_v6.py` (bản Kaggle) · `bench/` + `battles/` (bằng chứng) · tools autopsy: `land_probe.py` `care_probe.py` `autopsy.py` `sell_log.py` `cmp_seed_v6.py` `two_sided_v5.py`.
 
 **Trạng thái ladder (sau Task 28):** v6.6 = nhà vô địch — **93.75% vs v5 (75/80) · 100% vs v4 (1.400x) · 100% vs v3 (1.446x)**. KAIN khiêu chiến bằng delta cấu trúc (5 hướng/500 game): **31–40%** — tường twin-kernel (R104). Con đường v7 = kernel mới (P3 solver $/action toàn cục, gap N.1), KHÔNG phải núm (R98/R104).
 
-**Index mục (append-only biên bản):** A–P nền v1.0 (R1–R63) · Q Phase 5 audit (R64–R73) · R Task 21 GT-LAND (R74–R79, v5.5) · S Task 22 bẫy submission (R80) · T Task 23 Wave E (R81–R82, v5.6+E 97%) · U–V KAIN đối đầu v5 (R83–R96) · W Task 27 xây v6 (R97–R99) · X Task 28 KAIN đối đầu v6 + giả thuyết 75-đất (R100–R105).
+**Index mục (append-only biên bản):** A–P nền v1.0 (R1–R63) · Q Phase 5 audit (R64–R73) · R Task 21 GT-LAND (R74–R79, v5.5) · S Task 22 bẫy submission (R80) · T Task 23 Wave E (R81–R82, v5.6+E 97%) · U–V KAIN đối đầu v5 (R83–R96) · W Task 27 xây v6 (R97–R99) · X Task 28 KAIN đối đầu v6 + giả thuyết 75-đất (R100–R105) · Y Task 30 dọn dẹp kho xóa v1/v2/v3 (không luật mới).
 
 **Phân loại mỗi quy tắc:**
 - **[P] PHYSICS** — cứng, deterministic, đúng 100% mọi trận (engine white-box)
@@ -579,3 +579,30 @@ Bash-invocation sweep giết mọi tiến trình con (kể cả setsid+nohup —
 *KAIN — RULES.md v2.2 (mục X: Task 28 — KAIN đối đầu v6, 5 biến thể/500 game/31-40%, R100 đất dư = giá trị tùy chọn, R101 hiến kênh, R102 pháo đài không-đối-chếu-được, R103 thu>chăm, R104 tường twin-kernel phía thách đấu, R105 vòng phản hồi pipeline). 105 quy tắc.*
 
 *KAIN — RULES.md v2.3 (review toàn văn sau Task 28 — hiệu đính dữ kiện, không thêm/bỏ luật): (1) header: phiên bản 2.3 + trạng thái ladder + index mục A–X + nguồn đối chiếu bổ sung v6.py/cell4_v6.py + tools autopsy; (2) hiệu đính nhãn quadrant đất theo engine (LAND_ORDER = NE $1k → SW $2k → SE $4k — đã xác minh source engine + probe trực tiếp): R26 ghi rõ thứ tự ép, X.2 kain25 = SW d11 $2k (bỏ SE $4k), R100 = SE $4k, X.5 utilization 86→76-84%; (3) tái chạy land_probe 8 trận (cặp v6-vs-v5 + kain25-vs-v6 hai chiều, seed 115/123/140): số v6/v5 khớp tuyệt đối (57-67% / 93-106% / 933-1101 empty-tile-days), kain25 hiệu chỉnh còn 76-84% / ~20-26 ô trống / $45-60k; (4) sửa đếm mục C 7→6 (R14–R19); (5) bổ chú phạm vi áp dụng R74↔R100 (đối thủ yếu vs ngang tầm); (6) chuyển footer v2.2 về vị trí đúng cuối mục X, phục hồi footer v2.1 cho mục W. Lưu ý: ngày trong tiêu đề các mục lấy từ đồng hồ sandbox (có reset giữa chừng) — thứ tự đúng theo Task ID 21→28.*
+
+## Y. BIÊN BẢN TASK 30 (10 Sep) — DỌN DẸP KHO: XÓA v1/v2/v3
+
+*Nhiệm vụ user: "Tiến hành xóa từ phiên bản v3 đổ về trước, các phiên bản này đều lạc hậu cả rồi".*
+
+### Y.1 Phạm vi đã xóa (20 mục)
+- **Engine bản cũ (gốc):** `submission.py` (v1 "Homestead"), `v2.py`, `v3.py`, `submission_v3.py`
+- **Bản sao / biến thể trong bench:** `baseline.py` + `baseline_a/b.py` (bản sao v2), `v2_a/b.py`, `v3_a/b.py`, `vA.py`/`vB.py` (chỉ khác v2 đúng 3 dòng target đàn — diff đã verify)
+- **Harness chỉ chạy được với engine đã xóa:** `run.py`/`run2.py`/`diag.py` (v2-era), `run_v4.py`/`seeds_v4.py`/`diag_v4.py` (chiến dịch v4-vs-v3 — kết quả đã lưu LESSONS_V4.md + JSON)
+- `__pycache__/v3.cpython-312.pyc`
+
+### Y.2 Giữ lại (nguyên tắc: xóa PHIÊN BẢN, giữ TRI THỨC + CHUỖI BẰNG CHỨNG)
+- **Engine còn sống:** `v4.py`, `submission_v4.py`, `cell4_agent.py` (= submission_v4 từng byte, diff đã verify), `v5.py`, `v5_ab.py`, `cell4_v5.py`, `v6.py`, `v6_twin_trap.py`, `cell4_v6.py`, `kain3→kain29` (kain3 = tổ tiên di truyền của kain15/16 → v6.6 — KAIN-lineage, không phải "phiên bản v3"; tên kainN là số thứ tự biến thể KAIN)
+- **Toàn bộ evidence JSON** (~40 file bench/*.json, gồm `v6_vs_v3_100.json`, `vE2v3.json`/`vE2bv3.json`, `p0_results.json`, `profiles_learned.json`) — bằng chứng sống cho R69/R72/R74–R78/W.2, không tái tạo được sau khi engine chết
+- **Toàn bộ .md** (LESSONS_V4 / RESEARCH_v4 / RESEARCH_v4_REVIEW / PLAN_V5) — tham chiếu v3 trong văn bản là LỊCH SỬ ghi chép, không phải dependency runtime
+- **Tooling đo đạc:** `p0.py` (thư viện Inst — ledger_v4 import nó), `ledger_v4.py`/`ramp_v4.py` (default B đổi v3.py→v5.py), `profile_collect.py` (BOTS bỏ mục v3/baseline, profile lịch sử vẫn còn trong profiles_learned.json), `melon.py` (bot stress-test giá)
+
+### Y.3 Registry cập nhật đồng bộ
+- `arena/run_battle.py`: AGENTS còn {v4, v5, v6, kain3, kain16, kain25, melon} — bỏ v2/v3/baseline
+- `mini-services/arena-service/index.ts`: AGENTS còn 7 tên tương ứng (hot-reload)
+- `src/components/arena/constants.ts`: bỏ card v3/v2/baseline; card v4 đổi tag 'hiện tại'→'bản cũ' (v6 mới là hiện tại)
+
+### Y.4 Bài học quản trị kho tri thức
+- Phân biệt **PHIÊN BẢN** (engine agent — xóa được; lịch sử nằm trong git remote + battery JSON) với **TRI THỨC** (RULES.md + evidence + docs — giữ vĩnh viễn). Sau dọn dẹp: ladder v4→v5→v6 + dòng KAIN đọc ngược được qua git history và 40 battery JSON.
+
+---
+*KAIN — RULES.md v2.4 (mục Y: Task 30 — dọn dẹp kho v1/v2/v3: 20 file xóa + registry arena thu về 7 agent; 105 quy tắc nguyên vẹn, mọi bằng chứng JSON giữ lại; sửa typo nguồn đối chiếu kautopsy.py→autopsy.py). Ladder hiện tại: v6 (nhà vô địch) → v5 → v4 → melon + dòng KAIN kain3→kain29.*
