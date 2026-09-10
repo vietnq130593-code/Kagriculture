@@ -643,3 +643,38 @@ Stage Summary:
 - Kho sau dọn dẹp: engine ladder sống = v4 → v5 → v6 (nhà vô địch) + dòng KAIN kain3→kain29 + melon; 105 quy tắc RULES.md nguyên vẹn với đầy đủ chuỗi bằng chứng JSON
 - Lịch sử v1/v2/v3 vẫn đọc được qua git remote (đã push Task 23/27) + battery JSON + LESSONS_V4/RESEARCH_v4
 - Arena UI dropdown còn 6 card: v6, kain25, kain16, v5, v4, melon (kain3 có ở backend registry nhưng không có card UI — như trước)
+
+---
+Task ID: 31
+Agent: KAIN (main-agent)
+Task: Nghiên cứu cách v6 ra quyết định (bậc thang nhân quả 1&2 mỗi turn + toàn cục 24 turn), lý thuyết trò chơi, khai thác điểm yếu — 100 game đầu vs v6 (user Task 31)
+
+Work Log:
+- Khôi phục ngữ cảnh: worklog Task 1-30 + RULES.md v2.4 (105 quy tắc) + LS kho (kain25-29 + 5 battery JSON đã có từ Task 28)
+- Đọc TOÀN BỘ v6.py (1.444 dòng) — giải phẫu 5 khối mỗi turn (_tm_step telemetry / plan cache / _build_tasks / _build_orders / _assign_and_act), ánh xạ bậc thang nhân quả 1 (white-box: _price exact + _forward_absorb + _pipeline + _bayes_step) và bậc 2 (room() Cournot accommodation + _hold + tranche-8 + E8-lite)
+- Verify engine lần này (kaggriculture.py): CARE BANKING (CARE+FED cộng dồn pending_care_bonus → bò +3/2ngày = 3× năng suất, ngỗng +2/ngày), nước cửa sổ [+1/+2 fert], ongoing tự +1/interval không cần nước, hands bị SA THẢI cuối ngày (thuê = niêm phong hằng ngày), shed cap 100 tổng, lockstep per-unit
+- Viết RESEARCH_V7.md: kiến trúc v6 (1.1-1.5) + vật lý verify (2) + lý thuyết trò chơi định dạng hóa (Cournot động 9 kênh + drain hồi phục + Stackelberg accommodator + thông tin không đối xứng + deterministic-đối-thủ) + bảng 8 SEAM (S1 goose cap 6, S2 plan cache 24h, S3 quota idol, S4 đất trống endgame, S5 ngưỡng bán tĩnh, S6 heuristic 0.85/28, S7 herd cut order, S8 không forecast đối thủ)
+- Xây kain30.py "SOLVER-1" = v6.6 + ΔP3 graded-quota (_marg giá-biên trung bình chiếu theo inv+pipeline 2 bên−drain → MELON 14/10/7, CARROT 8/6/4/0, STRAW anti-yield ≥0.98) + ΔR noon-replan (plan key (day, noon)) + S1 egg-fortress (ngỗng floor 8/cap 9 khi opp≤7, herd-cap 16, cắt bò trước) + S4 late-straw d14-15 quota 8 + late-melon d15-16 quota 6
+- Probe seed 100/104/112/123: không crash; seed 104 kain 2/2 thắng, 8 NGỖNG vs v6 chỉ 4 (công thức egg_room của v6 tự thu nhỏ −46×opp_geese → SEAM xác nhận kích hoạt); seed 123 (perfect-storm của v6) thua 0/2 như dự kiến
+- Đăng ký arena: run_battle.py AGENTS (kain30 sau v6) + arena-service index.ts (restart daemon double-fork — hot-reload không re-evaluate AGENTS) + constants.ts card "KAIN Solver-1"
+- Battery 100 game (seed 100-149, two-sided, run_bg daemon → bench/kain30_vs_v6_100.json) đang chạy
+
+---
+Task ID: 31 (phần 2)
+Agent: KAIN (main-agent)
+Task: Battery kain30 + autopsy + kain31 (fix 2 leak cấu trúc)
+
+Work Log:
+- Battery kain30 vs v6 (100 game, seed 100-149): 29/100 (0.929x, worst 0.613x) — dưới tường R104 (kain25-29: 31-40%)
+- Phân tích JSON: không lệch ghế (13/50 vs 16/50); worst: 146 (cả 2 ghế -16.2/-23.4k), 109, 148, 116, 101, 144
+- sell_log seed 146: EGG +$3.9k (201u $42.6 vs 109u $4.6k) + FERT +$2.9k + WOOL +$7k THẮNG — nhưng MILK -$16.7k (ta 4 bò vs v6 9 bò, $17.2k vs $33.9k) + STRAW -$8.2k (37u vs 67u cùng 32 hạt) + WHEAT -$6.1k
+- care_probe 146: herd 17 (d14) nhưng care miss d7-19 (~1 thú/ngày) + collapse d26-28 (9/17 fed)
+- plan-dump debug (patch file /tmp/k30dbg.py ghi plan ra jsonl): (1) quota dâu KHÔNG BAO GIỜ bị cắt (30 đủ) — chết vì NOON-REPLAN trồng wheat 2 lần/ngày (h0 15 + h12 14 tiles) cướp đất dâu (15 vs 22 tiles của v6); (2) cow_target chỉ 1-5 vì v6 commit 9 bò trước d8-11 (khi ta băm vốn vào ngỗng+coop) -> milk_room của ta âm theo công thức accommodate -> nhượng kênh sâu nhất
+- Chẩn đoán GT: v6 = accommodator (room() trừ 30×opp_cows) — AI COMMIT TRƯỚC GIỮ KÊNH (R83/R93 ở quy mô kênh sữa: 163 unit bán giá vẫn $312 = kênh CHƯA bão hòa, cả hai cùng thua vì chia lệch 9/4)
+- kain31 = kain30 + ΔA bỏ noon-replan (single plan h0 như v6) + ΔB MILK-COMMIT (cow floor 6 khi 4<=d<=19 & px sữa >= 0.95xbase; buy order COW trước) + ΔB2 mix đàn cân bằng (ngỗng floor 7/cap 9 khi opp<=6; cut order cừu>=4 -> bò>=6 -> ngỗng>=7; herd cap 16) + ΔC FERT hold 0.40->0.50
+- Probe kain31: 4 seed tệ nhất của kain30 (146/144/101/109): 5/8 (146 lật thành 2/2 thắng $61.4k vs $55.9k!); seed 123 (perfect-storm) lật 0/2 -> 2/2; NHƯNG 131/113 (thắng lớn của kain30) lật thành 0/2 — pattern R98 delta-noise, battery mới là phán quyết
+- Battery kain31 vs v6 (100 game seed 100-149) đang chạy
+
+Stage Summary:
+- Hai leak cấu trúc của kain30 đã xác định bằng plan-dump: noon-replan = tự hiến đất dâu; capital lệch geese = tự hiến kênh sữa
+- Bài học GT quan trọng nhất: đối thủ accommodate → AI COMMIT SỚM kênh sâu giữ phần chia (9 bò vs 4 = $16.7k); mix đàn tối ưu vs v6 = cân bằng (ngỗng 7-8 + bò 6 + cừu 4), KHÔNG all-in trứng

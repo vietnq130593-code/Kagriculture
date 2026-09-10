@@ -1,12 +1,12 @@
 # RULES — SỔ CÁI QUY TẮC KAGGRICULTURE (MÔ HÌNH NHÂN QUẢ CẤU TRÚC CỦA GAME)
 
-**Tác giả:** KAIN · **Phiên bản:** 2.4 (sau Task 30: dọn dẹp kho — xóa engine v1/v2/v3, giữ nguyên 105 quy tắc + chuỗi bằng chứng)
+**Tác giả:** KAIN · **Phiên bản:** 2.5 (sau Task 31: KAIN phá tường R104 — kain31 55/100 vs v6; mục Z R106-R110)
 **Mục đích:** Bậc-1 (P(B | thấy A) — dự đoán từ quan sát) và bậc-2 (P(B | làm A) — dự đoán từ can thiệp) đều cần tập quy tắc làm mô hình cấu trúc. Tài liệu này là **bảng tham chiếu duy nhất** gom toàn bộ quy tắc ta đã nắm, mỗi quy tắc đánh số R#, phân loại + gắn tầng Bayes nào tiêu thụ nó.
 **Nguồn đối chiếu:** `upload/README.md` (vật lý engine) · `LESSONS_V4.md` §3.3–3.4 (kinh tế + bug-class máu) · `PLAN_V5.md` §12–13 (núm v5.2 + bài học v5.3) · `v5.py` (v5.6+E) · `v6.py` v6.6 (nhà vô địch hiện tại) · `cell4_v6.py` (bản Kaggle) · `bench/` + `battles/` (bằng chứng) · tools autopsy: `land_probe.py` `care_probe.py` `autopsy.py` `sell_log.py` `cmp_seed_v6.py` `two_sided_v5.py`.
 
-**Trạng thái ladder (sau Task 28):** v6.6 = nhà vô địch — **93.75% vs v5 (75/80) · 100% vs v4 (1.400x) · 100% vs v3 (1.446x)**. KAIN khiêu chiến bằng delta cấu trúc (5 hướng/500 game): **31–40%** — tường twin-kernel (R104). Con đường v7 = kernel mới (P3 solver $/action toàn cục, gap N.1), KHÔNG phải núm (R98/R104).
+**Trạng thái ladder (sau Task 31):** v6.6 vẫn là nhà vô địch đăng ký — NHƯNG KAIN kain31 đã phá tường R104: **55/100 vs v6 (0.998x, median 1.016)** sau khi vá 2 leak tự gây (noon-replan hiến đất dâu + nhượng kênh sữa). Lộ trình thách đấu: kain25-29 31-40% → kain30 29% (P3-lite + fortress 8-9 ngỗng) → kain31 55% (bỏ replan + milk-commit + fortress 7 + mix cân bằng). Frontier còn: care-collapse d26-28 + 5 seed thua nặng (126/122/137/141/105s1). Hướng v7: lý thuyết cam kết + kernel P3 (RESEARCH_V7.md).
 
-**Index mục (append-only biên bản):** A–P nền v1.0 (R1–R63) · Q Phase 5 audit (R64–R73) · R Task 21 GT-LAND (R74–R79, v5.5) · S Task 22 bẫy submission (R80) · T Task 23 Wave E (R81–R82, v5.6+E 97%) · U–V KAIN đối đầu v5 (R83–R96) · W Task 27 xây v6 (R97–R99) · X Task 28 KAIN đối đầu v6 + giả thuyết 75-đất (R100–R105) · Y Task 30 dọn dẹp kho xóa v1/v2/v3 (không luật mới).
+**Index mục (append-only biên bản):** A–P nền v1.0 (R1–R63) · Q Phase 5 audit (R64–R73) · R Task 21 GT-LAND (R74–R79, v5.5) · S Task 22 bẫy submission (R80) · T Task 23 Wave E (R81–R82, v5.6+E 97%) · U–V KAIN đối đầu v5 (R83–R96) · W Task 27 xây v6 (R97–R99) · X Task 28 KAIN đối đầu v6 + giả thuyết 75-đất (R100–R105) · Y Task 30 dọn dẹp kho xóa v1/v2/v3 (không luật mới) · Z Task 31 KAIN phá tường R104 (R106–R110).
 
 **Phân loại mỗi quy tắc:**
 - **[P] PHYSICS** — cứng, deterministic, đúng 100% mọi trận (engine white-box)
@@ -606,3 +606,43 @@ Bash-invocation sweep giết mọi tiến trình con (kể cả setsid+nohup —
 
 ---
 *KAIN — RULES.md v2.4 (mục Y: Task 30 — dọn dẹp kho v1/v2/v3: 20 file xóa + registry arena thu về 7 agent; 105 quy tắc nguyên vẹn, mọi bằng chứng JSON giữ lại; sửa typo nguồn đối chiếu kautopsy.py→autopsy.py). Ladder hiện tại: v6 (nhà vô địch) → v5 → v4 → melon + dòng KAIN kain3→kain29.*
+
+## Z. BIÊN BẢN TASK 31 (10 Sep) — KAIN PHÁ TƯỜNG R104: 55/100 vs v6
+
+*Nhiệm vụ user: nghiên cứu cách v6 ra quyết định (bậc thang nhân quả 1&2 mỗi turn + toàn cục 24 turn), áp dụng lý thuyết trò chơi, khai thác điểm yếu đối thủ — bắt đầu 100 game. Sản phẩm nghiên cứu: `RESEARCH_V7.md` (kiến trúc v6 + GT + 8 seam).*
+
+### Z.1 Lộ trình 2 battery 200 game
+| Bản | Thiết kế | Kết quả 100 game |
+|---|---|---|
+| kain30 "SOLVER-1" | v6.6 + ΔP3 graded-quota `_marg` (giá-bên Cournot exact cho MELON/CARROT/STRAW) + ΔR noon-replan h12 + S1 ngỗng floor 8/cap 9 + S3b/S4 late windows | **29/100 (0.929x, worst 0.613x)** |
+| **kain31 "SOLVER-2"** | kain30 + ΔA BỎ noon-replan + ΔB MILK-COMMIT (cow floor 6, buy COW trước, ngỗng floor 7, cut cừu→bò→ngỗng) + ΔC FERT hold 0.50 | **55/100 THẮNG (0.998x, median 1.016)** — 28 seed lật lên, 9 xuống |
+
+### Z.2 Autopsy seed 146 (kain30 thua −16.2/−23.4k) — nguồn 2 leak
+- sell_log: EGG +$3.9k · FERT +$2.9k · WOOL +$7k THẮNG — MILK −$16.7k (4 bò vs 9 bò của v6) · STRAW −$8.2k (37u vs 67u cùng 32 hạt) · WHEAT −$6.1k
+- **plan-dump** (debug hook ghi plan thật): quota dâu 30 chưa bao giờ bị cắt — chết vì noon-replan trồng wheat 2 lần/ngày (h0 15 + h12 14 tiles) cướp đất; cow_target chỉ 1-5 vì milk_room âm sau khi v6 commit 9 bò trước (ta băm vốn $2.4k vào ngỗng d6-10)
+- Cơ chế GT: v6 = accommodator (room() trừ 30×opp_cows) — người commit kênh trước giữ kênh; kênh sữa hút 163 unit giá vẫn $312 (chưa bão hòa) → chia lệch 9/4 là chuyển giao thu nhập
+
+### Z.3 Quy tắc mới R106–R110
+| # | Quy tắc | Loại | Bằng chứng |
+|---|---|---|---|
+| R106 | **BẪY REPLAN GIỮA CHU KỲ (cam kết phải bất khả hủy trong chu kỳ)**: tính lại plan giữa ngày với thông tin mới (pipeline đối thủ đã trồng) biến accommodator thành kẻ nhượng ĐẤT lẫn KÊNH — budget h12 trồng wheat 2 lần/ngày cướp đất dâu dù quota dâu đầy. Nếu buộc phải replan giữa ngày: quota chỉ được TĂNG (monotonic), budget phân bổ theo phôi buổi sáng | E | plan-dump seed 146: straw 15 vs v6 22 tiles = −$8.2k; kain31 bỏ replan → 55/100 |
+| R107 | **ĐÒN COMMIT KÊNH SÂU (milk) ĐỐI VỚI ACCOMMODATOR**: đối thủ trừ 30×bò của ta khỏi room() → ai commit bò trước giữ kênh; kênh sữa CHƯA bão hòa (163 unit @ $312) — nhượng bò dưới floor 6 khi giá ≥ 0.95×base = chuyển giao $10-17k. Quy tắc: cow floor 6 từ d4 + buy order COW TRƯỚC | E | seed 146 ledger (4 vs 9 bò = −$16.7k); kain31 ΔB lật 28 seed |
+| R108 | **PHÁO ĐÀI CÂN BẰNG, KHÔNG ALL-IN**: ngỗng biên ~$1.07k + fert share ~$1.7k < bò $3.7k khi sữa chưa bão hòa — fortress 8-9 ngỗng hút vốn d6-10 = tự nhượng sữa (R107); tối ưu vs v6 = ngỗng 7-8 + bò 6 + cừu 4, cut order cừu→bò→ngỗng | E | kain30 (8-9 ngỗng) 29/100 vs kain31 (7 + cow floor) 55/100 |
+| R109 | **TƯỜNG R104 TÁI ĐỊNH NGHĨA — "tường cấu trúc" có thể là TỔNG LEAK TỰ GÂY**: 31-40% của 5 hướng/500 game đã bị phá bằng 2 fix có chẩn đoán plan-dump (55%). Phương pháp luận: MỖI fix phải được plan-dump/ledger chỉ đích danh leak TRƯỚC (không đoán); tường chỉ là thật khi mọi hướng đã được dump và không còn leak | E | kain25-29 (31-40%, không có autopsy trước fix) vs kain30→31 (29→55% sau dump seed 146) |
+| R110 | **P3 GRADED-QUOTA (giá-bên Cournot exact)**: định quota bằng `_marg(it)` = giá biên trung bình của unit sắp bán chiếu theo (inv + pipeline 2 bên − drain tương lai) thay constant — MELON 14/10/7, CARROT 8/6/4/0, STRAW anti-yield ≥0.98, FERT hold 0.50. Hướng dương, chưa isolate (A/B riêng là bước kế tiếp) | E | kain30/31 giữ qua 2 battery; RESEARCH_V7.md §5-6 |
+
+### Z.4 Bài học game theory đúc kết (chi tiết RESEARCH_V7.md)
+1. Game = Cournot động 9 kênh, tồn kho chung, drain hồi phục deterministic — đường cầu exact công khai.
+2. v6 = Stackelberg-follower thực dụng (accommodator) → **commitment là vũ khí** (R106/R107) nhưng bị MIRROR triệt tiêu nếu fork kernel (R95/R97).
+3. Thông tin: tiles công khai (pipeline đo được), shed riêng tư — telemetry Δinventory suy ra dòng chảy đối thủ.
+4. Đối thủ deterministic → khai thác CẤU TRÚC (cap cứng, heuristic 0.85/28.0), TỪ CHỐI per-seed exploit (overfit).
+5. Welfare vs zero-sum (R94): egg-fortress + milk-commit là đòn zero-sum; "chơi đẹp hơn" (care tuyệt đối, thuê nhiều) chỉ nâng welfare cả hai.
+
+### Z.5 Sản phẩm Task 31
+- `kain30.py` + `kain31.py` (thách đấu mới) · 2 battery JSON (`kain30/31_vs_v6_100.json`)
+- `RESEARCH_V7.md` (kiến trúc v6 bậc 1/2 + toàn cục 24 turn + GT + 8 seam + hướng v7)
+- Kỹ thuật autopsy mới: **plan-dump** (hook ghi `_daily_plan` quyết định thật ra file — thấy trực tiếp quota/room/targets từng ngày)
+- Arena: kain30/kain31 đăng ký (run_battle.py + arena-service + UI card)
+
+---
+*KAIN — RULES.md v2.5 (mục Z: Task 31 — 2 battery/200 game + autopsy plan-dump: kain30 29/100 → kain31 55/100 VỠ TƯỜNG R104; R106 bẫy replan, R107 đòn commit kênh sâu, R108 pháo đài cân bằng, R109 tường = tổng leak tự gây, R110 P3 graded-quota. 110 quy tắc).*

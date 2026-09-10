@@ -38,9 +38,11 @@ sys.path.insert(0, BENCH)
 
 # name -> (file, entry function)
 AGENTS = {
+    "v6": (os.path.join(ROOT, "v6.py"), "agent"),
+    "kain30": (os.path.join(ROOT, "kain30.py"), "agent"),
+    "kain31": (os.path.join(ROOT, "kain31.py"), "agent"),
     "v4": (os.path.join(ROOT, "v4.py"), "agent"),
     "v5": (os.path.join(ROOT, "v5.py"), "agent"),
-    "v6": (os.path.join(ROOT, "v6.py"), "agent"),
     "kain3": (os.path.join(ROOT, "kain3.py"), "agent"),
     "kain16": (os.path.join(ROOT, "kain16.py"), "agent"),
     "kain25": (os.path.join(ROOT, "kain25.py"), "agent"),

@@ -99,6 +99,8 @@ export interface AgentDesc {
 
 export const AGENT_INFO: AgentDesc[] = [
   { name: 'v6', desc: 'ORCHESTRATOR-K · 93.75% vs v5, 100% vs v4/v3', tag: 'nhà vô địch' },
+  { name: 'kain31', desc: 'KAIN Solver-2 — 55/100 vs v6, phá tường R104', tag: 'KAIN' },
+  { name: 'kain30', desc: 'KAIN Solver-1 — kernel P3 giá-trị-biên + Egg Fortress', tag: 'KAIN' },
   { name: 'kain25', desc: 'KAIN thách đấu v6 — Geese Fortress 75 đất', tag: 'KAIN' },
   { name: 'kain16', desc: 'Đối thủ KAIN — 24 biến thể, tường 94%', tag: 'KAIN' },
   { name: 'v5', desc: 'Não 6 lớp Bayes (97% vs v4)', tag: 'đối thủ chuẩn' },
