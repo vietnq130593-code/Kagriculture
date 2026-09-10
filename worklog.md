@@ -734,3 +734,16 @@ Work Log:
 Stage Summary:
 - kain33 = nhà thách đấu mạnh nhất từng có vs v6.6: 68/100
 - Còn lại: browser verify UI + commit/push GitHub + báo cáo tiếng Việt cho user
+
+---
+Task ID: 32 (phần 3 — đóng gói)
+Agent: KAIN (main-agent)
+Task: Browser verify + commit + push
+
+Work Log:
+- agent-browser qua gateway :81: UI render OK, dropdown có kain33/kain32, trận live kain33 vs v6 seed 100 chạy end-to-end — kain33 THẮNG 1.41× hiển thị đúng, 0 console error; mobile 390px no-h-scroll; dev.log sạch; lint PASS
+- Git: commit 07cac93 (kain32/kain33 + battery JSON + RULES v2.6 + 4 công cụ bench + 3 registry + battles) — push GitHub OK
+
+Stage Summary:
+- Task 32 hoàn tất: 4 luật cứng top-Kaggle triển khai 2 đường (kain33 fighter 68/100 KỶ LỤC, kain32 research)
+- Mục tiêu 100%/$90-110k chưa đạt — phân tích tầng sâu AA.5 (vốn hóa thị trường 1v1 ~$110-135k tổng; một mình $90k+ = v6 phải sập <$40k) + hướng v7 (kernel lao động mới + đòn zero-sum có hệ thống)
