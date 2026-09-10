@@ -1,0 +1,4531 @@
+{
+ "R1_107559251": {
+  "episode_id": 107559251,
+  "teams": [
+   "SpaTaro",
+   "Unknown Mother-Goose"
+  ],
+  "seed": 1620414037,
+  "rewards": [
+   93281.0,
+   99793.0
+  ],
+  "n_steps": 720,
+  "daily": [
+   {
+    "day": 0,
+    "t": 23,
+    "players": [
+     {
+      "money": 61,
+      "nq": 1,
+      "n_hands": 6,
+      "empty": 5,
+      "unlocked": 25,
+      "empty_pct": 20.0,
+      "prod_tiles": 20,
+      "crops": {
+       "WHEAT": 3,
+       "CARROT": 2,
+       "MELON": 10
+      },
+      "animals": {
+       "SHEEP": 2,
+       "COW": 2
+      },
+      "struct_empty": 1,
+      "weed": 0
+     },
+     {
+      "money": 29,
+      "nq": 1,
+      "n_hands": 7,
+      "empty": 0,
+      "unlocked": 25,
+      "empty_pct": 0.0,
+      "prod_tiles": 25,
+      "crops": {
+       "WHEAT": 18,
+       "MELON": 1
+      },
+      "animals": {
+       "SHEEP": 1,
+       "COW": 5
+      },
+      "struct_empty": 0,
+      "weed": 0
+     }
+    ],
+    "prices": {
+     "CARROT": 35,
+     "EGG": 50,
+     "FERTILIZER": 100,
+     "MELON": 256,
+     "MILK": 169,
+     "STRAWBERRY": 128,
+     "TOMATO": 60,
+     "WHEAT": 29,
+     "WOOL": 206
+    },
+    "inv": {},
+    "shops": []
+   },
+   {
+    "day": 1,
+    "t": 47,
+    "players": [
+     {
+      "money": 12,
+      "nq": 1,
+      "n_hands": 6,
+      "empty": 4,
+      "unlocked": 25,
+      "empty_pct": 16.0,
+      "prod_tiles": 21,
+      "crops": {
+       "WHEAT": 3,
+       "CARROT": 3,
+       "MELON": 10
+      },
+      "animals": {
+       "SHEEP": 2,
+       "COW": 2
+      },
+      "struct_empty": 1,
+      "weed": 0
+     },
+     {
+      "money": 619,
+      "nq": 1,
+      "n_hands": 4,
+      "empty": 0,
+      "unlocked": 25,
+      "empty_pct": 0.0,
+      "prod_tiles": 25,
+      "crops": {
+       "WHEAT": 18,
+       "MELON": 1
+      },
+      "animals": {
+       "SHEEP": 1,
+       "COW": 5
+      },
+      "struct_empty": 0,
+      "weed": 0
+     }
+    ],
+    "prices": {
+     "CARROT": 35,
+     "EGG": 50,
+     "FERTILIZER": 99,
+     "MELON": 260,
+     "MILK": 172,
+     "STRAWBERRY": 132,
+     "TOMATO": 60,
+     "WHEAT": 29,
+     "WOOL": 209
+    },
+    "inv": {},
+    "shops": []
+   },
+   {
+    "day": 2,
+    "t": 71,
+    "players": [
+     {
+      "money": 134,
+      "nq": 1,
+      "n_hands": 6,
+      "empty": 3,
+      "unlocked": 25,
+      "empty_pct": 12.0,
+      "prod_tiles": 22,
+      "crops": {
+       "CARROT": 4,
+       "MELON": 11,
+       "WHEAT": 2
+      },
+      "animals": {
+       "SHEEP": 2,
+       "COW": 2
+      },
+      "struct_empty": 1,
+      "weed": 0
+     },
+     {
+      "money": 890,
+      "nq": 1,
+      "n_hands": 7,
+      "empty": 0,
+      "unlocked": 25,
+      "empty_pct": 0.0,
+      "prod_tiles": 25,
+      "crops": {
+       "WHEAT": 18,
+       "MELON": 1
+      },
+      "animals": {
+       "SHEEP": 1,
+       "COW": 5
+      },
+      "struct_empty": 0,
+      "weed": 0
+     }
+    ],
+    "prices": {
+     "CARROT": 35,
+     "EGG": 50,
+     "FERTILIZER": 97,
+     "MELON": 262,
+     "MILK": 175,
+     "STRAWBERRY": 135,
+     "TOMATO": 60,
+     "WHEAT": 30,
+     "WOOL": 212
+    },
+    "inv": {},
+    "shops": []
+   },
+   {
+    "day": 3,
+    "t": 95,
+    "players": [
+     {
+      "money": 92,
+      "nq": 1,
+      "n_hands": 6,
+      "empty": 4,
+      "unlocked": 25,
+      "empty_pct": 16.0,
+      "prod_tiles": 21,
+      "crops": {
+       "CARROT": 2,
+       "MELON": 11,
+       "STRAWBERRY": 1,
+       "WHEAT": 1
+      },
+      "animals": {
+       "COW": 3,
+       "SHEEP": 2
+      },
+      "struct_empty": 1,
+      "weed": 0
+     },
+     {
+      "money": 319,
+      "nq": 2,
+      "n_hands": 6,
+      "empty": 25,
+      "unlocked": 50,
+      "empty_pct": 50.0,
+      "prod_tiles": 25,
+      "crops": {
+       "WHEAT": 18,
+       "MELON": 1
+      },
+      "animals": {
+       "SHEEP": 1,
+       "COW": 5
+      },
+      "struct_empty": 0,
+      "weed": 0
+     }
+    ],
+    "prices": {
+     "CARROT": 35,
+     "EGG": 51,
+     "FERTILIZER": 95,
+     "MELON": 264,
+     "MILK": 177,
+     "STRAWBERRY": 147,
+     "TOMATO": 60,
+     "WHEAT": 31,
+     "WOOL": 214
+    },
+    "inv": {},
+    "shops": [
+     "BRUNCH_SPOT"
+    ]
+   },
+   {
+    "day": 4,
+    "t": 119,
+    "players": [
+     {
+      "money": 99,
+      "nq": 1,
+      "n_hands": 6,
+      "empty": 3,
+      "unlocked": 25,
+      "empty_pct": 12.0,
+      "prod_tiles": 22,
+      "crops": {
+       "WHEAT": 1,
+       "MELON": 11,
+       "STRAWBERRY": 5
+      },
+      "animals": {
+       "COW": 3,
+       "SHEEP": 2
+      },
+      "struct_empty": 0,
+      "weed": 0
+     },
+     {
+      "money": 743,
+      "nq": 2,
+      "n_hands": 7,
+      "empty": 39,
+      "unlocked": 50,
+      "empty_pct": 78.0,
+      "prod_tiles": 11,
+      "crops": {
+       "MELON": 5
+      },
+      "animals": {
+       "SHEEP": 1,
+       "COW": 5
+      },
+      "struct_empty": 0,
+      "weed": 0
+     }
+    ],
+    "prices": {
+     "CARROT": 34,
+     "EGG": 51,
+     "FERTILIZER": 93,
+     "MELON": 266,
+     "MILK": 179,
+     "STRAWBERRY": 155,
+     "TOMATO": 61,
+     "WHEAT": 31,
+     "WOOL": 215
+    },
+    "inv": {},
+    "shops": [
+     "BRUNCH_SPOT"
+    ]
+   },
+   {
+    "day": 5,
+    "t": 143,
+    "players": [
+     {
+      "money": 13,
+      "nq": 1,
+      "n_hands": 6,
+      "empty": 1,
+      "unlocked": 25,
+      "empty_pct": 4.0,
+      "prod_tiles": 24,
+      "crops": {
+       "WHEAT": 1,
+       "MELON": 11,
+       "STRAWBERRY": 6
+      },
+      "animals": {
+       "COW": 4,
+       "SHEEP": 2
+      },
+      "struct_empty": 0,
+      "weed": 0
+     },
+     {
+      "money": 206,
+      "nq": 2,
+      "n_hands": 7,
+      "empty": 23,
+      "unlocked": 50,
+      "empty_pct": 46.0,
+      "prod_tiles": 27,
+      "crops": {
+       "WHEAT": 3,
+       "STRAWBERRY": 2,
+       "MELON": 14
+      },
+      "animals": {
+       "SHEEP": 3,
+       "COW": 5
+      },
+      "struct_empty": 0,
+      "weed": 0
+     }
+    ],
+    "prices": {
+     "CARROT": 33,
+     "EGG": 51,
+     "FERTILIZER": 91,
+     "MELON": 267,
+     "MILK": 181,
+     "STRAWBERRY": 161,
+     "TOMATO": 61,
+     "WHEAT": 29,
+     "WOOL": 217
+    },
+    "inv": {},
+    "shops": [
+     "BRUNCH_SPOT"
+    ]
+   },
+   {
+    "day": 6,
+    "t": 167,
+    "players": [
+     {
+      "money": 56,
+      "nq": 2,
+      "n_hands": 9,
+      "empty": 5,
+      "unlocked": 50,
+      "empty_pct": 10.0,
+      "prod_tiles": 45,
+      "crops": {
+       "WHEAT": 6,
+       "MELON": 11,
+       "STRAWBERRY": 20
+      },
+      "animals": {
+       "COW": 4,
+       "SHEEP": 2
+      },
+      "struct_empty": 2,
+      "weed": 0
+     },
+     {
+      "money": 722,
+      "nq": 2,
+      "n_hands": 7,
+      "empty": 9,
+      "unlocked": 50,
+      "empty_pct": 18.0,
+      "prod_tiles": 41,
+      "crops": {
+       "STRAWBERRY": 13,
+       "WHEAT": 6,
+       "MELON": 14
+      },
+      "animals": {
+       "SHEEP": 3,
+       "COW": 5
+      },
+      "struct_empty": 0,
+      "weed": 0
+     }
+    ],
+    "prices": {
+     "CARROT": 33,
+     "EGG": 52,
+     "FERTILIZER": 88,
+     "MELON": 268,
+     "MILK": 183,
+     "STRAWBERRY": 167,
+     "TOMATO": 61,
+     "WHEAT": 32,
+     "WOOL": 194
+    },
+    "inv": {
+     "FERTILIZER": 10059
+    },
+    "shops": [
+     "BRUNCH_SPOT",
+     "BAKERY"
+    ]
+   },
+   {
+    "day": 7,
+    "t": 191,
+    "players": [
+     {
+      "money": 15,
+      "nq": 2,
+      "n_hands": 9,
+      "empty": 0,
+      "unlocked": 50,
+      "empty_pct": 0.0,
+      "prod_tiles": 50,
+      "crops": {
+       "WHEAT": 8,
+       "MELON": 11,
+       "STRAWBERRY": 23
+      },
+      "animals": {
+       "COW": 4,
+       "SHEEP": 2
+      },
+      "struct_empty": 2,
+      "weed": 0
+     },
+     {
+      "money": 514,
+      "nq": 2,
+      "n_hands": 8,
+      "empty": 1,
+      "unlocked": 50,
+      "empty_pct": 2.0,
+      "prod_tiles": 49,
+      "crops": {
+       "STRAWBERRY": 21,
+       "WHEAT": 6,
+       "MELON": 14
+      },
+      "animals": {
+       "SHEEP": 3,
+       "COW": 5
+      },
+      "struct_empty": 0,
+      "weed": 0
+     }
+    ],
+    "prices": {
+     "CARROT": 33,
+     "EGG": 53,
+     "FERTILIZER": 86,
+     "MELON": 269,
+     "MILK": 185,
+     "STRAWBERRY": 172,
+     "TOMATO": 61,
+     "WHEAT": 33,
+     "WOOL": 195
+    },
+    "inv": {
+     "FERTILIZER": 10071,
+     "WHEAT": 9937
+    },
+    "shops": [
+     "BRUNCH_SPOT",
+     "BAKERY"
+    ]
+   },
+   {
+    "day": 8,
+    "t": 215,
+    "players": [
+     {
+      "money": 44,
+      "nq": 3,
+      "n_hands": 10,
+      "empty": 3,
+      "unlocked": 75,
+      "empty_pct": 4.0,
+      "prod_tiles": 72,
+      "crops": {
+       "WHEAT": 31,
+       "MELON": 11,
+       "STRAWBERRY": 23
+      },
+      "animals": {
+       "COW": 4,
+       "SHEEP": 2
+      },
+      "struct_empty": 1,
+      "weed": 0
+     },
+     {
+      "money": 686,
+      "nq": 3,
+      "n_hands": 8,
+      "empty": 16,
+      "unlocked": 75,
+      "empty_pct": 21.3,
+      "prod_tiles": 59,
+      "crops": {
+       "STRAWBERRY": 21,
+       "WHEAT": 13,
+       "MELON": 14
+      },
+      "animals": {
+       "SHEEP": 3,
+       "COW": 5,
+       "GOOSE": 3
+      },
+      "struct_empty": 0,
+      "weed": 0
+     }
+    ],
+    "prices": {
+     "CARROT": 34,
+     "EGG": 54,
+     "FERTILIZER": 84,
+     "MELON": 270,
+     "MILK": 93,
+     "STRAWBERRY": 176,
+     "TOMATO": 61,
+     "WHEAT": 34,
+     "WOOL": 196
+    },
+    "inv": {
+     "EGG": 9937,
+     "FERTILIZER": 10080,
+     "WHEAT": 9910
+    },
+    "shops": [
+     "BRUNCH_SPOT",
+     "BAKERY"
+    ]
+   },
+   {
+    "day": 9,
+    "t": 239,
+    "players": [
+     {
+      "money": 1212,
+      "nq": 3,
+      "n_hands": 10,
+      "empty": 0,
+      "unlocked": 75,
+      "empty_pct": 0.0,
+      "prod_tiles": 75,
+      "crops": {
+       "WHEAT": 32,
+       "STRAWBERRY": 26,
+       "MELON": 11
+      },
+      "animals": {
+       "COW": 4,
+       "SHEEP": 2
+      },
+      "struct_empty": 0,
+      "weed": 0
+     },
+     {
+      "money": 860,
+      "nq": 3,
+      "n_hands": 11,
+      "empty": 0,
+      "unlocked": 75,
+      "empty_pct": 0.0,
+      "prod_tiles": 75,
+      "crops": {
+       "STRAWBERRY": 21,
+       "WHEAT": 26,
+       "MELON": 14
+      },
+      "animals": {
+       "SHEEP": 3,
+       "GOOSE": 5,
+       "COW": 5
+      },
+      "struct_empty": 1,
+      "weed": 0
+     }
+    ],
+    "prices": {
+     "CARROT": 35,
+     "EGG": 55,
+     "FERTILIZER": 80,
+     "MELON": 271,
+     "MILK": 95,
+     "STRAWBERRY": 184,
+     "TOMATO": 61,
+     "WHEAT": 36,
+     "WOOL": 187
+    },
+    "inv": {
+     "EGG": 9918,
+     "FERTILIZER": 10101,
+     "STRAWBERRY": 9942,
+     "WHEAT": 9873
+    },
+    "shops": [
+     "BRUNCH_SPOT",
+     "BAKERY",
+     "BRUNCH_SPOT"
+    ]
+   },
+   {
+    "day": 10,
+    "t": 263,
+    "players": [
+     {
+      "money": 14143,
+      "nq": 3,
+      "n_hands": 11,
+      "empty": 3,
+      "unlocked": 75,
+      "empty_pct": 4.0,
+      "prod_tiles": 72,
+      "crops": {
+       "WHEAT": 37,
+       "STRAWBERRY": 27,
+       "MELON": 1
+      },
+      "animals": {
+       "COW": 4,
+       "SHEEP": 3
+      },
+      "struct_empty": 0,
+      "weed": 0
+     },
+     {
+      "money": 3882,
+      "nq": 3,
+      "n_hands": 11,
+      "empty": 0,
+      "unlocked": 75,
+      "empty_pct": 0.0,
+      "prod_tiles": 75,
+      "crops": {
+       "STRAWBERRY": 21,
+       "WHEAT": 26,
+       "MELON": 13
+      },
+      "animals": {
+       "SHEEP": 3,
+       "GOOSE": 6,
+       "COW": 5
+      },
+      "struct_empty": 1,
+      "weed": 0
+     }
+    ],
+    "prices": {
+     "CARROT": 35,
+     "EGG": 56,
+     "FERTILIZER": 77,
+     "MELON": 228,
+     "MILK": 57,
+     "STRAWBERRY": 191,
+     "TOMATO": 61,
+     "WHEAT": 37,
+     "WOOL": 181
+    },
+    "inv": {
+     "EGG": 9899,
+     "FERTILIZER": 10116,
+     "STRAWBERRY": 9929,
+     "WHEAT": 9844
+    },
+    "shops": [
+     "BRUNCH_SPOT",
+     "BAKERY",
+     "BRUNCH_SPOT"
+    ]
+   },
+   {
+    "day": 11,
+    "t": 287,
+    "players": [
+     {
+      "money": 16647,
+      "nq": 3,
+      "n_hands": 10,
+      "empty": 0,
+      "unlocked": 75,
+      "empty_pct": 0.0,
+      "prod_tiles": 75,
+      "crops": {
+       "WHEAT": 40,
+       "STRAWBERRY": 27,
+       "MELON": 1
+      },
+      "animals": {
+       "COW": 4,
+       "SHEEP": 3
+      },
+      "struct_empty": 0,
+      "weed": 0
+     },
+     {
+      "money": 4867,
+      "nq": 3,
+      "n_hands": 11,
+      "empty": 0,
+      "unlocked": 75,
+      "empty_pct": 0.0,
+      "prod_tiles": 75,
+      "crops": {
+       "STRAWBERRY": 21,
+       "WHEAT": 26,
+       "MELON": 13
+      },
+      "animals": {
+       "SHEEP": 3,
+       "GOOSE": 6,
+       "COW": 5
+      },
+      "struct_empty": 1,
+      "weed": 0
+     }
+    ],
+    "prices": {
+     "CARROT": 35,
+     "EGG": 57,
+     "FERTILIZER": 73,
+     "MELON": 221,
+     "MILK": 47,
+     "STRAWBERRY": 197,
+     "TOMATO": 61,
+     "WHEAT": 38,
+     "WOOL": 174
+    },
+    "inv": {
+     "EGG": 9880,
+     "FERTILIZER": 10135,
+     "MELON": 10054,
+     "MILK": 10054,
+     "STRAWBERRY": 9916,
+     "WHEAT": 9819
+    },
+    "shops": [
+     "BRUNCH_SPOT",
+     "BAKERY",
+     "BRUNCH_SPOT"
+    ]
+   },
+   {
+    "day": 12,
+    "t": 311,
+    "players": [
+     {
+      "money": 20002,
+      "nq": 3,
+      "n_hands": 10,
+      "empty": 2,
+      "unlocked": 75,
+      "empty_pct": 2.7,
+      "prod_tiles": 73,
+      "crops": {
+       "WHEAT": 32,
+       "STRAWBERRY": 34
+      },
+      "animals": {
+       "COW": 4,
+       "SHEEP": 3
+      },
+      "struct_empty": 0,
+      "weed": 0
+     },
+     {
+      "money": 6055,
+      "nq": 3,
+      "n_hands": 11,
+      "empty": 0,
+      "unlocked": 75,
+      "empty_pct": 0.0,
+      "prod_tiles": 75,
+      "crops": {
+       "STRAWBERRY": 26,
+       "WHEAT": 19,
+       "MELON": 13,
+       "TOMATO": 2
+      },
+      "animals": {
+       "SHEEP": 3,
+       "GOOSE": 6,
+       "COW": 5
+      },
+      "struct_empty": 1,
+      "weed": 0
+     }
+    ],
+    "prices": {
+     "CARROT": 35,
+     "EGG": 59,
+     "FERTILIZER": 70,
+     "MELON": 215,
+     "MILK": 34,
+     "STRAWBERRY": 205,
+     "TOMATO": 62,
+     "WHEAT": 38,
+     "WOOL": 133
+    },
+    "inv": {
+     "EGG": 9855,
+     "FERTILIZER": 10151,
+     "MELON": 10059,
+     "MILK": 10060,
+     "STRAWBERRY": 9897,
+     "WHEAT": 9825
+    },
+    "shops": [
+     "BRUNCH_SPOT",
+     "BAKERY",
+     "BRUNCH_SPOT",
+     "BRUNCH_SPOT"
+    ]
+   },
+   {
+    "day": 13,
+    "t": 335,
+    "players": [
+     {
+      "money": 22552,
+      "nq": 3,
+      "n_hands": 10,
+      "empty": 0,
+      "unlocked": 75,
+      "empty_pct": 0.0,
+      "prod_tiles": 75,
+      "crops": {
+       "WHEAT": 34,
+       "STRAWBERRY": 34
+      },
+      "animals": {
+       "COW": 4,
+       "SHEEP": 3
+      },
+      "struct_empty": 0,
+      "weed": 0
+     },
+     {
+      "money": 8089,
+      "nq": 3,
+      "n_hands": 11,
+      "empty": 3,
+      "unlocked": 75,
+      "empty_pct": 4.0,
+      "prod_tiles": 72,
+      "crops": {
+       "STRAWBERRY": 33,
+       "WHEAT": 9,
+       "MELON": 13,
+       "TOMATO": 2
+      },
+      "animals": {
+       "SHEEP": 3,
+       "GOOSE": 6,
+       "COW": 5
+      },
+      "struct_empty": 1,
+      "weed": 0
+     }
+    ],
+    "prices": {
+     "CARROT": 35,
+     "EGG": 60,
+     "FERTILIZER": 66,
+     "MELON": 216,
+     "MILK": 11,
+     "STRAWBERRY": 212,
+     "TOMATO": 62,
+     "WHEAT": 36,
+     "WOOL": 116
+    },
+    "inv": {
+     "EGG": 9838,
+     "FERTILIZER": 10169,
+     "MELON": 10058,
+     "MILK": 10071,
+     "STRAWBERRY": 9880,
+     "WHEAT": 9870
+    },
+    "shops": [
+     "BRUNCH_SPOT",
+     "BAKERY",
+     "BRUNCH_SPOT",
+     "BRUNCH_SPOT"
+    ]
+   },
+   {
+    "day": 14,
+    "t": 359,
+    "players": [
+     {
+      "money": 25011,
+      "nq": 3,
+      "n_hands": 10,
+      "empty": 0,
+      "unlocked": 75,
+      "empty_pct": 0.0,
+      "prod_tiles": 75,
+      "crops": {
+       "WHEAT": 34,
+       "STRAWBERRY": 34
+      },
+      "animals": {
+       "COW": 4,
+       "SHEEP": 3
+      },
+      "struct_empty": 0,
+      "weed": 0
+     },
+     {
+      "money": 14160,
+      "nq": 3,
+      "n_hands": 11,
+      "empty": 0,
+      "unlocked": 75,
+      "empty_pct": 0.0,
+      "prod_tiles": 73,
+      "crops": {
+       "STRAWBERRY": 33,
+       "WHEAT": 11,
+       "MELON": 9,
+       "TOMATO": 5
+      },
+      "animals": {
+       "SHEEP": 3,
+       "GOOSE": 6,
+       "COW": 5
+      },
+      "struct_empty": 1,
+      "weed": 2
+     }
+    ],
+    "prices": {
+     "CARROT": 35,
+     "EGG": 60,
+     "FERTILIZER": 62,
+     "MELON": 194,
+     "MILK": 7,
+     "STRAWBERRY": 216,
+     "TOMATO": 62,
+     "WHEAT": 36,
+     "WOOL": 121
+    },
+    "inv": {
+     "EGG": 9833,
+     "FERTILIZER": 10188,
+     "MELON": 10075,
+     "MILK": 10073,
+     "STRAWBERRY": 9869,
+     "WHEAT": 9882
+    },
+    "shops": [
+     "BRUNCH_SPOT",
+     "BAKERY",
+     "BRUNCH_SPOT",
+     "BRUNCH_SPOT"
+    ]
+   },
+   {
+    "day": 15,
+    "t": 383,
+    "players": [
+     {
+      "money": 25409,
+      "nq": 3,
+      "n_hands": 10,
+      "empty": 1,
+      "unlocked": 75,
+      "empty_pct": 1.3,
+      "prod_tiles": 74,
+      "crops": {
+       "STRAWBERRY": 41,
+       "WHEAT": 26
+      },
+      "animals": {
+       "COW": 4,
+       "SHEEP": 3
+      },
+      "struct_empty": 0,
+      "weed": 0
+     },
+     {
+      "money": 22588,
+      "nq": 3,
+      "n_hands": 12,
+      "empty": 5,
+      "unlocked": 75,
+      "empty_pct": 6.7,
+      "prod_tiles": 68,
+      "crops": {
+       "STRAWBERRY": 33,
+       "WHEAT": 13,
+       "TOMATO": 5,
+       "MELON": 1
+      },
+      "animals": {
+       "SHEEP": 3,
+       "GOOSE": 6,
+       "COW": 6
+      },
+      "struct_empty": 1,
+      "weed": 2
+     }
+    ],
+    "prices": {
+     "CARROT": 35,
+     "EGG": 61,
+     "FERTILIZER": 63,
+     "MELON": 86,
+     "MILK": 7,
+     "STRAWBERRY": 225,
+     "TOMATO": 62,
+     "WHEAT": 36,
+     "WOOL": 43
+    },
+    "inv": {
+     "EGG": 9814,
+     "FERTILIZER": 10187,
+     "MELON": 10128,
+     "MILK": 10073,
+     "STRAWBERRY": 9844,
+     "WHEAT": 9888,
+     "WOOL": 10052
+    },
+    "shops": [
+     "BRUNCH_SPOT",
+     "BAKERY",
+     "BRUNCH_SPOT",
+     "BRUNCH_SPOT",
+     "SMOOTHIE_SHOP"
+    ]
+   },
+   {
+    "day": 16,
+    "t": 407,
+    "players": [
+     {
+      "money": 33109,
+      "nq": 3,
+      "n_hands": 10,
+      "empty": 5,
+      "unlocked": 75,
+      "empty_pct": 6.7,
+      "prod_tiles": 70,
+      "crops": {
+       "STRAWBERRY": 41,
+       "WHEAT": 22
+      },
+      "animals": {
+       "COW": 4,
+       "SHEEP": 3
+      },
+      "struct_empty": 0,
+      "weed": 0
+     },
+     {
+      "money": 26774,
+      "nq": 3,
+      "n_hands": 11,
+      "empty": 1,
+      "unlocked": 75,
+      "empty_pct": 1.3,
+      "prod_tiles": 71,
+      "crops": {
+       "STRAWBERRY": 33,
+       "WHEAT": 15,
+       "TOMATO": 6,
+       "MELON": 1
+      },
+      "animals": {
+       "SHEEP": 3,
+       "GOOSE": 6,
+       "COW": 6
+      },
+      "struct_empty": 1,
+      "weed": 3
+     }
+    ],
+    "prices": {
+     "CARROT": 35,
+     "EGG": 62,
+     "FERTILIZER": 62,
+     "MELON": 73,
+     "MILK": 9,
+     "STRAWBERRY": 219,
+     "TOMATO": 62,
+     "WHEAT": 35,
+     "WOOL": 1
+    },
+    "inv": {
+     "EGG": 9803,
+     "FERTILIZER": 10191,
+     "MELON": 10133,
+     "MILK": 10072,
+     "STRAWBERRY": 9861,
+     "WHEAT": 9896,
+     "WOOL": 10059
+    },
+    "shops": [
+     "BRUNCH_SPOT",
+     "BAKERY",
+     "BRUNCH_SPOT",
+     "BRUNCH_SPOT",
+     "SMOOTHIE_SHOP"
+    ]
+   },
+   {
+    "day": 17,
+    "t": 431,
+    "players": [
+     {
+      "money": 35204,
+      "nq": 3,
+      "n_hands": 10,
+      "empty": 0,
+      "unlocked": 75,
+      "empty_pct": 0.0,
+      "prod_tiles": 75,
+      "crops": {
+       "STRAWBERRY": 41,
+       "WHEAT": 27
+      },
+      "animals": {
+       "COW": 4,
+       "SHEEP": 3
+      },
+      "struct_empty": 0,
+      "weed": 0
+     },
+     {
+      "money": 31180,
+      "nq": 3,
+      "n_hands": 11,
+      "empty": 0,
+      "unlocked": 75,
+      "empty_pct": 0.0,
+      "prod_tiles": 74,
+      "crops": {
+       "STRAWBERRY": 34,
+       "WHEAT": 17,
+       "TOMATO": 8,
+       "MELON": 1
+      },
+      "animals": {
+       "SHEEP": 3,
+       "GOOSE": 6,
+       "COW": 5
+      },
+      "struct_empty": 0,
+      "weed": 1
+     }
+    ],
+    "prices": {
+     "CARROT": 36,
+     "EGG": 63,
+     "FERTILIZER": 61,
+     "MELON": 76,
+     "MILK": 11,
+     "STRAWBERRY": 220,
+     "TOMATO": 62,
+     "WHEAT": 34,
+     "WOOL": 5
+    },
+    "inv": {
+     "EGG": 9786,
+     "FERTILIZER": 10193,
+     "MELON": 10132,
+     "MILK": 10071,
+     "STRAWBERRY": 9859,
+     "WHEAT": 9913,
+     "WOOL": 10058
+    },
+    "shops": [
+     "BRUNCH_SPOT",
+     "BAKERY",
+     "BRUNCH_SPOT",
+     "BRUNCH_SPOT",
+     "SMOOTHIE_SHOP"
+    ]
+   },
+   {
+    "day": 18,
+    "t": 455,
+    "players": [
+     {
+      "money": 43666,
+      "nq": 3,
+      "n_hands": 11,
+      "empty": 2,
+      "unlocked": 75,
+      "empty_pct": 2.7,
+      "prod_tiles": 73,
+      "crops": {
+       "STRAWBERRY": 41,
+       "WHEAT": 25
+      },
+      "animals": {
+       "COW": 4,
+       "SHEEP": 3
+      },
+      "struct_empty": 0,
+      "weed": 0
+     },
+     {
+      "money": 34017,
+      "nq": 3,
+      "n_hands": 11,
+      "empty": 0,
+      "unlocked": 75,
+      "empty_pct": 0.0,
+      "prod_tiles": 75,
+      "crops": {
+       "STRAWBERRY": 34,
+       "WHEAT": 18,
+       "TOMATO": 8,
+       "MELON": 1
+      },
+      "animals": {
+       "SHEEP": 3,
+       "GOOSE": 6,
+       "COW": 5
+      },
+      "struct_empty": 0,
+      "weed": 0
+     }
+    ],
+    "prices": {
+     "CARROT": 37,
+     "EGG": 64,
+     "FERTILIZER": 59,
+     "MELON": 78,
+     "MILK": 5,
+     "STRAWBERRY": 214,
+     "TOMATO": 62,
+     "WHEAT": 33,
+     "WOOL": 11
+    },
+    "inv": {
+     "EGG": 9769,
+     "FERTILIZER": 10206,
+     "MELON": 10131,
+     "MILK": 10074,
+     "STRAWBERRY": 9876,
+     "WHEAT": 9928,
+     "WOOL": 10057
+    },
+    "shops": [
+     "BRUNCH_SPOT",
+     "BAKERY",
+     "BRUNCH_SPOT",
+     "BRUNCH_SPOT",
+     "SMOOTHIE_SHOP",
+     "PET_CAFE"
+    ]
+   },
+   {
+    "day": 19,
+    "t": 479,
+    "players": [
+     {
+      "money": 46044,
+      "nq": 3,
+      "n_hands": 10,
+      "empty": 0,
+      "unlocked": 75,
+      "empty_pct": 0.0,
+      "prod_tiles": 75,
+      "crops": {
+       "STRAWBERRY": 41,
+       "WHEAT": 27
+      },
+      "animals": {
+       "COW": 4,
+       "SHEEP": 3
+      },
+      "struct_empty": 0,
+      "weed": 0
+     },
+     {
+      "money": 41472,
+      "nq": 3,
+      "n_hands": 11,
+      "empty": 0,
+      "unlocked": 75,
+      "empty_pct": 0.0,
+      "prod_tiles": 75,
+      "crops": {
+       "STRAWBERRY": 34,
+       "WHEAT": 18,
+       "TOMATO": 8,
+       "MELON": 1
+      },
+      "animals": {
+       "SHEEP": 3,
+       "GOOSE": 6,
+       "COW": 5
+      },
+      "struct_empty": 0,
+      "weed": 0
+     }
+    ],
+    "prices": {
+     "CARROT": 38,
+     "EGG": 65,
+     "FERTILIZER": 59,
+     "MELON": 81,
+     "MILK": 7,
+     "STRAWBERRY": 207,
+     "TOMATO": 62,
+     "WHEAT": 34,
+     "WOOL": 1
+    },
+    "inv": {
+     "EGG": 9758,
+     "FERTILIZER": 10204,
+     "MELON": 10130,
+     "MILK": 10073,
+     "STRAWBERRY": 9893,
+     "WHEAT": 9927,
+     "WOOL": 10059
+    },
+    "shops": [
+     "BRUNCH_SPOT",
+     "BAKERY",
+     "BRUNCH_SPOT",
+     "BRUNCH_SPOT",
+     "SMOOTHIE_SHOP",
+     "PET_CAFE"
+    ]
+   },
+   {
+    "day": 20,
+    "t": 503,
+    "players": [
+     {
+      "money": 54442,
+      "nq": 3,
+      "n_hands": 11,
+      "empty": 0,
+      "unlocked": 75,
+      "empty_pct": 0.0,
+      "prod_tiles": 74,
+      "crops": {
+       "STRAWBERRY": 40,
+       "WHEAT": 27
+      },
+      "animals": {
+       "COW": 4,
+       "SHEEP": 3
+      },
+      "struct_empty": 0,
+      "weed": 1
+     },
+     {
+      "money": 46542,
+      "nq": 3,
+      "n_hands": 11,
+      "empty": 0,
+      "unlocked": 75,
+      "empty_pct": 0.0,
+      "prod_tiles": 74,
+      "crops": {
+       "STRAWBERRY": 34,
+       "WHEAT": 18,
+       "TOMATO": 7,
+       "MELON": 1
+      },
+      "animals": {
+       "SHEEP": 3,
+       "GOOSE": 6,
+       "COW": 5
+      },
+      "struct_empty": 0,
+      "weed": 1
+     }
+    ],
+    "prices": {
+     "CARROT": 39,
+     "EGG": 65,
+     "FERTILIZER": 59,
+     "MELON": 84,
+     "MILK": 7,
+     "STRAWBERRY": 192,
+     "TOMATO": 63,
+     "WHEAT": 32,
+     "WOOL": 5
+    },
+    "inv": {
+     "EGG": 9747,
+     "FERTILIZER": 10204,
+     "MELON": 10129,
+     "MILK": 10073,
+     "STRAWBERRY": 9926,
+     "WHEAT": 9947,
+     "WOOL": 10058
+    },
+    "shops": [
+     "BRUNCH_SPOT",
+     "BAKERY",
+     "BRUNCH_SPOT",
+     "BRUNCH_SPOT",
+     "SMOOTHIE_SHOP",
+     "PET_CAFE"
+    ]
+   },
+   {
+    "day": 21,
+    "t": 527,
+    "players": [
+     {
+      "money": 56604,
+      "nq": 3,
+      "n_hands": 10,
+      "empty": 0,
+      "unlocked": 75,
+      "empty_pct": 0.0,
+      "prod_tiles": 74,
+      "crops": {
+       "STRAWBERRY": 36,
+       "WHEAT": 26,
+       "CARROT": 5
+      },
+      "animals": {
+       "COW": 3,
+       "SHEEP": 3
+      },
+      "struct_empty": 1,
+      "weed": 1
+     },
+     {
+      "money": 50449,
+      "nq": 3,
+      "n_hands": 11,
+      "empty": 0,
+      "unlocked": 75,
+      "empty_pct": 0.0,
+      "prod_tiles": 74,
+      "crops": {
+       "STRAWBERRY": 32,
+       "WHEAT": 21,
+       "TOMATO": 7,
+       "MELON": 1
+      },
+      "animals": {
+       "SHEEP": 2,
+       "GOOSE": 6,
+       "COW": 5
+      },
+      "struct_empty": 0,
+      "weed": 1
+     }
+    ],
+    "prices": {
+     "CARROT": 40,
+     "EGG": 66,
+     "FERTILIZER": 60,
+     "MELON": 86,
+     "MILK": 5,
+     "STRAWBERRY": 195,
+     "TOMATO": 63,
+     "WHEAT": 32,
+     "WOOL": 5
+    },
+    "inv": {
+     "CARROT": 9935,
+     "EGG": 9736,
+     "FERTILIZER": 10202,
+     "MELON": 10128,
+     "MILK": 10074,
+     "STRAWBERRY": 9920,
+     "WHEAT": 9948,
+     "WOOL": 10058
+    },
+    "shops": [
+     "BRUNCH_SPOT",
+     "BAKERY",
+     "BRUNCH_SPOT",
+     "BRUNCH_SPOT",
+     "SMOOTHIE_SHOP",
+     "PET_CAFE",
+     "FARMERS_MARKET"
+    ]
+   },
+   {
+    "day": 22,
+    "t": 551,
+    "players": [
+     {
+      "money": 63643,
+      "nq": 3,
+      "n_hands": 10,
+      "empty": 1,
+      "unlocked": 75,
+      "empty_pct": 1.3,
+      "prod_tiles": 73,
+      "crops": {
+       "STRAWBERRY": 35,
+       "WHEAT": 24,
+       "CARROT": 7
+      },
+      "animals": {
+       "COW": 3,
+       "SHEEP": 3
+      },
+      "struct_empty": 1,
+      "weed": 1
+     },
+     {
+      "money": 55996,
+      "nq": 3,
+      "n_hands": 11,
+      "empty": 1,
+      "unlocked": 75,
+      "empty_pct": 1.3,
+      "prod_tiles": 74,
+      "crops": {
+       "STRAWBERRY": 22,
+       "WHEAT": 23,
+       "CARROT": 8,
+       "TOMATO": 7,
+       "MELON": 1
+      },
+      "animals": {
+       "SHEEP": 2,
+       "GOOSE": 6,
+       "COW": 5
+      },
+      "struct_empty": 0,
+      "weed": 0
+     }
+    ],
+    "prices": {
+     "CARROT": 42,
+     "EGG": 66,
+     "FERTILIZER": 59,
+     "MELON": 89,
+     "MILK": 7,
+     "STRAWBERRY": 183,
+     "TOMATO": 63,
+     "WHEAT": 32,
+     "WOOL": 1
+    },
+    "inv": {
+     "CARROT": 9916,
+     "EGG": 9727,
+     "FERTILIZER": 10204,
+     "MELON": 10127,
+     "MILK": 10073,
+     "STRAWBERRY": 9943,
+     "WOOL": 10059
+    },
+    "shops": [
+     "BRUNCH_SPOT",
+     "BAKERY",
+     "BRUNCH_SPOT",
+     "BRUNCH_SPOT",
+     "SMOOTHIE_SHOP",
+     "PET_CAFE",
+     "FARMERS_MARKET"
+    ]
+   },
+   {
+    "day": 23,
+    "t": 575,
+    "players": [
+     {
+      "money": 67988,
+      "nq": 3,
+      "n_hands": 10,
+      "empty": 0,
+      "unlocked": 75,
+      "empty_pct": 0.0,
+      "prod_tiles": 67,
+      "crops": {
+       "STRAWBERRY": 21,
+       "WHEAT": 27,
+       "CARROT": 12
+      },
+      "animals": {
+       "COW": 3,
+       "SHEEP": 3
+      },
+      "struct_empty": 1,
+      "weed": 8
+     },
+     {
+      "money": 63963,
+      "nq": 3,
+      "n_hands": 11,
+      "empty": 0,
+      "unlocked": 75,
+      "empty_pct": 0.0,
+      "prod_tiles": 75,
+      "crops": {
+       "STRAWBERRY": 15,
+       "WHEAT": 26,
+       "CARROT": 15,
+       "TOMATO": 5,
+       "MELON": 1
+      },
+      "animals": {
+       "SHEEP": 2,
+       "GOOSE": 6,
+       "COW": 5
+      },
+      "struct_empty": 0,
+      "weed": 0
+     }
+    ],
+    "prices": {
+     "CARROT": 43,
+     "EGG": 67,
+     "FERTILIZER": 59,
+     "MELON": 91,
+     "MILK": 5,
+     "STRAWBERRY": 165,
+     "TOMATO": 63,
+     "WHEAT": 29,
+     "WOOL": 5
+    },
+    "inv": {
+     "CARROT": 9897,
+     "EGG": 9712,
+     "FERTILIZER": 10204,
+     "MELON": 10126,
+     "MILK": 10074,
+     "WOOL": 10058
+    },
+    "shops": [
+     "BRUNCH_SPOT",
+     "BAKERY",
+     "BRUNCH_SPOT",
+     "BRUNCH_SPOT",
+     "SMOOTHIE_SHOP",
+     "PET_CAFE",
+     "FARMERS_MARKET"
+    ]
+   },
+   {
+    "day": 24,
+    "t": 599,
+    "players": [
+     {
+      "money": 69921,
+      "nq": 3,
+      "n_hands": 10,
+      "empty": 0,
+      "unlocked": 75,
+      "empty_pct": 0.0,
+      "prod_tiles": 64,
+      "crops": {
+       "STRAWBERRY": 18,
+       "WHEAT": 24,
+       "CARROT": 15
+      },
+      "animals": {
+       "COW": 3,
+       "SHEEP": 3
+      },
+      "struct_empty": 1,
+      "weed": 11
+     },
+     {
+      "money": 68781,
+      "nq": 3,
+      "n_hands": 11,
+      "empty": 0,
+      "unlocked": 75,
+      "empty_pct": 0.0,
+      "prod_tiles": 74,
+      "crops": {
+       "WHEAT": 23,
+       "CARROT": 19,
+       "STRAWBERRY": 13,
+       "TOMATO": 5,
+       "MELON": 1
+      },
+      "animals": {
+       "SHEEP": 2,
+       "GOOSE": 6,
+       "COW": 5
+      },
+      "struct_empty": 0,
+      "weed": 1
+     }
+    ],
+    "prices": {
+     "CARROT": 44,
+     "EGG": 68,
+     "FERTILIZER": 59,
+     "MELON": 94,
+     "MILK": 17,
+     "STRAWBERRY": 173,
+     "TOMATO": 64,
+     "WHEAT": 24,
+     "WOOL": 1
+    },
+    "inv": {
+     "CARROT": 9878,
+     "EGG": 9701,
+     "FERTILIZER": 10207,
+     "MELON": 10125,
+     "MILK": 10068,
+     "WOOL": 10059
+    },
+    "shops": [
+     "BRUNCH_SPOT",
+     "BAKERY",
+     "BRUNCH_SPOT",
+     "BRUNCH_SPOT",
+     "SMOOTHIE_SHOP",
+     "PET_CAFE",
+     "FARMERS_MARKET",
+     "SMOOTHIE_SHOP"
+    ]
+   },
+   {
+    "day": 25,
+    "t": 623,
+    "players": [
+     {
+      "money": 73167,
+      "nq": 3,
+      "n_hands": 9,
+      "empty": 1,
+      "unlocked": 75,
+      "empty_pct": 1.3,
+      "prod_tiles": 64,
+      "crops": {
+       "STRAWBERRY": 18,
+       "WHEAT": 20,
+       "CARROT": 19
+      },
+      "animals": {
+       "COW": 3,
+       "SHEEP": 3
+      },
+      "struct_empty": 1,
+      "weed": 10
+     },
+     {
+      "money": 72473,
+      "nq": 3,
+      "n_hands": 11,
+      "empty": 1,
+      "unlocked": 75,
+      "empty_pct": 1.3,
+      "prod_tiles": 73,
+      "crops": {
+       "WHEAT": 22,
+       "CARROT": 22,
+       "STRAWBERRY": 13,
+       "TOMATO": 3
+      },
+      "animals": {
+       "SHEEP": 2,
+       "GOOSE": 6,
+       "COW": 5
+      },
+      "struct_empty": 0,
+      "weed": 1
+     }
+    ],
+    "prices": {
+     "CARROT": 45,
+     "EGG": 69,
+     "FERTILIZER": 58,
+     "MELON": 96,
+     "MILK": 13,
+     "STRAWBERRY": 181,
+     "TOMATO": 63,
+     "WHEAT": 23,
+     "WOOL": 1
+    },
+    "inv": {
+     "CARROT": 9870,
+     "EGG": 9686,
+     "FERTILIZER": 10210,
+     "MELON": 10124,
+     "MILK": 10070,
+     "STRAWBERRY": 9948,
+     "WOOL": 10059
+    },
+    "shops": [
+     "BRUNCH_SPOT",
+     "BAKERY",
+     "BRUNCH_SPOT",
+     "BRUNCH_SPOT",
+     "SMOOTHIE_SHOP",
+     "PET_CAFE",
+     "FARMERS_MARKET",
+     "SMOOTHIE_SHOP"
+    ]
+   },
+   {
+    "day": 26,
+    "t": 647,
+    "players": [
+     {
+      "money": 78439,
+      "nq": 3,
+      "n_hands": 9,
+      "empty": 5,
+      "unlocked": 75,
+      "empty_pct": 6.7,
+      "prod_tiles": 57,
+      "crops": {
+       "STRAWBERRY": 15,
+       "WHEAT": 19,
+       "CARROT": 16
+      },
+      "animals": {
+       "COW": 3,
+       "SHEEP": 3
+      },
+      "struct_empty": 1,
+      "weed": 13
+     },
+     {
+      "money": 77715,
+      "nq": 3,
+      "n_hands": 11,
+      "empty": 5,
+      "unlocked": 75,
+      "empty_pct": 6.7,
+      "prod_tiles": 69,
+      "crops": {
+       "WHEAT": 16,
+       "CARROT": 25,
+       "STRAWBERRY": 13,
+       "TOMATO": 2
+      },
+      "animals": {
+       "SHEEP": 2,
+       "GOOSE": 6,
+       "COW": 5
+      },
+      "struct_empty": 0,
+      "weed": 1
+     }
+    ],
+    "prices": {
+     "CARROT": 44,
+     "EGG": 70,
+     "FERTILIZER": 57,
+     "MELON": 86,
+     "MILK": 28,
+     "STRAWBERRY": 182,
+     "TOMATO": 63,
+     "WHEAT": 23,
+     "WOOL": 1
+    },
+    "inv": {
+     "CARROT": 9887,
+     "EGG": 9673,
+     "FERTILIZER": 10213,
+     "MELON": 10128,
+     "MILK": 10063,
+     "STRAWBERRY": 9946,
+     "WOOL": 10059
+    },
+    "shops": [
+     "BRUNCH_SPOT",
+     "BAKERY",
+     "BRUNCH_SPOT",
+     "BRUNCH_SPOT",
+     "SMOOTHIE_SHOP",
+     "PET_CAFE",
+     "FARMERS_MARKET",
+     "SMOOTHIE_SHOP"
+    ]
+   },
+   {
+    "day": 27,
+    "t": 671,
+    "players": [
+     {
+      "money": 83284,
+      "nq": 3,
+      "n_hands": 9,
+      "empty": 19,
+      "unlocked": 75,
+      "empty_pct": 25.3,
+      "prod_tiles": 42,
+      "crops": {
+       "STRAWBERRY": 14,
+       "WHEAT": 14,
+       "CARROT": 7
+      },
+      "animals": {
+       "COW": 3,
+       "SHEEP": 3
+      },
+      "struct_empty": 1,
+      "weed": 14
+     },
+     {
+      "money": 82681,
+      "nq": 3,
+      "n_hands": 10,
+      "empty": 8,
+      "unlocked": 75,
+      "empty_pct": 10.7,
+      "prod_tiles": 67,
+      "crops": {
+       "CARROT": 29,
+       "WHEAT": 11,
+       "STRAWBERRY": 13,
+       "TOMATO": 1
+      },
+      "animals": {
+       "SHEEP": 2,
+       "GOOSE": 6,
+       "COW": 5
+      },
+      "struct_empty": 0,
+      "weed": 0
+     }
+    ],
+    "prices": {
+     "CARROT": 43,
+     "EGG": 70,
+     "FERTILIZER": 55,
+     "MELON": 89,
+     "MILK": 32,
+     "STRAWBERRY": 185,
+     "TOMATO": 63,
+     "WHEAT": 22,
+     "WOOL": 1
+    },
+    "inv": {
+     "CARROT": 9894,
+     "EGG": 9662,
+     "FERTILIZER": 10225,
+     "MELON": 10127,
+     "MILK": 10061,
+     "STRAWBERRY": 9941,
+     "WOOL": 10059
+    },
+    "shops": [
+     "BRUNCH_SPOT",
+     "BAKERY",
+     "BRUNCH_SPOT",
+     "BRUNCH_SPOT",
+     "SMOOTHIE_SHOP",
+     "PET_CAFE",
+     "FARMERS_MARKET",
+     "SMOOTHIE_SHOP"
+    ]
+   },
+   {
+    "day": 28,
+    "t": 695,
+    "players": [
+     {
+      "money": 88851,
+      "nq": 3,
+      "n_hands": 9,
+      "empty": 34,
+      "unlocked": 75,
+      "empty_pct": 45.3,
+      "prod_tiles": 27,
+      "crops": {
+       "STRAWBERRY": 14,
+       "WHEAT": 5,
+       "CARROT": 1
+      },
+      "animals": {
+       "COW": 3,
+       "SHEEP": 3
+      },
+      "struct_empty": 1,
+      "weed": 14
+     },
+     {
+      "money": 88185,
+      "nq": 3,
+      "n_hands": 11,
+      "empty": 28,
+      "unlocked": 75,
+      "empty_pct": 37.3,
+      "prod_tiles": 47,
+      "crops": {
+       "CARROT": 18,
+       "WHEAT": 8,
+       "STRAWBERRY": 8
+      },
+      "animals": {
+       "SHEEP": 2,
+       "GOOSE": 6,
+       "COW": 5
+      },
+      "struct_empty": 0,
+      "weed": 0
+     }
+    ],
+    "prices": {
+     "CARROT": 40,
+     "EGG": 72,
+     "FERTILIZER": 54,
+     "MELON": 91,
+     "MILK": 42,
+     "STRAWBERRY": 186,
+     "TOMATO": 64,
+     "WHEAT": 21,
+     "WOOL": 5
+    },
+    "inv": {
+     "CARROT": 9934,
+     "EGG": 9645,
+     "FERTILIZER": 10231,
+     "MELON": 10126,
+     "MILK": 10056,
+     "STRAWBERRY": 9938,
+     "WHEAT": 10068,
+     "WOOL": 10058
+    },
+    "shops": [
+     "BRUNCH_SPOT",
+     "BAKERY",
+     "BRUNCH_SPOT",
+     "BRUNCH_SPOT",
+     "SMOOTHIE_SHOP",
+     "PET_CAFE",
+     "FARMERS_MARKET",
+     "SMOOTHIE_SHOP"
+    ]
+   },
+   {
+    "day": 29,
+    "t": 719,
+    "players": [
+     {
+      "money": 93281,
+      "nq": 3,
+      "n_hands": 9,
+      "empty": 39,
+      "unlocked": 75,
+      "empty_pct": 52.0,
+      "prod_tiles": 15,
+      "crops": {
+       "STRAWBERRY": 7,
+       "CARROT": 1
+      },
+      "animals": {
+       "COW": 2,
+       "SHEEP": 2
+      },
+      "struct_empty": 3,
+      "weed": 21
+     },
+     {
+      "money": 99793,
+      "nq": 3,
+      "n_hands": 12,
+      "empty": 53,
+      "unlocked": 75,
+      "empty_pct": 70.7,
+      "prod_tiles": 22,
+      "crops": {
+       "STRAWBERRY": 8,
+       "WHEAT": 1
+      },
+      "animals": {
+       "GOOSE": 6,
+       "COW": 5
+      },
+      "struct_empty": 2,
+      "weed": 0
+     }
+    ],
+    "prices": {
+     "CARROT": 36,
+     "EGG": 73,
+     "FERTILIZER": 49,
+     "MELON": 94,
+     "MILK": 38,
+     "STRAWBERRY": 183,
+     "TOMATO": 64,
+     "WHEAT": 21,
+     "WOOL": 1
+    },
+    "inv": {
+     "EGG": 9640,
+     "FERTILIZER": 10255,
+     "MELON": 10125,
+     "MILK": 10058,
+     "STRAWBERRY": 9943,
+     "WHEAT": 10118,
+     "WOOL": 10059
+    },
+    "shops": [
+     "BRUNCH_SPOT",
+     "BAKERY",
+     "BRUNCH_SPOT",
+     "BRUNCH_SPOT",
+     "SMOOTHIE_SHOP",
+     "PET_CAFE",
+     "FARMERS_MARKET",
+     "SMOOTHIE_SHOP"
+    ]
+   }
+  ],
+  "sells": [
+   {
+    "WHEAT": 904,
+    "FERTILIZER": 123,
+    "CARROT": 116,
+    "WOOL": 59,
+    "MILK": 87,
+    "MELON": 90,
+    "STRAWBERRY": 413
+   },
+   {
+    "FERTILIZER": 406,
+    "WHEAT": 509,
+    "WOOL": 73,
+    "MILK": 152,
+    "MELON": 150,
+    "EGG": 228,
+    "STRAWBERRY": 313,
+    "TOMATO": 78,
+    "CARROT": 210
+   }
+  ],
+  "buys_animal": [
+   {
+    "COW": 7,
+    "SHEEP": 9
+   },
+   {
+    "COW": 6,
+    "SHEEP": 3,
+    "GOOSE": 6
+   }
+  ],
+  "buys_seed": [
+   {
+    "MELON": 18,
+    "CARROT": 33,
+    "WHEAT": 176,
+    "STRAWBERRY": 55
+   },
+   {
+    "MELON": 15,
+    "WHEAT": 133,
+    "STRAWBERRY": 34,
+    "TOMATO": 8,
+    "CARROT": 48
+   }
+  ],
+  "buys_product": [
+   {
+    "WHEAT": 449,
+    "CARROT": 306,
+    "TOMATO": 396,
+    "STRAWBERRY": 450,
+    "MILK": 276,
+    "EGG": 157,
+    "WOOL": 158,
+    "MELON": 281,
+    "FERTILIZER": 26
+   },
+   {
+    "WHEAT": 134,
+    "FERTILIZER": 17
+   }
+  ],
+  "hires": [
+   272,
+   293
+  ],
+  "land_buy_turn": {
+   "p0_NW": {
+    "turn": 23,
+    "day": 0
+   },
+   "p1_NW": {
+    "turn": 23,
+    "day": 0
+   },
+   "p1_NE": {
+    "turn": 95,
+    "day": 3
+   },
+   "p0_NE": {
+    "turn": 167,
+    "day": 6
+   },
+   "p0_SW": {
+    "turn": 215,
+    "day": 8
+   },
+   "p1_SW": {
+    "turn": 215,
+    "day": 8
+   }
+  },
+  "final_tiles": {
+   "p0": {
+    "money": 93281,
+    "crops": {
+     "STRAWBERRY": 7,
+     "CARROT": 1
+    },
+    "animals": {
+     "COW": 2,
+     "SHEEP": 2
+    },
+    "empty": 39,
+    "unlocked": 75,
+    "struct_empty": 3,
+    "weed": 21
+   },
+   "p1": {
+    "money": 99793,
+    "crops": {
+     "STRAWBERRY": 8,
+     "WHEAT": 1
+    },
+    "animals": {
+     "GOOSE": 6,
+     "COW": 5
+    },
+    "empty": 53,
+    "unlocked": 75,
+    "struct_empty": 2,
+    "weed": 0
+   }
+  }
+ },
+ "R2_107573831": {
+  "episode_id": 107573831,
+  "teams": [
+   "SpaTaro",
+   "Otter Vibe"
+  ],
+  "seed": 896878425,
+  "rewards": [
+   107329.0,
+   109084.0
+  ],
+  "n_steps": 720,
+  "daily": [
+   {
+    "day": 0,
+    "t": 23,
+    "players": [
+     {
+      "money": 118,
+      "nq": 1,
+      "n_hands": 6,
+      "empty": 3,
+      "unlocked": 25,
+      "empty_pct": 12.0,
+      "prod_tiles": 22,
+      "crops": {
+       "CARROT": 2,
+       "WHEAT": 7,
+       "MELON": 9
+      },
+      "animals": {
+       "SHEEP": 2,
+       "COW": 2
+      },
+      "struct_empty": 0,
+      "weed": 0
+     },
+     {
+      "money": 232,
+      "nq": 1,
+      "n_hands": 5,
+      "empty": 0,
+      "unlocked": 25,
+      "empty_pct": 0.0,
+      "prod_tiles": 25,
+      "crops": {
+       "MELON": 6,
+       "WHEAT": 14
+      },
+      "animals": {
+       "SHEEP": 2,
+       "GOOSE": 2,
+       "COW": 1
+      },
+      "struct_empty": 0,
+      "weed": 0
+     }
+    ],
+    "prices": {
+     "CARROT": 35,
+     "EGG": 50,
+     "FERTILIZER": 100,
+     "MELON": 256,
+     "MILK": 169,
+     "STRAWBERRY": 128,
+     "TOMATO": 60,
+     "WHEAT": 29,
+     "WOOL": 206
+    },
+    "inv": {},
+    "shops": []
+   },
+   {
+    "day": 1,
+    "t": 47,
+    "players": [
+     {
+      "money": 18,
+      "nq": 1,
+      "n_hands": 6,
+      "empty": 2,
+      "unlocked": 25,
+      "empty_pct": 8.0,
+      "prod_tiles": 23,
+      "crops": {
+       "CARROT": 2,
+       "WHEAT": 7,
+       "MELON": 10
+      },
+      "animals": {
+       "SHEEP": 2,
+       "COW": 2
+      },
+      "struct_empty": 0,
+      "weed": 0
+     },
+     {
+      "money": 584,
+      "nq": 1,
+      "n_hands": 1,
+      "empty": 0,
+      "unlocked": 25,
+      "empty_pct": 0.0,
+      "prod_tiles": 25,
+      "crops": {
+       "MELON": 6,
+       "WHEAT": 14
+      },
+      "animals": {
+       "SHEEP": 2,
+       "GOOSE": 2,
+       "COW": 1
+      },
+      "struct_empty": 0,
+      "weed": 0
+     }
+    ],
+    "prices": {
+     "CARROT": 35,
+     "EGG": 50,
+     "FERTILIZER": 99,
+     "MELON": 260,
+     "MILK": 172,
+     "STRAWBERRY": 132,
+     "TOMATO": 60,
+     "WHEAT": 29,
+     "WOOL": 209
+    },
+    "inv": {},
+    "shops": []
+   },
+   {
+    "day": 2,
+    "t": 71,
+    "players": [
+     {
+      "money": 163,
+      "nq": 1,
+      "n_hands": 6,
+      "empty": 3,
+      "unlocked": 25,
+      "empty_pct": 12.0,
+      "prod_tiles": 22,
+      "crops": {
+       "WHEAT": 7,
+       "MELON": 11
+      },
+      "animals": {
+       "SHEEP": 2,
+       "COW": 2
+      },
+      "struct_empty": 0,
+      "weed": 0
+     },
+     {
+      "money": 626,
+      "nq": 1,
+      "n_hands": 3,
+      "empty": 0,
+      "unlocked": 25,
+      "empty_pct": 0.0,
+      "prod_tiles": 25,
+      "crops": {
+       "MELON": 6,
+       "WHEAT": 14
+      },
+      "animals": {
+       "SHEEP": 2,
+       "GOOSE": 2,
+       "COW": 1
+      },
+      "struct_empty": 0,
+      "weed": 0
+     }
+    ],
+    "prices": {
+     "CARROT": 35,
+     "EGG": 50,
+     "FERTILIZER": 98,
+     "MELON": 262,
+     "MILK": 175,
+     "STRAWBERRY": 135,
+     "TOMATO": 60,
+     "WHEAT": 31,
+     "WOOL": 212
+    },
+    "inv": {},
+    "shops": []
+   },
+   {
+    "day": 3,
+    "t": 95,
+    "players": [
+     {
+      "money": 12,
+      "nq": 1,
+      "n_hands": 6,
+      "empty": 1,
+      "unlocked": 25,
+      "empty_pct": 4.0,
+      "prod_tiles": 24,
+      "crops": {
+       "WHEAT": 6,
+       "MELON": 13
+      },
+      "animals": {
+       "COW": 3,
+       "SHEEP": 2
+      },
+      "struct_empty": 0,
+      "weed": 0
+     },
+     {
+      "money": 954,
+      "nq": 1,
+      "n_hands": 2,
+      "empty": 0,
+      "unlocked": 25,
+      "empty_pct": 0.0,
+      "prod_tiles": 25,
+      "crops": {
+       "MELON": 6,
+       "WHEAT": 14
+      },
+      "animals": {
+       "SHEEP": 2,
+       "GOOSE": 2,
+       "COW": 1
+      },
+      "struct_empty": 0,
+      "weed": 0
+     }
+    ],
+    "prices": {
+     "CARROT": 36,
+     "EGG": 50,
+     "FERTILIZER": 96,
+     "MELON": 264,
+     "MILK": 177,
+     "STRAWBERRY": 137,
+     "TOMATO": 60,
+     "WHEAT": 31,
+     "WOOL": 214
+    },
+    "inv": {},
+    "shops": [
+     "PET_CAFE"
+    ]
+   },
+   {
+    "day": 4,
+    "t": 119,
+    "players": [
+     {
+      "money": 148,
+      "nq": 1,
+      "n_hands": 6,
+      "empty": 5,
+      "unlocked": 25,
+      "empty_pct": 20.0,
+      "prod_tiles": 20,
+      "crops": {
+       "WHEAT": 1,
+       "MELON": 14
+      },
+      "animals": {
+       "COW": 3,
+       "SHEEP": 2
+      },
+      "struct_empty": 0,
+      "weed": 0
+     },
+     {
+      "money": 1258,
+      "nq": 1,
+      "n_hands": 7,
+      "empty": 3,
+      "unlocked": 25,
+      "empty_pct": 12.0,
+      "prod_tiles": 22,
+      "crops": {
+       "MELON": 8,
+       "CARROT": 1,
+       "STRAWBERRY": 8
+      },
+      "animals": {
+       "SHEEP": 2,
+       "GOOSE": 2,
+       "COW": 1
+      },
+      "struct_empty": 0,
+      "weed": 0
+     }
+    ],
+    "prices": {
+     "CARROT": 37,
+     "EGG": 48,
+     "FERTILIZER": 94,
+     "MELON": 266,
+     "MILK": 179,
+     "STRAWBERRY": 139,
+     "TOMATO": 61,
+     "WHEAT": 31,
+     "WOOL": 215
+    },
+    "inv": {},
+    "shops": [
+     "PET_CAFE"
+    ]
+   },
+   {
+    "day": 5,
+    "t": 143,
+    "players": [
+     {
+      "money": 14,
+      "nq": 1,
+      "n_hands": 6,
+      "empty": 3,
+      "unlocked": 25,
+      "empty_pct": 12.0,
+      "prod_tiles": 22,
+      "crops": {
+       "CARROT": 1,
+       "MELON": 14,
+       "STRAWBERRY": 1
+      },
+      "animals": {
+       "COW": 4,
+       "SHEEP": 2
+      },
+      "struct_empty": 0,
+      "weed": 0
+     },
+     {
+      "money": 680,
+      "nq": 2,
+      "n_hands": 2,
+      "empty": 21,
+      "unlocked": 50,
+      "empty_pct": 42.0,
+      "prod_tiles": 29,
+      "crops": {
+       "MELON": 8,
+       "CARROT": 1,
+       "STRAWBERRY": 10,
+       "TOMATO": 1,
+       "WHEAT": 1
+      },
+      "animals": {
+       "SHEEP": 2,
+       "GOOSE": 3,
+       "COW": 3
+      },
+      "struct_empty": 0,
+      "weed": 0
+     }
+    ],
+    "prices": {
+     "CARROT": 38,
+     "EGG": 47,
+     "FERTILIZER": 92,
+     "MELON": 267,
+     "MILK": 181,
+     "STRAWBERRY": 141,
+     "TOMATO": 61,
+     "WHEAT": 23,
+     "WOOL": 217
+    },
+    "inv": {},
+    "shops": [
+     "PET_CAFE"
+    ]
+   },
+   {
+    "day": 6,
+    "t": 167,
+    "players": [
+     {
+      "money": 49,
+      "nq": 2,
+      "n_hands": 8,
+      "empty": 8,
+      "unlocked": 50,
+      "empty_pct": 16.0,
+      "prod_tiles": 42,
+      "crops": {
+       "CARROT": 3,
+       "MELON": 14,
+       "STRAWBERRY": 18,
+       "WHEAT": 1
+      },
+      "animals": {
+       "COW": 4,
+       "SHEEP": 2
+      },
+      "struct_empty": 0,
+      "weed": 0
+     },
+     {
+      "money": 610,
+      "nq": 2,
+      "n_hands": 4,
+      "empty": 14,
+      "unlocked": 50,
+      "empty_pct": 28.0,
+      "prod_tiles": 35,
+      "crops": {
+       "MELON": 8,
+       "CARROT": 1,
+       "WHEAT": 5,
+       "STRAWBERRY": 12,
+       "TOMATO": 1
+      },
+      "animals": {
+       "SHEEP": 2,
+       "GOOSE": 3,
+       "COW": 3
+      },
+      "struct_empty": 0,
+      "weed": 1
+     }
+    ],
+    "prices": {
+     "CARROT": 39,
+     "EGG": 49,
+     "FERTILIZER": 90,
+     "MELON": 268,
+     "MILK": 183,
+     "STRAWBERRY": 150,
+     "TOMATO": 61,
+     "WHEAT": 28,
+     "WOOL": 199
+    },
+    "inv": {
+     "CARROT": 9949
+    },
+    "shops": [
+     "PET_CAFE",
+     "BRUNCH_SPOT"
+    ]
+   },
+   {
+    "day": 7,
+    "t": 191,
+    "players": [
+     {
+      "money": 40,
+      "nq": 2,
+      "n_hands": 9,
+      "empty": 0,
+      "unlocked": 50,
+      "empty_pct": 0.0,
+      "prod_tiles": 50,
+      "crops": {
+       "CARROT": 10,
+       "MELON": 14,
+       "STRAWBERRY": 19,
+       "WHEAT": 1
+      },
+      "animals": {
+       "COW": 4,
+       "SHEEP": 2
+      },
+      "struct_empty": 0,
+      "weed": 0
+     },
+     {
+      "money": 886,
+      "nq": 2,
+      "n_hands": 7,
+      "empty": 0,
+      "unlocked": 50,
+      "empty_pct": 0.0,
+      "prod_tiles": 50,
+      "crops": {
+       "MELON": 10,
+       "STRAWBERRY": 20,
+       "WHEAT": 5,
+       "TOMATO": 2
+      },
+      "animals": {
+       "SHEEP": 3,
+       "GOOSE": 6,
+       "COW": 4
+      },
+      "struct_empty": 0,
+      "weed": 0
+     }
+    ],
+    "prices": {
+     "CARROT": 40,
+     "EGG": 50,
+     "FERTILIZER": 87,
+     "MELON": 269,
+     "MILK": 185,
+     "STRAWBERRY": 158,
+     "TOMATO": 61,
+     "WHEAT": 31,
+     "WOOL": 185
+    },
+    "inv": {
+     "CARROT": 9936,
+     "FERTILIZER": 10066
+    },
+    "shops": [
+     "PET_CAFE",
+     "BRUNCH_SPOT"
+    ]
+   },
+   {
+    "day": 8,
+    "t": 215,
+    "players": [
+     {
+      "money": 67,
+      "nq": 3,
+      "n_hands": 10,
+      "empty": 5,
+      "unlocked": 75,
+      "empty_pct": 6.7,
+      "prod_tiles": 70,
+      "crops": {
+       "CARROT": 27,
+       "MELON": 14,
+       "STRAWBERRY": 19,
+       "WHEAT": 4
+      },
+      "animals": {
+       "COW": 4,
+       "SHEEP": 2
+      },
+      "struct_empty": 0,
+      "weed": 0
+     },
+     {
+      "money": 1660,
+      "nq": 2,
+      "n_hands": 5,
+      "empty": 0,
+      "unlocked": 50,
+      "empty_pct": 0.0,
+      "prod_tiles": 50,
+      "crops": {
+       "MELON": 10,
+       "STRAWBERRY": 20,
+       "WHEAT": 5,
+       "TOMATO": 2
+      },
+      "animals": {
+       "SHEEP": 3,
+       "GOOSE": 6,
+       "COW": 4
+      },
+      "struct_empty": 0,
+      "weed": 0
+     }
+    ],
+    "prices": {
+     "CARROT": 41,
+     "EGG": 50,
+     "FERTILIZER": 85,
+     "MELON": 270,
+     "MILK": 141,
+     "STRAWBERRY": 164,
+     "TOMATO": 61,
+     "WHEAT": 33,
+     "WOOL": 187
+    },
+    "inv": {
+     "CARROT": 9926,
+     "FERTILIZER": 10073,
+     "WHEAT": 9942
+    },
+    "shops": [
+     "PET_CAFE",
+     "BRUNCH_SPOT"
+    ]
+   },
+   {
+    "day": 9,
+    "t": 239,
+    "players": [
+     {
+      "money": 302,
+      "nq": 3,
+      "n_hands": 9,
+      "empty": 1,
+      "unlocked": 75,
+      "empty_pct": 1.3,
+      "prod_tiles": 74,
+      "crops": {
+       "CARROT": 24,
+       "STRAWBERRY": 25,
+       "MELON": 14,
+       "WHEAT": 4
+      },
+      "animals": {
+       "COW": 5,
+       "SHEEP": 2
+      },
+      "struct_empty": 0,
+      "weed": 0
+     },
+     {
+      "money": 3339,
+      "nq": 2,
+      "n_hands": 6,
+      "empty": 0,
+      "unlocked": 50,
+      "empty_pct": 0.0,
+      "prod_tiles": 50,
+      "crops": {
+       "MELON": 10,
+       "STRAWBERRY": 20,
+       "WHEAT": 4,
+       "TOMATO": 2
+      },
+      "animals": {
+       "SHEEP": 3,
+       "GOOSE": 6,
+       "COW": 5
+      },
+      "struct_empty": 0,
+      "weed": 0
+     }
+    ],
+    "prices": {
+     "CARROT": 41,
+     "EGG": 51,
+     "FERTILIZER": 81,
+     "MELON": 271,
+     "MILK": 156,
+     "STRAWBERRY": 173,
+     "TOMATO": 61,
+     "WHEAT": 35,
+     "WOOL": 148
+    },
+    "inv": {
+     "CARROT": 9917,
+     "FERTILIZER": 10093,
+     "WHEAT": 9898
+    },
+    "shops": [
+     "PET_CAFE",
+     "BRUNCH_SPOT",
+     "ICE_CREAM_SHOP"
+    ]
+   },
+   {
+    "day": 10,
+    "t": 263,
+    "players": [
+     {
+      "money": 12868,
+      "nq": 3,
+      "n_hands": 11,
+      "empty": 4,
+      "unlocked": 75,
+      "empty_pct": 5.3,
+      "prod_tiles": 71,
+      "crops": {
+       "STRAWBERRY": 27,
+       "WHEAT": 10,
+       "MELON": 5,
+       "CARROT": 21
+      },
+      "animals": {
+       "COW": 6,
+       "SHEEP": 2
+      },
+      "struct_empty": 0,
+      "weed": 0
+     },
+     {
+      "money": 5943,
+      "nq": 3,
+      "n_hands": 12,
+      "empty": 16,
+      "unlocked": 75,
+      "empty_pct": 21.3,
+      "prod_tiles": 59,
+      "crops": {
+       "TOMATO": 5,
+       "STRAWBERRY": 28,
+       "MELON": 9,
+       "WHEAT": 2
+      },
+      "animals": {
+       "SHEEP": 3,
+       "GOOSE": 6,
+       "COW": 6
+      },
+      "struct_empty": 0,
+      "weed": 0
+     }
+    ],
+    "prices": {
+     "CARROT": 42,
+     "EGG": 50,
+     "FERTILIZER": 77,
+     "MELON": 213,
+     "MILK": 158,
+     "STRAWBERRY": 181,
+     "TOMATO": 61,
+     "WHEAT": 37,
+     "WOOL": 151
+    },
+    "inv": {
+     "CARROT": 9914,
+     "FERTILIZER": 10113,
+     "MELON": 10061,
+     "STRAWBERRY": 9947,
+     "WHEAT": 9862
+    },
+    "shops": [
+     "PET_CAFE",
+     "BRUNCH_SPOT",
+     "ICE_CREAM_SHOP"
+    ]
+   },
+   {
+    "day": 11,
+    "t": 287,
+    "players": [
+     {
+      "money": 15722,
+      "nq": 3,
+      "n_hands": 10,
+      "empty": 4,
+      "unlocked": 75,
+      "empty_pct": 5.3,
+      "prod_tiles": 71,
+      "crops": {
+       "STRAWBERRY": 27,
+       "WHEAT": 17,
+       "MELON": 4,
+       "CARROT": 15
+      },
+      "animals": {
+       "COW": 6,
+       "SHEEP": 2
+      },
+      "struct_empty": 0,
+      "weed": 0
+     },
+     {
+      "money": 9863,
+      "nq": 3,
+      "n_hands": 9,
+      "empty": 0,
+      "unlocked": 75,
+      "empty_pct": 0.0,
+      "prod_tiles": 75,
+      "crops": {
+       "TOMATO": 7,
+       "STRAWBERRY": 28,
+       "MELON": 9,
+       "WHEAT": 14
+      },
+      "animals": {
+       "SHEEP": 3,
+       "GOOSE": 8,
+       "COW": 6
+      },
+      "struct_empty": 0,
+      "weed": 0
+     }
+    ],
+    "prices": {
+     "CARROT": 42,
+     "EGG": 50,
+     "FERTILIZER": 73,
+     "MELON": 189,
+     "MILK": 154,
+     "STRAWBERRY": 188,
+     "TOMATO": 61,
+     "WHEAT": 37,
+     "WOOL": 154
+    },
+    "inv": {
+     "CARROT": 9914,
+     "FERTILIZER": 10135,
+     "MELON": 10078,
+     "STRAWBERRY": 9934,
+     "WHEAT": 9857
+    },
+    "shops": [
+     "PET_CAFE",
+     "BRUNCH_SPOT",
+     "ICE_CREAM_SHOP"
+    ]
+   },
+   {
+    "day": 12,
+    "t": 311,
+    "players": [
+     {
+      "money": 19872,
+      "nq": 3,
+      "n_hands": 10,
+      "empty": 1,
+      "unlocked": 75,
+      "empty_pct": 1.3,
+      "prod_tiles": 74,
+      "crops": {
+       "WHEAT": 15,
+       "STRAWBERRY": 31,
+       "MELON": 3,
+       "CARROT": 14
+      },
+      "animals": {
+       "COW": 9,
+       "SHEEP": 2
+      },
+      "struct_empty": 0,
+      "weed": 0
+     },
+     {
+      "money": 12278,
+      "nq": 3,
+      "n_hands": 8,
+      "empty": 0,
+      "unlocked": 75,
+      "empty_pct": 0.0,
+      "prod_tiles": 75,
+      "crops": {
+       "TOMATO": 7,
+       "STRAWBERRY": 28,
+       "MELON": 9,
+       "WHEAT": 14
+      },
+      "animals": {
+       "SHEEP": 3,
+       "GOOSE": 8,
+       "COW": 6
+      },
+      "struct_empty": 0,
+      "weed": 0
+     }
+    ],
+    "prices": {
+     "CARROT": 39,
+     "EGG": 47,
+     "FERTILIZER": 68,
+     "MELON": 174,
+     "MILK": 172,
+     "STRAWBERRY": 197,
+     "TOMATO": 62,
+     "WHEAT": 39,
+     "WOOL": 93
+    },
+    "inv": {
+     "FERTILIZER": 10158,
+     "MELON": 10087,
+     "STRAWBERRY": 9915,
+     "WHEAT": 9814
+    },
+    "shops": [
+     "PET_CAFE",
+     "BRUNCH_SPOT",
+     "ICE_CREAM_SHOP",
+     "ICE_CREAM_SHOP"
+    ]
+   },
+   {
+    "day": 13,
+    "t": 335,
+    "players": [
+     {
+      "money": 22703,
+      "nq": 3,
+      "n_hands": 10,
+      "empty": 0,
+      "unlocked": 75,
+      "empty_pct": 0.0,
+      "prod_tiles": 75,
+      "crops": {
+       "WHEAT": 16,
+       "STRAWBERRY": 33,
+       "MELON": 1,
+       "CARROT": 14
+      },
+      "animals": {
+       "COW": 9,
+       "SHEEP": 2
+      },
+      "struct_empty": 0,
+      "weed": 0
+     },
+     {
+      "money": 12580,
+      "nq": 3,
+      "n_hands": 10,
+      "empty": 0,
+      "unlocked": 75,
+      "empty_pct": 0.0,
+      "prod_tiles": 75,
+      "crops": {
+       "TOMATO": 7,
+       "STRAWBERRY": 28,
+       "MELON": 9,
+       "WHEAT": 14
+      },
+      "animals": {
+       "SHEEP": 3,
+       "GOOSE": 8,
+       "COW": 6
+      },
+      "struct_empty": 0,
+      "weed": 0
+     }
+    ],
+    "prices": {
+     "CARROT": 39,
+     "EGG": 46,
+     "FERTILIZER": 69,
+     "MELON": 167,
+     "MILK": 175,
+     "STRAWBERRY": 206,
+     "TOMATO": 61,
+     "WHEAT": 40,
+     "WOOL": 98
+    },
+    "inv": {
+     "CARROT": 9945,
+     "FERTILIZER": 10157,
+     "MELON": 10091,
+     "STRAWBERRY": 9896,
+     "WHEAT": 9787
+    },
+    "shops": [
+     "PET_CAFE",
+     "BRUNCH_SPOT",
+     "ICE_CREAM_SHOP",
+     "ICE_CREAM_SHOP"
+    ]
+   },
+   {
+    "day": 14,
+    "t": 359,
+    "players": [
+     {
+      "money": 26007,
+      "nq": 3,
+      "n_hands": 10,
+      "empty": 2,
+      "unlocked": 75,
+      "empty_pct": 2.7,
+      "prod_tiles": 73,
+      "crops": {
+       "WHEAT": 21,
+       "STRAWBERRY": 33,
+       "CARROT": 8
+      },
+      "animals": {
+       "COW": 9,
+       "SHEEP": 2
+      },
+      "struct_empty": 0,
+      "weed": 0
+     },
+     {
+      "money": 14045,
+      "nq": 3,
+      "n_hands": 10,
+      "empty": 0,
+      "unlocked": 75,
+      "empty_pct": 0.0,
+      "prod_tiles": 75,
+      "crops": {
+       "TOMATO": 7,
+       "STRAWBERRY": 28,
+       "MELON": 7,
+       "WHEAT": 15
+      },
+      "animals": {
+       "SHEEP": 3,
+       "GOOSE": 8,
+       "COW": 7
+      },
+      "struct_empty": 0,
+      "weed": 0
+     }
+    ],
+    "prices": {
+     "CARROT": 40,
+     "EGG": 46,
+     "FERTILIZER": 64,
+     "MELON": 148,
+     "MILK": 169,
+     "STRAWBERRY": 213,
+     "TOMATO": 62,
+     "WHEAT": 41,
+     "WOOL": 72
+    },
+    "inv": {
+     "CARROT": 9932,
+     "FERTILIZER": 10179,
+     "MELON": 10101,
+     "STRAWBERRY": 9877,
+     "WHEAT": 9746
+    },
+    "shops": [
+     "PET_CAFE",
+     "BRUNCH_SPOT",
+     "ICE_CREAM_SHOP",
+     "ICE_CREAM_SHOP"
+    ]
+   },
+   {
+    "day": 15,
+    "t": 383,
+    "players": [
+     {
+      "money": 27625,
+      "nq": 3,
+      "n_hands": 10,
+      "empty": 1,
+      "unlocked": 75,
+      "empty_pct": 1.3,
+      "prod_tiles": 74,
+      "crops": {
+       "WHEAT": 24,
+       "STRAWBERRY": 33,
+       "CARROT": 6
+      },
+      "animals": {
+       "COW": 9,
+       "SHEEP": 2
+      },
+      "struct_empty": 0,
+      "weed": 0
+     },
+     {
+      "money": 21795,
+      "nq": 3,
+      "n_hands": 13,
+      "empty": 0,
+      "unlocked": 75,
+      "empty_pct": 0.0,
+      "prod_tiles": 75,
+      "crops": {
+       "TOMATO": 12,
+       "STRAWBERRY": 28,
+       "MELON": 7,
+       "WHEAT": 8
+      },
+      "animals": {
+       "SHEEP": 3,
+       "GOOSE": 8,
+       "COW": 9
+      },
+      "struct_empty": 0,
+      "weed": 0
+     }
+    ],
+    "prices": {
+     "CARROT": 38,
+     "EGG": 45,
+     "FERTILIZER": 59,
+     "MELON": 120,
+     "MILK": 193,
+     "STRAWBERRY": 213,
+     "TOMATO": 62,
+     "WHEAT": 42,
+     "WOOL": 11
+    },
+    "inv": {
+     "FERTILIZER": 10203,
+     "MELON": 10114,
+     "STRAWBERRY": 9878,
+     "WHEAT": 9713,
+     "WOOL": 10057
+    },
+    "shops": [
+     "PET_CAFE",
+     "BRUNCH_SPOT",
+     "ICE_CREAM_SHOP",
+     "ICE_CREAM_SHOP",
+     "PIZZA_SHOP"
+    ]
+   },
+   {
+    "day": 16,
+    "t": 407,
+    "players": [
+     {
+      "money": 34706,
+      "nq": 3,
+      "n_hands": 11,
+      "empty": 1,
+      "unlocked": 75,
+      "empty_pct": 1.3,
+      "prod_tiles": 74,
+      "crops": {
+       "WHEAT": 24,
+       "STRAWBERRY": 33,
+       "CARROT": 6
+      },
+      "animals": {
+       "COW": 9,
+       "SHEEP": 2
+      },
+      "struct_empty": 0,
+      "weed": 0
+     },
+     {
+      "money": 27330,
+      "nq": 3,
+      "n_hands": 11,
+      "empty": 0,
+      "unlocked": 75,
+      "empty_pct": 0.0,
+      "prod_tiles": 75,
+      "crops": {
+       "TOMATO": 11,
+       "STRAWBERRY": 28,
+       "MELON": 7,
+       "WHEAT": 9
+      },
+      "animals": {
+       "SHEEP": 3,
+       "GOOSE": 8,
+       "COW": 9
+      },
+      "struct_empty": 0,
+      "weed": 0
+     }
+    ],
+    "prices": {
+     "CARROT": 39,
+     "EGG": 44,
+     "FERTILIZER": 58,
+     "MELON": 122,
+     "MILK": 194,
+     "STRAWBERRY": 208,
+     "TOMATO": 63,
+     "WHEAT": 41,
+     "WOOL": 1
+    },
+    "inv": {
+     "CARROT": 9947,
+     "FERTILIZER": 10209,
+     "MELON": 10113,
+     "STRAWBERRY": 9889,
+     "WHEAT": 9741,
+     "WOOL": 10059
+    },
+    "shops": [
+     "PET_CAFE",
+     "BRUNCH_SPOT",
+     "ICE_CREAM_SHOP",
+     "ICE_CREAM_SHOP",
+     "PIZZA_SHOP"
+    ]
+   },
+   {
+    "day": 17,
+    "t": 431,
+    "players": [
+     {
+      "money": 38733,
+      "nq": 3,
+      "n_hands": 10,
+      "empty": 0,
+      "unlocked": 75,
+      "empty_pct": 0.0,
+      "prod_tiles": 75,
+      "crops": {
+       "WHEAT": 30,
+       "STRAWBERRY": 33,
+       "CARROT": 1
+      },
+      "animals": {
+       "COW": 9,
+       "SHEEP": 2
+      },
+      "struct_empty": 0,
+      "weed": 0
+     },
+     {
+      "money": 33571,
+      "nq": 3,
+      "n_hands": 12,
+      "empty": 0,
+      "unlocked": 75,
+      "empty_pct": 0.0,
+      "prod_tiles": 75,
+      "crops": {
+       "TOMATO": 11,
+       "STRAWBERRY": 28,
+       "WHEAT": 11,
+       "MELON": 5
+      },
+      "animals": {
+       "SHEEP": 3,
+       "GOOSE": 8,
+       "COW": 9
+      },
+      "struct_empty": 0,
+      "weed": 0
+     }
+    ],
+    "prices": {
+     "CARROT": 40,
+     "EGG": 44,
+     "FERTILIZER": 56,
+     "MELON": 111,
+     "MILK": 195,
+     "STRAWBERRY": 205,
+     "TOMATO": 63,
+     "WHEAT": 42,
+     "WOOL": 5
+    },
+    "inv": {
+     "CARROT": 9934,
+     "FERTILIZER": 10219,
+     "MELON": 10118,
+     "STRAWBERRY": 9897,
+     "WHEAT": 9709,
+     "WOOL": 10058
+    },
+    "shops": [
+     "PET_CAFE",
+     "BRUNCH_SPOT",
+     "ICE_CREAM_SHOP",
+     "ICE_CREAM_SHOP",
+     "PIZZA_SHOP"
+    ]
+   },
+   {
+    "day": 18,
+    "t": 455,
+    "players": [
+     {
+      "money": 44680,
+      "nq": 3,
+      "n_hands": 11,
+      "empty": 1,
+      "unlocked": 75,
+      "empty_pct": 1.3,
+      "prod_tiles": 74,
+      "crops": {
+       "WHEAT": 28,
+       "STRAWBERRY": 33,
+       "CARROT": 2
+      },
+      "animals": {
+       "COW": 9,
+       "SHEEP": 2
+      },
+      "struct_empty": 0,
+      "weed": 0
+     },
+     {
+      "money": 43090,
+      "nq": 3,
+      "n_hands": 12,
+      "empty": 0,
+      "unlocked": 75,
+      "empty_pct": 0.0,
+      "prod_tiles": 75,
+      "crops": {
+       "TOMATO": 11,
+       "STRAWBERRY": 28,
+       "WHEAT": 9,
+       "MELON": 5
+      },
+      "animals": {
+       "SHEEP": 3,
+       "COW": 11,
+       "GOOSE": 8
+      },
+      "struct_empty": 0,
+      "weed": 0
+     }
+    ],
+    "prices": {
+     "CARROT": 40,
+     "EGG": 43,
+     "FERTILIZER": 53,
+     "MELON": 99,
+     "MILK": 200,
+     "STRAWBERRY": 192,
+     "TOMATO": 63,
+     "WHEAT": 43,
+     "WOOL": 11
+    },
+    "inv": {
+     "CARROT": 9939,
+     "FERTILIZER": 10236,
+     "MELON": 10123,
+     "STRAWBERRY": 9926,
+     "WHEAT": 9670,
+     "WOOL": 10057
+    },
+    "shops": [
+     "PET_CAFE",
+     "BRUNCH_SPOT",
+     "ICE_CREAM_SHOP",
+     "ICE_CREAM_SHOP",
+     "PIZZA_SHOP",
+     "SMOOTHIE_SHOP"
+    ]
+   },
+   {
+    "day": 19,
+    "t": 479,
+    "players": [
+     {
+      "money": 51289,
+      "nq": 3,
+      "n_hands": 11,
+      "empty": 2,
+      "unlocked": 75,
+      "empty_pct": 2.7,
+      "prod_tiles": 73,
+      "crops": {
+       "STRAWBERRY": 33,
+       "WHEAT": 27,
+       "CARROT": 2
+      },
+      "animals": {
+       "COW": 9,
+       "SHEEP": 2
+      },
+      "struct_empty": 0,
+      "weed": 0
+     },
+     {
+      "money": 46794,
+      "nq": 3,
+      "n_hands": 14,
+      "empty": 0,
+      "unlocked": 75,
+      "empty_pct": 0.0,
+      "prod_tiles": 75,
+      "crops": {
+       "TOMATO": 11,
+       "STRAWBERRY": 28,
+       "WHEAT": 9,
+       "MELON": 5
+      },
+      "animals": {
+       "SHEEP": 3,
+       "COW": 11,
+       "GOOSE": 8
+      },
+      "struct_empty": 0,
+      "weed": 0
+     }
+    ],
+    "prices": {
+     "CARROT": 41,
+     "EGG": 43,
+     "FERTILIZER": 50,
+     "MELON": 101,
+     "MILK": 203,
+     "STRAWBERRY": 193,
+     "TOMATO": 63,
+     "WHEAT": 43,
+     "WOOL": 5
+    },
+    "inv": {
+     "CARROT": 9926,
+     "EGG": 10057,
+     "FERTILIZER": 10248,
+     "MELON": 10122,
+     "STRAWBERRY": 9925,
+     "WHEAT": 9669,
+     "WOOL": 10058
+    },
+    "shops": [
+     "PET_CAFE",
+     "BRUNCH_SPOT",
+     "ICE_CREAM_SHOP",
+     "ICE_CREAM_SHOP",
+     "PIZZA_SHOP",
+     "SMOOTHIE_SHOP"
+    ]
+   },
+   {
+    "day": 20,
+    "t": 503,
+    "players": [
+     {
+      "money": 63143,
+      "nq": 3,
+      "n_hands": 12,
+      "empty": 0,
+      "unlocked": 75,
+      "empty_pct": 0.0,
+      "prod_tiles": 75,
+      "crops": {
+       "WHEAT": 30,
+       "STRAWBERRY": 33,
+       "CARROT": 1
+      },
+      "animals": {
+       "COW": 9,
+       "SHEEP": 2
+      },
+      "struct_empty": 0,
+      "weed": 0
+     },
+     {
+      "money": 58670,
+      "nq": 3,
+      "n_hands": 15,
+      "empty": 0,
+      "unlocked": 75,
+      "empty_pct": 0.0,
+      "prod_tiles": 75,
+      "crops": {
+       "TOMATO": 11,
+       "STRAWBERRY": 20,
+       "WHEAT": 22
+      },
+      "animals": {
+       "SHEEP": 3,
+       "COW": 11,
+       "GOOSE": 8
+      },
+      "struct_empty": 0,
+      "weed": 0
+     }
+    ],
+    "prices": {
+     "CARROT": 42,
+     "EGG": 43,
+     "FERTILIZER": 47,
+     "MELON": 40,
+     "MILK": 190,
+     "STRAWBERRY": 163,
+     "TOMATO": 63,
+     "WHEAT": 43,
+     "WOOL": 11
+    },
+    "inv": {
+     "CARROT": 9914,
+     "EGG": 10061,
+     "FERTILIZER": 10267,
+     "MELON": 10145,
+     "WHEAT": 9674,
+     "WOOL": 10057
+    },
+    "shops": [
+     "PET_CAFE",
+     "BRUNCH_SPOT",
+     "ICE_CREAM_SHOP",
+     "ICE_CREAM_SHOP",
+     "PIZZA_SHOP",
+     "SMOOTHIE_SHOP"
+    ]
+   },
+   {
+    "day": 21,
+    "t": 527,
+    "players": [
+     {
+      "money": 68596,
+      "nq": 3,
+      "n_hands": 11,
+      "empty": 1,
+      "unlocked": 75,
+      "empty_pct": 1.3,
+      "prod_tiles": 74,
+      "crops": {
+       "WHEAT": 30,
+       "STRAWBERRY": 33
+      },
+      "animals": {
+       "COW": 9,
+       "SHEEP": 2
+      },
+      "struct_empty": 0,
+      "weed": 0
+     },
+     {
+      "money": 64093,
+      "nq": 3,
+      "n_hands": 13,
+      "empty": 0,
+      "unlocked": 75,
+      "empty_pct": 0.0,
+      "prod_tiles": 75,
+      "crops": {
+       "WHEAT": 27,
+       "STRAWBERRY": 18,
+       "TOMATO": 8
+      },
+      "animals": {
+       "SHEEP": 3,
+       "COW": 11,
+       "GOOSE": 8
+      },
+      "struct_empty": 0,
+      "weed": 0
+     }
+    ],
+    "prices": {
+     "CARROT": 44,
+     "EGG": 43,
+     "FERTILIZER": 43,
+     "MELON": 25,
+     "MILK": 194,
+     "STRAWBERRY": 150,
+     "TOMATO": 63,
+     "WHEAT": 44,
+     "WOOL": 18
+    },
+    "inv": {
+     "CARROT": 9889,
+     "EGG": 10070,
+     "FERTILIZER": 10285,
+     "MELON": 10150,
+     "WHEAT": 9646,
+     "WOOL": 10056
+    },
+    "shops": [
+     "PET_CAFE",
+     "BRUNCH_SPOT",
+     "ICE_CREAM_SHOP",
+     "ICE_CREAM_SHOP",
+     "PIZZA_SHOP",
+     "SMOOTHIE_SHOP",
+     "PET_CAFE"
+    ]
+   },
+   {
+    "day": 22,
+    "t": 551,
+    "players": [
+     {
+      "money": 76468,
+      "nq": 3,
+      "n_hands": 11,
+      "empty": 1,
+      "unlocked": 75,
+      "empty_pct": 1.3,
+      "prod_tiles": 73,
+      "crops": {
+       "WHEAT": 31,
+       "STRAWBERRY": 30,
+       "CARROT": 1
+      },
+      "animals": {
+       "COW": 9,
+       "SHEEP": 2
+      },
+      "struct_empty": 0,
+      "weed": 1
+     },
+     {
+      "money": 68847,
+      "nq": 3,
+      "n_hands": 14,
+      "empty": 0,
+      "unlocked": 75,
+      "empty_pct": 0.0,
+      "prod_tiles": 75,
+      "crops": {
+       "WHEAT": 31,
+       "STRAWBERRY": 16,
+       "TOMATO": 6
+      },
+      "animals": {
+       "SHEEP": 3,
+       "COW": 11,
+       "GOOSE": 8
+      },
+      "struct_empty": 0,
+      "weed": 0
+     }
+    ],
+    "prices": {
+     "CARROT": 45,
+     "EGG": 42,
+     "FERTILIZER": 43,
+     "MELON": 28,
+     "MILK": 193,
+     "STRAWBERRY": 84,
+     "TOMATO": 63,
+     "WHEAT": 44,
+     "WOOL": 1
+    },
+    "inv": {
+     "CARROT": 9871,
+     "EGG": 10077,
+     "FERTILIZER": 10287,
+     "MELON": 10149,
+     "WHEAT": 9645,
+     "WOOL": 10059
+    },
+    "shops": [
+     "PET_CAFE",
+     "BRUNCH_SPOT",
+     "ICE_CREAM_SHOP",
+     "ICE_CREAM_SHOP",
+     "PIZZA_SHOP",
+     "SMOOTHIE_SHOP",
+     "PET_CAFE"
+    ]
+   },
+   {
+    "day": 23,
+    "t": 575,
+    "players": [
+     {
+      "money": 80472,
+      "nq": 3,
+      "n_hands": 10,
+      "empty": 1,
+      "unlocked": 75,
+      "empty_pct": 1.3,
+      "prod_tiles": 66,
+      "crops": {
+       "WHEAT": 39,
+       "STRAWBERRY": 15,
+       "CARROT": 1
+      },
+      "animals": {
+       "COW": 9,
+       "SHEEP": 2
+      },
+      "struct_empty": 0,
+      "weed": 8
+     },
+     {
+      "money": 70857,
+      "nq": 3,
+      "n_hands": 15,
+      "empty": 0,
+      "unlocked": 75,
+      "empty_pct": 0.0,
+      "prod_tiles": 75,
+      "crops": {
+       "WHEAT": 35,
+       "STRAWBERRY": 10,
+       "CARROT": 2,
+       "TOMATO": 6
+      },
+      "animals": {
+       "SHEEP": 3,
+       "COW": 11,
+       "GOOSE": 8
+      },
+      "struct_empty": 0,
+      "weed": 0
+     }
+    ],
+    "prices": {
+     "CARROT": 47,
+     "EGG": 42,
+     "FERTILIZER": 40,
+     "MELON": 31,
+     "MILK": 195,
+     "STRAWBERRY": 60,
+     "TOMATO": 63,
+     "WHEAT": 44,
+     "WOOL": 1
+    },
+    "inv": {
+     "CARROT": 9846,
+     "EGG": 10081,
+     "FERTILIZER": 10299,
+     "MELON": 10148,
+     "WHEAT": 9622,
+     "WOOL": 10059
+    },
+    "shops": [
+     "PET_CAFE",
+     "BRUNCH_SPOT",
+     "ICE_CREAM_SHOP",
+     "ICE_CREAM_SHOP",
+     "PIZZA_SHOP",
+     "SMOOTHIE_SHOP",
+     "PET_CAFE"
+    ]
+   },
+   {
+    "day": 24,
+    "t": 599,
+    "players": [
+     {
+      "money": 84756,
+      "nq": 3,
+      "n_hands": 11,
+      "empty": 1,
+      "unlocked": 75,
+      "empty_pct": 1.3,
+      "prod_tiles": 67,
+      "crops": {
+       "WHEAT": 37,
+       "STRAWBERRY": 14,
+       "CARROT": 5
+      },
+      "animals": {
+       "COW": 9,
+       "SHEEP": 2
+      },
+      "struct_empty": 0,
+      "weed": 7
+     },
+     {
+      "money": 75821,
+      "nq": 3,
+      "n_hands": 14,
+      "empty": 0,
+      "unlocked": 75,
+      "empty_pct": 0.0,
+      "prod_tiles": 75,
+      "crops": {
+       "WHEAT": 28,
+       "STRAWBERRY": 8,
+       "CARROT": 11,
+       "TOMATO": 6
+      },
+      "animals": {
+       "SHEEP": 3,
+       "COW": 11,
+       "GOOSE": 8
+      },
+      "struct_empty": 0,
+      "weed": 0
+     }
+    ],
+    "prices": {
+     "CARROT": 50,
+     "EGG": 42,
+     "FERTILIZER": 36,
+     "MELON": 34,
+     "MILK": 186,
+     "STRAWBERRY": 45,
+     "TOMATO": 63,
+     "WHEAT": 44,
+     "WOOL": 5
+    },
+    "inv": {
+     "CARROT": 9809,
+     "EGG": 10094,
+     "FERTILIZER": 10319,
+     "MELON": 10147,
+     "WHEAT": 9633,
+     "WOOL": 10058
+    },
+    "shops": [
+     "PET_CAFE",
+     "BRUNCH_SPOT",
+     "ICE_CREAM_SHOP",
+     "ICE_CREAM_SHOP",
+     "PIZZA_SHOP",
+     "SMOOTHIE_SHOP",
+     "PET_CAFE",
+     "PET_CAFE"
+    ]
+   },
+   {
+    "day": 25,
+    "t": 623,
+    "players": [
+     {
+      "money": 88486,
+      "nq": 3,
+      "n_hands": 10,
+      "empty": 3,
+      "unlocked": 75,
+      "empty_pct": 4.0,
+      "prod_tiles": 69,
+      "crops": {
+       "WHEAT": 41,
+       "CARROT": 7,
+       "STRAWBERRY": 10
+      },
+      "animals": {
+       "COW": 9,
+       "SHEEP": 2
+      },
+      "struct_empty": 0,
+      "weed": 3
+     },
+     {
+      "money": 83901,
+      "nq": 3,
+      "n_hands": 14,
+      "empty": 0,
+      "unlocked": 75,
+      "empty_pct": 0.0,
+      "prod_tiles": 75,
+      "crops": {
+       "WHEAT": 22,
+       "CARROT": 17,
+       "STRAWBERRY": 8,
+       "TOMATO": 6
+      },
+      "animals": {
+       "SHEEP": 3,
+       "COW": 11,
+       "GOOSE": 8
+      },
+      "struct_empty": 0,
+      "weed": 0
+     }
+    ],
+    "prices": {
+     "CARROT": 53,
+     "EGG": 42,
+     "FERTILIZER": 33,
+     "MELON": 37,
+     "MILK": 156,
+     "STRAWBERRY": 47,
+     "TOMATO": 62,
+     "WHEAT": 42,
+     "WOOL": 1
+    },
+    "inv": {
+     "CARROT": 9772,
+     "EGG": 10103,
+     "FERTILIZER": 10336,
+     "MELON": 10146,
+     "WHEAT": 9699,
+     "WOOL": 10059
+    },
+    "shops": [
+     "PET_CAFE",
+     "BRUNCH_SPOT",
+     "ICE_CREAM_SHOP",
+     "ICE_CREAM_SHOP",
+     "PIZZA_SHOP",
+     "SMOOTHIE_SHOP",
+     "PET_CAFE",
+     "PET_CAFE"
+    ]
+   },
+   {
+    "day": 26,
+    "t": 647,
+    "players": [
+     {
+      "money": 92260,
+      "nq": 3,
+      "n_hands": 10,
+      "empty": 3,
+      "unlocked": 75,
+      "empty_pct": 4.0,
+      "prod_tiles": 68,
+      "crops": {
+       "WHEAT": 39,
+       "CARROT": 10,
+       "STRAWBERRY": 8
+      },
+      "animals": {
+       "COW": 9,
+       "SHEEP": 2
+      },
+      "struct_empty": 0,
+      "weed": 4
+     },
+     {
+      "money": 88525,
+      "nq": 3,
+      "n_hands": 14,
+      "empty": 2,
+      "unlocked": 75,
+      "empty_pct": 2.7,
+      "prod_tiles": 73,
+      "crops": {
+       "WHEAT": 18,
+       "CARROT": 27,
+       "STRAWBERRY": 2,
+       "TOMATO": 4
+      },
+      "animals": {
+       "SHEEP": 3,
+       "COW": 11,
+       "GOOSE": 8
+      },
+      "struct_empty": 0,
+      "weed": 0
+     }
+    ],
+    "prices": {
+     "CARROT": 55,
+     "EGG": 42,
+     "FERTILIZER": 33,
+     "MELON": 40,
+     "MILK": 137,
+     "STRAWBERRY": 39,
+     "TOMATO": 62,
+     "WHEAT": 42,
+     "WOOL": 5
+    },
+    "inv": {
+     "CARROT": 9738,
+     "EGG": 10113,
+     "FERTILIZER": 10335,
+     "MELON": 10145,
+     "WHEAT": 9716,
+     "WOOL": 10058
+    },
+    "shops": [
+     "PET_CAFE",
+     "BRUNCH_SPOT",
+     "ICE_CREAM_SHOP",
+     "ICE_CREAM_SHOP",
+     "PIZZA_SHOP",
+     "SMOOTHIE_SHOP",
+     "PET_CAFE",
+     "PET_CAFE"
+    ]
+   },
+   {
+    "day": 27,
+    "t": 671,
+    "players": [
+     {
+      "money": 97263,
+      "nq": 3,
+      "n_hands": 9,
+      "empty": 26,
+      "unlocked": 75,
+      "empty_pct": 34.7,
+      "prod_tiles": 43,
+      "crops": {
+       "WHEAT": 22,
+       "STRAWBERRY": 6,
+       "CARROT": 4
+      },
+      "animals": {
+       "COW": 9,
+       "SHEEP": 2
+      },
+      "struct_empty": 0,
+      "weed": 6
+     },
+     {
+      "money": 91155,
+      "nq": 3,
+      "n_hands": 14,
+      "empty": 0,
+      "unlocked": 75,
+      "empty_pct": 0.0,
+      "prod_tiles": 74,
+      "crops": {
+       "WHEAT": 26,
+       "CARROT": 25,
+       "TOMATO": 1
+      },
+      "animals": {
+       "SHEEP": 3,
+       "COW": 11,
+       "GOOSE": 8
+      },
+      "struct_empty": 0,
+      "weed": 1
+     }
+    ],
+    "prices": {
+     "CARROT": 57,
+     "EGG": 42,
+     "FERTILIZER": 33,
+     "MELON": 43,
+     "MILK": 131,
+     "STRAWBERRY": 74,
+     "TOMATO": 61,
+     "WHEAT": 40,
+     "WOOL": 1
+    },
+    "inv": {
+     "CARROT": 9719,
+     "EGG": 10114,
+     "FERTILIZER": 10334,
+     "MELON": 10144,
+     "WHEAT": 9760,
+     "WOOL": 10059
+    },
+    "shops": [
+     "PET_CAFE",
+     "BRUNCH_SPOT",
+     "ICE_CREAM_SHOP",
+     "ICE_CREAM_SHOP",
+     "PIZZA_SHOP",
+     "SMOOTHIE_SHOP",
+     "PET_CAFE",
+     "PET_CAFE"
+    ]
+   },
+   {
+    "day": 28,
+    "t": 695,
+    "players": [
+     {
+      "money": 102806,
+      "nq": 3,
+      "n_hands": 9,
+      "empty": 43,
+      "unlocked": 75,
+      "empty_pct": 57.3,
+      "prod_tiles": 25,
+      "crops": {
+       "WHEAT": 6,
+       "STRAWBERRY": 6,
+       "CARROT": 2
+      },
+      "animals": {
+       "COW": 9,
+       "SHEEP": 1
+      },
+      "struct_empty": 1,
+      "weed": 7
+     },
+     {
+      "money": 97477,
+      "nq": 3,
+      "n_hands": 11,
+      "empty": 12,
+      "unlocked": 75,
+      "empty_pct": 16.0,
+      "prod_tiles": 62,
+      "crops": {
+       "WHEAT": 19,
+       "CARROT": 20,
+       "TOMATO": 1
+      },
+      "animals": {
+       "SHEEP": 3,
+       "COW": 11,
+       "GOOSE": 8
+      },
+      "struct_empty": 0,
+      "weed": 1
+     }
+    ],
+    "prices": {
+     "CARROT": 56,
+     "EGG": 42,
+     "FERTILIZER": 31,
+     "MELON": 46,
+     "MILK": 118,
+     "STRAWBERRY": 108,
+     "TOMATO": 62,
+     "WHEAT": 38,
+     "WOOL": 5
+    },
+    "inv": {
+     "CARROT": 9725,
+     "EGG": 10125,
+     "FERTILIZER": 10343,
+     "MELON": 10143,
+     "WHEAT": 9843,
+     "WOOL": 10058
+    },
+    "shops": [
+     "PET_CAFE",
+     "BRUNCH_SPOT",
+     "ICE_CREAM_SHOP",
+     "ICE_CREAM_SHOP",
+     "PIZZA_SHOP",
+     "SMOOTHIE_SHOP",
+     "PET_CAFE",
+     "PET_CAFE"
+    ]
+   },
+   {
+    "day": 29,
+    "t": 719,
+    "players": [
+     {
+      "money": 107329,
+      "nq": 3,
+      "n_hands": 9,
+      "empty": 51,
+      "unlocked": 75,
+      "empty_pct": 68.0,
+      "prod_tiles": 13,
+      "crops": {
+       "STRAWBERRY": 2
+      },
+      "animals": {
+       "COW": 8,
+       "SHEEP": 1
+      },
+      "struct_empty": 2,
+      "weed": 11
+     },
+     {
+      "money": 109084,
+      "nq": 3,
+      "n_hands": 12,
+      "empty": 44,
+      "unlocked": 75,
+      "empty_pct": 58.7,
+      "prod_tiles": 30,
+      "crops": {
+       "WHEAT": 7,
+       "TOMATO": 1
+      },
+      "animals": {
+       "SHEEP": 3,
+       "COW": 11,
+       "GOOSE": 8
+      },
+      "struct_empty": 0,
+      "weed": 1
+     }
+    ],
+    "prices": {
+     "CARROT": 52,
+     "EGG": 41,
+     "FERTILIZER": 22,
+     "MELON": 48,
+     "MILK": 105,
+     "STRAWBERRY": 148,
+     "TOMATO": 62,
+     "WHEAT": 34,
+     "WOOL": 1
+    },
+    "inv": {
+     "CARROT": 9785,
+     "EGG": 10148,
+     "FERTILIZER": 10390,
+     "MELON": 10142,
+     "WHEAT": 9925,
+     "WOOL": 10059
+    },
+    "shops": [
+     "PET_CAFE",
+     "BRUNCH_SPOT",
+     "ICE_CREAM_SHOP",
+     "ICE_CREAM_SHOP",
+     "PIZZA_SHOP",
+     "SMOOTHIE_SHOP",
+     "PET_CAFE",
+     "PET_CAFE"
+    ]
+   }
+  ],
+  "sells": [
+   {
+    "WHEAT": 863,
+    "FERTILIZER": 178,
+    "CARROT": 203,
+    "WOOL": 54,
+    "MILK": 254,
+    "MELON": 98,
+    "STRAWBERRY": 313
+   },
+   {
+    "FERTILIZER": 280,
+    "WHEAT": 351,
+    "EGG": 322,
+    "WOOL": 56,
+    "CARROT": 133,
+    "MILK": 231,
+    "MELON": 90,
+    "TOMATO": 100,
+    "STRAWBERRY": 224
+   }
+  ],
+  "buys_animal": [
+   {
+    "COW": 12,
+    "SHEEP": 6,
+    "GOOSE": 3
+   },
+   {
+    "SHEEP": 3,
+    "GOOSE": 8,
+    "COW": 11
+   }
+  ],
+  "buys_seed": [
+   {
+    "MELON": 25,
+    "WHEAT": 170,
+    "CARROT": 66,
+    "STRAWBERRY": 44
+   },
+   {
+    "MELON": 15,
+    "WHEAT": 111,
+    "CARROT": 37,
+    "STRAWBERRY": 28,
+    "TOMATO": 13
+   }
+  ],
+  "buys_product": [
+   {
+    "WHEAT": 446,
+    "STRAWBERRY": 431,
+    "TOMATO": 517,
+    "CARROT": 306,
+    "EGG": 87,
+    "MELON": 221,
+    "MILK": 382,
+    "WOOL": 231,
+    "FERTILIZER": 4
+   },
+   {
+    "WHEAT": 244,
+    "FERTILIZER": 46
+   }
+  ],
+  "hires": [
+   279,
+   289
+  ],
+  "land_buy_turn": {
+   "p0_NW": {
+    "turn": 23,
+    "day": 0
+   },
+   "p1_NW": {
+    "turn": 23,
+    "day": 0
+   },
+   "p1_NE": {
+    "turn": 143,
+    "day": 5
+   },
+   "p0_NE": {
+    "turn": 167,
+    "day": 6
+   },
+   "p0_SW": {
+    "turn": 215,
+    "day": 8
+   },
+   "p1_SW": {
+    "turn": 263,
+    "day": 10
+   }
+  },
+  "final_tiles": {
+   "p0": {
+    "money": 107329,
+    "crops": {
+     "STRAWBERRY": 2
+    },
+    "animals": {
+     "COW": 8,
+     "SHEEP": 1
+    },
+    "empty": 51,
+    "unlocked": 75,
+    "struct_empty": 2,
+    "weed": 11
+   },
+   "p1": {
+    "money": 109084,
+    "crops": {
+     "WHEAT": 7,
+     "TOMATO": 1
+    },
+    "animals": {
+     "SHEEP": 3,
+     "COW": 11,
+     "GOOSE": 8
+    },
+    "empty": 44,
+    "unlocked": 75,
+    "struct_empty": 0,
+    "weed": 1
+   }
+  }
+ }
+}
