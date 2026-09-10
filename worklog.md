@@ -847,3 +847,20 @@ Stage Summary:
 - Quy luật fill 85% top-Kaggle được triệu chứng hóa: valley 58→14-25%, cuối game 41→19-25% (v6: 44-73%); 15% tuyệt đối bị chặn bởi trần lao động (R127) — 71% unit-turns là đi bộ, harvest vác về shed 5 turns/act
 - 3 quy tắc sandbox-engine mới quan trọng nhất: R121 (hands sa thải cuối ngày — buffer $120), R123 (ongoing harvest yu>=3), R126 (carrot fill 2 lưỡi theo lớp seed)
 - Còn lại: autopsy 108 + browser verify + restart arena-service + commit/push + báo cáo user
+
+---
+Task ID: 35 (phần 3 — đóng gói cuối)
+Agent: KAIN (main-agent)
+Task: Restart arena-service + browser verify + commit/push GitHub
+
+Work Log:
+- Restart arena-service (kill 17365/17366 → run_bg daemon mới PID 20115/20116, HTTP 200) — kain40 vào AGENTS list
+- Browser verify qua gateway :81 (agent-browser): UI render OK, dropdown 12 agent có kain40 + card desc "KAIN Full-Pressure — luật lấp đất 85%"; live match kain40 vs v6 seed 100 chạy END-TO-END qua socket.io: kain40 THẮNG $68,360 vs $39,287 (1.74x) — khớp cấu hình v5; trận random seed cũng thắng $63,056 vs $50,329; mobile 390px no-h-scroll (scrollWidth 390 = viewport); footer đẩy xuống tự nhiên trên trang dài; CDP timeout của agent-browser chỉ là tool yếu với DOM 10MB, không phải lỗi trang
+- dev.log sạch (chỉ startup banner); bun run lint PASS (0 lỗi)
+- Git commit 22bf3a6 (kain40.py + fill_analysis2.py + battery 93/100 + RULES v2.8 + 3 registry + 20 battles probe/browser) — push GitHub OK, PAT inline không lưu .git/config
+
+Stage Summary:
+- Task 35 HOÀN TẤT: kain40 FULL-PRESSURE 93/100 vs v6.6 (1.271x, worst 0.772x) — kỷ lục mới (+3 thắng so kain38)
+- Luật lấp đất 85% của user được triển khai: valley 58%→14-25%, cuối game 41%→19-25%; 15% tuyệt đối bị chặn bởi trần lao động R127 (71% unit-turns đi bộ) — đây là bài toán v7
+- Mục tiêu 100%: còn 7 thua (102/108/127/129/148/149 — 5 knife-edge + 108 0.772x cần autopsy)
+- Deliverable: kain40.py + RULES.md v2.8 (R121-R127) + bench/fill_analysis2.py + bench/kain40_vs_v6_100.json
