@@ -1,8 +1,8 @@
 # KAIN-27 "FORTRESS-75 FLOW" (Task 28 vòng 3): kain26 + 3 fix dòng chảy (thu-len tier1 yu>=3, geese tier1 chỉ khi đói, feed-d26)
 # (straw 26, melon 13, wheat nhường ô cho dâu d6-16) — v6.6 + 6 DELTA CẤU TRÚC gốc:
 # — đánh nhà vô địch bằng cách đổi HÌNH DẠNG kinh tế (thoát twin-kernel R97):
-#   Δ1 LAND-75: cap 3 quadrant (NW+NE+SE) — KHÔNG mua SW $4k (probe seed 115:
-#      v6 mua SW d12 khi còn 35 ô trống, utilization chỉ 67%, 933 empty-tile-days).
+#   Δ1 LAND-75: cap 3 quadrant (NW+NE+SW) — KHÔNG mua SE $4k (probe seed 115:
+#      v6 mua SE d12 khi còn ~35 ô trống, utilization chỉ 67%, 933 empty-tile-days).
 #      $4k quay về vốn đàn + hạt. Ý tưởng từ user: "dùng tối đa 75 đất".
 #   Δ2 EGG-FORTRESS: goose floor 6 / cap 9 (v6 hard-cap 6, floor 3) — kênh trứng
 #      SÂU (R49 floor 0), ngỗng đẻ HẰNG NGÀY từ d4 + 1 fert/ngày (R17). V6 đọc
@@ -1268,7 +1268,7 @@ def _build_orders(me, shed, seeds, inventories, inv, prices, day, hour, plan,
 
 
     nq = len(unlocked)
-    if nq < 3 and bought.get("LAND", 0) < 1:   # KAIN-25 Δ1: cap 75 ô, không mua SW $4k
+    if nq < 3 and bought.get("LAND", 0) < 1:   # KAIN-25 Δ1: cap 75 ô, không mua SE $4k
         owned_empty = sum(1 for row in tiles for t in row if t is None)
         price = LAND_PRICES[nq - 1]
         if nq == 3:

@@ -604,3 +604,22 @@ Stage Summary:
 - Giả thuyết 75-đất của user: ĐÚNG về utilization (86% vs 67%), SAI về kinh tế (quota binding −$6-10k/season, R100)
 - Bài học lớn nhất: đánh vô địch bằng delta = bất khả; con đường v7 = kernel mới (P3 solver $/action toàn cục)
 - Còn: commit + push GitHub + browser verify + báo cáo tiếng Việt
+
+---
+Task ID: 29
+Agent: KAIN (main-agent)
+Task: Review toàn bộ RULES.md từ những gì đã học (user: "tiến hành review RULES.md và chỉnh sửa, cập nhập nếu cần thiết")
+
+Work Log:
+- Đọc lại toàn bộ worklog (Task 1→28) + RULES.md v2.2 (571 dòng, 105 quy tắc) — xác nhận Task 28 đã chạy xong 5 battery/500 game (kain25-29 vs v6: 39/40/36/31/32 trên 100) và viết mục X + R100-R105
+- Đối chiếu engine trực tiếp (kaggle_environments/envs/kaggriculture/kaggriculture.py): LAND_ORDER = [NE, SW, SE], LAND_PRICES = [1000, 2000, 4000] → PHÁT HIỆN LỖI NHÃN QUADRANT trong RULES.md X.2/R100 và comment kain25-29.py ("SW $4k"/"SE d11 ($2k)"/"NW+NE+SE" — thực tế SE=$4k, SW=$2k, quadrant thứ 3 bắt buộc là SW theo thứ tự ép)
+- Tái chạy land_probe 8 trận (v6-vs-v5 + kain25-vs-v6 hai chiều, seed 115/123/140): số v6/v5 khớp TUYỆT ĐỐI với X.2 (57-67% / 93-106% / 933-1101 empty-tile-days / $53-72k / $33-59k); kain25 hiệu chỉnh: utilization 86%→76-84%, ô trống ~17→~20-26, $44-59k→$45-60k (đối chiếu battery JSON 2 ghế)
+- Xác minh 5 battery JSON: kain25 39/100 0.945x · kain26 40/100 0.927x · kain27 36/100 0.918x · kain28 31/100 0.924x · kain29 32/100 0.926x — bảng X.3 khớp hoàn toàn
+- RULES.md v2.2→v2.3 (10 nhóm sửa): (1) header phiên bản 1.0→2.3 + block TRẠNG THÁI LADDER + INDEX MỤC A-X + nguồn đối chiếu bổ sung v6.py/cell4_v6.py/tools; (2) R26 ghi rõ thứ tự ép LAND_ORDER; (3) X.2 sửa nhãn quadrant + số kain25 + chú thích cặp đấu; (4) R100 sửa SE $4k; (5) X.5 utilization 76-84%; (6) mục C đếm 7→6 (R14-R19); (7) R74 bổ chú phạm vi ↔R100; (8) phục hồi footer v2.1 cho mục W (bị mất), chuyển footer v2.2 về cuối mục X (đứng sai vị trí trước mục X); (9) sửa 3 lỗi ký tự CJK lẫn vào tiếng Việt (R89 "THỐNG SOÁTH"→"THỐNG SOÁT", "(10动作)"→"10action", "đô-la机 hội"→"đô-la cơ hội") + "kich hoạt"→"kích hoạt"; (10) footer v2.3 ghi biên bản hiệu đính
+- Sửa comment nhãn quadrant trong kain25-29.py (3 chỗ/file — chỉ comment, không đụng logic); py_compile 5 file OK; RULES.md 582 dòng, 0 ký tự CJK, đúng 105 quy tắc R1-R105
+- Push GitHub (hoàn nợ Task 28: commit c1daa64 chưa push) + commit v2.3
+
+Stage Summary:
+- RULES.md v2.3 hoàn tất: mọi dữ kiện then chốt đã được đối chiếu nguồn (engine source + battery JSON + probe tái chạy) — không thêm/bỏ luật nào, chỉ hiệu đính độ chính xác
+- Bài học meta: quy tắc [E] viết tay vẫn có thể sai NHÃN dữ kiện (quadrant) dù đúng bản chất — review phải verify về source engine, không chỉ nội bộ nhất quán
+- Lỗi duy nhất còn lại trong v2.3: không có — 105 quy tắc nguyên vẹn, cấu trúc biên bản A-X chuẩn
