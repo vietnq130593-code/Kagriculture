@@ -944,3 +944,26 @@ Stage Summary:
 - Phát kiến cấu trúc lớn nhất: (1) R133 shed end-of-day dump = đòn bẩy lao động 2-3× (top-3 fill 75/75 ở 0% empty — phá trần R127 của ta); (2) R131 FERT-funded bootstrap ($300-600/ngày từ d1 tài trợ mua đất); (3) R132 đọc shop draw quyết định cấu trúc đàn (thắng M1 nhờ 6 ngỗng theo egg-shops, thua M1 vì 4 bò vào kênh sữa chết); (4) R138 liquidation-day $4-11.6k; (5) R137 fertilize dâu 90-190 lần = +100% yield kênh #1
 - RULES.md bị mâu thuẫn ở 3 luật: R74 (top-3 dùng 75 ô không phải 50), R127 (trần lao động 85% là trần kernel v6, không phải vật lý), R75/R114 (wheat-FEED machine 24-41 ô khác wheat-flood bán rẻ) — 4 luật cứng của user được xác nhận toàn bộ
 - Chưa triển khai v7/kain41 theo chỉ thị; câu hỏi mở vòng 2 đã ghi cuối file
+---
+Task ID: 39
+Agent: KAIN (main-agent)
+Task: Vòng phân tích replay top-3 THỨ 2 (user yêu cầu: chỉnh sửa/bổ sung/nâng cấp TOP3_REPLAY_ANALYSIS.md + phán quyết có cần vòng 3 không)
+
+Work Log:
+- Xây "god replay" (tool-results/r2_godreplay.py): nạp engine kaggle_environments 1.32.7 thật + bơm đúng 719 action đã ghi từ 2 file replay + monkey-patch _commit_unit/_do_hire/_do_buy_land/_apply_unit_action để log từng giao dịch + snapshot state đầy đủ sau mỗi step
+- Quy ước đúng (verify empirically): row t = state SAU action t, true hour = (t-1)%24 — nhãn giờ vòng 1 bị lệch +1; row 0 = initial state
+- Kết quả: 719/719 step × 2 trận = 0 MISMATCH (money + market inventory + shops + shed + seeds cả 2 người) — final khớp rewards từng đô-la; mọi số liệu vòng 2 là EXACT (bỏ sai số ±20% vòng 1)
+- Sửa 2 bug trong quá trình: (1) identity-struct — interpreter nhận structify-clone của env.state nên `is` fail, mọi log bị tag p1; fix bằng wrap env.interpreter capture state per-call; (2) harvest non-ongoing crop xóa ô → diff tile_a None
+- Phát hiện lớn nhất: CẢ 2 TRẬN ĐỀU LẬT KẾT QUẢ NGÀY CUỐI — SpaTaro dẫn +$858 (M1) / +$3,595 (M2) sau d28 rồi thua vì d29: UMG $11,576/Otter $10,001 vs SpaTaro $3,998/$4,363; người thắng = danh mục đứng cuối (carrot+tomato+egg/milk máy) + bán tới h22 (Otter h22: 91u/6 lệnh) + không ngưỡng giá (bán tới $1)
+- 5 câu hỏi mở vòng 1 trả lời hết: Q1 không ngưỡng giá, ngưỡng = logistics; Q2 milk/cow ~1.2 mọi phong cách (care bonus ai cũng max — 2.35-2.55/event), quyết định = quy mô đàn + shop draw; Q3 wheat 5-ngày-cycles, 4-8 replant/ngày giữ 17-29 ô, 3.41-5.32u/ô theo chất lượng tưới cửa sổ tuổi 2-4; Q4 ngỗng không ceiling (1.72-1.85 egg + 2.4-2.7 FERT/ngỗng/ngày = $82-114/ngỗng-ngày, hoà vốn 3-5 ngày); Q5 zero-sum CỤ BỘU theo kênh, TOÀN CỤC positive-sum (M2 pie $216k > M1 $193k)
+- Sổ cái exact mới: M1 gross SpaTaro $120,293 < UMG $123,506 (vòng 1 ước ngược!); M2 $138,824 vs $147,817; chi phí: Otter hire $12,848 (ramp 12→15 hands/ngày cuối game) vẫn thắng
+- Autopsy SpaTaro 5 vết nứt (đủ giải thích 2 khoản thua): (1) M1 không mua ngỗng dù 4 egg-shop; (2) M2 mua 1 ngỗng d5 KHÔNG ĐẶT (coop đập d4 — $300 + kênh $14k mất trắng, cuối game ngỗng vẫn trên tay); (3) BUY_PRODUCT rác ~250-350 lệnh/mùa, 25 slot (319u) đúng 3 ngày cuối M2 chiếm chỗ bán; (4) wheat-seller (bán 705-799u thô) thay vì converter (người thắng ăn 259/446u vào đàn, wheat→milk 5.2× ROI ở M2); (5) không trồng tomato cả 2 trận ($3.3-6.2k bỏ lại)
+- Engine discoveries: d29 KHÔNG có end-of-day dump (step 719 không chạy — tồn trên tay h22 = mất trắng); bán $1 KHÔNG thêm supply; FERT của con vật là UNCONDITIONAL (ngày không feed vẫn nhả nếu không đói 2 ngày liền); care bonus +1/event cho cả egg và milk; shop drain = 6 lần/ngày/instance (1-sản phẩm ×2); dâu chết tuổi d21-23 do max 4 events (vách cấu trúc — không phải lỗi chơi)
+- Nâng cấp TOP3_REPLAY_ANALYSIS.md → V2.0 (299 dòng, 11 phần): methodology god replay + bảng sửa sai vòng 1, sổ cái exact, drain math, Q1-Q5, N1-N9, quy tắc mới R139-R146, hàm ý v7, PHÁN QUYẾT VÒNG 3
+- PHÁN QUYẾT VÒNG 3: KHÔNG cần vòng phân tích thụ động (nguồn đã kiệt — mọi số đo được nay exact); NÊN mở vòng mới loại "counterfactual" (thay action + chạy lại god replay) khi v7 cần trả lời câu hỏi nhân-quả cụ thể — harness đã sẵn sàng
+
+Stage Summary:
+- TOP3_REPLAY_ANALYSIS.md V2.0 hoàn thành: toàn bộ số liệu CHÍNH XÁC (0-mismatch god replay), 5 câu hỏi mở được trả lời, 8 quy tắc mới R139-R146, phán quyết vòng 3 = KHÔNG (thụ động) / CÓ-KHI-CẦN (counterfactual cho v7)
+- Headline: 2 trận top-3 đều quyết định ở NGÀY CUỐI (d29) — SpaTaro dẫn sau d28 cả 2 trận rồi thua vì thanh lý kém (danh mục cuối mùa + slot rác + hết hàng sớm)
+- Tools tái sử dụng cho v7: tool-results/r2_godreplay.py (harness engine thật) + r2_god_M1/M2.json (719 snapshot đầy đủ vị trí/shed/tiles từng giờ) + r2_analyze.py
+- Chưa triển khai v7/kain41 theo chỉ thị của user

@@ -1,0 +1,244 @@
+########## M1: SpaTaro (p0) vs Unknown Mother-Goose (p1) | rewards [93281.0, 99793.0]
+
+== EXACT LEDGER (god replay, $) ==
+channel                        SpaTaro               Unknown Mot
+WHEAT            24916 ( 799u @  31.2)     12913 ( 441u @  29.3)
+CARROT            3862 (  93u @  41.5)      5142 ( 128u @  40.2)
+TOMATO               0 (   0u @   0.0)      3316 (  52u @  63.8)
+STRAWBERRY       57723 ( 296u @ 195.0)     48537 ( 253u @ 191.8)
+MELON            15932 (  66u @ 241.4)     14099 (  89u @ 158.4)
+EGG                  0 (   0u @   0.0)     13958 ( 210u @  66.5)
+MILK              4145 (  87u @  47.6)      6543 ( 133u @  49.2)
+WOOL              6079 (  57u @ 106.6)      5030 (  50u @ 100.6)
+FERTILIZER        7636 ( 103u @  74.1)     13968 ( 195u @  71.6)
+TOTAL REV       120293                    123506
+seed cost        -7460  {'MELON': 960.0, 'CARROT': 660.0, 'WHEAT': 1740.0, 'STRAWBERRY': 4100.0}           -7290  {'MELON': 1200.0, 'WHEAT': 1330.0, 'STRAWBERRY': 3400.0, 'TOMATO': 400.0, 'CARROT': 960.0}
+animal cost      -3100  {'COW': 1600.0, 'SHEEP': 1500.0}           -5700  {'COW': 2400.0, 'SHEEP': 1500.0, 'GOOSE': 1800.0}
+buy WHEAT/FERT    -11431 (365u) FERT -1587 (26u)           -4362 (133u) FERT -990 (17u)
+hire cost        -3434  (272 hires)           -5371  (293 hires)
+land cost        -3000                     -3000
+
+== Q1: LIQUIDATION d27-29 (exact prices) ==
+  SpaTaro: STRAWBERRY: 52u $9645 (min $172, avg $185); CARROT: 59u $2465 (min $38, avg $42); WHEAT: 108u $2352 (min $21, avg $22); FERTILIZER: 13u $696 (min $50, avg $54); MILK: 12u $439 (min $26, avg $37); WOOL: 3u $21 (min $5, avg $7)
+  Unknown Mother-Goose: STRAWBERRY: 56u $10557 (min $176, avg $189); CARROT: 104u $4074 (min $36, avg $39); EGG: 42u $3029 (min $70, avg $72); WHEAT: 105u $2258 (min $21, avg $22); FERTILIZER: 35u $1876 (min $49, avg $54); MILK: 22u $894 (min $28, avg $41); TOMATO: 10u $643 (min $64, avg $64); WOOL: 2u $2 (min $1, avg $1)
+  FINAL SHED (t=719, after last action d29h22): p0={'WHEAT': 0, 'CARROT': 0, 'TOMATO': 0, 'STRAWBERRY': 0, 'MELON': 0, 'EGG': 0, 'MILK': 0, 'WOOL': 16, 'FERTILIZER': 0, 'GOOSE': 0, 'COW': 0, 'SHEEP': 0} p1={'WHEAT': 0, 'CARROT': 0, 'TOMATO': 0, 'STRAWBERRY': 0, 'MELON': 0, 'EGG': 0, 'MILK': 0, 'WOOL': 0, 'FERTILIZER': 0, 'GOOSE': 0, 'COW': 0, 'SHEEP': 0}
+  LOST in inventories at game end (no d29 end-of-day dump): p0=0u p1=0u (detail p0=[], p1=[])
+  SpaTaro d29 sells by hour: {0: 16, 1: 6, 4: 2, 7: 2, 13: 4, 14: 2, 17: 10, 18: 4, 20: 2, 21: 10, 22: 2}
+  Unknown Mother-Goose d29 sells by hour: {1: 29, 2: 18, 5: 8, 9: 8, 10: 6, 12: 4, 13: 8, 14: 1, 16: 8, 17: 14, 18: 35, 19: 36, 21: 5, 22: 20}
+
+== Q2: FEED/CARE + milk per cow (exact) ==
+  SpaTaro: FEED/day d8-28 avg 4.5, CARE/day 4.5
+    milk harvested d8-28: 87u | cow-days 74 | milk/cow/day 1.18u | per prod-event(every 2d) 2.35u
+    egg harvested: 0u, wool: 73u
+    fed/cows by day: d8:5f/4c, d9:6f/4c, d10:6f/4c, d11:7f/4c, d12:5f/4c, d13:7f/4c, d14:5f/4c, d15:4f/4c, d16:6f/4c, d17:5f/4c, d18:4f/4c, d19:5f/4c, d20:3f/3c, d21:4f/3c, d22:5f/3c, d23:3f/3c, d24:5f/3c, d25:1f/3c, d26:5f/3c, d27:1f/3c, d28:3f/2c
+  Unknown Mother-Goose: FEED/day d8-28 avg 9.7, CARE/day 8.5
+    milk harvested d8-28: 133u | cow-days 106 | milk/cow/day 1.25u | per prod-event(every 2d) 2.51u
+    egg harvested: 210u, wool: 50u
+    fed/cows by day: d8:7f/5c, d9:12f/5c, d10:9f/5c, d11:14f/5c, d12:9f/5c, d13:14f/5c, d14:9f/5c, d15:11f/6c, d16:9f/5c, d17:11f/5c, d18:9f/5c, d19:11f/5c, d20:8f/5c, d21:11f/5c, d22:7f/5c, d23:11f/5c, d24:8f/5c, d25:11f/5c, d26:7f/5c, d27:10f/5c, d28:6f/5c
+
+== Q3: WHEAT CYCLE ==
+  SpaTaro: total wheat planted 169 tiles, harvested 167 tiles / 569u (3.41u/tile)
+    standing wheat d13-27 avg 25.0 | replant/day d8-26 avg 8.2
+    day detail (plant/harv/units/standing): d0:3p/0h/0u/s3, d2:0p/1h/2u/s2, d3:0p/1h/3u/s1, d4:1p/1h/4u/s1, d6:6p/1h/2u/s6, d7:2p/0h/0u/s8, d8:25p/2h/4u/s31, d9:4p/3h/9u/s32, d10:7p/1h/4u/s37, d11:12p/9h/27u/s40, d12:11p/19h/74u/s32, d13:8p/6h/19u/s34, d14:8p/8h/29u/s34, d15:4p/12h/40u/s26, d16:5p/9h/35u/s21, d17:11p/5h/18u/s27, d18:6p/8h/31u/s25, d19:8p/6h/19u/s27, d20:5p/5h/19u/s27, d21:8p/9h/34u/s26, d22:8p/10h/36u/s24, d23:10p/7h/22u/s27, d24:6p/9h/29u/s24, d25:4p/8h/23u/s20, d26:6p/7h/22u/s19, d27:1p/6h/22u/s14, d28:0p/9h/28u/s5
+  Unknown Mother-Goose: total wheat planted 132 tiles, harvested 124 tiles / 567u (4.57u/tile)
+    standing wheat d13-27 avg 17.0 | replant/day d8-26 avg 5.6
+    day detail (plant/harv/units/standing): d0:18p/0h/0u/s18, d4:0p/18h/72u/s0, d5:3p/0h/0u/s3, d6:3p/0h/0u/s6, d8:7p/0h/0u/s13, d9:16p/3h/12u/s26, d10:3p/3h/12u/s26, d12:0p/7h/28u/s19, d13:4p/14h/56u/s9, d14:7p/3h/12u/s11, d15:2p/0h/0u/s12, d16:5p/2h/10u/s15, d17:9p/8h/40u/s16, d18:3p/1h/5u/s18, d19:6p/6h/29u/s17, d20:7p/6h/30u/s18, d21:5p/2h/10u/s21, d22:9p/7h/37u/s22, d23:10p/6h/32u/s26, d24:4p/7h/33u/s23, d25:3p/4h/20u/s20, d26:7p/11h/51u/s16, d27:1p/6h/28u/s11, d28:0p/3h/15u/s8
+
+== Q4: GOOSE ECONOMICS ==
+  Unknown Mother-Goose: geese timeline [(8, 3), (9, 5), (10, 6), (11, 6), (12, 6), (13, 6), (14, 6), (15, 6), (16, 6), (17, 6), (18, 6), (19, 6)]...
+    goose-days 122 | eggs 210 (1.72/goose/day) | fert collected 326 (2.67/goose/day)
+    days-tiles at EGG cap(4): 2 | egg rev $13958 + fert used/sold
+    egg revenue total $13958 -> per goose-day $114.41 | fert: collected 326, sold 195, fertilized below
+
+== Q5: ZERO-SUM (combined supply vs price) ==
+  STRAWBERRY: combined-sold/day + EOD price: d0:0u@$128, d4:0u@$149, d8:0u@$173, d12:0u@$199, d13:2u@$207, d14:8u@$214, d16:42u@$227, d17:23u@$217, d18:48u@$218, d19:38u@$205, d20:59u@$201, d21:22u@$188, d22:54u@$192, d23:59u@$168, d24:26u@$166, d25:25u@$167, d26:35u@$175, d27:34u@$176, d28:34u@$187, d29:40u@$189
+  WHEAT: combined-sold/day + EOD price: d0:17u@$28, d1:1u@$29, d2:8u@$31, d3:8u@$31, d4:28u@$32, d5:34u@$26, d6:3u@$30, d7:4u@$32, d8:6u@$34, d9:7u@$35, d10:12u@$37, d11:6u@$38, d12:49u@$38, d13:88u@$38, d14:38u@$36, d15:47u@$35, d16:59u@$34, d17:64u@$35, d18:50u@$34, d19:56u@$33, d20:68u@$33, d21:49u@$32, d22:67u@$31, d23:60u@$30, d24:74u@$28, d25:69u@$23, d26:55u@$24, d27:75u@$22, d28:57u@$22, d29:81u@$21
+  MILK: combined-sold/day + EOD price: d0:0u@$169, d4:0u@$179, d8:41u@$186, d10:19u@$97, d11:6u@$59, d12:7u@$49, d13:12u@$36, d14:3u@$13, d15:7u@$11, d16:6u@$11, d17:6u@$13, d18:10u@$15, d19:6u@$9, d20:7u@$11, d21:8u@$11, d22:6u@$9, d23:8u@$11, d24:7u@$11, d25:15u@$24, d26:6u@$19, d27:11u@$34, d28:8u@$38, d29:15u@$49
+  MELON: combined-sold/day + EOD price: d0:0u@$256, d4:0u@$266, d8:0u@$270, d10:58u@$272, d11:8u@$223, d12:6u@$222, d14:18u@$218, d15:54u@$186, d16:6u@$73, d20:0u@$84, d24:0u@$94, d26:5u@$86, d28:0u@$91
+  EGG: combined-sold/day + EOD price: d0:0u@$50, d4:0u@$51, d8:0u@$53, d12:0u@$58, d13:8u@$59, d14:20u@$60, d15:6u@$60, d16:14u@$62, d17:8u@$62, d18:8u@$63, d19:14u@$64, d20:14u@$65, d21:14u@$66, d22:16u@$66, d23:10u@$67, d24:14u@$68, d25:10u@$68, d26:12u@$69, d27:14u@$70, d28:12u@$71, d29:16u@$72
+  CARROT: combined-sold/day + EOD price: d0:0u@$35, d4:6u@$35, d5:4u@$35, d8:0u@$34, d11:1u@$35, d12:0u@$35, d16:0u@$35, d20:0u@$38, d24:0u@$43, d25:11u@$45, d26:36u@$45, d27:35u@$44, d28:56u@$41, d29:72u@$40
+  TOMATO: combined-sold/day + EOD price: d0:0u@$60, d4:0u@$61, d8:0u@$61, d12:0u@$62, d16:0u@$62, d20:0u@$63, d22:7u@$64, d23:10u@$64, d24:0u@$63, d25:14u@$64, d26:11u@$63, d28:0u@$64, d29:10u@$64
+
+== N2: MONEY CURVE (end of day, diff) ==
+  d 0: SpaTaro           61  Unknown Moth      29  diff      -32
+  d 1: SpaTaro           12  Unknown Moth     619  diff     +607
+  d 2: SpaTaro          134  Unknown Moth     890  diff     +756
+  d 3: SpaTaro           92  Unknown Moth     319  diff     +227
+  d 4: SpaTaro           99  Unknown Moth     743  diff     +644
+  d 5: SpaTaro           13  Unknown Moth     206  diff     +193
+  d 6: SpaTaro           56  Unknown Moth     722  diff     +666
+  d 7: SpaTaro           15  Unknown Moth     514  diff     +499
+  d 8: SpaTaro           44  Unknown Moth     686  diff     +642
+  d 9: SpaTaro         1212  Unknown Moth    1099  diff     -113
+  d10: SpaTaro        14143  Unknown Moth    4112  diff   -10031
+  d11: SpaTaro        16647  Unknown Moth    5302  diff   -11345
+  d12: SpaTaro        20002  Unknown Moth    6125  diff   -13877
+  d13: SpaTaro        22660  Unknown Moth    8221  diff   -14439
+  d14: SpaTaro        25011  Unknown Moth   14509  diff   -10502
+  d15: SpaTaro        25409  Unknown Moth   22588  diff    -2821
+  d16: SpaTaro        33109  Unknown Moth   26774  diff    -6335
+  d17: SpaTaro        35184  Unknown Moth   31180  diff    -4004
+  d18: SpaTaro        43666  Unknown Moth   35293  diff    -8373
+  d19: SpaTaro        46044  Unknown Moth   41885  diff    -4159
+  d20: SpaTaro        54442  Unknown Moth   47117  diff    -7325
+  d21: SpaTaro        56604  Unknown Moth   50545  diff    -6059
+  d22: SpaTaro        63643  Unknown Moth   55996  diff    -7647
+  d23: SpaTaro        67988  Unknown Moth   64089  diff    -3899
+  d24: SpaTaro        69921  Unknown Moth   68956  diff     -965
+  d25: SpaTaro        73167  Unknown Moth   72725  diff     -442
+  d26: SpaTaro        78439  Unknown Moth   77715  diff     -724
+  d27: SpaTaro        83911  Unknown Moth   82810  diff    -1101
+  d28: SpaTaro        89451  Unknown Moth   88593  diff     -858
+  d29: SpaTaro        93281  Unknown Moth   99793  diff    +6512
+
+== N5: FERT ALLOCATION ==
+  SpaTaro: collected 173 | fertilized 96 | sold 103 | bought 26
+    fertilize by day: {12: 2, 13: 3, 14: 2, 15: 11, 16: 7, 17: 7, 18: 8, 19: 7, 20: 10, 21: 5, 22: 4, 23: 8, 24: 6, 25: 4, 26: 7, 27: 3, 28: 2}
+  Unknown Mother-Goose: collected 326 | fertilized 142 | sold 195 | bought 17
+    fertilize by day: {14: 2, 15: 14, 16: 13, 17: 1, 18: 9, 19: 15, 20: 11, 21: 14, 22: 13, 23: 7, 24: 8, 25: 11, 26: 12, 27: 4, 28: 8}
+
+== N8: WATER DISCIPLINE ==
+  SpaTaro watered/standing by day: d1:9/16, d2:15/17, d3:11/15, d4:19/17, d5:13/18, d6:36/37, d7:33/42, d8:59/65, d9:65/69, d10:57/65, d11:65/68, d12:62/66, d13:62/68, d14:67/68, d15:65/67, d16:53/62, d17:65/68, d18:58/66, d19:69/68, d20:59/67, d21:69/67, d22:50/66, d23:56/60, d24:60/57, d25:54/57, d26:54/50, d27:46/35, d28:29/20
+  Unknown Mother-Goose watered/standing by day: d1:0/19, d2:19/19, d3:18/19, d4:23/5, d5:14/19, d6:19/33, d7:23/41, d8:29/48, d9:42/61, d10:29/60, d11:46/60, d12:57/60, d13:51/57, d14:46/58, d15:40/51, d16:34/55, d17:43/59, d18:31/61, d19:42/59, d20:39/60, d21:45/61, d22:52/60, d23:42/61, d24:44/61, d25:55/58, d26:54/56, d27:41/54, d28:38/34
+
+== LABOR (effective unit events) ==
+  SpaTaro: {'WATER': 1387, 'HARVEST': 410, 'PLANT': 254, 'COLLECT_FERTILIZER': 173, 'CARE': 136, 'FEED': 135, 'FERTILIZE': 96, 'PICKUP': 93, 'DROP': 70, 'PLACE': 12}
+  Unknown Mother-Goose: {'WATER': 1060, 'HARVEST': 517, 'COLLECT_FERTILIZER': 326, 'FEED': 248, 'PLANT': 237, 'CARE': 223, 'PICKUP': 185, 'FERTILIZE': 142, 'PLACE': 119, 'DROP': 68}
+
+== HARVEST FLOWS (units by product, exact) ==
+  SpaTaro: CARROT:93u/32tiles, COW:87u/27tiles, MELON:66u/11tiles, SHEEP:73u/16tiles, STRAWBERRY:296u/157tiles, WHEAT:569u/167tiles
+  Unknown Mother-Goose: CARROT:134u/48tiles, COW:133u/55tiles, GOOSE:210u/102tiles, MELON:89u/15tiles, SHEEP:50u/18tiles, STRAWBERRY:255u/129tiles, TOMATO:52u/26tiles, WHEAT:567u/124tiles
+########## M2: SpaTaro (p0) vs Otter Vibe (p1) | rewards [107329.0, 109084.0]
+
+== EXACT LEDGER (god replay, $) ==
+channel                        SpaTaro                Otter Vibe
+WHEAT            28140 ( 705u @  39.9)     13559 ( 351u @  38.6)
+CARROT            7920 ( 186u @  42.6)      7241 ( 133u @  54.4)
+TOMATO               0 (   0u @   0.0)      6234 ( 100u @  62.3)
+STRAWBERRY       32101 ( 245u @ 131.0)     32700 ( 224u @ 146.0)
+MELON            17865 (  82u @ 217.9)     12846 (  90u @ 142.7)
+EGG                  0 (   0u @   0.0)     14225 ( 322u @  44.2)
+MILK             37623 ( 221u @ 170.2)     39178 ( 231u @ 169.6)
+WOOL              5469 (  48u @ 113.9)      5381 (  56u @  96.1)
+FERTILIZER        9706 ( 160u @  60.7)     16453 ( 280u @  58.8)
+TOTAL REV       138824                    147817
+seed cost        -7410  {'MELON': 1120.0, 'WHEAT': 1670.0, 'CARROT': 1320.0, 'STRAWBERRY': 3300.0}           -6500  {'MELON': 1200.0, 'WHEAT': 1110.0, 'CARROT': 740.0, 'STRAWBERRY': 2800.0, 'TOMATO': 650.0}
+animal cost      -4900  {'COW': 3600.0, 'SHEEP': 1000.0, 'GOOSE': 300.0}           -8300  {'SHEEP': 1500.0, 'GOOSE': 2400.0, 'COW': 4400.0}
+buy WHEAT/FERT    -14896 (389u) FERT -245 (4u)           -9004 (244u) FERT -2081 (46u)
+hire cost        -4044  (278 hires)          -12848  (289 hires)
+land cost        -3000                     -3000
+
+== Q1: LIQUIDATION d27-29 (exact prices) ==
+  SpaTaro: WHEAT: 178u $6855 (min $35, avg $39); MILK: 36u $4561 (min $114, avg $127); STRAWBERRY: 20u $1870 (min $43, avg $94); CARROT: 28u $1569 (min $54, avg $56); FERTILIZER: 29u $842 (min $24, avg $29); WOOL: 8u $36 (min $1, avg $4)
+  Otter Vibe: CARROT: 130u $7121 (min $52, avg $55); MILK: 51u $6361 (min $108, avg $125); WHEAT: 108u $4026 (min $34, avg $37); EGG: 56u $2343 (min $41, avg $42); FERTILIZER: 43u $1224 (min $22, avg $28); TOMATO: 18u $1111 (min $61, avg $62)
+  FINAL SHED (t=719, after last action d29h22): p0={'WHEAT': 0, 'CARROT': 0, 'TOMATO': 0, 'STRAWBERRY': 0, 'MELON': 0, 'EGG': 0, 'MILK': 0, 'WOOL': 0, 'FERTILIZER': 1, 'GOOSE': 0, 'COW': 0, 'SHEEP': 0} p1={'WHEAT': 0, 'CARROT': 0, 'TOMATO': 0, 'STRAWBERRY': 0, 'MELON': 0, 'EGG': 0, 'MILK': 0, 'WOOL': 0, 'FERTILIZER': 0, 'GOOSE': 0, 'COW': 0, 'SHEEP': 0}
+  LOST in inventories at game end (no d29 end-of-day dump): p0=1u p1=0u (detail p0=[{'GOOSE': 1}], p1=[])
+  SpaTaro d29 sells by hour: {0: 27, 1: 7, 3: 4, 6: 3, 7: 4, 11: 2, 12: 4, 14: 2, 15: 4, 16: 8, 17: 12, 19: 3, 20: 1, 21: 6}
+  Otter Vibe d29 sells by hour: {0: 54, 20: 21, 21: 30, 22: 91}
+
+== Q2: FEED/CARE + milk per cow (exact) ==
+  SpaTaro: FEED/day d8-28 avg 8.8, CARE/day 8.8
+    milk harvested d8-28: 221u | cow-days 173 | milk/cow/day 1.28u | per prod-event(every 2d) 2.55u
+    egg harvested: 0u, wool: 48u
+    fed/cows by day: d8:6f/4c, d9:7f/5c, d10:7f/6c, d11:8f/6c, d12:9f/9c, d13:11f/9c, d14:11f/9c, d15:10f/9c, d16:11f/9c, d17:10f/9c, d18:10f/9c, d19:11f/9c, d20:9f/9c, d21:9f/9c, d22:9f/9c, d23:11f/9c, d24:8f/9c, d25:11f/9c, d26:6f/9c, d27:8f/9c, d28:3f/8c
+  Otter Vibe: FEED/day d8-28 avg 18.7, CARE/day 16.0
+    milk harvested d8-28: 231u | cow-days 188 | milk/cow/day 1.23u | per prod-event(every 2d) 2.46u
+    egg harvested: 322u, wool: 56u
+    fed/cows by day: d8:13f/4c, d9:14f/5c, d10:15f/6c, d11:17f/6c, d12:17f/6c, d13:17f/6c, d14:18f/7c, d15:20f/9c, d16:17f/9c, d17:20f/9c, d18:19f/11c, d19:22f/11c, d20:19f/11c, d21:22f/11c, d22:19f/11c, d23:22f/11c, d24:19f/11c, d25:22f/11c, d26:19f/11c, d27:22f/11c, d28:19f/11c
+
+== Q3: WHEAT CYCLE ==
+  SpaTaro: total wheat planted 161 tiles, harvested 156 tiles / 540u (3.46u/tile)
+    standing wheat d13-27 avg 29.1 | replant/day d8-26 avg 8.0
+    day detail (plant/harv/units/standing): d0:7p/0h/0u/s7, d2:1p/1h/2u/s7, d3:0p/1h/3u/s6, d4:0p/5h/20u/s1, d5:0p/1h/3u/s0, d6:1p/0h/0u/s1, d8:3p/0h/0u/s4, d10:7p/1h/4u/s10, d11:7p/0h/0u/s17, d12:5p/6h/18u/s15, d13:4p/3h/7u/s16, d14:8p/3h/10u/s21, d15:8p/4h/16u/s24, d16:4p/4h/16u/s24, d17:11p/5h/18u/s30, d18:6p/8h/32u/s28, d19:10p/11h/39u/s26, d20:7p/3h/10u/s30, d21:13p/13h/43u/s30, d22:10p/9h/28u/s31, d23:14p/6h/21u/s39, d24:13p/15h/51u/s36, d25:12p/7h/22u/s41, d26:10p/12h/50u/s39, d27:0p/17h/64u/s21, d28:0p/16h/43u/s5
+  Otter Vibe: total wheat planted 111 tiles, harvested 104 tiles / 553u (5.32u/tile)
+    standing wheat d13-27 avg 18.9 | replant/day d8-26 avg 3.9
+    day detail (plant/harv/units/standing): d0:14p/0h/0u/s14, d4:0p/14h/56u/s0, d5:1p/0h/0u/s1, d6:4p/0h/0u/s5, d9:0p/1h/4u/s4, d10:2p/4h/24u/s2, d11:12p/0h/0u/s14, d14:3p/2h/12u/s15, d15:5p/12h/72u/s8, d16:1p/0h/0u/s9, d17:2p/0h/0u/s11, d18:1p/3h/18u/s9, d19:5p/5h/30u/s9, d20:14p/1h/6u/s22, d21:7p/2h/12u/s27, d22:5p/1h/6u/s31, d23:9p/5h/30u/s35, d24:7p/14h/84u/s28, d25:1p/7h/42u/s22, d26:1p/5h/30u/s18, d27:17p/9h/54u/s26, d28:0p/7h/42u/s19
+
+== Q4: GOOSE ECONOMICS ==
+  Otter Vibe: geese timeline [(5, 3), (6, 3), (7, 6), (8, 6), (9, 6), (10, 6), (11, 8), (12, 8), (13, 8), (14, 8), (15, 8), (16, 8)]...
+    goose-days 174 | eggs 322 (1.85/goose/day) | fert collected 420 (2.41/goose/day)
+    days-tiles at EGG cap(4): 6 | egg rev $14225 + fert used/sold
+    egg revenue total $14225 -> per goose-day $81.75 | fert: collected 420, sold 280, fertilized below
+
+== Q5: ZERO-SUM (combined supply vs price) ==
+  STRAWBERRY: combined-sold/day + EOD price: d0:0u@$128, d4:0u@$139, d8:0u@$159, d12:0u@$190, d14:6u@$207, d15:14u@$212, d16:44u@$214, d17:19u@$201, d18:48u@$199, d19:44u@$187, d20:68u@$180, d21:38u@$128, d22:55u@$112, d23:39u@$60, d24:23u@$43, d25:20u@$24, d26:31u@$57, d27:5u@$45, d28:7u@$84, d29:8u@$118
+  WHEAT: combined-sold/day + EOD price: d0:9u@$28, d1:6u@$29, d2:9u@$31, d3:11u@$31, d4:64u@$32, d5:13u@$23, d6:2u@$27, d7:8u@$30, d8:7u@$32, d9:3u@$34, d10:16u@$35, d11:3u@$37, d12:10u@$37, d13:18u@$39, d14:21u@$40, d15:24u@$41, d16:65u@$40, d17:32u@$41, d18:20u@$42, d19:44u@$43, d20:45u@$42, d21:40u@$43, d22:50u@$43, d23:43u@$43, d24:63u@$44, d25:81u@$42, d26:63u@$41, d27:66u@$41, d28:130u@$39, d29:90u@$35
+  MILK: combined-sold/day + EOD price: d0:0u@$169, d4:0u@$179, d8:18u@$186, d10:6u@$160, d11:9u@$156, d12:8u@$160, d13:18u@$179, d14:12u@$160, d15:6u@$172, d16:15u@$175, d17:27u@$195, d18:17u@$190, d19:18u@$199, d20:35u@$194, d21:25u@$196, d22:26u@$196, d23:35u@$195, d24:26u@$181, d25:30u@$179, d26:34u@$160, d27:34u@$129, d28:28u@$122, d29:25u@$116
+  MELON: combined-sold/day + EOD price: d0:0u@$256, d4:0u@$266, d8:0u@$270, d10:84u@$272, d11:6u@$189, d12:10u@$191, d13:5u@$176, d14:23u@$160, d15:2u@$125, d16:0u@$122, d17:12u@$125, d20:30u@$104, d24:0u@$34, d28:0u@$46
+  EGG: combined-sold/day + EOD price: d0:0u@$50, d4:8u@$50, d5:4u@$48, d6:4u@$47, d7:4u@$49, d8:2u@$50, d9:8u@$50, d10:6u@$50, d11:10u@$50, d12:14u@$47, d13:12u@$46, d14:10u@$45, d15:16u@$46, d16:15u@$44, d17:15u@$44, d18:16u@$43, d19:17u@$43, d20:11u@$43, d21:16u@$43, d22:17u@$42, d23:8u@$42, d24:22u@$42, d25:14u@$42, d26:17u@$42, d27:12u@$42, d28:18u@$42, d29:26u@$42
+  CARROT: combined-sold/day + EOD price: d0:0u@$35, d3:4u@$35, d4:0u@$36, d8:3u@$40, d9:4u@$41, d10:10u@$42, d11:13u@$42, d12:50u@$40, d13:7u@$39, d15:37u@$38, d16:4u@$39, d18:18u@$40, d20:1u@$41, d22:7u@$44, d24:0u@$48, d26:3u@$53, d27:18u@$56, d28:51u@$54, d29:89u@$55
+  TOMATO: combined-sold/day + EOD price: d0:0u@$60, d4:0u@$61, d8:0u@$61, d12:0u@$62, d13:2u@$62, d15:4u@$62, d16:4u@$62, d17:2u@$62, d18:2u@$63, d19:7u@$63, d20:12u@$63, d21:8u@$62, d22:9u@$62, d23:4u@$63, d24:8u@$62, d25:14u@$62, d26:6u@$61, d27:12u@$62, d28:2u@$61, d29:4u@$62
+
+== N2: MONEY CURVE (end of day, diff) ==
+  d 0: SpaTaro          118  Otter Vibe       232  diff     +114
+  d 1: SpaTaro           18  Otter Vibe       584  diff     +566
+  d 2: SpaTaro          163  Otter Vibe       919  diff     +756
+  d 3: SpaTaro           12  Otter Vibe      1242  diff    +1230
+  d 4: SpaTaro          148  Otter Vibe      2575  diff    +2427
+  d 5: SpaTaro           14  Otter Vibe       680  diff     +666
+  d 6: SpaTaro           49  Otter Vibe      3292  diff    +3243
+  d 7: SpaTaro           40  Otter Vibe       886  diff     +846
+  d 8: SpaTaro           67  Otter Vibe      1660  diff    +1593
+  d 9: SpaTaro          302  Otter Vibe      3884  diff    +3582
+  d10: SpaTaro        12868  Otter Vibe      8710  diff    -4158
+  d11: SpaTaro        15722  Otter Vibe      9863  diff    -5859
+  d12: SpaTaro        19950  Otter Vibe     12278  diff    -7672
+  d13: SpaTaro        22703  Otter Vibe     13867  diff    -8836
+  d14: SpaTaro        26007  Otter Vibe     17664  diff    -8343
+  d15: SpaTaro        27793  Otter Vibe     22636  diff    -5157
+  d16: SpaTaro        34706  Otter Vibe     30598  diff    -4108
+  d17: SpaTaro        38733  Otter Vibe     37303  diff    -1430
+  d18: SpaTaro        44680  Otter Vibe     44467  diff     -213
+  d19: SpaTaro        51289  Otter Vibe     51361  diff      +72
+  d20: SpaTaro        63143  Otter Vibe     61109  diff    -2034
+  d21: SpaTaro        68596  Otter Vibe     67021  diff    -1575
+  d22: SpaTaro        76468  Otter Vibe     70760  diff    -5708
+  d23: SpaTaro        80692  Otter Vibe     74631  diff    -6061
+  d24: SpaTaro        84756  Otter Vibe     78915  diff    -5841
+  d25: SpaTaro        88486  Otter Vibe     84681  diff    -3805
+  d26: SpaTaro        92260  Otter Vibe     89510  diff    -2750
+  d27: SpaTaro        97263  Otter Vibe     92619  diff    -4644
+  d28: SpaTaro       103054  Otter Vibe     99459  diff    -3595
+  d29: SpaTaro       107329  Otter Vibe    109084  diff    +1755
+
+== N5: FERT ALLOCATION ==
+  SpaTaro: collected 249 | fertilized 91 | sold 160 | bought 4
+    fertilize by day: {14: 3, 15: 12, 16: 3, 17: 4, 18: 13, 19: 10, 20: 4, 21: 8, 22: 8, 23: 5, 24: 1, 25: 8, 26: 8, 27: 4}
+  Otter Vibe: collected 420 | fertilized 186 | sold 280 | bought 46
+    fertilize by day: {8: 4, 12: 3, 13: 20, 14: 3, 15: 3, 16: 11, 17: 16, 18: 5, 19: 12, 20: 9, 21: 7, 22: 19, 23: 15, 24: 5, 25: 17, 26: 16, 27: 7, 28: 14}
+
+== N8: WATER DISCIPLINE ==
+  SpaTaro watered/standing by day: d1:13/19, d2:16/18, d3:14/19, d4:14/15, d5:13/16, d6:30/36, d7:36/44, d8:59/64, d9:59/67, d10:58/62, d11:66/62, d12:53/63, d13:57/64, d14:65/62, d15:55/63, d16:56/63, d17:66/64, d18:57/63, d19:64/61, d20:54/64, d21:71/63, d22:44/62, d23:51/55, d24:55/55, d25:49/58, d26:51/56, d27:41/31, d28:28/13
+  Otter Vibe watered/standing by day: d1:0/20, d2:20/20, d3:14/20, d4:31/17, d5:4/21, d6:23/27, d7:22/37, d8:23/37, d9:25/36, d10:40/44, d11:30/58, d12:31/58, d13:40/58, d14:43/57, d15:46/55, d16:33/55, d17:38/55, d18:39/53, d19:46/53, d20:39/53, d21:32/53, d22:39/53, d23:50/53, d24:48/53, d25:44/53, d26:46/51, d27:57/52, d28:28/39
+
+== LABOR (effective unit events) ==
+  SpaTaro: {'WATER': 1320, 'HARVEST': 446, 'PLANT': 274, 'COLLECT_FERTILIZER': 249, 'CARE': 225, 'FEED': 224, 'PICKUP': 119, 'FERTILIZE': 91, 'DROP': 85, 'PLACE': 18}
+  Otter Vibe: {'WATER': 982, 'HARVEST': 561, 'FEED': 446, 'COLLECT_FERTILIZER': 420, 'CARE': 387, 'PICKUP': 344, 'PLANT': 204, 'FERTILIZE': 186, 'DROP': 133, 'PLACE': 22}
+
+== HARVEST FLOWS (units by product, exact) ==
+  SpaTaro: CARROT:186u/66tiles, COW:221u/68tiles, MELON:82u/14tiles, SHEEP:48u/11tiles, STRAWBERRY:245u/131tiles, WHEAT:540u/156tiles
+  Otter Vibe: CARROT:133u/37tiles, COW:231u/66tiles, GOOSE:322u/160tiles, MELON:90u/15tiles, SHEEP:56u/15tiles, STRAWBERRY:224u/112tiles, TOMATO:100u/52tiles, WHEAT:553u/104tiles
+
+########## M1 RAW ACTIONS: ['SpaTaro', 'Unknown Mother-Goose']
+  SpaTaro requested orders (units): BUY_ANIMAL COW:7; BUY_ANIMAL SHEEP:9; BUY_PRODUCT CARRO:306; BUY_PRODUCT EGG:157; BUY_PRODUCT FERTI:26; BUY_PRODUCT MELON:281; BUY_PRODUCT MILK:276; BUY_PRODUCT STRAW:450; BUY_PRODUCT TOMAT:396; BUY_PRODUCT WHEAT:449; BUY_PRODUCT WOOL:158; BUY_SEED CARRO:33; BUY_SEED MELON:18; BUY_SEED STRAW:55; BUY_SEED WHEAT:176; SELL CARRO:116; SELL FERTI:123; SELL MELON:90; SELL MILK:87; SELL STRAW:413; SELL WHEAT:904; SELL WOOL:59
+    orders-per-step histogram: {0: 329, 1: 217, 2: 58, 3: 20, 4: 14, 5: 14, 6: 16, 7: 18, 8: 5, 9: 12, 10: 16}
+    hires by TRUE hour: {0: 208, 1: 58, 2: 6}
+  Unknown Mother-Goose requested orders (units): BUY_ANIMAL COW:6; BUY_ANIMAL GOOSE:6; BUY_ANIMAL SHEEP:3; BUY_PRODUCT FERTI:17; BUY_PRODUCT WHEAT:134; BUY_SEED CARRO:48; BUY_SEED MELON:15; BUY_SEED STRAW:34; BUY_SEED TOMAT:8; BUY_SEED WHEAT:133; SELL CARRO:210; SELL EGG:228; SELL FERTI:406; SELL MELON:150; SELL MILK:152; SELL STRAW:313; SELL TOMAT:78; SELL WHEAT:509; SELL WOOL:73
+    orders-per-step histogram: {0: 410, 1: 188, 2: 50, 3: 12, 4: 11, 5: 7, 6: 9, 7: 4, 8: 2, 10: 26}
+    hires by TRUE hour: {0: 244, 1: 49}
+  SpaTaro hourly MOVE/WORK: h 0:M 11/W 15 h 1:M137/W 82 h 2:M150/W124 h 3:M179/W108 h 4:M162/W125 h 5:M155/W128 h 6:M141/W142 h 7:M142/W143 h 8:M145/W141 h 9:M143/W144 h10:M147/W137 h11:M150/W130 h12:M144/W137 h13:M146/W136 h14:M145/W133 h15:M145/W128 h16:M131/W134 h17:M132/W123 h18:M113/W127 h19:M111/W118 h20:M104/W114 h21:M 76/W106 h22:M 40/W 82 h23:M 13/W 49
+    cmd totals: {'WATER': 1388, 'PASS': 1128, 'WEST': 920, 'NORTH': 909, 'SOUTH': 588, 'EAST': 545, 'HARVEST': 412, 'PLANT': 254, 'COLLECT_FERTILIZER': 173, 'CARE': 136, 'FEED': 135, 'PICKUP': 98, 'FERTILIZE': 96, 'DROP': 70}
+  Unknown Mother-Goose hourly MOVE/WORK: h 0:M  1/W 28 h 1:M102/W159 h 2:M235/W 69 h 3:M203/W105 h 4:M126/W175 h 5:M121/W180 h 6:M135/W174 h 7:M146/W167 h 8:M130/W174 h 9:M125/W182 h10:M105/W200 h11:M132/W179 h12:M143/W162 h13:M148/W156 h14:M149/W149 h15:M142/W148 h16:M126/W138 h17:M122/W120 h18:M133/W107 h19:M120/W108 h20:M126/W 91 h21:M117/W 88 h22:M113/W 81 h23:M124/W 53
+    cmd totals: {'PASS': 1080, 'WATER': 1060, 'NORTH': 861, 'WEST': 860, 'EAST': 748, 'SOUTH': 655, 'HARVEST': 517, 'COLLECT_FERTILIZER': 326, 'FEED': 248, 'PLANT': 237, 'CARE': 223, 'PICKUP': 185, 'FERTILIZE': 148, 'PLACE': 119}
+
+########## M2 RAW ACTIONS: ['SpaTaro', 'Otter Vibe']
+  SpaTaro requested orders (units): BUY_ANIMAL COW:12; BUY_ANIMAL GOOSE:3; BUY_ANIMAL SHEEP:6; BUY_PRODUCT CARRO:306; BUY_PRODUCT EGG:87; BUY_PRODUCT FERTI:4; BUY_PRODUCT MELON:221; BUY_PRODUCT MILK:382; BUY_PRODUCT STRAW:431; BUY_PRODUCT TOMAT:517; BUY_PRODUCT WHEAT:446; BUY_PRODUCT WOOL:231; BUY_SEED CARRO:66; BUY_SEED MELON:25; BUY_SEED STRAW:44; BUY_SEED WHEAT:170; SELL CARRO:203; SELL FERTI:178; SELL MELON:98; SELL MILK:254; SELL STRAW:313; SELL WHEAT:863; SELL WOOL:54
+    orders-per-step histogram: {0: 315, 1: 189, 2: 91, 3: 30, 4: 11, 5: 9, 6: 22, 7: 15, 8: 11, 9: 12, 10: 14}
+    hires by TRUE hour: {0: 203, 1: 70, 2: 4, 3: 1}
+  Otter Vibe requested orders (units): BUY_ANIMAL COW:11; BUY_ANIMAL GOOSE:8; BUY_ANIMAL SHEEP:3; BUY_PRODUCT FERTI:46; BUY_PRODUCT WHEAT:244; BUY_SEED CARRO:37; BUY_SEED MELON:15; BUY_SEED STRAW:28; BUY_SEED TOMAT:13; BUY_SEED WHEAT:111; SELL CARRO:133; SELL EGG:322; SELL FERTI:280; SELL MELON:90; SELL MILK:231; SELL STRAW:224; SELL TOMAT:100; SELL WHEAT:351; SELL WOOL:56
+    orders-per-step histogram: {0: 579, 1: 26, 2: 21, 3: 30, 4: 10, 5: 5, 6: 6, 7: 4, 8: 3, 9: 2, 10: 33}
+    hires by TRUE hour: {0: 185, 1: 102, 7: 2}
+  SpaTaro hourly MOVE/WORK: h 0:M 10/W 14 h 1:M129/W 88 h 2:M161/W119 h 3:M182/W108 h 4:M181/W113 h 5:M134/W156 h 6:M133/W158 h 7:M129/W156 h 8:M126/W159 h 9:M132/W153 h10:M145/W144 h11:M147/W145 h12:M131/W158 h13:M127/W161 h14:M126/W147 h15:M131/W142 h16:M124/W150 h17:M131/W137 h18:M120/W131 h19:M129/W123 h20:M105/W137 h21:M 87/W125 h22:M 56/W 97 h23:M 13/W 74
+    cmd totals: {'WATER': 1320, 'PASS': 1039, 'WEST': 896, 'NORTH': 887, 'EAST': 579, 'SOUTH': 527, 'HARVEST': 446, 'PLANT': 274, 'COLLECT_FERTILIZER': 249, 'CARE': 225, 'FEED': 224, 'PICKUP': 120, 'FERTILIZE': 92, 'DROP': 85}
+  Otter Vibe hourly MOVE/WORK: h 0:M  0/W  0 h 1:M  0/W  0 h 2:M 57/W245 h 3:M214/W103 h 4:M260/W 57 h 5:M207/W110 h 6:M164/W153 h 7:M139/W178 h 8:M128/W190 h 9:M135/W183 h10:M 99/W218 h11:M114/W203 h12:M111/W206 h13:M115/W202 h14:M127/W187 h15:M111/W203 h16:M113/W201 h17:M133/W181 h18:M134/W179 h19:M152/W157 h20:M148/W156 h21:M131/W147 h22:M 83/W150 h23:M  0/W138
+    cmd totals: {'WATER': 982, 'WEST': 856, 'NORTH': 852, 'EAST': 635, 'PASS': 616, 'HARVEST': 561, 'SOUTH': 532, 'FEED': 446, 'COLLECT_FERTILIZER': 420, 'CARE': 387, 'PICKUP': 344, 'PLANT': 204, 'FERTILIZE': 186, 'DROP': 133}

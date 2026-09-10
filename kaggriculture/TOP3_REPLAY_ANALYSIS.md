@@ -1,293 +1,299 @@
-# NGHIÊN CỨU REPLAY TOP-3 KAGGLE — VÒNG PHÂN TÍCH 1 (Task 38)
+# NGHIÊN CỨU REPLAY TOP-3 KAGGLE — V2.0 (VÒNG 1 + VÒNG 2)
 
-**Ngày:** 10 Sep (sau Task 37) · **Tác giả:** KAIN
-**Nguồn:** 2 file replay Kaggle chính thức do user tải lên: `upload/107559251.json` (32.4MB) + `upload/107573831.json` (33MB) — episode đầy đủ 720 turn, engine `kaggle_environments 1.32.7` (khớp 100% engine local đã audit Task 21 mục Q.1).
+**Ngày:** 10 Sep · **Tác giả:** KAIN
+**Nguồn:** `upload/107559251.json` (M1) + `upload/107573831.json` (M2) — 720 step, engine `kaggle_environments 1.32.7`, seed M1=1620414037 / M2=896878425.
 **Phạm vi:** Chỉ phân tích học tập — CHƯA triển khai v7/kain41 (theo chỉ thị của user).
 
 ---
 
-## PHẦN 0 — NGUỒN DỮ LIỆU & PHƯƠNG PHÁP
+## PHẦN 0 — PHƯƠNG PHÁP: GOD REPLAY 0-LỖI (nâng cấp lớn nhất của vòng 2)
 
-- Trích xuất toàn bộ 720 step × 2 player × 2 match: tiles 10×10, money, quadrants, herd, hands, market orders, prices, inventory, shops.
-- **Quy ước replay đã xác minh bằng trace từng đô-la** (step 144-156 M1): `steps[t].observation` = trạng thái SAU khi `steps[t].action` được thực thi. Mọi phép đo trong file này dùng quy ước đó.
-- Doanh thu theo kênh: tái dựng giá từng unit theo công thức giá engine (MARKET_PARAMS gốc) + điều hòa bằng sổ cái tiền (final = 3000 + revenue − costs). Doanh thu absolute có sai số ±20% do SELL fail khi shed rỗng (đơn vị "requested" ≠ "executed"); TỶ TRỌNG theo kênh là tín hiệu đáng tin.
-- Bộ tool phân tích: `tool-results/replay_analyze.py` (extract), `replay_ledger.py` (sổ cái), `q1_land.py`→`q7_plant.py` (query).
+Vòng 2 xây dựng **"god replay"**: nạp lại engine thật (`kaggle_environments` local) và **bơm đúng 720 action đã ghi** vào interpreter, kèm instrument (monkey-patch `_commit_unit`, `_do_hire`, `_do_buy_land`, `_apply_unit_action`) và snapshot đầy đủ state sau mỗi step.
 
-**4 người chơi (top-3 bảng xếp hạng Kaggle):**
+**Kết quả xác minh:** 719/719 step × 2 trận = **0 mismatch** trên toàn bộ money + market inventory + shops + shed + seeds của CẢ HAI người chơi, final money khớp rewards ĐẾN TỪNG ĐÔ-LA ($93,281/$99,793 và $107,329/$109,084). Mọi con số trong V2.0 là **SỐ THẬT CHÍNH XÁC** — bỏ mức sai số ±20% của vòng 1.
 
-| Trận | Đối thủ | Kết quả | Chênh |
-|---|---|---|---|
-| M1 (107559251) | **SpaTaro** vs **Unknown Mother-Goose** (UMG) | $93,281 vs **$99,793** | −$6,512 |
-| M2 (107573831) | **SpaTaro** vs **Otter Vibe** | $107,329 vs **$109,084** | −$1,755 |
+Tool: `tool-results/r2_godreplay.py` (engine harness) → `r2_god_M1/M2.json` (commit/hire/land/unit logs + 719 snapshot) → `r2_analyze.py` → `r2_report.txt`.
 
-**SpaTaro thua cả 2 trận nhưng vẫn ở mức $93-107k** — cả 4 performance đều gấp ~2x mức tốt nhất của chúng ta (kain40 $58k, v6.6 $45-55k). Tổng tiền 2 bên mỗi trận: **$193k (M1) / $216k (M2)** — trận đấu top-3 gần như ĐỐI XỨNG (0.98-1.07x), không phải trận đè bẹp.
+**Quy ước giờ đúng (sửa lỗi vòng 1):** action ở row t chạy tại engine-step t−1 → **true day=(t−1)//24, true hour=(t−1)%24**. Nhãn giờ vòng 1 bị +1 (vd "HIRE h1-2" thực chất là **h0**).
 
----
+**Các số đo được (từ exact data):**
+1. HIRE: **74-88% xảy ra ở true h0** (ngay sau end-of-day dump + reset fib) — vòng 1 ghi "h1-2" là nhãn lệch.
+2. Giá bán: mỗi lệnh SELL chạy **từng unit một**, giá tại khoảnh khắc đó — tái dựng chính xác giá từng unit đã bán (bao gồm interleaving 2 người chơi trong cùng step).
+3. Executed ≠ requested: engine drop âm thầm lệnh không hợp lệ → đo được chính xác "yêu cầu vs thực thi".
 
-## PHẦN 1 — BỨC TRANH CHIẾN LƯỢC TỔNG QUÁT (điểm chung của cả 4 lượt chơi)
+**Bảng sửa sai vòng 1 (đối chiếu god replay):**
 
-### 1.1 Timeline chuẩn 30 ngày (tổng hợp từ cả 4 lượt)
-
-| Giai đoạn | Hành động | Chi tiết |
-|---|---|---|
-| **d0** | Mở màn "vườn ươm + chuồng" | Trồng melon 6-16 ô + wheat 3-18 ô + carrot 2 ô. **Mua 3-5 con vật NGAY d0** (bò 1-5, cừu 1-2, ngỗng 2). Hire 5-7. Tiền về ~$0-230 cuối ngày d0. |
-| **d1-3** | Thu hoạch fertilizer = **máy in tiền khởi động** | Mỗi con vật nhả 1 FERT/ngày → 3-6 FERT/ngày × $95-100 = **$300-600/ngày từ d1**. Đây là nguồn vốn mua đất sớm. UMG giàu nhất giai đoạn này ($619 d1, $890 d2). |
-| **d3-6** | **Mua NE ($1k)** — đúng vào lúc vốn tích đủ | UMG d3 (sớm nhất), Otter d5, SpaTaro d6 (cả 2 trận). Trống 20-78% 1-2 ngày ngay sau mua rồi lấp lại. |
-| **d4-7** | **Sóng dâu đợt 1: 14-17 ô** | Mua 20-40 hạt dâu ($100/hạt), trồng dọc d5-7. Được bón phân + tưới đủ → chờ event d10-16. |
-| **d5-10** | **Mua SW ($2k)** — sớm hơn cửa sổ 10-12 | UMG d8, SpaTaro d8 (cả 2 trận), Otter d10. Sau mua: lấp đầy trong **1-2 ngày** (0-16 ô trống thoáng qua). |
-| **d8-9** | Bò bắt đầu cho sữa (first_yield_day 8) | Sữa chảy từ d8: 2-6 u/ngày mỗi bên. Wheat machine (24-41 ô) vận hành để FEED. |
-| **d10-12** | **QUẢ BOM MELON chín** | 76-90 quả × $143-271 = **$13-22k trong 2-3 ngày**. Đây là cú vốn giữa game. |
-| **d10-16** | Sóng dâu đợt 2 (5-9 ô) + **TOMATO** (chỉ 2 người thắng) | Dâu event mỗi 2 ngày (4 lần × 1-2u/ô); cà chua event mỗi ngày d8-11. |
-| **d12-20** | **Mở rộng đàn theo shop draw** | Xem Phần 6 — đây là điểm quyết định thắng thua. |
-| **d13-27** | **Chạy ổn định 75/75 ô, empty 0-2%** | Dâu 20-34 đứng + wheat 15-31 + đàn 14-22 con + carrot/straw thay phiên. **FERTILIZE dâu 92-186 lần** (×2 yield). |
-| **d21-26** | Dâu chết tuổi → **CARROT lấp chỗ** (7-12 ô/ngày) | Carrot $35-56 (PET_CAFE d18/d21+ hút mạnh ở M2). Wheat tăng 22-41 ô. |
-| **d27-29** | **THANH LÝ TOÀN BỘ** | Ngừng trồng, thu tất cả, bán dồn. Ngày 29 bán 348u (UMG) / 97u wheat (SpaTaro M2). Shed cuối game: **0-16u tồn** (~$0-300 lãng phí trên $100k+). |
-
-### 1.2 Bảng đối chiếu mua đất (kiểm chứng 4 luật cứng)
-
-| Người chơi | NE (50 ô) | SW (75 ô) | SE (100 ô) | Empty d7-26 (duy trì) | Empty max sau khi mua |
-|---|---|---|---|---|---|
-| SpaTaro M1 | d6 | **d8** | KHÔNG | 0-7% (đa số 0-1%) | 5 ô (1 ngày) |
-| UMG (thắng M1) | **d3** | **d8** | KHÔNG | **0-7%** (d9-27 hầu như 0) | 39 ô (d4, sau NE sớm — thung lũng 2 ngày) |
-| SpaTaro M2 | d6 | **d8** | KHÔNG | 0-5% | 8 ô |
-| Otter Vibe (thắng M2) | d5 | **d10** | KHÔNG | **0% tuyệt đối d11-27** (chỉ 16 ô 1 ngày sau SW d10) | 16 ô (1 ngày) |
-
-**Phán quyết 4 luật cứng của user (từ quan sát top-Kaggle):**
-1. ✅ **NE d5-7** — đúng khung (biến thể: d3-6; sớm hơn nếu vốn cho phép — UMG d3 vẫn thắng)
-2. ✅ **SW d10-12** — đúng khung (biến thể: **d8-10 — cả 3 người còn lại mua SỚM HƠN** cửa sổ 1-2 ngày)
-3. ✅✅ **KHÔNG BAO GIỜ 100 ô** — 4/4 lượt chơi, không ai mua SE dù cuối game có $30-90k nhàn rỗi
-4. ✅✅ **Empty 0-15%** — thực tế còn gắt hơn: **0-7% duy trì d7-26**; spike duy nhất = 16-39 ô trong **đúng 1 ngày** sau khi mua đất, lấp lại trong 24h
-
-**Điểm mới quan trọng nhất: lấp NE/SW mất 1-2 NGÀY** (không phải 5-9 ngày như kain33-40 của ta). Họ có sẵn hạt + lao động dự trữ TRƯỚC khi mua đất.
-
----
-
-## PHẦN 2 — KINH TẾ KÊNH: SỔ CÁI DOANH THU
-
-### 2.1 Doanh thu theo kênh (điều hòa theo sổ cái tiền, ±20%)
-
-**M1 (SpaTaro thua vì chọn sai kênh):**
-
-| Kênh | SpaTaro ($93.3k) | UMG ($99.8k) | Ghi chú |
-|---|---|---|---|
-| STRAWBERRY | **$65.5k** (413u) | $43.9k (313u) | Kênh #1 cả hai bên |
-| WHEAT | $22.7k (904u) | $10.6k (509u) | SpaTaro là máy xay wheat |
-| MELON | $17.9k (90u) | $15.7k (150u) | Bom d10-12 |
-| FERTILIZER | $7.3k (123u) | **$19.7k (406u)** | UMG thu FERT tử tế |
-| WOOL | $5.3k | $4.8k | Bằng nhau |
-| CARROT | $3.9k | $6.1k (210u, chủ yếu d26-29) | |
-| MILK | $3.4k (87u @ avg $48) | $5.3k (152u) | **Kênh CHẾT ở M1** — giá sữa sập $8 |
-| EGG | $0 (0 ngỗng) | **$11.1k (228u)** | UMG độc quyền 6 ngỗng |
-| TOMATO | $0 | $3.6k (78u) | |
-| **TỔNG revenue** | ~$126k | ~$121k | SpaTaro gross CAO HƠN |
-
-**M2 (đối xứng — cả hai đều $107k+):**
-
-| Kênh | SpaTaro ($107.3k) | Otter Vibe ($109.1k) | Ghi chú |
-|---|---|---|---|
-| MILK | **$36.7k (254u)** | **$38.4k (231u)** | Kênh #1 M2 — 9 vs 11 bò |
-| STRAWBERRY | $36.4k (313u) | $32k (224u) | |
-| WHEAT | $29.6k (863u) | $13.3k (351u) | SpaTaro bán wheat 2.5× |
-| MELON | $18.8k (98u) | $12.6k (90u) | |
-| FERTILIZER | $9.1k (178u) | **$16.1k (280u)** | |
-| EGG | $0 | **$13.9k (322u)** | 8 ngỗng của Otter |
-| CARROT | $7.6k | $7.1k | |
-| TOMATO | $0 | $6.1k (100u) | |
-| WOOL | $5.3k | $5.3k | Bằng nhau tuyệt đối |
-| **TỔNG revenue** | ~$143.5k | ~$144.8k | Gần như hoàn hảo đối xứng |
-
-### 2.2 Chi phí (theo sổ cái tái dựng)
-
-| Hạng mục | SpaTaro M1 | UMG | SpaTaro M2 | Otter Vibe |
-|---|---|---|---|---|
-| Hạt giống | $9.4k (176 wheat + 55 straw + 33 carrot + 18 melon) | $7.3k | $9.4k | $6.5k |
-| Con vật | $7.3k (7 bò + 9 cừu) | $5.7k (6 bò + 3 cừu + 6 ngỗng) | $8.7k (12 bò + 6 cừu + 3 ngỗng) | $8.3k (11 bò + 3 cừu + 8 ngỗng) |
-| Mua wheat feed | $14.0k (449u) | $4.5k (134u) | $16.7k (446u) | $9.0k (244u) |
-| **HIRE (272-293 lần)** | $3.4k | $5.4k | $4.1k | **$12.8k** ⚠ |
-| Đất (NE+SW) | $3k | $3k | $3k | $3k |
-| Mua FERT | $1.6k | $1.0k | $0.2k | $2.1k |
-
-⚠ **Otter Vibe đốt $12.8k tiền hire** (13-15 thợ/ngày cuối game, fib $89-377/thợ) và VẪN THẮNG — lao động cuối game có ROI $100-200/action khi dâu+sữa ở đỉnh giá.
-
-### 2.3 Cấu trúc đàn — điểm khác biệt thắng/thua lớn nhất
-
-| | SpaTaro M1 | UMG ✅ | SpaTaro M2 | Otter ✅ |
-|---|---|---|---|---|
-| Ngỗng (EGG+FERT) | **0** | **6** (mua d8-10) | 3 (chết sớm) | **8** (d4-7) |
-| Bò (MILK) | 4 | 5-6 | 9 | 11 (mua d15-18) |
-| Cừu (WOOL) | 3 | 3 | 2 | 3 |
-| Tổng đàn | **7** | **14** | 11-13 | **22** |
-
-**Cả 2 người thắng đều có ngỗng; cả 2 lần SpaTaro thua đều không có/không giữ ngỗng.** Ngỗng = EGG ($11-14k) + FERT (1/con/ngày) + chăm nhẹ.
-
----
-
-## PHẦN 3 — CƠ CHẾ ĐỌC SHOP DRAW (game theory quyết định thắng thua M1)
-
-### 3.1 Shop là số phận kênh
-
-Shop unlock mỗi 3 ngày (d3, d6, d9, ..., d24; tối đa 8 instance, bốc CÓ hoàn lại):
-
-| Trận | Shop draw | Hệ quả giá |
-|---|---|---|
-| M1 | BRUNCH×3 + BAKERY + SMOOTHIE×2 + PET_CAFE + FARMERS (d24) | **EGG demand 4 instance** (BAKERY d6 + BRUNCH d3/d9/d12) → trứng khan hiếm −360u → $73. **MILK demand gần bằng 0 đến d15** (chỉ SMOOTHIE d15/d24 + town center) → sữa +73 above-I0 → **sập $8**. WHEAT demand 7 instance → khan −181 → $38. |
-| M2 | PET_CAFE×3 + ICE_CREAM×2 + BRUNCH + PIZZA + SMOOTHIE | **MILK demand 4 instance từ d9-15** (ICE d9/d12, PIZZA d15) → sữa khan −25 → **$122-200 cả mùa**. CARROT demand 3 PET_CAFE ×2u = mạnh → $35→56. EGG chỉ 1 BRUNCH → $42. STRAW 4 instance → $211 đỉnh nhưng **2 bên bán 537u → sập $37 d23-25** (tự hủy chung). |
-
-### 3.2 Phản ứng của người thắng (ADAPTIVE herd scaling)
-
-- **UMG (M1)**: d0 mua 5 bò (trước khi biết gì) → thấy BAKERY d6 + BRUNCH d3/d9 = trứng mạnh → **mua 6 ngỗng d8-10, KHÔNG mở rộng bò** (sữa đang chết). Kết quả: $11.1k trứng + $19.7k FERT mà không đổ thêm tiền vào kênh sữa chết.
-- **Otter (M2)**: thấy ICE_CREAM d9/d12 + PIZZA d15 = sữa mạnh → **tăng bò 6→9→11 theo từng mốc shop d15/d18**. Đồng thời giữ 8 ngỗng từ d4-7 (trứng $44 vẫn dương + FERT machine).
-- **SpaTaro (M1, thua)**: profile cứng 4 bò 0 ngỗng — bán sữa avg $48 vào kênh $8-40, không có kênh trứng dù demand mạnh nhất mùa.
-
-→ **Bài học lớn nhất M1: herd composition phải đọc shop draw d3-d12, không phải theo profile tĩnh.** Đây là biến thể của R50 (tín hiệu thị trường > tín hiệu đối thủ) nhưng ở tầng cấu trúc đàn.
-
-### 3.3 Cung-cầu 9 kênh (kiểm chứng inventory I0=10000)
-
-- Kênh có SHOP hút (wheat/egg/milk/straw theo draw): giá giữ trên base khi 2 bên bán đúng nhịp drain (M2 milk −25u → $122-200; M1 wheat −181 → $38).
-- **Kênh KHÔNG có shop nào hút: MELON (0 shop), FERTILIZER (0 shop + bị loại khỏi town center)** → mọi unit bán vào là cộng dồn inventory vĩnh viễn, giá chỉ đi xuống (melon $270→$74; FERT $100→$26-51). Vẫn bán được lớn ($12-27k) nhưng phải bán SỚM + NHỎ.
-- **FERT dùng nội bộ (FERTILIZE) là "drain" duy nhất của kênh FERT**: Otter FERTILIZE 186 lần = tiêu 186u tự sản, giữ giá FERT thị trường. Vòng lặp: thú nhả FERT → bón dâu → dâu ×2 yield.
-
----
-
-## PHẦN 4 — HỆ THỐNG LAO ĐỘNG & LOGISTICS (khác biệt cấu trúc lớn nhất vs engine ta)
-
-### 4.1 Các con số lao động mỗi ngày (giai đoạn ổn định d13-27)
-
-| Chỉ số | SpaTaro | UMG | Otter Vibe |
-|---|---|---|---|
-| Hands thuê | 9-12 | 10-12 | **13-15** |
-| WATER/ngày | 50-73 | 39-57 | 28-54 |
-| FEED/ngày | 3-7 | 7-14 | **17-22** (full-care 22 con) |
-| CARE/ngày | 3-7 | 6-14 | **14-19** |
-| HARVEST/ngày | 9-32 | 18-38 | 22-39 |
-| PLANT/ngày | 5-18 | 3-17 | 2-24 |
-| COLLECT_FERT | 4-7 | 10-15 | 12-24 |
-| MOVE/ngày | 97-148 | 100-136 | 105-152 |
-| **Tổng action/ngày** | 189-259 | 204-268 | 253-344 |
-
-So với engine ta (kain40/v6.6: **52-67 action/ngày, 12-13 units, 71% thời gian đi bộ**) — top-3 chạy **4-5× tổng khối lượng hành động** với chỉ ~1.2× số units. 
-
-### 4.2 Hai khám phá cơ chế then chốt
-
-1. ** KHÔNG CẦN ĐI VỀ SHED CUỐI NGÀY**: `_drop_inventories_to_shed` chạy ở end-of-day — tay thợ chết lúc h23 và TOÀN BỘ inventory tự đổ vào shed. Top players cho thợ thu hoạch khắp farm suốt ngày, không bao giờ đi về. Đây chính là "phím tăng tốc lao động" 2-3× mà R127 (trần 85% fill) của ta bị khóa.
-2. ** HIRE 90% diễn ra ở h1-h2** (208-244/272-293 lần) — ngay sau đợt bán sáng (tiền có sẵn) và fib reset đầu ngày. Bán sáng → thuê → dispatch.
-
-### 4.3 Hai phong cách nuôi động vật (đều thắng/thua)
-
-| | SpaTaro "producer-feeding" | Otter "full-care" |
-|---|---|---|
-| FEED/CARE | 4-7/ngày (chỉ bò ĐANG có sữa hôm đó) | 17-22/ngày (mọi con, mọi ngày) |
-| Wheat tiêu | ~5u/ngày | ~20u/ngày |
-| Sữa/bò/ngày (đo thực tế) | **~1.3-1.4u** (254u / 9 bò) | ~1.0-1.1u (231u / 11 bò) |
-| Chi phí chênh | tiết kiệm ~$10-12k wheat/mùa | đốt thêm nhưng bù bằng EGG+FERT scale |
-
-Kết quả sữa/bò gần như NGANG NHAU → **care-bonus không đáng tiền bằng giá wheat ở M2 ($40+)**; nhưng full-care nuôi được đàn LỚN hơn (22 vs 13 con) để chạy kênh FERT+EGG. Hai chiến lược đều khả thi — điều quyết định là TỔNG ĐÀN + ĐỌC SHOP.
-
-### 4.4 Nhịp bán (tranche discipline — R90 đúng và còn gắt hơn)
-
-- Đơn hàng SELL trung bình **3.5-15.3u** (không bao giờ dội 20+u một lệnh)
-- Giờ bán: **h0-2 (sáng, sau shed đêm) + h21-23 (tối)** — UMG 47 bán ở h22, Otter 72 bán ở h0
-- Tổng units bán ra: **1,963-2,119u/người/mùa** (~70u/ngày) với shed 100 → shed là bộ đệm NGÀY, không phải kho
-
----
-
-## PHẦN 5 — THANH LÝ CUỐI GAME (E8 ở quy mô chưa từng thấy)
-
-| | d28 | d29 (ngày cuối) | Tồn cuối |
-|---|---|---|---|
-| SpaTaro M1 | +$5.6k | +$4.4k (57 wheat + 36 dâu + 55 carrot + ...) | 16 wool + 5 hạt |
-| UMG | +$4.6k | **+$11.6k** (94 wheat + 34 dâu + 24 trứng + **125 carrot** + 40 FERT + ...) | **~0** (1 hạt wheat) |
-| SpaTaro M2 | +$5.1k | +$4.5k | ~0 (1 FERT + 6 hạt) |
-| Otter | +$3.7k | **+$11.6k** | 6 wool + 7 wheat trên ô |
-
-Ngày 29 riêng lẻ đóng góp **$4.4-11.6k** (5-11% tổng tiền). Người thắng M1/M2 đều có ngày cuối $11.6k — thanh lý là "trận trong trận". Họ ngừng trồng từ d27-28, thu+dồn bán hết, kết thúc sạch bóng (R71 của ta: tồn $250-800 — top-3 để lại <$300).
-
-**Cấu trúc ngày 29 của người thắng**: dồn tất cả tồn + thu harvest cuối + bán theo hàng đợi 10 lệnh/giờ tới h22, giá chấp nhận (carrot 125u vẫn bán được $38-44 vì drain PET_CAFE còn hút).
-
----
-
-## PHẦN 6 — ĐỐI CHIẾU RULES.md ↔ THỰC TẾ TOP-3 (yêu cầu chính của user)
-
-### 6.1 ✅ QUY TẮC ĐƯỢC XÁC NHẬN (giữ nguyên, bổ sung bằng chứng)
-
-| Quy tắc | Bằng chứng từ replay |
+| Con số vòng 1 (±20%) | Con số thật V2.0 |
 |---|---|
-| R8 (lịch ongoing 4 events) | Dâu 4 events × 2 ngày, chết tuổi 17 (cả 4 lượt dâu chết d20-23 đúng lịch) |
-| R10 (melon window đóng) | Không ai trồng melon sau d15 |
-| R24 (shed 100 + end-of-day dump) | **Được khai thác TỐI ĐA** — xem 4.2: đây là phím lao động top-3 |
-| R36 (chỉ WHEAT+FERT mua được) | SpaTaro spam 248-260 lệnh BUY_PRODUCT vô hiệu (CARROT/EGG/MELON/MILK/STRAW/TOMATO) — engine drop sạch. **Cả bot top-3 còn mang bug này** |
-| R37/R48 (wheat churn/room) | M2: 2 bên tự trồng ~527u + mua 244-446u → wheat khan −355 → $44. Mua feed $40 đổi sữa $170 = 4× margin (R92 đúng ở quy mô top) |
-| R49 (wool floor 2-3 cừu) | Mọi người đúng 2-3 cừu, wool $5.3k bằng nhau tuyệt đối. 5-6 cừu tổng 2 bên vẫn sập giá (T=105 quá hẹp) |
-| R83 (first-mover premium) | Dâu trồng d5-7 bắt event d10-14 ở $165-188 |
-| R90 (tranche sâu/dump chết) | Melon dump d10-12 (kênh không drain) vs milk tranche nhỏ cả mùa (kênh drain sâu) |
-| R92 (wheat→milk converter) | 9-11 bò + wheat machine 24-41 ô — đúng cấu trúc, nhưng quy mô 2× |
-| R101 (hiến kênh) | M2: 2 bên cùng dội dâu d20-26 → cùng ăn giá $37-56 |
-| R53/E8 (thanh lý d29) | $4.4-11.6k ngày cuối (xem Phần 5) |
-| R5 (P0/P1) | Cả 2 trận chênh 1.6-6.9% — knife-edge ở top |
+| SpaTaro M1 gross CAO HƠN UMG (~$126k vs $121k) | **SAI ngược**: SpaTaro $120,293 < UMG $123,506 |
+| UMG bán FERT 406u | **Requested 406u, thực thi 195u** (406 là lệnh yêu cầu) |
+| UMG EGG $11.1k/228u | $13,958/**210u** @ $66.5 |
+| SpaTaro M2: "3 ngỗng chết sớm" | **1 ngỗng mua d5 KHÔNG BAO GIỜ đặt ra ô** (coop bị đập d4) |
+| Sữa/bò SpaTaro 1.3-1.4 vs Otter 1.0-1.1 | **Cả hai đều ~1.2-1.3/bò/ngày** — xem Q2 |
+| Giờ bán "h0-2 sáng + h21-23 tối" | **true h0 + h17-h22** |
 
-### 6.2 ❌ QUY TẮC BỊ MÂU THUẪN / CẦN HIỆU ĐÍNH
+---
 
-| Quy tắc | Thực tế top-3 | Hiệu đính đề xuất |
+## PHẦN 1 — BỨC TRANH CHIẾN LƯỢC TỔNG QUÁT (giữ nguyên vòng 1, chốt giờ chính xác)
+
+Timeline 30 ngày của vòng 1 được xác nhận toàn bộ. Bổ sung giờ CHÍNH XÁC mua đất (từ land_log):
+
+| Sự kiện | M1 UMG | M1 SpaTaro | M2 Otter | M2 SpaTaro |
+|---|---|---|---|---|
+| NE ($1k) | t=89 (**d3 h16**) | t=151 (**d6 h6**) | t=121 (**d5 h0**) | t=151 (**d6 h6**) |
+| SW ($2k) | t=198 (**d8 h5**) | t=198 (**d8 h5**) | t=247 (**d10 h6**) | t=198 (**d8 h5**) |
+
+- **SpaTaro mua đất theo lịch đồng hồ cố định** (NE t=151, SW t=198 — TRÙNG TUYỆT ĐỐI ở cả 2 trận, khác seed!) → agent của anh ấy chạy schedule determinist, không phải canh vốn.
+- M1: **cả 2 mua SW cùng một step t=198** (d8 h5).
+- 4 luật cứng của user: NE d3-6 ✓, SW d8-10 ✓, KHÔNG ai mua SE ✓ (đều dừng 75 ô), empty 0-7% ✓ — giữ nguyên phán quyết vòng 1.
+
+---
+
+## PHẦN 2 — SỔ CÁI CHÍNH XÁC (thay toàn bộ bảng ±20% của vòng 1)
+
+### 2.1 Doanh thu theo kênh — EXACT (god replay, từng đô-la)
+
+**M1 (SpaTaro thua −$6,512):**
+
+| Kênh | SpaTaro ($93,281) | UMG ($99,793) |
 |---|---|---|
-| **R74 "Đất tối ưu = 50 ô (NW+NE)"** | **4/4 lượt chơi đều mua 75 ô.** R74 chỉ đúng trong bối cảnh v5-vs-v4 (đối thủ yếu, quota không binding — đã tự ghi chú sẵn trong R74) | R74 giữ nguyên phạm vi "vs đối thủ yếu"; luật top-3 là **75 ô + fill 98-100%** (kết hợp R100 + kernel lao động mới) |
-| **R127 "Trần lao động: fill tối đa 60-66 ô, 85% là giới hạn vật lý"** | **BỊ PHỦ BỎ HOÀN TOÀN**: Otter Vibe fill 75/75 + 22 con vật với 253-344 action/ngày (vs 67 của ta). Chìa khóa = cơ chế shed end-of-day dump (4.2) + 13-15 hands | R127 hiệu đính: trần 67 action/ngày là trần của KERNEL LAO ĐỘNG v6 (đi-về-shed), không phải vật lý game. Vật lý thật: ~350+ action/ngày với 15 units |
-| **R75 "Lấp đất bằng wheat = tự sát"** | Top-3 lấp 24-41 ô wheat (32-55% đất!) NHƯNG làm máy FEED cho đàn 11-22 con, không phải để bán rẻ | Phân biệt wheat-FEED (đúng) vs wheat-SELL-flood (sai): R75 đúng cho bán, cần luật mới cho feed-machine 24-41 ô |
-| **R114 "wheat-flood nuôi bò đối thủ"** | Chỉ đúng khi ĐỐI THỦ mua wheat. Top-3 TỰ TRỒNG ~527u + chỉ mua phần thiếu (244-446u); không ai phụ thuộc hoàn toàn vào mua feed | Hiệu đính phạm vi: R114 áp dụng khi telemetry (R44) đọc được đối thủ net-buyer wheat |
-| **R86 (milk counter-scale theo archetype)** | Mức cao hơn: quyết định đàn theo SHOP DRAW (public info từ d3!) chứ không phải theo đối thủ | Nâng cấp: shop draw là tín hiệu SỚM hơn telemetry đàn (R78 đã nói telemetry trễ) |
-| **R100 (SE = option value $4k đổi $8-12k quota)** | Top-3 KHÔNG mua SE dù quota dâu/wheat đầy 75 ô + $30-90k tiền nhàn rỗi cuối game | 100 ô KHÔNG nằm trong optimale top-3; option value của R100 chưa đủ lớn khi kernel lao động đã bão hòa ở 75 |
-| R17 (FERT 1/con/ngày miễn phí) | Được coi là KÊNH DOANH THU chính: $9.1-19.7k/mùa, nhiều khi lớn hơn milk | Bổ sung giá trị: FERT = 25-33% doanh thu "đàn" khi卖的 đúng nhịp |
-| R58 (kho là độ trễ) | Top-3 bán 70u/ngày — shed-clearing daily là chuẩn mực | Tăng nhịp dọn: tồn shed qua ngày = lãng phí action chở đồ |
+| STRAWBERRY | **$57,723** (296u @ $195.0) | $48,537 (253u @ $191.8) |
+| WHEAT | **$24,916** (799u @ $31.2) | $12,913 (441u @ $29.3) |
+| MELON | **$15,932** (66u @ $241.4) | $14,099 (89u @ $158.4) |
+| FERTILIZER | $7,636 (103u @ $74.1) | $13,968 (195u @ $71.6) |
+| WOOL | $6,079 (57u) | $5,030 (50u) |
+| MILK | $4,145 (87u @ $47.6) | $6,543 (133u @ $49.2) |
+| CARROT | $3,862 (93u) | $5,142 (128u) |
+| EGG | **$0** | **$13,958** (210u @ $66.5) |
+| TOMATO | **$0** | $3,316 (52u) |
+| **TỔNG GROSS** | **$120,293** | **$123,506** |
 
-### 6.3 ✨ PHÁT HIỆN MỚI KHÔNG CÓ TRONG RULES.md (đề xuất R131-R138)
+**M2 (SpaTaro thua −$1,755):**
 
-**R131 [E] — FERT-FUNDED BOOTSTRAP**: Con vật mua d0 trả FERT từ d1 ($95-100/u) = $300-600/ngày tiền mặt khởi động, tài trợ mua NE d3-6. Mở màn không có con vật = chậm 2-3 ngày vốn đất. (UMG: 6 con d0 → NE d3.)
+| Kênh | SpaTaro ($107,329) | Otter ($109,084) |
+|---|---|---|
+| MILK | $37,623 (221u @ $170.2) | **$39,178** (231u @ $169.6) |
+| STRAWBERRY | $32,101 (245u @ $131.0) | $32,700 (224u @ $146.0) |
+| WHEAT | $28,140 (705u @ $39.9) | $13,559 (351u @ $38.6) |
+| MELON | $17,865 (82u @ $217.9) | $12,846 (90u @ $142.7) |
+| FERTILIZER | $9,706 (160u) | $16,453 (280u) |
+| CARROT | $7,920 (186u) | $7,241 (133u) |
+| WOOL | $5,469 (48u) | $5,381 (56u) |
+| EGG | **$0** | **$14,225** (322u @ $44.2) |
+| TOMATO | **$0** | $6,234 (100u) |
+| **TỔNG GROSS** | **$138,824** | **$147,817** |
 
-**R132 [E] — ĐỌC SHOP DRAW LÀ DECISION LAYER CẤP CAO NHẤT CỦA ĐÀN**: từ d3 mỗi 3 ngày 1 shop mở; herd composition (ngỗng/bò) phải đổi theo số instance kênh: M1 (4 egg-shop) → 6 ngỗng + 5 bò thắng; profile cứng 4 bò + 0 ngỗng thua. Tín hiệu shop công khai từ d3-d12, TRƯỚC khi telemetry đối thủ có ý nghĩa.
+### 2.2 Chi phí — EXACT
 
-**R133 [E] — SHED END-OF-DAY DUMP = ĐÒN BẨY LAO ĐỘNG 2-3×**: tay thợ không cần quay về shed — chết h23, inventory tự về kho. Toàn bộ hành động giữa ngày dành cho harvest/water/plant xa shed. Đây là cơ chế để fill 75 ô ở 0% empty (phá trần R127).
+| Hạng mục | SpaTaro M1 | UMG M1 | SpaTaro M2 | Otter M2 |
+|---|---|---|---|---|
+| Hạt giống | $7,460 | $7,290 | $7,410 | $6,500 |
+| Con vật | $3,100 (4 bò+3 cừu) | $5,700 (6 bò+3 cừu+**6 ngỗng**) | $4,900 (9 bò+2 cừu+1 ngỗng*) | $8,300 (11 bò+3 cừu+**8 ngỗng**) |
+| Mua wheat feed | $11,431 (365u) | $4,362 (133u) | $14,896 (389u) | $9,004 (244u) |
+| Mua FERT | $1,587 | $990 | $245 | $2,081 |
+| HIRE | $3,434 (272 lượt) | $5,371 (293) | $4,044 (278) | **$12,848** (289) |
+| Đất | $3,000 | $3,000 | $3,000 | $3,000 |
+| **TỔNG chi** | **$27,012** | $26,713 | **$34,495** | **$41,733** |
 
-**R134 [E] — SELL-BEFORE-HIRE (nhịp h0-2)**: 90% HIRE ở h1-2 sau đợt bán sáng (fib reset + tiền có sẵn); mua hạt/thú sau hire. Ngược trình tự này = mất ngày lao động.
+\* con ngỗng duy nhất không bao giờ được đặt ra ô (xem Phần 9-N6).
 
-**R135 [E] — MELON LÀ BOM VỐN GIỮA GAME, KHÔNG PHẢI KÊNH**: 90-150 quả d10-12, bán hết trong 2-3 ngày ($13-22k), sau đó kênh chết vĩnh viễn (0 shop drain) — không cố quay lại. Kết hợp R114: nửa sau mùa chuyển hoàn toàn sang wheat-feed + carrot.
+**Kiểm tra sổ cái:** 3,000 + gross − chi = final, khớp tuyệt đối cả 4 lượt ($93,281 / $99,793 / $107,329 / $109,084).
 
-**R136 [E] — TOMATO LÀ KÊNH THỨ 4 CỦA NGƯỜI THẮNG**: 5-12 ô d10-18 (sau khi dâu đợt 1 xong), $5-6.2k/season, 100-130u. Chỉ 2 người thắng dùng (SpaTaro bỏ qua cả 2 trận). Event mỗi ngày (interval 1) = dòng đều, cân bằng dâu (mỗi 2 ngày).
+### 2.3 Điểm mới quan trọng từ sổ cái exact
 
-**R137 [E] — FERTILIZE DÂU 90-190 LẦN/MÙA = +100% YIELD KÊNH #1**: bón phân đúng event-day (fert+water → yield ×2 theo R8) trên 20-34 ô dâu đứng. 186 lần của Otter tiêu FERT nội bộ (tự sản) — vòng lặp dâu↔đàn khép kín. FERT không bón = bỏ 50% doanh thu kênh lớn nhất.
+- **Gross không quyết định thắng thua**: M1 gross chênh $3.2k, net chênh $6.5k; M2 gross chênh $9k, net chỉ chênh $1.75k. Otter đốt $41.7k chi phí (hire $12.8k + feed $11k) và vẫn thắng — **chi phí chuyển hóa được thành doanh thu cuối ngày**.
+- **Otter hire ramp cuối game**: d15-27 thuê 12→15 hands/ngày = $609-1,596/ngày (fib bậc cao) — tổng $12.8k; hàng ngày 12-15 hands thu hoạch carrot/water dâu → trả tiền ngay trong doanh thu d24-29 ($30k+ 5 ngày cuối).
 
-**R138 [E] — LIQUIDATION-DAY LÀ "TRẬN TRONG TRẬN" ($4-11.6k)**: d27 ngừng trồng → d28-29 thu tất cả + bán theo queue 10 lệnh/giờ đến h22, kể cả bán 125 carrot một ngày cuối. Kết thúc sạch <$300 tồn. E8 của ta thu $3-5k thời v4 — top-3 gấp đôi.
+---
 
-### 6.4 Kiểm chứng chéo 4 luật cứng (AA) của user
+## PHẦN 3 — CƠ CHẾ SHOP DRAW & DRAIN MATH (bổ sung vòng 1)
 
-| Luật cứng AA | Trạng thái sau replay |
+Drain chính xác theo engine: mỗi shop instance hút **1u mỗi sản phẩm của nó × 6 lần/ngày** (mỗi 4 turn; shop 1-sản phẩm ×2), town center −1u/ngày mọi sản phẩm trừ FERT. **FERTILIZER và MELON không có shop nào hút** → chỉ đi xuống (R135 xác nhận tuyệt đối).
+
+| Kênh | M1 (drain/ngày cuối) | M2 (drain/ngày cuối) | Hệ quả giá (exact) |
+|---|---|---|---|
+| EGG | 4 inst × 6 = **24u** + center | 1 inst = 6u | M1: $50→**$72** cả mùa (khan sâu dần); M2: $50→$42 (đủ 8 ngỗng vẫn chỉ sụt nhẹ) |
+| MILK | 2 inst = 12u | 4 inst = **24u** | M1: 41u d8 dồn vào drain 12u → **$36→$11**; M2: 18-35u/ngày vào drain 24u → **$160-199 cả mùa** |
+| STRAW | 6 inst = **36u** | 4 inst = 24u | M1: giá giữ $191-195; M2: sóng d21-23 dồn 223u/3 ngày → **$180→$24** |
+| WHEAT | 7 inst = 42u | 4 inst = 24u | M1: $38→$21 cuối; M2: giữ $39-44 nhờ tự trồng |
+| CARROT | 2-3 inst = 18u | 3 inst = **36u** (+PET_CAFE ×2) | M1: $35→$45; M2: $40→$56 (khan) |
+| WOOL | **0** (không YARN_STORE) | 0 | Chỉ center −1u/ngày → bán sớm ~$106, cuối $1-5 |
+
+**Bài học R132 giữ nguyên nhưng giờ có số exact:** cùng 1 con bò, milk ở M2 đáng gấp **3.5×** M1 ($170 vs $49 avg). SpaTaro M2 tăng đàn 4→9 bò theo shop và gần thắng — đúng hướng; M1 giữ 4 bò 0 ngỗng vào kênh chết = thua.
+
+---
+
+## PHẦN 4 — LAO ĐỘNG & LOGISTICS (cập nhật true-hour + hiệu suất lệnh)
+
+### 4.1 Số lệnh thật (raw) vs lệnh hiệu quả (exact từ unit_log)
+
+| | SpaTaro M1 | UMG M1 | SpaTaro M2 | Otter M2 |
+|---|---|---|---|---|
+| Lệnh raw/mùa (gồm move+pass) | ~5,724 | ~6,248 | ~5,700 | ~6,040 |
+| **Lệnh hiệu quả** (thực sự đổi state) | 2,766 | 3,125 | 2,776 | 3,100 |
+| Tỷ lệ lệnh đi bộ | 52% | 50% | 51% | 48% |
+| WATER (lệnh #1) | 1,387 | 1,060 | 1,320 | 982 |
+| HARVEST | 410 | 517 | 446 | 561 |
+| FEED/CARE | 135/136 | 248/223 | 224/225 | 446/387 |
+| COLLECT_FERT | 173 | 326 | 249 | 420 |
+| FERTILIZE | 96 | 142 | 91 | 186 |
+
+- **WATER là việc chiếm nhiều lao động nhất** (35-45% lệnh hiệu quả). Nhưng **số lượng nước không bằng chất lượng thời điểm**: SpaTaro tưới 1,387 lần → wheat 3.41u/ô; UMG 1,060 lần → 4.57u/ô; Otter 982 lần → **5.32u/ô** (tưới đúng cửa sổ tuổi 2-4 của wheat + đúng event-day của dâu).
+- **R133 (end-of-day dump) định lượng**: DROP chủ động chỉ 68-133 lần so với 410-615 HARVEST → **~70-85% sản lượng dựa vào auto-dump h23**, units đi khắp farm không cần về kho. Xác nhận vòng 1.
+- **Otter bỏ trống h0-h1 mỗi ngày** (0 lệnh unit) nhưng vẫn chạy market h0 (54 lệnh SELL d29) — pattern "sáng chỉ bán, chiều mới làm".
+
+### 4.2 Phản ứng đàn (giữ vòng 1) + số exact về nhịp nuôi
+
+Xem Q2 bên dưới — vòng 1 đoán "2 phong cách cho sữa khác nhau" là **SAI**: cả 4 lượt đều đạt milk/prod-event 2.35-2.55 (care bonus được max gần như mọi event).
+
+---
+
+## PHẦN 5 — THANH LÝ CUỐI GAME = TRẬN CHUNG KẾT (nâng cấp từ vòng 1 + Q1)
+
+### 5.1 Dòng tiền cuối mùa — SPA TARO DẪN TRƯỚC NGÀY CUỐI CẢ 2 TRẬN RỒI THUA
+
+| Cuối ngày | M1: SpaTaro vs UMG | M2: SpaTaro vs Otter |
+|---|---|---|
+| d27 | $83,911 vs $82,810 (**dẫn +$1,101**) | $97,263 vs $92,619 (**dẫn +$4,644**) |
+| d28 | $89,451 vs $88,593 (**dẫn +$858**) | $103,054 vs $99,459 (**dẫn +$3,595**) |
+| **d29** | $93,281 vs $99,793 (**thua −$6,512**) | $107,329 vs $109,084 (**thua −$1,755**) |
+
+**Cả 2 trận đều lật kết quả NGAY TRONG NGÀY CUỐI.** Doanh thu theo ngày (exact):
+
+| | d28 | d29 |
+|---|---|---|
+| SpaTaro M1 | $5,670 | $3,998 |
+| UMG M1 | $6,349 | **$11,576** |
+| SpaTaro M2 | $6,069 | $4,363 |
+| Otter M2 | $7,389 | **$10,001** |
+
+### 5.2 Cơ chế thắng ngày cuối (từ commit log từng unit)
+
+1. **Danh mục đứng cuối mùa**: người thắng đứng ngoài dâu (đã chết tuổi) bằng **carrot (bán d27-29: UMG $4,074; Otter $7,121) + tomato (Otter $1,111) + máy egg/milk chạy đều mỗi ngày**. SpaTaro chỉ còn wheat tồn ($6,855 M2).
+2. **Nhịp bán d29**: bán từ h0 (shed qua đêm: Otter 54 lệnh) → thu hoạch+rải suốt ngày → **dump lớn giờ chót: Otter h22 = 91u trong 6 lệnh** (`SELL CARROT 42, WHEAT 25, MILK 6, EGG 10, FERT 6, TOMATO 2` — đúng hàng đợi cuối trận). SpaTaro h22 M2: **market RỖNG** — hết hàng để bán.
+3. **Ngưỡng giá thanh lý = KHÔNG NGƯỠNG**: bán xuống tới **$1 (wool)**, $21-34 (wheat), $22-49 (FERT), $26-41 (sữa chết M1). Nguyên tắc: **bán 100% tồn, mọi giá** — nhưng sắp thứ tự kênh lớn trước, giờ chót ép nốt.
+4. **Cấu trúc kỹ thuật d29 (phát hiện engine mới — xem R146)**: step 719 không bao giờ chạy → **không có end-of-day dump ngày 29** — tất cả tồn trên tay unit lúc h22 = mất trắng. SpaTaro M2 để lộ 1 ngỗng trên tay; cả 2 bên còn lại gần 0.
+
+### 5.3 Vết nứt của SpaTaro (nguyên nhân thật)
+
+- **M1: 16 wool tồn shed** (~$100) — anh ta chỉ REQUEST 59u bán cả mùa trong khi có 73u (under-request).
+- **M2: 25 lệnh BUY_PRODUCT vô hiệu trong 3 ngày cuối (319u rác)** — engine drop im lặng vì chỉ WHEAT/FERT mua được; các lệnh này **chiếm slot hàng đợi 10 lệnh/giờ** đúng lúc cần bán. Cả mùa: ~2,000-2,600u lệnh BUY rác (CARROT/EGG/MELON/MILK/STRAW/TOMATO/WOOL).
+- Tồn cuối sạch: 16 wool (M1) / 1 FERT + 1 ngỗng trên tay (M2) — người thắng: ~0.
+
+---
+
+## PHẦN 6 — ĐỐI CHIẾU RULES.md (cập nhật exact + quy tắc mới R139-R146)
+
+### 6.1 Bảng xác nhận (cập nhật bằng chứng vòng 2)
+
+Giữ nguyên 12 quy tắc đã xác nhận ở vòng 1 (R8/R10/R24/R36/R37/R49/R83/R90/R92/R101/R53/E8/R5) — tất cả được tái khẳng định bằng số exact. Lưu ý **R36 còn lớn hơn tưởng tượng**: SpaTaro (top-3) spam ~250-350 lệnh BUY_PRODUCT rác mỗi mùa, trong đó 25 lệnh rơi đúng 3 ngày cuối M2.
+
+### 6.2 Bảng mâu thuẫn vòng 1 — giờ có số exact
+
+| Quy tắc | Phán quyết vòng 2 |
 |---|---|
-| 50 ô ngày 5-7 | ✅ đúng (biến thể d3-6; sớm hơn nếu vốn FERT đủ) |
-| 75 ô ngày 10-12 | ✅ đúng (thực tế d8-10 — sớm hơn 1-2 ngày) |
-| Không 100 ô | ✅ 4/4 |
-| Empty 0-15% | ✅ thực tế 0-7% (d7-26), spike 1 ngày khi mua đất |
+| R74 (50 ô tối ưu) | Giữ phán quyết vòng 1: 75 ô + fill 98-100% là meta top-3 |
+| R127 (trần 85% fill) | Định lượng thêm: top-3 chạy 2,700-3,100 lệnh hiệu quả/mùa (~90-105/ngày) vs engine ta 52-67 — chênh 1.5-2×, không phải 4-5× như ước lượng thô vòng 1 (vòng 1 đếm cả move) |
+| R75/R114 (wheat) | Exact: SpaTaro bán thô 799/705u wheat; người thắng chuyển hóa 259/446u thành milk+egg+fert. Wheat→sữa ở M2 = **5.2× ROI** ($40 wheat → 1.23 sữa × $170) |
+| R100 (SE option) | Giữ: 0/4 mua SE |
+| R86/R132 | Củng cố: cùng đàn bò, giá sữa M2 = 3.5× M1 — shop draw là biến số #1 |
 
-→ **4 luật cứng của user là ĐÚNG và được replay xác nhận đầy đủ** — khác biệt duy nhất: cửa sổ mua đất thực tế XIÊN SỚM hơn (d3-8), và "0-15%" thực chất là "0-7% + 1 ngày thông khí khi mua đất".
+### 6.3 Quy tắc mới vòng 2 (R139-R146)
+
+**R139 [E] — NGÀY 29 LÀ TRẬN TRONG TRẬN, ĐÃ ĐO BẰNG CHỨNG**: cả 2 trận top-3 đều lật kết quả trong ngày cuối (+$6.5k và +$5.3k swing). Công thức người thắng: danh mục đứng cuối mùa (carrot+tomato d24-29 + máy egg/milk) + nhịp h0-rải-đến-h22 + bán không ngưỡng. Ngày cuối = 9-11% tổng tiền.
+
+**R140 [E]— ORDER SLOT LÀ TÀI SẢN HIẾM**: 10 lệnh/giờ; lệnh BUY_PRODUCT ngoài WHEAT/FERT = drop im lặng NHƯNG VẪN CHIẾM SLOT. 25 slot rác ngày cuối M2 = CONTRIBUTING trực tiếp vào thất bại. Không bao giờ submit lệnh không thực thi được.
+
+**R141 [E] — WHEAT-FEED MACHINE 5× ROI (exact)**: 1 wheat ($40 M2) → 1 bò ăn 1 wheat/ngày → 1.23 sữa/ngày × $170 = $209/ngày. Ngay cả kênh sữa chết M1 vẫn 1.9× ($31→$59). Máy wheat 17-29 ô + mua thêm 133-389u = lõi kinh tế đàn. (Công thức: thu hoạch + mua − bán = lượng thật ăn: 135/259/224/446u theo thứ tự 4 lượt.)
+
+**R142 [E] — VỰC CẮT TUỔI DÂU d21-23 LÀ CƠ CẤU, KHÔNG PHẢI LỖI**: dâu 4 events (d+10/12/14/16) → chết tuổi ~d21-22 → toàn bộ yield tồn + zombie decay buộc bán trong 2-3 ngày. M2: 2 bên dồn 223u trong d20-22 vào drain 24u/ngày → $180→$24 (self-crash cấu trúc). Phòng thủ duy nhất: bán TRƯỚC vách (d18-20 ở $187-199) hoặc bớt wave-3 replant khi drain mỏng.
+
+**R143 [E] — CARE BONUS RẺ NHƯ MIỄN PHÍ, AI CŨNG MAX**: care+feed cùng ngày → +1 unit ở event kế tiếp. Cả 4 lượt đều đạt 2.35-2.55 milk/event (max lý thuyết 3) và 1.72-1.85 egg/ngỗng/ngày (max 2). Không có "phong cách feed" nào thua vì sữa — cái phân định là QUY MÔ ĐÀN.
+
+**R144 [E] — MELON: AI DUMP SỚM HƠN THẮNG CỬA SỔ** (kênh 0-drain): SpaTaro thắng cả 2 cửa sổ melon (66u@$241 M1, 82u@$218 M2) — đó là lý do anh ta dẫn giữa game; UMG/Otter bán muộn hơn (89u@$158, 90u@$143). Trong kênh không drain, mỗi ngày chậm = −$50-80/quả.
+
+**R145 [E] — NGỖNG LÀ TÀI SẢN ROI CAO NHẤT GAME**: $300/con → 1.72-1.85 egg/ngày ($66.5 M1) + 2.4-2.7 FERT/ngày (unconditional — kể cả ngày không feed, chỉ cần không bỏ đói 2 ngày liên tiếp) = **$82-114 doanh thu/ngỗng-ngày**. Hoà vốn 3-5 ngày. Ceiling 6-8 con không phải giới hạn máy (max_held 4 chỉ đạt 2-6 ô-ngày) — là lựa chọn theo giá egg của shop draw. Mua d0-5, đặt NGAY (SpaTaro M2 mua d5 không đặt = mất $300 + cả kênh $14k).
+
+**R146 [E] — CƠ CHẾ NGÀY 29 (engine)**: step 719 không chạy → (a) **không có shed-dump cuối d29** — tồn trên tay unit h22 = mất trắng; (b) ngày 30 không tồn tại; (c) sản xuất "cho d29" được credit từ cuối d28 (con vật/cây vẫn nhả cho d29, thu được sáng d29); (d) **bán $1 KHÔNG thêm supply** (floor sale không ô nhiễm giá thị trường — engine). E8 của ta phải bán xong trước h22 d29 và không trông chờ dump.
+
+---
+
+## PHẦN 7 — TRẢ LỜI 5 CÂU HỎI MỞ CỦA VÒNG 1 (Q1-Q5)
+
+**Q1 — DP thanh lý của họ có ngưỡng thế nào?**
+Không có ngưỡng giá — bán tới $1 (wool), $21 (wheat), $22 (FERT). Ngưỡng thật là **LOGISTIQUE**: có hàng để bán (danh mục d24-29) + đủ slot lệnh (không rác) + bán đến tận h22. UMG/Otter d29 = $10-11.6k; SpaTaro = $4.0-4.4k vì (i) thiếu kênh đứng cuối (egg/tomato/carrot ít), (ii) 9-25 slot bị lệnh BUY rác chiếm, (iii) h22 market rỗng.
+
+**Q2 — Producer-feeding vs full-care, đâu tối ưu?**
+Câu hỏi sai bấm. **Milk/cow/ngày ~1.18-1.28 ở CẢ 4 lượt** (2.35-2.55/event) — care bonus ai cũng max gần hết. Khác biệt thật: **quy mô đàn + kênh** (Otter 11 bò vào milk $170 = $39k; SpaTaro M1 4 bò vào milk $49 = $4.1k). Wheat qua bò = 5.2× ở M2 / 1.9× ngay cả M1. Kết luận cho v7: luôn feed+cared các con đang product-cycle (rẻ), quyết định ĐÀN theo shop draw.
+
+**Q3 — Chu kỳ wheat: trồng lại bao nhiêu để giữ standing?**
+Chu kỳ ~5 ngày (trồng → tưới tuổi 2-4 (+1/lần, ×2 nếu fert) → thu 3.4-5.3u/ô). Giữ standing 17-29 ô cần **4-8 lần trồng/ngày** (đo được: SpaTaro 8.0-8.2, UMG 5.6, Otter 3.9-11.9). Năng suất/ô phụ thuộc CHẤT LƯỢNG tưới cửa sổ: Otter 5.32u (tưới đủ 3 ngày cửa sổ) vs SpaTaro 3.41u.
+
+**Q4 — 6-8 ngỗng có phải ceiling?**
+Không. Máy cho phép nhiều hơn (cap trứng 4/ô hầu như không chạm: chỉ 2-6 ô-ngày ở cap). Giới hạn thật = **giá egg theo shop draw** (M1 4 inst → $66.5-72 lên đều cả mùa; M2 1 inst → $42) + thức ăn + slot COOP. 8 ngỗng của Otter ở $44 egg vẫn lãi (egg $14.2k + share FERT).
+
+**Q5 — Zero-sum ở top tồn tại không?**
+**Cục bộ có, toàn cục không.** Kênh: ai dồn thêm 1u vào kênh bão hòa làm giá tụt cho CẢ HAI (straw M2 d20-24; milk M1 d8). Nhưng tổng nền kinh tế M2 = $216.4k > M1 = $193.1k (+12%) vì cả hai cùng bơm vào các kênh có drain lớn (milk 24u/ngày) → **pie lớn hơn cho cả hai**. Ở top, "chơi tốt hơn" = "chọn kênh drain lớn + không tự sát kênh chung", không phải cướp phần của đối thủ.
 
 ---
 
-## PHẦN 7 — HÀM Ý CHO v7 (chưa triển khai — chỉ định hướng)
+## PHẦN 8 — CÁC PHÁT HIỆN MỚI VÒNG 2 (ngoài Q1-Q5)
 
-1. **Lao động là đồng xu tăng tốc**: cơ chế R133 + hire 13-15 cuối game = fill 75 ô 100%. Kernel lao động v7 phải tận dụng end-of-day dump (không đi về shed giữa ngày) — đây là điều kiện tiên quyết cho luật empty 0-7%.
-2. **Đàn 14-22 con theo shop draw** (R131/R132): FERT $10-20k + EGG $11-14k + MILK $37-43k = "kênh đàn" tổng $60-70k — lớn hơn toàn bộ doanh thu v6.6 hiện tại.
-3. **Dâu 20-34 ô + FERTILIZE nội bộ** (R137): kênh #1 $32-66k.
-4. **Wheat machine 24-41 ô làm feed** + mua thêm khi $40 (R92 scale 2×) — wheat-FEED ≠ wheat-flood (R75).
-5. **Melon bomb d0-5 → thanh lý d10-12** (R135) rồi chuyển hoàn toàn feed/premium.
-6. **Thanh lý d27-29 chuẩn $5-11k** (R138) — DP ngưỡng giảm dần + queue 10 lệnh/giờ.
-7. **Thang điểm chuẩn mới**: $93-109k/lượt (2× kain40 hiện tại) — tổng 2 bên $193-216k nghĩa là nền kinh tế đủ cho cả hai cùng $100k+ khi KHÔNG crash kênh chung (M2 gần như Pareto-optimal $107k/$109k).
+**N1 — Nhịp giờ chuẩn (true hours):** h0 = dump shed qua đêm + HIRE (74-88%) + mua hạt; h2-h17 = lao động chính (water/harvest/plant/feed); h17-22 = sóng bán lớn (Otter h22 d29: 91u). Đỉnh MOVE ~h3-5 (đi ra nông trại sau hiring).
+
+**N2 — Cấu trúc dòng tiền theo giai đoạn (money curve):**
+- d0-8: bootstrap FERT — UMG/Otter bán $5.1-5.7k FERT d0-9 (vs SpaTaro $3.6k) → dẫn sớm $0.5-3.6k.
+- d9-13: SpaTaro bật melon bomb $13-16k → dẫn $10-14k (M1) / $4-9k (M2).
+- d14-28: người thắng gỡ chậm bằng annuity (egg $400-1,200/ngày + milk $1-4.6k/ngày + FERT) — cần 10-14 ngày để bắt kịp.
+- d29: lật kèo (xem Phần 5).
+
+**N3 — Mua hạt JIT theo lô nhỏ**, không tồn kho lớn (seeds mua 15-66u/lần theo đợt, khớp đợt trồng). Seed tồn cuối: ~0 (mua vừa đủ).
+
+**N4 — Vi cấu trúc lệnh bán**: 60-70% lệnh SELL cỡ 2-6u; tranche lớn (16-49u) chỉ cho wheat (T=400 sâu). Suy giảm giá trong 1 lệnh: $0.30-0.58/unit — tách lệnh không quan trọng bằng CHỌN GIỜ (bán sau đợt drain/shop). Winners dùng đủ 10 slot ở 26-33 bước (đặc biệt d29).
+
+**N5 — Phân phối FERT (exact)**: UMG thu 326 → 142 bón (44%) + 195 bán; Otter 420 → 186 bón (44%) + 280 bán; mua thêm 17-50u khi cần bón dâu đúng event. Tỷ lệ bón/sell ~44/56 ổn định cả 2 người thắng.
+
+**N6 — Autopsy SpaTaro (5 vết nứt, đủ giải thích 2 khoản thua):**
+1. M1: không mua ngỗng dù 4 egg-shop (R132 fail) — mất $14k kênh.
+2. M2: 1 ngỗng mua d5 không đặt (coop đập d4) — mất $300 + $14k kênh.
+3. BUY_PRODUCT rác ~250-350 lệnh/mùa (319u rác d27-29 M2) — chiếm slot thanh lý.
+4. Wheat-seller thay vì wheat-converter (bán 705-799u thô; người thắng ăn 446u vào đàn).
+5. Không bao giờ trồng tomato ($3.3-6.2k bỏ lại cả 2 trận).
+Bù lại: melon timing tốt nhất cả 2 trận + wheat machine lớn → đủ để dẫn đến d28. Thua ở đích, không phải ở giữa chặng.
+
+**N7 — Kỷ luật tưới (chất lượng > số lượng)**: UMG/Otter tưới ÍT hơn SpaTaro nhưng đúng cửa sổ tuổi → wheat 4.6-5.3u/ô vs 3.4. Với cây ongoing (dâu/tomato): nước chỉ tính vào ngày event (fert bonus cần watered) — tưới ngày thường phần lớn là lãng phí.
+
+**N8 — Xác nhận R133 (end-of-day dump)**: DROP chủ động 68-133 lần vs 410-615 HARVEST — đại đa số harvest để trên tay chờ auto-dump h23. Đây là nguồn gốc hiệu suất lao động 2× của top-3 (không về kho giữa ngày).
+
+**N9 — Cả top-3 vẫn để tử vong tồn tại**: 16 wool + 1 ngỗng + ~$300-1k nhỏ lẻ ở 2 người — vì bot của họ cũng có bug (order rác, under-request). Khoảng cách top-3 với phần còn lại = kỷ luật nhỏ nhân với 720 step.
 
 ---
 
-## PHẦN 8 — CÂU HỎI MỞ CHO VÒNG PHÂN TÍCH 2
+## PHẦN 9 — HÀM Ý CHO v7 (cập nhật bằng số exact, CHƯA triển khai theo chỉ thị)
 
-1. Tại sao UMG/Otter để shed gần 0 ở cuối game nhưng SpaTaro M1 còn 16 wool — DP thanh lý của họ có ngưỡng giá thế nào?
-2. Producer-feeding (SpaTaro) vs full-care (Otter) — cần A/B để tìm điểm tối ưu theo giá wheat;
-3. Chu kỳ wheat 5 ngày: trồng lại bao nhiêu ô/ngày để duy trì 24-41 standing? (trace PLANT wheat theo ngày: 3-17 ô/ngày, gần như liên tục)
-4. Ngỗng 6-8 con có phải ceiling không (max_held 4 trứng/ngày/con)?
-5. Đòn zero-sum có tồn tại ở top không? (M2 cho thấy 2 bên gần Pareto — có lẽ "đánh tốt hơn" ở top = "tổng lớn hơn", R94 đúng ở tầng tối thượng)
+1. **Ngày cuối là một module riêng** (R139): danh mục carrot 10-15 ô + tomato 5-8 ô đứng từ d24; máy egg/milk full; nhịp bán h0→h22; DP = 0 (bán mọi giá, kênh lớn trước); tối ưu slot (R140).
+2. **Đàn theo shop draw (R132/R145)**: d0 mua 2-5 con (bootstrap FERT $300-600/ngày); đọc shop d3-d12: ≥3 egg-inst → 6-8 ngỗng; ≥3 milk-inst → 9-11 bò; luôn feed+cared chu kỳ sản xuất (R143). Wheat-feed 5× ROI (R141).
+3. **Wheat machine 17-29 ô**: tưới CHÍNH XÁC cửa sổ tuổi 2-4 (5.3u/ô), replant 4-8 ô/ngày, mua thêm khi giá <$45 và đàn cần.
+4. **Dâu theo drain-corrected quota** (R142): số ô wave-2/3 ∝ drain của shop draw (36u/ngày → 35-40 ô ok; 24u/ngày → max ~25 ô + bán sớm trước vách d21).
+5. **FERT 44/56**: bón event-day của dâu/tomato, bán phần thừa theo tranche 2-6u (N4/N5).
+6. **Melon d0-5 → dọn SỚM d10-12** (R144) — không giữ melon quá d15.
+7. **Thang điểm chuẩn giữ nguyên vòng 1**: $93-109k/lượt; kernel lao động: 90-105 lệnh hiệu quả/ngày (đếm như top-3, không tính move).
 
 ---
-*KAIN — TOP3_REPLAY_ANALYSIS.md v1.0 (Task 38, vòng phân tích 1). Nguồn: 107559251.json + 107573831.json. Tool: tool-results/replay_*.py + q1-q7. Số liệu absolute ±20% (requested≠executed), tỷ trọng kênh đáng tin. Chưa triển khai v7/kain41 theo chỉ thị.*
+
+## PHẦN 10 — PHÁN QUYẾT: CÓ CẦN VÒNG PHÂN TÍCH 3?
+
+**Kết luận: KHÔNG cần thêm vòng phân tích thụ động (đọc lại replay). Lý do:**
+
+1. **Nguồn đã kiệt**: mọi con số có thể đo từ 2 file replay nay là CHÍNH XÁC (god replay 0-mismatch) — doanh thu từng unit, giá từng lệnh, nước/tưới/fert từng action, vị trí từng unit từng giờ. Một vòng đọc thứ 3 sẽ không tạo thông tin mới đáng kể.
+2. **5 câu hỏi mở vòng 1 đã trả lời hết** (Phần 7); các quy tắc mới R139-R146 đã đủ để thiết kế v7 mà không còn chỗ mơ hồ lớn.
+3. **Các chi tiết chưa khai thác** (pathing từng bước chân, phân bố khoảng cách shed, weeds RNG) chỉ có ý nghĩa khi THIẾT KẾ kernel v7 cụ thể — lúc đó lấy từ `r2_god_*.json` (đã lưu, tái dùng được).
+
+**NHƯNG nên mở 1 loại vòng mới khi bắt đầu v7 — "VÒNG PHẢN CẢNH (counterfactual)" bằng chính harness god replay:**
+- Thay action của 1 người chơi rồi chạy lại engine thật để đo: "SpaTaro + 6 ngỗng ở M1 thắng bao nhiêu?", "bán dâu sớm hơn 2 ngày ở M2 thì giá nào?", "10 ngỗng có sập giá egg?". Đây là thí nghiệm nhân-quả, không phải đọc lại — chỉ làm khi có câu hỏi thiết kế cụ thể của kain41/v7.
+- Harness `r2_godreplay.py` đã sẵn sàng làm việc này (bơm action sửa đổi + validate).
+
+**Khuyến nghị cho user: chuyển sang triển khai v7 (kain41) dựa trên V2.0 này; chạy vòng phản cảnh chỉ khi v7 cần quyết định mà số liệu thụ động không trả lời được.**
+
+---
+*KAIN — TOP3_REPLAY_ANALYSIS.md v2.0 (Task 39, vòng phân tích 2). Nguồn: god replay 0-mismatch trên 107559251.json + 107573831.json (engine 1.32.7, seed 1620414037/896878425). Tool: tool-results/r2_godreplay.py + r2_analyze.py + r2_god_M1/M2.json + r2_report.txt. Mọi số liệu là EXACT (không còn ±20% của vòng 1). Chưa triển khai v7/kain41 theo chỉ thị.*
