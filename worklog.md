@@ -1008,3 +1008,24 @@ Stage Summary:
 - v7.py SHIP: 96/100 vs v6, 1.278x, worst-case 0.898x (từ 0.772x — kernel chắc chắn hơn đáng kể)
 - Bài học vòng lặp: phân tích → phản cảnh → thiết kế → differential từng mảnh → chỉ giữ mảnh thắng — 6/7 ý tưởng hay bị cổ chai lao động bác bỏ (R151), 1 mảnh sống và là nâng cấp thật
 - Bàn giao v8: kernel task-scheduler mới (hiệu suất đi bộ + tựa ô + 90-105 acts/ngày) là điều kiện cần cho toàn bộ playbook top-3 (fert 406u, dâu liên tục, đàn lớn)
+
+---
+Task ID: 41
+Agent: KAIN (main-agent)
+Task: User không thấy v7 trong UI — đăng ký v7 vào cả 3 lớp (runner / service / UI) + verify end-to-end qua browser
+
+Work Log:
+- Chẩn đoán: v7.py (77KB) tồn tại và hoàn chỉnh từ Task 40 nhưng vắng mặt ở 3 chỗ đăng ký — AGENTS dict trong kaggriculture/arena/run_battle.py, mảng AGENTS trong mini-services/arena-service/index.ts, và AGENT_INFO trong src/components/arena/constants.ts
+- Sửa run_battle.py: thêm "v7" đứng đầu AGENTS dict
+- Sửa arena-service/index.ts: thêm 'v7' đứng đầu mảng AGENTS (15 agent)
+- Sửa frontend: AGENT_INFO thêm v7 (tag "nhà vô địch", desc "kain40 + collect-first R149 · 96/100 vs v6, 1.278×"), hạ v6 xuống "cựu vô địch"; EmptyState badge v7=rose/v6=amber; ControlPanel default A=v7, B=v6
+- Phát hiện bug vận hành [E]: bun --hot KHÔNG áp dụng thay đổi AGENTS — global guard __arenaListening giữ listener cũ với closure cũ, socket.io cũ tiếp tục phát danh sách không có v7 → phải restart process thật sự
+- Restart sạch: kill cây dev (pgid 8793) + arena-service (2092/2093) → chạy lại qua bench/run_bg.py (BG_LOG=/tmp/arena_service.log) → service pid 9101, next-server 9126 tự respawn
+- Smoke test runner trực tiếp: 48 lượt v7 $694 vs v6 $227; full 720 lượt seed 100: v7 $63,646 vs $39,233 (1.62×)
+- Verify browser qua gateway :81 (không phải :3000 trực tiếp — socket.io cần Caddy XTransformPort): dropdown đủ 15 agent với v7 đứng đầu selected, default A=v7/B=v6, start battle seed 100 → trận full stream 19.5s → banner "🏆 v7 THẮNG! $63.646 vs $39.233 · 1.62×", money chart + action log (D29·H22 thanh lý cuối) render đúng
+- bun run lint sạch; screenshot tool-results/ui_v7_victory.png; mobile 390px + desktop 1920px đều hold layout
+
+Stage Summary:
+- v7 đã HIỆN DIỆN đầy đủ trong UI: chọn được, thi đấu được, thắng hiển thị đúng — user có thể test trực tiếp trên Preview Panel
+- Ghi nhớ vận hành: mọi thay đổi mảng AGENTS của arena-service bắt buộc restart process (bun --hot không đủ vì __arenaListening guard) — lệnh: cd kaggriculture && BG_LOG=/tmp/arena_service.log python3 bench/run_bg.py bun --hot ../mini-services/arena-service/index.ts
+- Kiểm thử UI arena trong sandbox này phải mở qua http://127.0.0.1:81/ (gateway Caddy) — port 3000 trực tiếp không có socket

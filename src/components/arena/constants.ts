@@ -98,7 +98,8 @@ export interface AgentDesc {
 }
 
 export const AGENT_INFO: AgentDesc[] = [
-  { name: 'v6', desc: 'ORCHESTRATOR-K · 93.75% vs v5, 100% vs v4/v3', tag: 'nhà vô địch' },
+  { name: 'v7', desc: 'KAIN Champion — kain40 + collect-first R149: thu FERTILIZER trước CARE · 96/100 vs v6, 1.278×', tag: 'nhà vô địch' },
+  { name: 'v6', desc: 'ORCHESTRATOR-K · 93.75% vs v5, 100% vs v4/v3', tag: 'cựu vô địch' },
   { name: 'kain40', desc: 'KAIN Full-Pressure — luật lấp đất 85%: fill-law + tomato channel + hire-buffer', tag: 'KAIN' },
   { name: 'kain39', desc: 'KAIN Price-Blade — kain38 + wheat-hold + egg-fortress-8 (đòn tấn công giá)', tag: 'KAIN' },
   { name: 'kain38', desc: 'KAIN Fill-Smart — tối ưu nguồn lực: lấp thung lũng d5-9 + late-straw + late-wheat', tag: 'KAIN' },

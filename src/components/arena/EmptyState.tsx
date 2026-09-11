@@ -46,11 +46,11 @@ export function EmptyState({ streaming }: { streaming: boolean }) {
               <Badge
                 variant="outline"
                 className={
-                  agent.name === 'v6'
+                  agent.name === 'v7'
                     ? 'border-rose-300 bg-rose-50 text-rose-800'
-                    : agent.name === 'v5'
+                    : agent.name === 'v6'
                       ? 'border-amber-300 bg-amber-50 text-amber-800'
-                      : agent.name === 'v4'
+                      : agent.name === 'v5'
                         ? 'border-emerald-300 bg-emerald-50 text-emerald-800'
                         : 'border-stone-200 bg-white text-stone-500'
                 }
