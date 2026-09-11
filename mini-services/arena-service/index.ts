@@ -23,7 +23,7 @@
 import { createServer } from 'http'
 import { Server } from 'socket.io'
 import { spawn, type ChildProcess } from 'child_process'
-import { appendFileSync, mkdirSync, openSync, writeFileSync } from 'fs'
+import { appendFileSync, mkdirSync, openSync, readdirSync, readFileSync, writeFileSync } from 'fs'
 import { join } from 'path'
 
 const PORT = 3005
@@ -31,7 +31,7 @@ const RUNNER = '/home/z/my-project/kaggriculture/arena/run_battle.py'
 const BATTLE_DIR = '/home/z/my-project/kaggriculture/battles'
 const PYTHON = 'python3'
 
-const AGENTS = ['v5', 'v4', 'v3', 'v2', 'kain1', 'kain2', 'kain3', 'melon', 'baseline']
+const AGENTS = ['v8', 'v7', 'v6', 'kain40', 'kain39', 'kain38', 'kain33', 'kain32', 'kain31', 'kain30', 'kain25', 'kain16', 'kain3', 'v5', 'v4', 'melon']
 
 mkdirSync(BATTLE_DIR, { recursive: true })
 
@@ -221,22 +221,156 @@ io.on('connection', (socket) => {
   })
 })
 
-// Hot-reload safety: when bun --hot re-evaluates this module, the previous
-// evaluation's listener is still bound. Guard against a second listen() and
-// swallow EADDRINUSE so a reload can never crash the service.
 httpServer.on('error', (err: any) => {
-  if (err?.code === 'EADDRINUSE') {
-    console.log('[arena] port already in use (hot-reload) — keeping previous listener')
-  } else {
-    console.error('[arena] http server error:', err?.message ?? err)
-  }
+  if (err?.code === 'EADDRINUSE') console.log('[arena] port already in use (hot-reload) — keeping previous listener')
+  else console.error('[arena] http server error:', err?.message ?? err)
 })
-
 if (!(globalThis as any).__arenaListening) {
   ;(globalThis as any).__arenaListening = true
   httpServer.listen(PORT, () => {
     console.log(`[arena] service listening on port ${PORT}`)
   })
+}
+
+// ---------------------------------------------------------------------------
+// DEV-SERVER SUPERVISOR — keep the Next.js app (port 3000) alive forever.
+// Every Bash-tool invocation kills its child processes, so the dev server
+// must be spawned by THIS long-lived service. Health check every 10s,
+// restart backoff 15s..120s, SIGKILL if stuck >240s.
+//
+// Task 36 (preview panel died mid-battle): the heavy arena page made webpack
+// dev balloon next-server to ~2.9GB RSS on this 4GB box → kernel OOM-killer
+// killed it while the user was watching a live match. Mitigations:
+//   1. old-space cap 768MB (spawn env) + experimental.webpackMemoryOptimizations
+//      (next.config.ts) to shrink the compile footprint
+//   2. detached process-group spawn → whole-tree SIGKILL (port 3000 is never
+//      orphaned by a surviving bash/node when the wrapper dies)
+//   3. RSS watchdog: when next-server >2.4GB for >120s AND no battle is
+//      streaming, restart it proactively so the kernel never has to kill it
+//      mid-battle. (120s grace = never fire during the initial compile peak;
+//      steady state with webpackMemoryOptimizations + 768MB cap ≈ 1.4GB.)
+// ---------------------------------------------------------------------------
+const RSS_LIMIT_MB = 2400
+const RSS_GRACE_MS = 120_000
+
+type DevSup = { timer?: any; child?: any; restarts: number; lastStart: number; busy: boolean }
+const g = globalThis as any
+const gSup: DevSup = g.__devSup ?? { restarts: 0, lastStart: 0, busy: false }
+g.__devSup = gSup
+
+function killDevTree() {
+  const c = gSup.child
+  if (!c) return
+  try {
+    process.kill(-c.pid, 'SIGKILL') // negative pid → whole process group
+  } catch {}
+  try {
+    c.kill('SIGKILL')
+  } catch {}
+  gSup.child = null
+}
+
+function spawnDev() {
+  const out = openSync('/tmp/nextdev.log', 'a')
+  // detached: true → bun becomes a process-group leader, so kill(-pid) later
+  // reaps the whole tree (bash + node + next-server) together.
+  gSup.child = spawn('bun', ['run', 'dev'], {
+    cwd: '/home/z/my-project',
+    env: { ...process.env, NODE_OPTIONS: '--max-old-space-size=768' },
+    stdio: ['ignore', out, out],
+    detached: true,
+  })
+  gSup.lastStart = Date.now()
+  gSup.busy = false
+  console.log(`[supervisor] spawned dev server pid ${gSup.child.pid} (restart #${gSup.restarts})`)
+  gSup.child.on('exit', (code: any) => {
+    if (gSup.child && Date.now() - gSup.lastStart > 5 * 60 * 1000) gSup.restarts = 0
+    console.log(`[supervisor] dev server exited code=${code}`)
+  })
+}
+
+/** RSS (MB) of the next-server process inside OUR dev tree (0 = none). */
+function nextServerRssMb(): number {
+  const root = gSup.child?.pid
+  if (!root) return 0
+  let rss = 0
+  let dirs: string[]
+  try {
+    dirs = readdirSync('/proc')
+  } catch {
+    return 0
+  }
+  for (const dir of dirs) {
+    const c0 = dir.charCodeAt(0)
+    if (c0 < 48 || c0 > 57) continue // not a pid dir
+    try {
+      const st = readFileSync(`/proc/${dir}/status`, 'utf8')
+      if (!/^Name:\s+next-server/m.test(st)) continue
+      // walk the PPid chain up to our wrapper (guard against cycles)
+      let cur = Number(dir)
+      let ok = false
+      let guard = 0
+      while (cur > 1 && guard++ < 12) {
+        if (cur === root) {
+          ok = true
+          break
+        }
+        const s2 = readFileSync(`/proc/${cur}/status`, 'utf8')
+        cur = Number(s2.match(/^PPid:\s+(\d+)/m)?.[1] ?? '0')
+      }
+      if (ok) rss = Math.max(rss, Number(st.match(/VmRSS:\s+(\d+)/)?.[1] ?? 0))
+    } catch {}
+  }
+  return Math.round(rss / 1024)
+}
+
+async function checkOnce() {
+  if (gSup.busy) return
+  try {
+    const res = await fetch('http://127.0.0.1:3000/', { signal: AbortSignal.timeout(8000) })
+    if (!res.ok) throw new Error(`status ${res.status}`)
+    // healthy — RSS watchdog (skip while a battle is streaming: restarting the
+    // dev server mid-match would blank the live view; retry next 10s tick)
+    const rss = nextServerRssMb()
+    const pastGrace = gSup.child && Date.now() - gSup.lastStart > RSS_GRACE_MS
+    if (rss > RSS_LIMIT_MB && !proc && pastGrace) {
+      gSup.restarts += 1
+      const wait = Math.min(15 * gSup.restarts, 120)
+      console.log(
+        `[supervisor] next-server rss=${rss}MB > ${RSS_LIMIT_MB}MB (idle) — proactive restart in ${wait}s`,
+      )
+      gSup.busy = true
+      setTimeout(() => {
+        killDevTree()
+        spawnDev()
+      }, wait * 1000)
+      return
+    }
+    if (rss > 1500) console.log(`[supervisor] next-server rss=${rss}MB (limit ${RSS_LIMIT_MB})`)
+    gSup.restarts = 0
+    return
+  } catch (e: any) {
+    if (String(e?.name) === 'TimeoutError' && gSup.child && Date.now() - gSup.lastStart > 240_000) {
+      console.log('[supervisor] dev server stuck >240s — SIGKILL + restart')
+      killDevTree()
+    } else if (String(e?.name) === 'TimeoutError') {
+      return // still compiling — wait
+    }
+    gSup.busy = true
+    gSup.restarts += 1
+    const wait = Math.min(15 * gSup.restarts, 120)
+    console.log(`[supervisor] dev server DOWN (${e?.message ?? e}) — restart in ${wait}s`)
+    setTimeout(() => {
+      killDevTree()
+      spawnDev()
+    }, wait * 1000)
+  }
+}
+
+if (!g.__devSupStarted) {
+  ;(globalThis as any).__devSupStarted = true
+  setTimeout(spawnDev, 1500)
+  gSup.timer = setInterval(checkOnce, 10_000)
 }
 
 process.on('SIGTERM', () => {
@@ -248,106 +382,4 @@ process.on('SIGINT', () => {
   httpServer.close(() => process.exit(0))
 })
 
-// ============================================================================
-// NEXT.JS DEV SERVER SUPERVISOR (port 3000)
-// ----------------------------------------------------------------------------
-// The sandbox kills every process spawned inside an agent Bash-tool invocation
-// once that invocation ends (even setsid/disowned children — verified). This
-// service is long-lived, so processes IT spawns survive. It therefore owns the
-// lifecycle of the Next.js dev server:
-//   • health check every 10s (HTTP GET http://127.0.0.1:3000/)
-//   • (re)spawns `bun run dev` in /home/z/my-project when the app is down
-//   • exponential restart backoff (15s→120s) to avoid crash loops
-// `dev` runs webpack (not Turbopack): Turbopack's cold compile needs >2.4 GB
-// RSS and the kernel OOM-killer terminates it on this 4 GB box (verified in
-// dmesg twice); webpack compiles the same app with a much lower peak.
-// ============================================================================
-const gSup = globalThis as any
-if (!gSup.__devSup) {
-  gSup.__devSup = {
-    child: null as ChildProcess | null,
-    lastOk: Date.now(),
-    okSince: 0,
-    restarts: 0,
-    nextRetry: 0,
-  }
-  const sup = gSup.__devSup
-
-  const devLog = (msg: string) => {
-    const line = `${new Date().toISOString()} ${msg}`
-    console.log(line)
-    try {
-      appendFileSync('/tmp/nextdev.log', line + '\n')
-    } catch {}
-  }
-
-  const spawnDev = (reason: string) => {
-    if (sup.child && sup.child.exitCode === null && !sup.child.killed) return
-    const out = openSync('/tmp/nextdev.log', 'a')
-    const child = spawn('bun', ['run', 'dev'], {
-      cwd: '/home/z/my-project',
-      env: { ...process.env, NODE_OPTIONS: '--max-old-space-size=1024' },
-      stdio: ['ignore', out, out],
-    })
-    sup.child = child
-    sup.lastOk = Date.now()
-    sup.okSince = 0
-    sup.restarts += 1
-    devLog(`[devsup] spawned \`bun run dev\` (pid ${child.pid}) — ${reason} (start #${sup.restarts})`)
-    child.on('exit', (code, sig) => {
-      if (gSup.__devSup === sup && sup.child === child) {
-        sup.child = null
-        const wait = Math.min(15 * sup.restarts, 120) * 1000
-        sup.nextRetry = Date.now() + wait
-        devLog(`[devsup] next dev exited (code=${code} sig=${sig}) — respawn in ${wait / 1000}s`)
-      }
-    })
-    child.on('error', (err) => {
-      devLog(`[devsup] spawn error: ${err.message}`)
-      sup.child = null
-    })
-  }
-
-  const check = async () => {
-    const now = Date.now()
-    if (now < sup.nextRetry) return
-    if (!sup.child) {
-      spawnDev(sup.restarts === 0 ? 'initial start' : 'respawn after exit')
-      return
-    }
-    try {
-      const ctrl = new AbortController()
-      const timer = setTimeout(() => ctrl.abort(), 4000)
-      const res = await fetch('http://127.0.0.1:3000/', { signal: ctrl.signal })
-      clearTimeout(timer)
-      if (res.status < 500) {
-        if (!sup.okSince) {
-          sup.okSince = now
-          devLog(`[devsup] app is up (HTTP ${res.status})`)
-        }
-        sup.lastOk = now
-        // healthy for 5+ minutes → reset the backoff counter
-        if (now - sup.okSince > 300000) {
-          sup.restarts = 0
-          sup.okSince = now
-        }
-        return
-      }
-    } catch {
-      /* not answering yet — cold compile can take ~30s */
-    }
-    // No HTTP answer for a long time while the process is alive → wedged;
-    // kill it so the exit handler schedules a clean respawn.
-    if (now - sup.lastOk > 240000 && sup.child && sup.child.exitCode === null) {
-      devLog('[devsup] app unresponsive >240s — killing for a clean restart')
-      try {
-        sup.child.kill('SIGKILL')
-      } catch {}
-    }
-  }
-
-  setInterval(() => {
-    check().catch(() => {})
-  }, 10000)
-  devLog('[devsup] supervisor installed — checking app health every 10s')
-}
+// touch-reload Task 30: registry v1/v2/v3 cleanup

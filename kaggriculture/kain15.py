@@ -668,10 +668,9 @@ def _build_tasks(tiles, shed, seeds, plan, day, hour, step, inventories, n_units
                         stats["water_yield"] = stats.get("water_yield", 0) + 1
                     elif cu >= 1:
                         # KAIN-9: missed yesterday -> save the PREMIUM crops
-                        # (strawberry/tomato, $287/$60 per unit) at tier 0;
-                        # wheat/carrot ($25/$35, seed $10/$20) wait at tier 2
-                        # behind the dairy — v5 gains more than kain when
-                        # unconditional CRIT watering starves FEED labor.
+                        # (strawberry/tomato) at tier 0; wheat/carrot wait at
+                        # tier 2 behind the dairy — v5 gains more than kain
+                        # when unconditional CRIT watering starves FEED labor.
                         if crop in ("STRAWBERRY", "TOMATO"):
                             tasks.append(_mk(T_WATER_CRIT, x, y, "WATER"))
                             stats["water_crit"] += 1

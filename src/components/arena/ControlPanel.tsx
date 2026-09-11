@@ -30,9 +30,9 @@ export function ControlPanel({ arena }: { arena: ArenaApi }) {
   const [selB, setSelB] = useState<string>('')
   const [seedText, setSeedText] = useState<string>('')
 
-  // defaults: A = v5, B = v4 once the agent list arrives
-  const a = selA || (agents.includes('v5') ? 'v5' : agents[0] || '')
-  const b = selB || (agents.includes('v4') ? 'v4' : agents[1] || agents[0] || '')
+  // defaults: A = v8 (champion), B = v7 (former champion) once the agent list arrives
+  const a = selA || (agents.includes('v8') ? 'v8' : agents[0] || '')
+  const b = selB || (agents.includes('v7') ? 'v7' : agents[1] || agents[0] || '')
 
   const seedNum = seedText.trim() === '' ? null : Number(seedText.trim())
   const canStart = connected && !running && !!a && !!b

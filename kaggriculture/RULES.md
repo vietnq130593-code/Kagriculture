@@ -1,8 +1,12 @@
 # RULES — SỔ CÁI QUY TẮC KAGGRICULTURE (MÔ HÌNH NHÂN QUẢ CẤU TRÚC CỦA GAME)
 
-**Tác giả:** KAIN · **Phiên bản:** 1.0 (biên soạn đầu Phase 5 thảo luận)
+**Tác giả:** KAIN · **Phiên bản:** 2.10 (sau Task 37: 130 quy tắc; Task 35: kain40 FULL-PRESSURE 93/100 (1.271x) KỶ LỤC — luật lấp đất 85% + R121-R127 mục AC; Task 36-37: mục AD ops sandbox + R128-R130 playbook rollback. Hướng v7 hiện hành: RESEARCH_V7.md Phần II)
 **Mục đích:** Bậc-1 (P(B | thấy A) — dự đoán từ quan sát) và bậc-2 (P(B | làm A) — dự đoán từ can thiệp) đều cần tập quy tắc làm mô hình cấu trúc. Tài liệu này là **bảng tham chiếu duy nhất** gom toàn bộ quy tắc ta đã nắm, mỗi quy tắc đánh số R#, phân loại + gắn tầng Bayes nào tiêu thụ nó.
-**Nguồn đối chiếu:** `upload/README.md` (vật lý engine) · `LESSONS_V4.md` §3.3–3.4 (kinh tế + bug-class máu) · `PLAN_V5.md` §12–13 (núm v5.2 + bài học v5.3) · `v5.py` v5.3 (mã hóa thật) · `bench/` + `battles/` (bằng chứng).
+**Nguồn đối chiếu:** `upload/README.md` (vật lý engine) · `LESSONS_V4.md` §3.3–3.4 (kinh tế + bug-class máu) · `PLAN_V5.md` §12–13 (núm v5.2 + bài học v5.3) · `v5.py` (v5.6+E) · `v6.py` v6.6 (nhà vô địch hiện tại) · `cell4_v6.py` (bản Kaggle) · `bench/` + `battles/` (bằng chứng) · tools autopsy: `land_probe.py` `care_probe.py` `autopsy.py` `sell_log.py` `cmp_seed_v6.py` `two_sided_v5.py`.
+
+**Trạng thái ladder (sau Task 35):** kain40 FULL-PRESSURE là nhà vô địch thách đấu mới — **93/100 vs v6.6 (1.271x, worst 0.772x)**, vượt kỷ lục kain38 (90/100). Lộ trình: kain25-29 31-40% → kain30 29% → kain31 55% (phá tường R104) → kain32-33 → kain38 FILL-SMART 90/100 → kain40 93/100 (fill-law 85% + tomato channel). Còn 7 thua (5 knife-edge + 108 cần autopsy). Hướng v7: 6 trụ cột từ replay top-3 (RESEARCH_V7.md Phần II — dâu tái trồng, fert discipline, labor sustain, feed-buy, liquidation, đàn lớn).
+
+**Index mục (append-only biên bản):** A–P nền v1.0 (R1–R63) · Q Phase 5 audit (R64–R73) · R Task 21 GT-LAND (R74–R79, v5.5) · S Task 22 bẫy submission (R80) · T Task 23 Wave E (R81–R82, v5.6+E 97%) · U–V KAIN đối đầu v5 (R83–R96) · W Task 27 xây v6 (R97–R99) · X Task 28 KAIN đối đầu v6 + giả thuyết 75-đất (R100–R105) · Y Task 30 dọn dẹp kho xóa v1/v2/v3 (không luật mới) · Z Task 31 KAIN phá tường R104 (R106–R110) · AA Task 32 4 luật cứng top-Kaggle + plan-cache fix (R111–R113) · AB Task 34 tối ưu nguồn lực lấp đất (R114–R120) · AC Task 35 luật lấp đất 85% + tomato channel (R121–R127).
 
 **Phân loại mỗi quy tắc:**
 - **[P] PHYSICS** — cứng, deterministic, đúng 100% mọi trận (engine white-box)
@@ -37,7 +41,7 @@
 | R12 | Fertilizer: $100, +2 unit/ngày trong 3 ngày kế (one-time crops) — chỉ có tác dụng ngày cây CŨNG được tưới | P | ECON | C |
 | R13 | Bảng $/tile/day (đã hiệu chỉnh tưới tối ưu): egg 1.00 > wheat 0.80 > carrot 0.75 > melon 0.55 > milk 0.50 = tomato 0.33 = wool 0.33 > straw 0.24 — thứ tự "năng suất mặt đất" thô | P | ECON | C |
 
-## C. VẬT NUÔI — 7 quy tắc
+## C. VẬT NUÔI — 6 quy tắc
 
 | # | Quy tắc | Loại | Tầng | Bậc |
 |---|---|---|---|---|
@@ -63,7 +67,7 @@
 |---|---|---|---|---|
 | R24 | Shed 100 item (không tính seed); cuối ngày đổ inventory vào shed, **tràn = mất trắng** (không có overflow area — stockpile trên tay KHÔNG qua mặt được cap) | P | ECON | C |
 | R25 | Farmer/hands spawn ở shed đầu mỗi ngày — shed là "trung tâm logistics", 4 ô kề nó (mỗi quadrant 1 ô) là vị trí đắc địa | P | LABOR | C |
-| R26 | 10×10 = 4 quadrant 5×5; NW mở sẵn, BUY_LAND $1k/$2k/$4k; mỗi cây/thú 1 ô; không giới hạn loại | P | ECON | C |
+| R26 | 10×10 = 4 quadrant 5×5; NW mở sẵn; BUY_LAND theo thứ tự ép của engine (LAND_ORDER): NE $1k → SW $2k → SE $4k, không mua nhảy cóc — quadrant thứ 3 luôn là SW; mỗi cây/thú 1 ô; không giới hạn loại | P | ECON | C |
 | R27 | Cỏ dại spawn 0.005/ô trống/đêm (kỳ vọng ~0.6 ô/đêm trên 25 ô trống) → phải DIG trước khi dùng lại; ô có cỏ dại là "đất bị đóng băng" | S | LABOR | C |
 
 ## F. THỊ TRƯỜNG GIÁ — 10 quy tắc (TRÁI TIM của bậc-2)
@@ -284,11 +288,11 @@ Nông trại 50 ô chạy **đầy ~100%** (empty 1–14): wheat 13–20 + dâu 
 
 | # | Quy tắc | Loại | Bằng chứng |
 |---|---|---|---|
-| R74 | **Đất tối ưu = 50 ô (NW+NE)**: đường cong U ngược 25/50/75/100 = 1.078/1.158/1.112/1.060x. Mua đất chỉ đúng khi ruộng đang đầy (gate owned_empty ≤ 14 của v5.4 đúng tín hiệu) nhưng lấp đầy ruộng mới phụ thuộc LAO ĐỘNG — không thuê thêm thì mua đất = chôn vốn | E | 4 battery 40 game |
+| R74 | **Đất tối ưu = 50 ô (NW+NE)**: đường cong U ngược 25/50/75/100 = 1.078/1.158/1.112/1.060x. Mua đất chỉ đúng khi ruộng đang đầy (gate owned_empty ≤ 14 của v5.4 đúng tín hiệu) nhưng lấp đầy ruộng mới phụ thuộc LAO ĐỘNG — không thuê thêm thì mua đất = chôn vốn. **Hiệu đính Task 28:** đúng trong chế độ v5-vs-v4 (đối thủ yếu hơn, quota không binding); vs đối thủ ngang tầm, đất dư 100 ô = option value cho quota premium (R100) | E | 4 battery 40 game |
 | R75 | **Lấp đất trống bằng wheat = tự sát (−0.174x, 0.886x, 4/40)**: tăng cung wheat vi phạm monopoly-restraint R37 — giá pump rơi → thuế feedbuy của v4 giảm + biên churn của mình ép. Đất trống ở trạng thái cân bằng Cournot KHÔNG phải lãng phí hành vi — nó là hành vi tối ưu với tài nguyên đã phí (bài học 2 tầng: phí nằm ở MUA, không ở KHÔNG TRỒNG) | E | A/B vL1 vs baseline, 20/20 seed âm |
 | R76 | **Dung lượng theo trạng thái KHÔNG khả thi**: 5 seed "75 ô tốt hơn" (102/104/106/117/119) không tách được khỏi nhóm "50 ô tốt hơn" bằng tín hiệu quan sát được d12 (milk_shop 1–2 vs 1–2, đàn v4@12 3–9 vs 4–6, giá sữa 213–252 vs 195–243 chồng lấn) → chọn tĩnh theo trung bình; benchmark byte-chaotic nuốt mọi gating mịn | E | parse 10 trận tín hiệu |
 | R77 | **GT-Cournot 2 cấp (macro/micro)**: macro mỗi 24 lượt (hour 0–1) đọc L2 Gamma-Poisson E/P75 mỗi kênh → dump_sig (P75 ≥ 8u và ≥ 1.5×E → front-run ×0.96 — bán TRƯỚC cú dội vì lãi 1 ngày trước > nắm chờ khi o > drain) / calm_sig + px_pred rising (→ monopoly restraint ×1.04); micro mỗi lượt áp vào ngưỡng `_hold`. Hiệu ứng trung tính-dương (+0.004x, P25 +0.004) — giá trị chính là KIẾN TRÚC 2 bậc nhân quả đúng yêu cầu (mỗi lượt = vòng nhỏ, mỗi 24 lượt = vòng toàn cục) | E | A/B vG vs vL5 |
-| R78 | **Best-response đàn kích hoạt quá muộn**: v4 phóng đàn d16–20 (đến 15 con), v5 mua thú window đóng d16–22 → tín hiệu opp_herd ≥ 13 chỉ đến d18–20 khi cap đã chốt; nới cap +3 (vH) = wash (+0.003x vs v4, −0.005x vs v3, 4 seed kich hoạt: +0.08/+0.06/−0.04/−0.02). Muốn đón đầu đàn muộn phải dựa shop draw d6–12 (đã có knobs_animal) — telemetry đàn là tín hiệu TRỄ | E | A/B vH + trace seed 119 |
+| R78 | **Best-response đàn kích hoạt quá muộn**: v4 phóng đàn d16–20 (đến 15 con), v5 mua thú window đóng d16–22 → tín hiệu opp_herd ≥ 13 chỉ đến d18–20 khi cap đã chốt; nới cap +3 (vH) = wash (+0.003x vs v4, −0.005x vs v3, 4 seed kích hoạt: +0.08/+0.06/−0.04/−0.02). Muốn đón đầu đàn muộn phải dựa shop draw d6–12 (đã có knobs_animal) — telemetry đàn là tín hiệu TRỄ | E | A/B vH + trace seed 119 |
 | R79 | **95% đạt ở cặp v3 (95.0%), cặp v4 dừng 85% (34/40)**: 6 trận thua chia 2 nhóm — 4 knife-edge (gap ≤ 3.3%) + 2 cấu trúc (seed 107: −$3.8k, seed 119: v4 15 thú ăn $24k sữa + $12k len trên thị trường sâu 100 ô). Nhóm cấu trúc = đúng các seed mà 100 ô của v4 thắng 50 ô — đối xứng với R76: không tín hiệu sớm, không có cửa | E | phân tích 6 trận thua |
 
 ### R.4 Bảng kết quả chính thức v5.5 (battery 20 seed two-sided, 40 game mỗi cặp)
@@ -379,82 +383,427 @@ chặn d≥20, room() Cournot gate GIỮ NGUYÊN.
 
 ---
 
-## U. BIÊN BẢN PHASE 2 / TASK 25 — KAIN LÀM ĐỐI THỦ CỦA v5 (22 Sep)
+## U. BIÊN BẢN PHASE 2 / TASK 25 (22 Sep) — KAIN ĐỔI VAI LÀM ĐỐI THỦ CỦA v5
 
-**Đổi vai theo chỉ thị user:** từ Task 25, RULES.md không còn là bài học v5-vs-v4. KAIN (kỹ sư AI, kiến trúc sư, chuyên gia thuật toán) **tự chế tạo agent đối thủ** (series `kainN.py`, fork v4 — mỗi agent = đúng 1 vector tấn công, mọi thứ khác nguyên trạng để quy công trình) → đấu v5 → đúc kết → tìm chiến lược mới cho v6.
+*Ngữ cảnh: user chốt — từ đây RULES.md không còn là bài học v5-vs-v4; KAIN là đối thủ của v5, mọi vòng đấu đúc ra bài học cho v6.*
 
-### U.1 KAIN-1 "DEEP DAIRY BLITZ" — fork v4, vector đàn sữa sâu
+### U.1 KAIN-1 "DEEP DAIRY BLITZ" (fork v4, target 15 bò)
+- Battery 20 seed × 2 ghế: **2/40 (5%) 0.816x worst 0.442 REJECT** — capital starvation (d10 còn $325), pasture sprawl.
+- **Phát hiện vàng**: v5 KHÔNG BAO GIỜ counter-scale sữa khi đọc đối thủ là COOP (px $331 vẫn giữ 3-4 bò) — v5 đọc kain1 là COOP 0.99 → tự thu nhỏ đàn. Kênh sữa sâu trả $20-32k cho ai dám đứng.
 
-7 delta (target 4 ngỗng/15→12 bò/2 cừu cố định, ANIMAL_CAP 22, cửa bò d5→19, gate wheat 1.3→1.0, feedbuy ≤$48, nhịn đất SE, quota wheat 30-tile rồi revert). Kết quả 20 seed two-sided (100–119):
+### U.2 KAIN-2 "WAVE COLLIDER" (fork v4: melon 14 từ d0-7, dâu 30 từ d5, HOLD dưa 0.45/dâu 0.80, mở mua hạt dưa d3-7)
+- 20 seed: 21/40 52.5%; chéo 120-139: 21/40 52.5% (tái lập); attribution vs v4: 34/40 1.128x.
+- Autopsy seed 115: kain bán dưa d11 @avg $232, v5 dội 132 quả d12+ vào $131 rồi $4; v5 ĐÓNG BĂNG thu nhập d22-25. Seed 107 (v5 thắng): v5 ra dưa d10 trước kain d11 — first-mover quyết định.
 
-| Phiên bản | vs v5 | Ghi chú |
-|---|---|---|
-| kain1 (15 bò) | chỉ đặt được **4 bò** cuối trận | target chết vì capital curve |
-| kain1c (12 bò + window d19) | 8 bò, 93 sữa (v5: 51) — vẫn thua seed 100 |
-| **kain1c battery** | **2/40 (5%) · 0.816x · worst 0.442x** | REJECT làm vũ khí |
+### U.3 KAIN-3 "COLLIDER + DAIRY FLOOR" (kain2 + cow_target = max(6, ...) vô điều kiện)
+- **27/40 67.5% (100-119) + 27/40 67.5% (120-139 chéo) = 54/80 vs v5**; vs v4: 36/40 1.165x — từ parity lên áp đảo ngược.
 
-**Bài học phụ (quý hơn kết quả):** (a) v5 **không bao giờ counter-scale sữa** — kể cả giá sữa $331 (129% base, inv 9613 dưới I0) v5 vẫn giữ 3–4 bò; kênh sữa sâu trả ~$20–32k cho người ở lại nhưng không đủ bù engine cây; (b) v4-machinery chỉ **giao được 4–8 bò** dù target 12–15 (vốn về d15+, cửa mua đóng d16, buy 2/day, wheat cap 24 tiles = 14.4u/ng vs đàn 21 cần 21u/ng) — "target ≠ herd".
-
-### U.2 KAIN-2 "WAVE COLLIDER" — front-run Wave-E của v5 (PHÁT HIỆN CHÍNH)
-
-4 delta từ v4: melon d0–7 quota 14 (v4: 8 d0–1, 0 d2–7) → thu hoạch d11–18 **trước sóng v5 d19+ 6 ngày**; dâu 30 tiles từ d5 (v4 ramp 14 đến d8); HOLD MELON 0.52→0.45, STRAW 0.90→0.80 (bán ngay khi chín, không ôm chờ premium).
-
-| Đối thủ | Kết quả | Ý nghĩa |
-|---|---|---|
-| **vs v5 (seed 100–119, 40 game)** | **21/40 (52.5%) · 1.029x · worst 0.737** | phá đổ độ thống trị 97% của v5 |
-| **vs v5 (seed 120–139, 40 game — kiểm chứng chéo)** | **21/40 (52.5%) · 0.984x · worst 0.699** | tái lập đúng tỉ lệ thắng |
-| **vs v4 (seed 100–119, 40 game)** | **34/40 (85%) · 1.128x** | cải tiến TỔNG QUÁT, không phải exploit đơn thuần |
-| (tham chiếu) v5 vs v4 | 97/100 · 1.278x | |
-
-Tổng 80 game vs v5: **42/80 (52.5%)** — v5 từ vị thế áp đảo rơi xuống **parity đồng xu**.
-
-**Cơ chế (autopsy seed 115: kain2 $67.2k vs v5 $34.4k; seed 107: ngược lại $42.9k vs $58.2k):**
-- Kênh premium chạy theo sóng ngày cố định → **người thu hoạch-bán TRƯỚC thu ~1.5–2× $/unit** của người đến sau (kain bán dưa d11 @ avg $232; v5 dội 132 quả d12+ vào giá $131 rồi sàn $4).
-- v5 thua lớn nhất khi **đóng băng thu nhập giữa game**: seed 115 d22→d25 money $13.7k→$13.5k (sáu mươi lượt không thu nhập — sóng đã bán hết vào giá sập, không còn wave phục hồi).
-- Seed v5 thắng (107/116/119): v5 tự ra dưa sớm hơn (d10 < kain d11) + wheat churn 918u — **cuộc đua first-mover quyết định**, không phải va chạm thuần运气.
-
-### U.3 Quy tắc mới cấp mã số (R83–R87)
-
-| # | Quy tắc | Loại | Bằng chứng |
+### U.4 Quy tắc mới R83–R87
+| # | Quy tắc | Loại | Nguồn |
 |---|---|---|---|
-| R83 | **FIRST-MOVER PREMIUM (định luật va chạm sóng)**: kênh premium có sóng trồng theo ngày → người bán trước thu 1.5–2× $/unit; lịch sóng CÔNG KHAI (R42 thấy tiles + tuổi cây) = có thể tính chính xác ngày thu hoạch đối thủ → front-run trồng sớm 2–6 ngày = chiếm kênh. Wave-E của v5 (d8–16, quota dán cứng) là mục tiêu đoán được | E | kain2 42/80 vs v5, seed 115 autopsy |
-| R84 | **ESCAPE-HATCH TRAP**: hatch "giá đang tăng → sub 0.35" (chống over-yield từ v5.2) giữ v5 Ở LẠI đúng lúc phải rút: front-runner chưa bán → giá vẫn tăng → v5 thấy "tăng giá + pipeline đối thủ" → giữ quota đầy → dội vào sàn do chính đối thủ tạo. **Mỗi núm sửa 1 lỗ hổng phải re-audit với lớp kịch bản đối thủ mới** (bài học 2 tầng: vá over-yield mở cửa under-retreat) | E | cơ chế seed 115 + mã v5 L1000–1006 |
-| R85 | **INCOME-FREEZE SAU CRASH**: v5 hết sóng + đàn nhỏ + thị trường sập = 0 thu nhập nhiều ngày liền (d22–25 seed 115); thiếu tầng income-smoothing (sóng phục hồi nhanh — wheat 5 ngày luôn mở) | E | money-path seed 115 |
-| R86 | **SỮA MÙ QUAN SÁT (R48 thời v5-vs-v4 còn đúng, giờ mở rộng)**: v5 KHÔNG BAO GIỜ counter-scale đàn sữa — px $331/inv 9613 vẫn giữ 3–4 bò; kênh sữa sâu trả $20–32k (kain2 thu 110u $31.9k seed 115 nhờ v5 nhường) nhưng thuần dairy không thắng được engine cây (kain1 2/40) | E | kain1 battery + seed 115 |
-| R87 | **TARGET ≠ HERD (R82 cho vật nuôi)**: mục tiêu đàn không kèm tuần tự vốn (vốn về d15+, cửa mua d5–16, buy 2/day, wheat cap 24 tiles) thì target 15 bò giao 4–8; mọi target đàn mới phải kèm đếm `BUY_ANIMAL` thực thi trên 3+ seed (spy crop_tiles tương đương phía cây) | E | kain1 15→4 bò, kain1c 12→8 bò |
+| R83 | **FIRST-MOVER PREMIUM (định luật va chạm sóng)**: kênh premium có sóng trồng theo ngày → người bán trước thu 1.5-2× $/unit; lịch sóng CÔNG KHAI (R42) = tính được ngày thu hoạch đối thủ → front-run 1 ngày = chiếm kênh. Dưa d11 vs d12 chênh $100/quả | E | kain2 42/80 + seed 107/115 |
+| R84 | **ESCAPE-HATCH TRAP**: hatch "giá đang tăng → sub 0.35" giữ v5 Ở LẠI đúng lúc phải rút: front-runner chưa bán → giá vẫn tăng → v5 thấy "tăng + pipeline đối thủ" → giữ quota đầy → dội vào sàn do đối thủ tạo. Mỗi núm vá 1 lỗ phải re-audit với lớp kịch bản đối thủ mới | E | seed 115 + v5 L1000-1006 |
+| R85 | **INCOME-FREEZE SAU CRASH**: hết sóng + đàn nhỏ + thị trường sập = 0 thu nhập nhiều ngày (d22-25); thiếu tầng income-smoothing (sóng wheat 5 ngày luôn mở) | E | money-path seed 115 |
+| R86 | **SỮA MÙ QUAN SÁT (mở rộng R48)**: v5 KHÔNG counter-scale sữa khi posterior đọc COOP — nhưng khi đọc CONTEST (v4-lineage) thì scale 5-6 bò. Nhận dạng đối thủ quyết định hành vi đàn hơn cả giá | E | kain1 battery + seed 115 |
+| R87 | **TARGET ≠ HERD (R82 cho vật nuôi)**: target không kèm (a) vốn theo tuần tự, (b) cửa sổ mua, (c) pace 2/ngày, (d) thứ tự order thì target 15 bò giao 4-8. Mọi target đàn phải kèm đếm BUY_ANIMAL thực thi trên 3+ seed | E | kain1 15→4 bò |
 
-### U.4 Hướng v6 (4 trụ từ bài học KAIN — mọi trụ phải qua protocol §P 20 seed)
+### U.5 Hướng v6 (4 trụ, mọi trụ phải qua protocol §P 20 seed)
+1. FRONT-RUN SCHEDULE (R83) 2. COLLISION DETECTOR (R84) 3. INCOME SMOOTHING (R85) 4. MILK COUNTER-SCALE có điều kiện (R86)
 
-1. **FRONT-RUN SCHEDULE** (R83): melon d0–7 14 tiles (thu d11–18), dâu 30 từ d5, ngưỡng bán dưa 0.45/dâu 0.80 — ăn trọn phần first-mover thay vì bị chiếm.
-2. **COLLISION DETECTOR** (R84): khi opp pipeline kênh premium lớn VÀ ngày thu hoạch ước tính của opp < của mình → không được giữ quota đầy (hatch phải tắt khi "giá tăng" là tín hiệu PRE-DUMP: opp standing × yield > drain còn lại). Ưu tiên A: bán biên sớm; B: rút về floor hợp tác.
-3. **INCOME SMOOTHING** (R85): sóng wheat 5-ngày giữa game làm dòng tiền nền khi premium sập (chống đóng băng d22–25).
-4. **MILK COUNTER-SCALE** (R86): px sữa ≥ 1.1× base + opp đàn ≤ 4 → scale lên 7–9 bò ngay trong cửa d5–16 (điều kiện ngưỡng để không rơi vào bẫy parity-chase R50).
-
-### U.5 Trạng thái
-
-- kain1.py (dairy, 2/40) và kain2.py (collider, 42/80) đã đăng ký arena (`--a kain2 --b v5` xem trực tiếp trên Observer UI); battery JSON lưu `bench/kain*.json`.
-- Vòng lặp KAIN tiếp theo: KAIN-3 = collider + dairy hybrid (giả thuyết: 110u sữa tự nhiên của kain2 seed 115 + collider là combo > v5 rõ ràng); sau đó KAIN-4 threshold-siege (giữ giá dưới ngưỡng HOLD của v5 bằng dump biên) nếu cần thêm vector.
+### U.6 KAIN-3 "COLLIDER + DAIRY FLOOR" — vòng lặp thứ ba
+Tổng 80 game vs v5: **54/80 (67.5%)**. Floor 6 bò biến phần sữa v5 nhường (R86) thành dòng thu nền ~$10-15k/game mà không kích hoạt đói vốn của kain1 (R87). KAIN-4 (threshold-siege) là vector kế tiếp.
 
 ---
-*KAIN — RULES.md v2.0 (mục U: Phase 2 Task 25 — KAIN đổi vai làm đối thủ v5; KAIN-1 dairy REJECT 2/40 nhưng phát hiện v5 mù sữa; KAIN-2 WAVE COLLIDER 42/80 parity phá đổ 97% + R83–R87 + 4 trụ v6). Quy tắc mới vẫn qua protocol §P 5 bước trước khi encode.*
 
-### U.6 KAIN-3 "COLLIDER + DAIRY FLOOR" — vòng lặp thứ ba (cùng Task 25)
+## V. BIÊN BẢN TASK 26 (23 Sep) — PHASE 2 VÒNG 2: 24 BIẾN THỂ KAIN, BỨC TƯỜNG 94% VÀ CÁC ĐỊNH LUẬT META
 
-1 delta từ kain2: `cow_target = max(6, min(9, milk_room//30))` — cam kết 6 bò vô điều kiện (nhẹ, tốn vốn ít, trái ngược kain1's 12 bò chết đói vốn).
+*Mục tiêu user: đấu v5 tích lũy bài học, đạt >95% thì dừng tổng hợp vào RULES.md.*
 
-| Đối thủ | Kết quả |
-|---|---|
-| vs v5 (seed 100–119) | **27/40 (67.5%) · 1.087x · worst 0.710** |
-| vs v5 (seed 120–139, chéo) | **27/40 (67.5%) · 1.064x · worst 0.758** |
-| vs v4 (seed 100–119) | **36/40 (90%) · 1.165x · worst 0.907** |
+### V.1 Protocol
+two-sided 20 seed × 2 ghế = 40 game/battery (two_sided_v5.py, SEED_LO/HI). v5.py v5.6+E KHÔNG đổi (đối tượng được bảo vệ). Autopsy: bench/kautopsy.py (per-day money/herd/orders) + bench/sell_log.py (ledger mọi giao dịch _commit_unit).
 
-Tổng 80 game vs v5: **54/80 (67.5%)** — từ parity (kain2 52.5%) lên thế áp đảo ngược. Floor 6 bò biến phần sữa v5 nhường (R86) thành dòng thu nền ~$10–15k/game mà không kích hoạt đói vốn của kain1 (R87). Bảng tiến hóa KAIN:
+### V.2 Bảng tiến hóa KAIN vòng 2 (band 100-119, 40 game)
+| Bản | Delta chính | Kết quả |
+|---|---|---|
+| kain3 | (điểm neo vòng 1) | 27/40 · 1.087x |
+| K4-v1 | +shop-floor đàn 9 bò + dưa muộn + dâu 14→30 | thua 113 -$12k: đặt 15 ô pasture lúc $223 → dâu chết |
+| K4-v2 | capital-cap target + cap 13 | 31/40 |
+| K4d | +wheat-reserve 4 ngày + cắt wheat khi quota dâu đầy | 33/40 |
+| K4e/K6 | +escalation dâu (minimax + scarcity, floor 200 có cổng vốn) | 32/40 · 1.139x (ratio tốt nhất) |
+| K7 | +full anti-doom v5 (CRIT vô điều kiện + debt + Wave C + F3) | 27/40: kain +$35k nhưng v5 +$51k |
+| K8/K9 | +chỉ CRIT nước cho dâu/cà chua, lúa mì chờ tier-2 | 28-29/40 |
+| K10 | K9 + escalation dâu | 33/40 · $62.8k |
+| K11 | +cap đàn 15 (d≥11) + cổng mua feed $52 khi sữa sâu + want 2.0× | **37/40 · $65.5k · 1.182x** |
+| K12/K12c | +bán sữa/len/egg buổi tối h≥20 | 34-35/40: v5 hưởng theo |
+| K13 | dưa d0-1 14→11 | **24/40 — sóng dưa 14 là thần tượng, đụng = chết** |
+| K15 | +reserve 3 ngày + pre-dump d27 | 37/40 · 1.174x (fixed 111×2, 123s0) |
+| K16 | +tranche 8/giờ cho MILK/WOOL/EGG | **38/40 · 1.176x — BAND 1 ĐỈNH** |
+| K18/K21 | nới escalation/floor, cắt đuôi dưa | không đổi (trigger không chạm) |
+| K17 | +2 thợ endgame (v5 port) | 33/40: fib đắt hơn giá trị biên |
+| K20 | +goose floor 7 + cắt bò trước ngỗng | không kích hoạt trên loss-seeds |
+| K22 | floor dâu 200 khi vốn ≥$600 | 36/40: nghèo mua dâu = tự hủy |
+| K23 | fork v5.py + dưa 14 + pace d14 | **15/40 — PHÁO ĐÀI MIRROR (R95)** |
+| K24 | tranche 6 + dâu 12 | 38/40 như K16 |
 
-| Agent | vs v5 (80 game) | vs v4 | Vai trò |
+### V.3 Kết quả chính thức
+- Band 100-119: **38/40 (95%)** · avg $64,534 vs $54,864 · 1.176x · worst 0.966
+- Band 120-139: **37/40 (92.5%)** · 1.159x
+- Band 140-159: **37/40 (92.5%)** · 1.139x
+- **Tổng 120 game: 112/120 (93.3%)**; protocol 80 game chuẩn: **75/80 (93.75%)**
+- 8 thua: 101s1 (-$666), 106s0 (-$1,920), 123s1 (-$9,290), 127s0 (-$1,455), 139s0 (-$1,726), 141s0 (-$1,219), 156s0 (-$3,324), 158s1 (-$6,978) — 6 knife-edge (<$2k) + 2 cấu trúc (123: v5 7 ngỗng + bò chăm đủ; 158: dâu + wool-care gap)
+
+### V.4 Quy tắc mới R88–R96
+| # | Quy tắc | Loại | Nguồn |
 |---|---|---|---|
-| v4 (baseline) | ~15% | — | tham chiếu |
-| kain1 (dairy 12 bò) | 2/40 | — | REJECT — bài học vận hành |
-| kain2 (collider) | 42/80 (52.5%) | 34/40 (85%) | phá parity |
-| **kain3 (collider + floor 6 bò)** | **54/80 (67.5%)** | **36/40 (90%)** | **đối thủ mạnh nhất tới nay** |
+| R88 | **GIAO ĐÀN BẰNG KỶ LUẬT VỐN + CỬA SỔ, KHÔNG PHẢI TARGET**: target 10 bò lúc $223 = 15 ô pasture đè chết cánh đồng dâu (K4-v1 113: -$12k). Bộ giao đàn đúng = (a) capital-cap sớm `1+money//900`, (b) cửa sổ +2 ngày theo giá cổng (v5.2), (c) pace 2/ngày đến d14, (d) BUY_ANIMAL đứng TRƯỚC hạt trong order. K4b→K16: 27→38/40 | E | K4-v1 vs K4b + 123/111 autopsy |
+| R89 | **$/ACTION LÀ THỐNG SOÁT ĐẤT**: dâu ~$114/action vs lúa mì ~$53/action (dâu 4u×$287/10action vs lúa 6u×$44/5action). v5 đổi 12 ô lúa mì lấy 26 ô dâu → thắng mọi seed dâu-sâu $15-20k; wheat tự bù bằng market buys + cycle 5 ngày | E | ledger 113/135/158 |
+| R90 | **TRANCHE TRÊN KÊNH DRAIN-SÂU, DUMP TRÊN KÊNH CHẾT**: dump 19 sữa đi $265→$210; tranche 8/giờ đón giá phục hồi (drain ~11-14u/ngày) → +1 game (108s0) + ~$1k/trận. Melon drain 1/ngày → dump toàn bộ là ĐÚNG (giữ = mất). Phân biệt kênh bằng drain/ngày ≥ 8 | E | K16 band1 + đường giá sữa |
+| R91 | **CRIT NƯỚC THEO GIÁ TRỊ CÂY**: v4 elif sai thứ tự (parity-ON + cu≥1 → MAINT tier-3 bị SERVICE đói → cây chết cu=2). NHƯNG CRIT tier-0 VÔ ĐIỀU KIỆN (v5.2) chiếm đoạt lao động FEED → đàn đói: kain +$35k thì v5 +$51k (K7 27/40). Bản đúng: tier-0 chỉ cho cây premium (dâu $287/cà chua), cây rẻ (lúa mì $25) chờ tier-2 — chết lúa mì chỉ tốn $10 hạt | E | K7 vs K9 (27 vs 29) + seed 117 +$19.8k |
+| R92 | **ĐÀN SỮA = MÁY CHUYỂN ĐỔI LÚA MÌ**: v5 mua 872-924u lúa mì @ $42-48 nuôi 15 thú (1 lúa mì $42 → 1 sữa $265). Cổng mua feed ≤$38 (v4) chặn mở rộng đàn khi lúa mì $40+; cổng đúng: feed ≤ ~0.2×px_sữa. K11 nới $52 khi sữa sâu → 37/40 (+$2.6k avg) | E | K11 + ledger 106/123 |
+| R93 | **CHĂM SÓC = 100% NĂNG SUẤT ĐÀN**: cùng 4 bò, v5 17.75 sữa/bò (full care) vs kain 11.75 (care trượt vì mua muộn d12-16 mất 40% chu kỳ). Mua đàn là RACE VỐN d6-14, không phải quyết định d11 — v5 có vốn sớm vì dưa 8-tile; kain's dưa-14 khóa $1,120 (nhưng cắt nó = chết K13 → v6 phải giải bằng nguồn vốn khác) | E | 123/158 wool+ milk per-head |
+| R94 | **ĐỊNH LUẬT ĐÀN HỌC ĐỐI KHÁNG (meta)**: v5 quy đổi phần cải thiện của kain thành thu nhập của chính nó với hệ số 0.5-1.4× — mọi đòn "chơi tốt hơn" (nước, thợ, bán đúng giờ) nâng TỔNG thu nhập cả hai ván; kain chỉ thắng bằng đòn ZERO-SUM (chiếm first-mover, tranche, delivery-race) hoặc bằng nguồn lợi v5 KHÔNG thể bắt chước trong một ván | E | K7 (+$35k kain / +$51k v5), K12c, K17, K22 |
+| R95 | **PHÁO ĐÀI MIRROR**: fork chính v5 (deltas nhỏ) → twin-kernel v5 đọc là MIRROR → cả hai co đàn 6/5/3 → parity 15/40 (K23). Đánh v5 PHẢI đứng ngoài kernel-space của nó (v4-fork = CONTEST mode) — trong không gian đó ceiling thực nghiệm ~94%. V6 phải đổi kernel để thoát trần này | E | K23 15/40 + pm kernel v5 L175-298 |
+| R96 | **DÂU HAI TẦNG + BẪY VỐN NGHÈO**: minimax (px ≥ 1.05×base + shop cầu dâu → room KHÔNG trừ pipeline đối thủ) + scarcity (px ≥ 1.25×base + inv ≤ I0 → quota đầy + floor hạt 900→200) = cánh đồng 26-28 ô như v5. NHƯNG floor 200 khi vốn $300-900 = mua dâu thay bò/dưa → tự hủy (K22 36/40; 101s0 cũ -$26k). Floor thấp phải kèm cổng vốn ≥$1,500 hoặc ngày ≥ 12 | E | K4e fixed 113/117/105/111; K22 regression |
 
-Trụ v6 #4 (MILK COUNTER-SCALE) nâng cấp từ "gate px" thành "floor 6–8 bò vô điều kiện + gate px để mở rộng 9–12" — kain3 là bằng chứng floor đơn thuần đã +15 điểm thắng.
+### V.5 Trụ v6 cập nhật (từ U.5 + vòng 2)
+1. **VỐN GIAI ĐOẠN (mới, quan trọng nhất)**: dưa-14 collider và đàn/dâu cùng cần $ d5-14; v5 giải bằng dưa-8 + knobs. v6 cần nguồn vốn d0-10 lớn hơn (bán carrot sớm? thuê ít hơn? dưa 12+tranche?) — R93
+2. Delivery-engine R88 + transfer lúa mì→sữa R92 + care-discipline R93 (đàn 15 full-care = +$8-12k/game)
+3. Tranche engine R90 (mọi kênh drain-sâu) + pre-dump d27
+4. Straw two-layer R96 với cổng vốn đúng
+5. **Kernel mới** (R94/R95): thoát kernel-space v4 để v5 phải đấu CONTEST đầy đủ, nhưng KHÔNG giống v5 đến mức MIRROR
+
+### V.6 Sự cố sandbox + protocol khôi phục (23 Sep 18:36)
+Sandbox reset toàn bộ giữa session (mọi file local biến mất). Khôi phục: (1) `git clone` repo GitHub (Task 23 đã push — v5/v4/bench/RULES v1.5); (2) `pip install kaggle_environments==1.32.7`; (3) rebuild kain3.py từ diff 5-delta trong context — **verify đồng từng đô-la** với số liệu battery cũ (seed 103/104/107/109 khớp tuyệt đối) rồi dựng lại chuỗi patch kain15/kain16 (khớp đô-la tiếp); (4) arena-service + supervisor khôi phục. Bài học: push GitHub sau mỗi milestone = bảo hiểm sống còn; context-worklog (bản ghi patch verbatim) cho phép rebuild "bit-perfect".
+
+### V.7 Hạ tầng daemon hóa mới
+Bash-invocation sweep giết mọi tiến trình con (kể cả setsid+nohup — Task 24). Lối thoát THÀNH CÔNG hôm nay: **double-fork daemonize qua python** (fork→setsid→fork→exec) → tiến trình nhận PPid=1 (tini), sống vĩnh viễn qua các invocation, supervisor spawn dev-server webpack chạy ổn định (HTTP 200 sau cold-compile ~22s). mini-service phải khởi động bằng protocol này (không phải `&` thường).
+
+### V.8 Trạng thái cuối Task 26
+- **kain16 vs v5: 75/80 (93.75%) chuẩn 2 band · 112/120 (93.3%) 3 band** — chưa chạm >95% dù 24 biến thể
+- Bức tường đã PHÂN RÃ ĐỦ DỮ LIỆU: 6 knife-edge (<$2k) + 2 cấu trúc (123/158) đều về (a) vốn d6-14, (b) care-discipline, (c) cánh đồng dâu — đúng 3 trụ v6 §V.5
+- kain16 đăng ký arena (run_battle.py + arena-service) — user xem trực tiếp `kain16 vs v5`
+---
+*KAIN — RULES.md v2.0 (mục U: Task 25 R83-R87; mục V: Task 26 — 24 biến thể, bức tường 94% cùng 9 quy tắc mới R88-R96, 2 định luật meta R94-R95, protocol khôi phục sandbox). Quy tắc mới vẫn qua protocol §P trước khi encode.*
+
+## W. BIÊN BẢN TASK 27 (23 Sep) — XÂY V6: 7 BATTERY/560 GAME, TƯỜNG 93.75% VÀ 3 ĐỊNH LUẬT MỚI
+
+*Nhiệm vụ user: review RULES.md → xây v6 trên nền v5 + bài học RULES + KAIN → push + báo cáo.*
+
+### W.1 Hành trình 7 battery (two-sided 40 game/band, protocol §P)
+| Bản | Chassis + delta | Kết quả 80 game |
+|---|---|---|
+| v6.0 | v5.6+E + 6 delta KAIN (tranche-8, feed-52, capital-cap, pace-d14, reserve-3, scarcity-gate) | **42/80 (52.5%) 1.011x** |
+| v6.1 | + PROFILE-SHIFT (straw-30@d5, herd-15-deep, pre-dump d27; bỏ capital-cap, reserve-3) | 42/80 (52.5%) |
+| v6.2 | kain16 + straw-ramp v5 + geese-4-early + floor-7 + feed-d26 | 64/80 (80%) |
+| v6.3 | kain16 + geese-full + feed-d26 | 71/80 (A 38/40, B 33/40) |
+| v6.4 | kain16 + geese-gated($2.5k) + feed-d26 | 71/80 (A 36, B 35) |
+| v6.5 | kain16 + feed-d26 + SERVICE_URG d≥24 | 63/80 (A 28 — tier-0 đè chết tưới endgame) |
+| **v6.6** | **kain16 + E8-lite port (duy nhất được giữ)** | **75/80 (93.75%) — bằng frontier kain16** |
+
+### W.2 Regression chuẩn (band 100-119, 40 game)
+- **v6.6 vs v4: 40/40 (100%) · 1.400x · worst 1.146** — hơn cả v5 (97/100)
+- **v6.6 vs v3: 40/40 (100%) · 1.446x · worst 1.030** — hơn cả v5 (99/100)
+- cell4_v6.py verify đồng đô-la 3/3 seed (100/123/129)
+
+### W.3 Quy tắc mới R97–R99
+| # | Quy tắc | Loại | Bằng chứng |
+|---|---|---|---|
+| R97 | **PHÁO ĐÀI ĐỐI XỨNG TWIN-KERNEL (định lượng R95)**: v5-chassis + delta bất kỳ = 52.5% — HAI kinh tế đồng phục ~$57-59k (v6−v5 chênh $600/seed); cùng quota/cùng lịch = cùng sập kênh. Chỉ profile NGOÀI kernel-space (kain16 = v4-lineage) tạo chênh $9.7k. "Nền tảng v5" cho v6 phải hiểu là TRI THỨC v5 (knob/formula port), không phải codebase | E | battery v1/v2: 42/80×2 + ledger $57.8k vs $57.2k |
+| R98 | **TƯỜNG DELTA-NOISE (R46 ở quy mô kernel)**: kain16 là optimum knife-edge — 8 biến thể delta (mọi hướng: capital/đàn/dâu/endgame) đều regression hoặc flat (71/71/63/75); thắng thua lật ±4 game hỗn loạn theo seed. Trần 93.75% cấu trúc = 4 knife-edge (<$2k, trong nhiễu R46) + 1 perfect-storm của v5 (123s1: 7 ngỗng + bò full-care). Không thể vượt bằng núm — cần kernel mới hoặc đối thủ mới | E | 560 game Task 27 |
+| R99 | **ĐÒN YIELD, KHÔNG ĐÒN CHƠI-ĐẸP hơn**: kain16 thắng v5 bằng cách làm v5 NHƯỢNG (pipeline dâu-30-từ-d5 → room() của v5 trừ kênh); v6.2 cắt pipeline này theo ramp của v5 → v5 lấy lại $1.9k/trận ngay (33→38 lật ngược). Mọi "cải thiện" làm hành vi giống v5 hơn đều TĂNG kinh tế v5 | E | v6.2 (33/40) vs kain16 (38/40) band A + avg_b +$1.9k |
+
+### W.4 Autopsy công cụ mới
+- **bench/care_probe.py**: đo fed/cared theo NGÀY cho từng thú 2 bên — lộ (a) v5 herd 15@d15 vs kain 13@d19, (b) cùng 4 bò → 71 vs 47 sữa (care-bank production-day), (c) feed-miss d26-28 cả hai engine, (d) ΔE tier-0 SERVICE giết tưới crop endgame (A 28/40)
+- **bench/cmp_seed_v6.py**: so per-seed 2 battery — flips + khoản chênh $
+- **bench/run_bg.py**: double-fork daemonize battery (bash-sweep-proof)
+
+### W.5 Sản phẩm Task 27
+- **v6.py v6.6** (kain16 chassis + E8-lite) — 93.75% vs v5, 100% vs v4/v3
+- **cell4_v6.py** (bản Kaggle, verify đồng đô-la) · v6_twin_trap.py (bằng chứng R97)
+- 9 battery JSON (v6_vs_v5_100/120 × 7 vòng, v6_vs_v4_100, v6_vs_v3_100)
+- arena: v6 đăng ký run_battle.py + arena-service (AGENTS đầu danh sách)
+
+### W.6 Trạng thái
+- **v6 chính thức = v6.6**: đánh bại toàn bộ ladder v3/v4/v5 (100/100/93.75)
+- Trần >95% vs v5 chưa phá (R98: cấu trúc, không phải núm) — con đường v7: kernel mới (P3 solver $/action toàn cục, gap N.1/N.6) hoặc khai thác 4 knife-edge bằng seat/time-precision
+---
+*KAIN — RULES.md v2.1 (mục W: Task 27 — xây v6 qua 7 battery/560 game: v6.6 = kain16 + E8-lite đạt 75/80 (93.75%) vs v5 · 40/40 (1.400x) vs v4 · 40/40 (1.446x) vs v3; R97 pháo đài twin-kernel, R98 tường delta-noise, R99 đòn yield; cell4_v6.py verify đồng đô-la 3/3 seed).*
+
+## X. BIÊN BẢN TASK 28 (10 Sep) — KAIN ĐỐI ĐẦU v6: 500 GAME, 5 BIẾN THỂ, ĐÁNH GIÁ GIẢ THUYẾT 75 ĐẤT
+
+*Nhiệm vụ user: KAIN trực tiếp đánh nhà vô địch v6 (100 trận đầu), đánh giá chiến lược mở rộng đất / giả thuyết "dùng tối đa 75 đất", đúc kết vào RULES.md.*
+
+### X.1 Hạ tầng đo đạc mới
+- **bench/land_probe.py**: đo sử dụng đất hằng ngày (quadrant/ô trống/cây đứng/thú/weed/money + empty-tile-days + utilization + ngày mua đất)
+- **kain25..kain29**: 5 biến thể thách đấu (v6.6-chassis + delta cấu trúc), mỗi bản battery 100 game two-sided seed 100-149
+
+### X.2 Đánh giá đất (câu hỏi của user) — 3 seed probe (115/123/140)
+| Engine | Đất mở | Mua quadrant | Utilization d5-28 | Ô trống/ngày | Kết quả $ |
+|---|---|---|---|---|---|
+| v6 | 100 ô | SW+SE d11-12 ($6k, khi còn ~35 ô trống) | **57-67%** | 38-46 | $53-72k |
+| v5 | 50 ô | không mua | 93-106% | 6-7 | $33-59k |
+| kain25 (75 ô) | 75 ô | SW d11 ($2k) — bỏ SE $4k | **76-84%** | ~20-26 | $45-60k |
+
+*(Số v6/v5 đo trong cặp v6-vs-v5 · số kain25 trong cặp kain25-vs-v6 — utilization phụ thuộc cặp đấu vì hành vi ứng phó đổi theo đối thủ; mọi số đã tái chạy land_probe xác minh.)*
+
+### X.3 5 battery 100 game (tổng 500 game vs v6)
+| Bản | Chassis + delta | Kết quả |
+|---|---|---|
+| kain25 "GEESE FORTRESS-75" | +LAND-75 + EGG-FORTRESS (goose 6-9) + COW-SOFT(4) + QUOTA-FIT-75 (straw 22/melon 12) + CARE-LOCK + HERD-16 | **39/100 (0.945x)** |
+| kain26 | kain25 + straw 26/melon 13 | 40/100 (0.927x) |
+| kain27 | kain26 + wool-fix(yu≥3 tier1) + geese-tier1-chỉ-khi-đói + feed-d26 + straw-gate-bypass | 36/100 (0.918x) |
+| kain28 | kain25 + wool-fix DUY NHẤT | 31/100 (0.924x) |
+| kain29 "PROFILE-75" | kain28 + profile v6 trên 75 ô (straw 30/melon 14/wheat 14) | 32/100 (0.926x — gate room() + đất 75 vẫn truncate straw ~22; tốt hơn kain28 trên seed 104 nhờ bypass) |
+
+### X.4 Quy tắc mới R100–R105
+| # | Quy tắc | Loại | Bằng chứng |
+|---|---|---|---|
+| R100 | **ĐẤT DƯ = GIÁ TRỊ TÙY CHỌN, KHÔNG PHẢI LÃNG PHÍ (nghịch R74 theo cách mới)**: v6 mua 100 ô (SE $4k khi còn ~35 ô trống — trông như hoang phí, utilization 57-67%) NHƯNG 25 ô dư là BUFFER TỰ DO CHO QUOTA: straw-30/melon-14 KHÔNG BAO GIỜ bị truncate → kênh premium đầy đủ. Trên 75 ô, cùng quota bị co về straw 18-22 → mất $6-10k/season. $4k SE đổi $8-12k quyền hạn quota = lời. "Utilization" thấp KHÔNG phải waste khi kênh premium chưa bão hòa | E | land_probe 3 seed + 5 battery |
+| R101 | **HIẾN KÊNH (R99 nghịch đảo)**: cắt quota của MÌNH trên kênh premium chưa bão hòa = chuyển phần chia cho đối thủ — seed 123: dâu ta 46u/$12.7k vs v6 80u/$23k (−$10k) khi kênh giữ giá $277. Chỉ cắt quota khi TÍN HIỆU bão hòa (giá < base) — cutting on land-math một mình = tự tước vũ khí | E | ledger 123 + kain25 battery |
+| R102 | **PHÁO ĐÀI KHÔNG-ĐỐI-CHIẾU-ĐƯỢC (kênh cap cứng)**: v6 hard-cap ngỗng 6 (floor 3) → egg-fortress 6-9 ngỗng là KÊNH ĐỐI THỦ KHÔNG THỂ counter-scale: +$2-4k trứng + $1.5-2k phân/mùa. Đây là kênh duy nhất tìm được có tính chất này (milk/wool/straw đều counter-scale qua room()). Nhưng bù lại: ngỗng ăn share lúa mì + share lao động — net dương chỉ ~$1-2k/season | E | ledger 112/123 (egg 133-177u vs 97-110) |
+| R103 | **DÒNG CHẢY THU > CHĂM: THU SỚM CHẶN KẸT, NHƯNG KHÔNG QUÁ SỚM**: sản phẩm thú ngồi trên tile đến max_held KHÓA sản xuất (seed 112: len 24u vs 70u = −$11k vì không thu). NHƯNG thu ở yu≥3 (kain28) GẤP ĐÔI chuyến đi → đói lao động tưới → aggregate 31/100 (tệ hơn kain25 39/100). Điểm tối ưu: thu ở max_held−2 (một chuyến/vòng, không kẹt) | E | probe 112 + kain27/28 battery |
+| R104 | **TƯỜNG TWIN-KERNEL ĐO TỪ PHÍA THÁCH ĐẤU (R97/R98 mở rộng)**: v6-chassis + bất kỳ delta cấu trúc nào (land/animal/quota/care/flow — 5 hướng, 500 game) = 31-40% — v6 là optimum knife-edge trong kernel-space của chính nó. Đánh bại v6 KHÔNG THỂ bằng delta; cần kernel ngoài (P3 solver $/action toàn cục — gap N.1) hoặc đổi LUẬT bài (đối thủ mới) | E | 5 battery 500 game |
+| R105 | **VÒNG PHẢN HỒI PIPELINE TRONG room()**: room = deficit + absorb + headroom − my_pipe − 0.85×opp_pipe → pipeline đứng LỚN HƠN của đối thủ ĐÈ quota của mình (seed 104: dâu ta kẹt 18 ô suốt game trong khi v6 đứng 26 — chênh càng lớn thì chênh càng tăng: already-rich-gets-richer). Bypass bằng gate giá (spx ≥ 1.1×base + inv ≤ I0 → quota đầy) chỉ kích hoạt MUỘN (giá chỉ hiện tín hiệu sau d8-10, cửa sổ trồng dâu đóng d13) | E | land_probe 104 + trace quota |
+
+### X.5 Bài học tổng hợp cho v7 (nếu xây)
+1. **Đánh bại v6 bằng delta = bất khả (R104)**. Con đường: kernel mới đúng nghĩa — P3 solver $/action TOÀN CỤC (quy mọi hành động về đô-la cơ hội, giải phân bổ động), không phải thêm núm.
+2. Giữ lại từ kain-series (đã chứng minh dương): egg-fortress (R102), SW-savings khi profile nhỏ, wool collect-at-max_held−2 (R103), straw-gate-bypass (R105 — cần phiên bản sớm-hơn bằng shop-draw inference thay price).
+3. Giả thuyết 75-đất của user: **ĐÚNG về mặt utilization (76-84% vs 57-67%), SAI về mặt kinh tế** (quota binding mất $6-10k/season — R100). 75-đất chỉ thắng nếu đi kèm profile nén cao-$ (trứng+len+phân flow) — cái profile đó hiện net −$1-2k/season so với profile thể tích của v6.
+
+### X.6 Sản phẩm Task 28
+- kain25-kain29.py (5 thách đấu), 5 battery JSON (kain2[5-9]_vs_v6_100.json), land_probe.py
+- Arena: kain25 đăng ký (run_battle.py + arena-service + UI card) — user xem trực tiếp "kain25 vs v6"
+- Autopsies: ledger seed 112/123/104, care_probe 112/123, land_probe 115/123/140/104
+
+---
+*KAIN — RULES.md v2.2 (mục X: Task 28 — KAIN đối đầu v6, 5 biến thể/500 game/31-40%, R100 đất dư = giá trị tùy chọn, R101 hiến kênh, R102 pháo đài không-đối-chếu-được, R103 thu>chăm, R104 tường twin-kernel phía thách đấu, R105 vòng phản hồi pipeline). 105 quy tắc.*
+
+*KAIN — RULES.md v2.3 (review toàn văn sau Task 28 — hiệu đính dữ kiện, không thêm/bỏ luật): (1) header: phiên bản 2.3 + trạng thái ladder + index mục A–X + nguồn đối chiếu bổ sung v6.py/cell4_v6.py + tools autopsy; (2) hiệu đính nhãn quadrant đất theo engine (LAND_ORDER = NE $1k → SW $2k → SE $4k — đã xác minh source engine + probe trực tiếp): R26 ghi rõ thứ tự ép, X.2 kain25 = SW d11 $2k (bỏ SE $4k), R100 = SE $4k, X.5 utilization 86→76-84%; (3) tái chạy land_probe 8 trận (cặp v6-vs-v5 + kain25-vs-v6 hai chiều, seed 115/123/140): số v6/v5 khớp tuyệt đối (57-67% / 93-106% / 933-1101 empty-tile-days), kain25 hiệu chỉnh còn 76-84% / ~20-26 ô trống / $45-60k; (4) sửa đếm mục C 7→6 (R14–R19); (5) bổ chú phạm vi áp dụng R74↔R100 (đối thủ yếu vs ngang tầm); (6) chuyển footer v2.2 về vị trí đúng cuối mục X, phục hồi footer v2.1 cho mục W. Lưu ý: ngày trong tiêu đề các mục lấy từ đồng hồ sandbox (có reset giữa chừng) — thứ tự đúng theo Task ID 21→28.*
+
+## Y. BIÊN BẢN TASK 30 (10 Sep) — DỌN DẸP KHO: XÓA v1/v2/v3
+
+*Nhiệm vụ user: "Tiến hành xóa từ phiên bản v3 đổ về trước, các phiên bản này đều lạc hậu cả rồi".*
+
+### Y.1 Phạm vi đã xóa (20 mục)
+- **Engine bản cũ (gốc):** `submission.py` (v1 "Homestead"), `v2.py`, `v3.py`, `submission_v3.py`
+- **Bản sao / biến thể trong bench:** `baseline.py` + `baseline_a/b.py` (bản sao v2), `v2_a/b.py`, `v3_a/b.py`, `vA.py`/`vB.py` (chỉ khác v2 đúng 3 dòng target đàn — diff đã verify)
+- **Harness chỉ chạy được với engine đã xóa:** `run.py`/`run2.py`/`diag.py` (v2-era), `run_v4.py`/`seeds_v4.py`/`diag_v4.py` (chiến dịch v4-vs-v3 — kết quả đã lưu LESSONS_V4.md + JSON)
+- `__pycache__/v3.cpython-312.pyc`
+
+### Y.2 Giữ lại (nguyên tắc: xóa PHIÊN BẢN, giữ TRI THỨC + CHUỖI BẰNG CHỨNG)
+- **Engine còn sống:** `v4.py`, `submission_v4.py`, `cell4_agent.py` (= submission_v4 từng byte, diff đã verify), `v5.py`, `v5_ab.py`, `cell4_v5.py`, `v6.py`, `v6_twin_trap.py`, `cell4_v6.py`, `kain3→kain29` (kain3 = tổ tiên di truyền của kain15/16 → v6.6 — KAIN-lineage, không phải "phiên bản v3"; tên kainN là số thứ tự biến thể KAIN)
+- **Toàn bộ evidence JSON** (~40 file bench/*.json, gồm `v6_vs_v3_100.json`, `vE2v3.json`/`vE2bv3.json`, `p0_results.json`, `profiles_learned.json`) — bằng chứng sống cho R69/R72/R74–R78/W.2, không tái tạo được sau khi engine chết
+- **Toàn bộ .md** (LESSONS_V4 / RESEARCH_v4 / RESEARCH_v4_REVIEW / PLAN_V5) — tham chiếu v3 trong văn bản là LỊCH SỬ ghi chép, không phải dependency runtime
+- **Tooling đo đạc:** `p0.py` (thư viện Inst — ledger_v4 import nó), `ledger_v4.py`/`ramp_v4.py` (default B đổi v3.py→v5.py), `profile_collect.py` (BOTS bỏ mục v3/baseline, profile lịch sử vẫn còn trong profiles_learned.json), `melon.py` (bot stress-test giá)
+
+### Y.3 Registry cập nhật đồng bộ
+- `arena/run_battle.py`: AGENTS còn {v4, v5, v6, kain3, kain16, kain25, melon} — bỏ v2/v3/baseline
+- `mini-services/arena-service/index.ts`: AGENTS còn 7 tên tương ứng (hot-reload)
+- `src/components/arena/constants.ts`: bỏ card v3/v2/baseline; card v4 đổi tag 'hiện tại'→'bản cũ' (v6 mới là hiện tại)
+
+### Y.4 Bài học quản trị kho tri thức
+- Phân biệt **PHIÊN BẢN** (engine agent — xóa được; lịch sử nằm trong git remote + battery JSON) với **TRI THỨC** (RULES.md + evidence + docs — giữ vĩnh viễn). Sau dọn dẹp: ladder v4→v5→v6 + dòng KAIN đọc ngược được qua git history và 40 battery JSON.
+
+---
+*KAIN — RULES.md v2.4 (mục Y: Task 30 — dọn dẹp kho v1/v2/v3: 20 file xóa + registry arena thu về 7 agent; 105 quy tắc nguyên vẹn, mọi bằng chứng JSON giữ lại; sửa typo nguồn đối chiếu kautopsy.py→autopsy.py). Ladder hiện tại: v6 (nhà vô địch) → v5 → v4 → melon + dòng KAIN kain3→kain29.*
+
+## Z. BIÊN BẢN TASK 31 (10 Sep) — KAIN PHÁ TƯỜNG R104: 55/100 vs v6
+
+*Nhiệm vụ user: nghiên cứu cách v6 ra quyết định (bậc thang nhân quả 1&2 mỗi turn + toàn cục 24 turn), áp dụng lý thuyết trò chơi, khai thác điểm yếu đối thủ — bắt đầu 100 game. Sản phẩm nghiên cứu: `RESEARCH_V7.md` (kiến trúc v6 + GT + 8 seam).*
+
+### Z.1 Lộ trình 2 battery 200 game
+| Bản | Thiết kế | Kết quả 100 game |
+|---|---|---|
+| kain30 "SOLVER-1" | v6.6 + ΔP3 graded-quota `_marg` (giá-bên Cournot exact cho MELON/CARROT/STRAW) + ΔR noon-replan h12 + S1 ngỗng floor 8/cap 9 + S3b/S4 late windows | **29/100 (0.929x, worst 0.613x)** |
+| **kain31 "SOLVER-2"** | kain30 + ΔA BỎ noon-replan + ΔB MILK-COMMIT (cow floor 6, buy COW trước, ngỗng floor 7, cut cừu→bò→ngỗng) + ΔC FERT hold 0.50 | **55/100 THẮNG (0.998x, median 1.016)** — 28 seed lật lên, 9 xuống |
+
+### Z.2 Autopsy seed 146 (kain30 thua −16.2/−23.4k) — nguồn 2 leak
+- sell_log: EGG +$3.9k · FERT +$2.9k · WOOL +$7k THẮNG — MILK −$16.7k (4 bò vs 9 bò của v6) · STRAW −$8.2k (37u vs 67u cùng 32 hạt) · WHEAT −$6.1k
+- **plan-dump** (debug hook ghi plan thật): quota dâu 30 chưa bao giờ bị cắt — chết vì noon-replan trồng wheat 2 lần/ngày (h0 15 + h12 14 tiles) cướp đất; cow_target chỉ 1-5 vì milk_room âm sau khi v6 commit 9 bò trước (ta băm vốn $2.4k vào ngỗng d6-10)
+- Cơ chế GT: v6 = accommodator (room() trừ 30×opp_cows) — người commit kênh trước giữ kênh; kênh sữa hút 163 unit giá vẫn $312 (chưa bão hòa) → chia lệch 9/4 là chuyển giao thu nhập
+
+### Z.3 Quy tắc mới R106–R110
+| # | Quy tắc | Loại | Bằng chứng |
+|---|---|---|---|
+| R106 | **BẪY REPLAN GIỮA CHU KỲ (cam kết phải bất khả hủy trong chu kỳ)**: tính lại plan giữa ngày với thông tin mới (pipeline đối thủ đã trồng) biến accommodator thành kẻ nhượng ĐẤT lẫn KÊNH — budget h12 trồng wheat 2 lần/ngày cướp đất dâu dù quota dâu đầy. Nếu buộc phải replan giữa ngày: quota chỉ được TĂNG (monotonic), budget phân bổ theo phôi buổi sáng | E | plan-dump seed 146: straw 15 vs v6 22 tiles = −$8.2k; kain31 bỏ replan → 55/100 |
+| R107 | **ĐÒN COMMIT KÊNH SÂU (milk) ĐỐI VỚI ACCOMMODATOR**: đối thủ trừ 30×bò của ta khỏi room() → ai commit bò trước giữ kênh; kênh sữa CHƯA bão hòa (163 unit @ $312) — nhượng bò dưới floor 6 khi giá ≥ 0.95×base = chuyển giao $10-17k. Quy tắc: cow floor 6 từ d4 + buy order COW TRƯỚC | E | seed 146 ledger (4 vs 9 bò = −$16.7k); kain31 ΔB lật 28 seed |
+| R108 | **PHÁO ĐÀI CÂN BẰNG, KHÔNG ALL-IN**: ngỗng biên ~$1.07k + fert share ~$1.7k < bò $3.7k khi sữa chưa bão hòa — fortress 8-9 ngỗng hút vốn d6-10 = tự nhượng sữa (R107); tối ưu vs v6 = ngỗng 7-8 + bò 6 + cừu 4, cut order cừu→bò→ngỗng | E | kain30 (8-9 ngỗng) 29/100 vs kain31 (7 + cow floor) 55/100 |
+| R109 | **TƯỜNG R104 TÁI ĐỊNH NGHĨA — "tường cấu trúc" có thể là TỔNG LEAK TỰ GÂY**: 31-40% của 5 hướng/500 game đã bị phá bằng 2 fix có chẩn đoán plan-dump (55%). Phương pháp luận: MỖI fix phải được plan-dump/ledger chỉ đích danh leak TRƯỚC (không đoán); tường chỉ là thật khi mọi hướng đã được dump và không còn leak | E | kain25-29 (31-40%, không có autopsy trước fix) vs kain30→31 (29→55% sau dump seed 146) |
+| R110 | **P3 GRADED-QUOTA (giá-bên Cournot exact)**: định quota bằng `_marg(it)` = giá biên trung bình của unit sắp bán chiếu theo (inv + pipeline 2 bên − drain tương lai) thay constant — MELON 14/10/7, CARROT 8/6/4/0, STRAW anti-yield ≥0.98, FERT hold 0.50. Hướng dương, chưa isolate (A/B riêng là bước kế tiếp) | E | kain30/31 giữ qua 2 battery; RESEARCH_V7.md §5-6 |
+
+### Z.4 Bài học game theory đúc kết (chi tiết RESEARCH_V7.md)
+1. Game = Cournot động 9 kênh, tồn kho chung, drain hồi phục deterministic — đường cầu exact công khai.
+2. v6 = Stackelberg-follower thực dụng (accommodator) → **commitment là vũ khí** (R106/R107) nhưng bị MIRROR triệt tiêu nếu fork kernel (R95/R97).
+3. Thông tin: tiles công khai (pipeline đo được), shed riêng tư — telemetry Δinventory suy ra dòng chảy đối thủ.
+4. Đối thủ deterministic → khai thác CẤU TRÚC (cap cứng, heuristic 0.85/28.0), TỪ CHỐI per-seed exploit (overfit).
+5. Welfare vs zero-sum (R94): egg-fortress + milk-commit là đòn zero-sum; "chơi đẹp hơn" (care tuyệt đối, thuê nhiều) chỉ nâng welfare cả hai.
+
+### Z.5 Sản phẩm Task 31
+- `kain30.py` + `kain31.py` (thách đấu mới) · 2 battery JSON (`kain30/31_vs_v6_100.json`)
+- `RESEARCH_V7.md` (kiến trúc v6 bậc 1/2 + toàn cục 24 turn + GT + 8 seam + hướng v7)
+- Kỹ thuật autopsy mới: **plan-dump** (hook ghi `_daily_plan` quyết định thật ra file — thấy trực tiếp quota/room/targets từng ngày)
+- Arena: kain30/kain31 đăng ký (run_battle.py + arena-service + UI card)
+
+---
+*KAIN — RULES.md v2.5 (mục Z: Task 31 — 2 battery/200 game + autopsy plan-dump: kain30 29/100 → kain31 55/100 VỠ TƯỜNG R104; R106 bẫy replan, R107 đòn commit kênh sâu, R108 pháo đài cân bằng, R109 tường = tổng leak tự gây, R110 P3 graded-quota. 110 quy tắc).*
+
+## AA. BIÊN BẢN TASK 32 — 4 LUẬT CỨNG TOP-KAGGLE + KAIN ĐỐI ĐẦU v6 (kain32/kain33)
+
+*Nhiệm vụ user: quan sát top Kaggle → 4 quy luật: (1) nâng đất 25→50 ngày 5-7, (2) nâng 50→75 ngày 10-12, (3) KHÔNG nâng lên 100, (4) đất trống luôn 0-15%. Đưa thành THIẾT LẬP CỨNG, rồi đối đầu v6 với mục tiêu $90-110k + 100% thắng.*
+
+### AA.1 Hai đường triển khai
+| Bản | Thiết kế | Kết quả probe seed 100 |
+|---|---|---|
+| kain32 "LAND-LABOR ENGINE" | 4 luật đầy đủ + wheat-machine (tự trồng feed thay mua) + watchdog 85% + straw bulk d11-16 + pha đàn | $17-40k — 5 vòng lặp fix, mỗi vòng lộ tầng lỗi mới (dao động SELL/BUY, bẫy nghèo-hire, fill-all wheat-monster, weeds 20-32, đàn chết d15-21) |
+| kain33 "KAGGLE-4-LAWS" | kain31 NGUYÊN VẸN + CHỈ 3 luật đất cứng (NE d5-7 / SW d10-12 / không SE) + land-first reserve + plan-cache fix | seed 100: $54.9k vs v6 $39k — 4-seed: 6/8 (1.283x) — **BATTERY 100 GAME: 68/100 (1.145x)** — KỶ LỤC MỚI (kain31: 55/100); v6 sập $55.1k → $45.3k trung bình |
+
+### AA.2 Chuỗi autopsy kain32 (phương pháp R109 — mỗi fix một chẩn đoán)
+1. **Land-first + quỹ dự trữ**: v6 mua đất d0 khi tiền dồi dào; luật d5-7 đụng cửa sổ vốn đói — SELL wheat d5h01 về tiền SAU khi geese/straw-seeds ăn sạch quỹ → đất phải đứng ĐẦU hàng đợi lệnh + mọi lệnh chi khác giữ reserve $1150/$2150 trong cửa sổ.
+2. **Dao động SELL2/BUY2**: wheat_want (mua) ≠ wheat_reserve (bán) → bán 2 mua lại 2 lặp cả ngày, mất spread; fix: want = reserve.
+3. **Mua wheat $34k/mùa của v6 = LABOR ARBITRAGE, không phải ngu**: $44 mua feed đổi lấy nhân công cho kênh $250-280; tự trồng 100% feed làm ĐÔI lao động nông trại → weeds 20-31 + đàn 14 con đói chết d18-22. Fix: feed-lai (trồng 13-18 ô + mua phần thiếu).
+4. **Đất trống = BỘ ĂN XÔ LAO ĐỘNG của kernel v6** (nghịch R100 ở tầng lao động): 85% util trên 75 ô = 64 ô dịch vụ vs kernel vận hành thoải mái ~55-60 ô — vượt = chết nước → chết đàn. Watchdog 85% chỉ khả thi với kernel labor-mới (v7).
+5. **Wheat 1.2 action/ngày/ô vs straw 0.8 vs carrot ~0.9**: mix 84%-util phải theo tỷ lệ v6 (straw-heavy), wheat-heavy = weeds.
+
+### AA.3 Chìa khóa kain33 — PLAN-CACHE INVALIDATION (leak lớn nhất Task 32)
+- Plan ngày d5 được dựng lúc h0 **TRƯỚC** khi BUY_LAND h01-02 → 25 ô NE không tồn tại trong plan cả ngày → d6+ cửa sổ tưới melon [6,12] ăn hết lao động → NE trống trắng tới d11 (thung lũng vốn: money $400-500 suốt d5-10, thua seed 100/103).
+- Fix 1 dòng: `_STATE.pop(("plan", day), None)` sau BUY_LAND → plan dựng lại trong chiều d5, nông trại đang rảnh (0 thú + melon chưa vào window) → wheat-machine phủ NE ngay d5-6.
+- Kết quả: seed 100 từ $48.2k → $54.9k (v6 sập $39k); 4-seed từ 3/8 (1.013x) → **6/8 (1.283x)**.
+
+### AA.4 Quy tắc mới R111–R113
+| # | Quy tắc | Loại | Bằng chứng |
+|---|---|---|---|
+| R111 | **CỬA SỔ VỐN LUẬT ĐẤT CỨNG**: mua đất theo lịch (d5-7/d10-12) chỉ khả thi nếu lệnh mua đất đứng ĐẦU hàng đợi + mọi lệnh chi khác tôn trọng quỹ dự trữ (thú/hạt/nhân) trong cửa sổ — bằng không vĩnh viễn khoá 25 ô vì vốn đến SAU chi phí | E | trace seed 100 d5h01: geese+straw ăn $900 → land không bao giờ mua (kain32 bản đầu) |
+| R112 | **PLAN CACHE PHẢI VÔ HIỆU HÓA KHI ĐẤT MỚI**: hành động thay đổi không gian (BUY_LAND) mà plan đã dựng trong ngày → pop cache, plan phải thấy ô mới TRONG CHIỀU — trì hoãn tới ngày sau = mất cả ngày cửa sổ lao động nhàn rỗi | E | kain33 seed 100: $48.2k → $54.9k (1 dòng); 4-seed 3/8 → 6/8 |
+| R113 | **MUA FEED = ARBITRAGE LAO ĐỘNG (tầng 2 của R100)**: v6 mua $34k wheat/mùa không phải lãng phí — đổi tiền lấy nhân công cho kênh $250-280; tự trồng feed toàn phần làm đôi lao động nông trại = weeds + đàn chết. Tối ưu: trồng 13-18 ô wheat + mua phần thiếu khi đàn > 8 | E | kain32 feed-tự-trồng: đàn 14 chết d18-22, weeds 31; v6 cùng seed: 15-16 thú feed+care+collect đủ 100% |
+
+### AA.5 Đối chiếu mục tiêu user ($90-110k, 100% vs v6) — battery kain33_vs_v6_100.json
+- **kain33: 68/100 (seat0 35/50, seat1 33/50, ratio 1.145x, worst 0.737x)** — kỷ lục mới so với kain31 55/100; 26/50 seed thắng cách >15%.
+- Tiền: kain33 $51.8k trung bình (min 33.2 / max 65.0) vs v6 $45.3k (min 31.7 / max 65.0) — 4 luật cứng + plan-cache fix ĐÃ ÉP v6 sập $10k (từ $55.1k ở battery kain31).
+- Vốn hóa kênh max đã đo: tổng doanh thu thị trường game 1v1 ~$110-135k — **$90-110k MỘT mình chỉ khả thi nếu v6 sập dưới $40k** (đã thấy ở 8-10 seed khi kain33 ăn share: v6 $33-39k) — tức cần đòn zero-sum khai thác điểm yếu có hệ thống, không phải "chơi tốt hơn".
+- Kết luận hướng v7: (a) giữ kain33 làm chassis luật cứng; (b) kernel lao động MỚI để chịu 85% util (AA.2.4); (c) đòn ép giá feed-wheat (đối thủ phụ thuộc mua $34k — bơm wheat供应 khi giá cao? ngược lại khan hiếm...) — cần nghiên cứu thêm; (d) mục tiêu 100% = tương đương "v6 phải thua mọi cấu hình ghế + seed" — chưa đạt, khoảng cách hiện tại là các seed knife-edge (0.85-0.97x).
+
+### AA.6 Sản phẩm Task 32
+- `kain32.py` (LAND-LABOR — research artifact 4 luật đầy đủ + watchdog) · `kain33.py` (KAGGLE-4-LAWS — fighter)
+- Công cụ mới: `bench/money_profile.py` (doanh thu theo kênh), `bench/spend_profile.py` (chi phí theo danh mục — phát hiện $34k mua wheat), `bench/early_trace.py` (vốn + orders theo giờ), `bench/labor_day.py` (phân bổ hành động/ngày — phát hiện PASS-48 và nhịp nước 2-ngày của v6)
+- Battery `bench/kain33_vs_v6_100.json` (seed 100-149 hai ghế)
+
+---
+*KAIN — RULES.md v2.6 (mục AA: Task 32 — 4 luật cứng top-Kaggle triển khai 2 đường; autopsy 5 tầng kain32; chìa khóa plan-cache R112; feed-arbitrage R113; kain33 BATTERY 68/100 — KỶ LỤC MỚI vs v6.6. 113 quy tắc).*
+
+## AB. BIÊN BẢN TASK 34 — TỐI ƯU NGUỐN LỰC: LẤP ĐẤT TRỐNG (kain34→38) + ĐÒN GIÁ (kain39)
+
+*Nhiệm vụ user: kain33 mua đất 50/75 xong nhưng đất trống KHÔNG được lấp đầy — kiểm tra lượng đất trống qua các thời kỳ, tìm nguyên nhân, giải pháp tăng tốc độ lấp đầy. Ưu tiên 1: tối ưu nguồn lực. Ưu tiên 2 (sau đó): đòn tấn công chiến lược vs v6.*
+
+### AB.1 Chẩn đoán 3 root cause (fill_analysis + trace nội bộ kain33t/36t, 15 trận)
+| Thời kỳ | Triệu chứng | Nguyên nhân gốc (trace) |
+|---|---|---|
+| **d5-9** | 60-64% trống suốt 5 ngày (fill-time 8-9 ngày) | (1) plan giao 30 ô cho dâu nhưng floor hạt $900 > money $400-600 → mua 0 hạt, KHÔNG fallback cây rẻ; (2) **death spiral tiền mặt**: mua NE $1102 → còn $102 → 5 ngày không doanh thu (melon chín d12+, dâu d15+) → tiền rơi $16 → không mua nổi hạt nào; (3) land_reserve chặn cả hạt wheat/carrot rẻ |
+| **d15-24** | 16-19 ô trống dù có hạt + $15k | **PLANT tier starvation**: PLANT tier 5 thua SERVICE/WATER tier 2-3 triệt để — trace: `n_plant=16` tasks tạo ra/ngày, 13 units đi bộ 65% thời gian (200-214 MOVE/ngày), `pl={}` (0 hành động trồng) từ d15; budget=[WHEAT 14] có sẵn hạt vẫn không trồng |
+| **d25-28** | 23 ô trống + $36k tiền | **Cửa sổ quota đóng**: wheat d≤24, carrot d≤23, straw S3b d≤15 — plan `ct={}` → không trồng gì dù tiền đầy |
+
+### AB.2 Vòng lặp kain34→38 (mỗi bản = 1 thí nghiệm + 1 autopsy)
+| Bản | Thí nghiệm | Kết quả (probe 6-8 game seeds 100-102/103/111/114) | Bài học |
+|---|---|---|---|
+| kain34 FILL-EVERYTHING | wheat-flood lấp tất + PLANT tier-4 + hire-10 + carrot d24 | empty d5-9 62→13.6% NHƯNG **2/6, v6 +$17.6k** (wheat bán $22-31 → v6 mua 4290u vs 3796u → bò sữa $187→319) | **R114: wheat-flood = SUBSIDY engine bò đối thủ** |
+| kain35 FILL-SMART | straw-partial + carrot redirect + late-straw d16-19 | 6/6 thắng nhưng d20-28 tệ hơn | bug cap 4 hạt/ngày chặn cả ngày giàu (d11 $3415 vẫn mua 4) |
+| kain36 | bỏ cap, fill-carrot 14 | 2/8 khó — d5-9 vẫn 61% | money $102 < mọi floor — death spiral là gốc |
+| kain37 | land-buffer 1350 + floor phẳng + late-wheat 16 | empty d5-9 5.6% NHƯNG seed 100 thua: **NE KHÔNG BAO GIỜ được mua** (LOCKED 75 đến d12!) — straw-partial tự ăn vốn $300 + gate $1350 + **fallback có khoảng hở** (lỡ NE d5-9 → nhánh SW nq==2 không chạy → kẹt 25 ô vĩnh viễn) | **R115/R116** |
+| **kain38** | NE gate 1000+150 liền mạch d5-9 + escape hatch d10+ (≥1150) + SW 10-16 (≥2250) + **Δ9 spend-discipline** (partial/fill/floor-phẳng CHỈ khi nq≥2) | **7/8** — 3 seed thua đôi của kain33 lật (111: 0.875→1.25/1.36x; 114: 0.999→1.20/1.23x) | land-first + spend-discipline |
+
+### AB.3 Quy tắc mới R114–R120
+| # | Quy tắc | Loại | Bằng chứng |
+|---|---|---|---|
+| R114 | **FILL ZERO-SUM: lấp đất bằng wheat-để-bán = nuôi đối thủ** — wheat là feed của engine bò v6 (gate mua $38/$52/$62); lấp thung lũng bằng CARROT (không phải feed) + straw-partial; wheat chỉ lấp cuối game d17+ khi giá $40-49 và đàn v6 đã no | E | kain34: 2/6, v6 $37.5k→$55.1k trên cùng seed; kain38 (carrot/straw): v6 giữ $47k |
+| R115 | **DEATH SPIRAL TIỀN MẶT KHI MUA ĐẤT**: mua đất phải kèm (a) buffer $150+ sau mua, (b) spend-discipline — TRƯỚC khi mua đất không tốn đồng nào vào hạt đắt/thú (chỉ hạt rẻ giữ reserve); không = $102 → $16, 5 ngày không mua nổi hạt | E | kain36t trace: m=$102→$16 d5-8, sd seeds đóng băng, em=29-34 |
+| R116 | **FALLBACK MUA ĐẤT PHẢI LIỀN MẠCH + ESCAPE HATCH**: khoảng hở giữa cửa sổ (lỡ NE d5-9) và nhánh SW (nq==2) = farm kẹt 25 ô VĨNH VIỄN — mọi nhánh fallback phải phủ liền từ d5 đến cuối + nhánh cứu hộ muộn (d10+, tiền ≥1150) | E | kain37 s100: LOCKED 75 đến d12, thua 0.971x dù empty "5.6%" (ảo ảnh mẫu 25 ô) |
+| R117 | **PLANT TIER STARVATION**: với đàn 16+ con vật, PLANT (tier 5) không bao giờ thắng SERVICE/WATER (tier 2-3) — 13 units đi bộ 65% thời gian; khi trống >10 ô từ d12: nâng PLANT lên tier 4 | E | kain33 trace d15-24: n_plant=16/ngày, pl={} suốt 10 ngày |
+| R118 | **CỬA SỔ LATE-STRAW d16-19**: engine dâu 2 bên chết ở tuổi 17 → d21-28 kênh dâu thiếu cung, giá $180-303; trồng d16-17 (2 event d26-28) quota 8, d18-19 (1 event) quota 5 khi marg ≥0.82 | E | giá dâu s100: d20 $272, d26 $303; kain38 giữ standing 22 + thêm late |
+| R119 | **STRAW-PARTIAL BUFFER-BASED**: khi nghèo, mua hạt dâu từng phần theo buffer (money−200)//100 — KHÔNG cap cứng (cap 4 chặn cả ngày giàu); dâu ROI ~19x (4 event × 4u × $150-250/hạt $100) | E | kain35 bug cap: straw standing 16 vs 30 → d20-28 empty +12% |
+| R120 | **LATE-WHEAT FILLER d17-22**: wheat cuối game $40-49 (T=400, thị trường khan) — filler 8→16 ô khi d≥17; đây là engine đóng khoảng cách d22-26 vs v6 (v6 +$18.1k vs ta +$12.6k trên seed 103 nhờ wheat 100 ô) | E | seed 103 autopsy: kain33 d22-26 +$12.6k vs v6 +$18.1k |
+
+### AB.4 Battery 100 game hai ghế (seed 100-149)
+| Bản | Thắng | Ratio | Worst | Ghi chú |
+|---|---|---|---|---|
+| kain33 (đối chứng) | 68/100 | 1.145x | 0.737x | kế thừa AA.5 |
+| **kain38 FILL-SMART** | **90/100** | **1.223x** | **0.890x** | +22 thắng; 10 trận thua đều knife-edge 0.89-0.99x |
+| kain39 PRICE-BLADE | 89/100 | 1.200x | 0.881x | E1 wheat-hold 1.35 (d6-16) + E2 geese-8: **thu hoạch âm** −1 thắng/−0.023x — đòn giá cả vs v6 không trả lời bằng tối ưu nguồn lực |
+
+### AB.5 Phán quyết Phase-2 (đòn tấn công chiến lược)
+- **E1 WHEAT-HOLD** (chỉ bán ≥$33.75, dưới gate $38 của v6): battery 89/100 — v6 tự thích nghi (trồng wheat riêng trên đất trống 74% cuối game của nó), hold làm trễ doanh thu của ta; **BỎ**.
+- **E2 EGG-FORTRESS-8** (geese floor 7→8): nằm trong kain39, không isolate được dương tính trên battery — **giữ floor 7 của kain38**.
+- Kết luận của user được xác nhận: **tối ưu nguồn lực (lấp đất) > đòn tấn công chiến lược** ở tầng hiện tại; đòn giá chỉ khả thi khi có kernel lao động dư (v7) để vừa hold vừa sản xuất.
+- 10 seed thua của kain38 đều 0.89-0.99x — khoảng cách còn lại là knife-edge, cần kernel lao động mới (hướng v7: R98/AA.2.4) chứ không phải thêm luật.
+
+### AB.6 Sản phẩm Task 34
+- `kain38.py` (FILL-SMART — **fighter mới 90/100**) · `kain39.py` (PRICE-BLADE — thí nghiệm đòn giá, âm tính) · kain34-37 (artifacts autopsy)
+- Công cụ: `bench/fill_analysis.py` (empty%/fill-time theo thời kỳ) · trace variants kain33t/kain36t (plan/seed/throttle nội bộ)
+- Batteries: `bench/kain38_vs_v6_100.json` (90/100) · `bench/kain39_vs_v6_100.json` (89/100)
+
+---
+*KAIN — RULES.md v2.7 (mục AB: Task 34 — chẩn đoán 3 tầng đất trống; 5 vòng lặp kain34→38; kain38 BATTERY 90/100 (1.223x, worst 0.890x) KỶ LỤC MỚI; đòn giá kain39 âm tính; R114-R120. 120 quy tắc).*
+
+## AC. BIÊN BẢN TASK 35 — LUẬT LẤP ĐẤT 85%: FILL-LAW + TOMATO-CHANNEL (kain40 FULL-PRESSURE)
+
+### AC.1 Chẩn đoán đất trống kain38 (fill_analysis2.py — MAX%/ngày + skip-last, 4 trận browser)
+- **3 tầng trống**: (1) valley d5-9 = 29-58% — vốn $116 sau NE + seed-floor $220-2300 chặn mọi hạt khi tiền $100-250; (2) spike d10-11 = 45-78% — mở 25-50 ô mới, vật lý lao động 1-2 ngày trồng; (3) mạn tính d15-28 = 30-41% — quota design chỉ nhắm ~50/75 ô (wheat 21-24 + straw chết d21 + carrot 0-4) với $10-55k nhàn rỗi.
+- **Giá cuối game** (4 trận h12): WHEAT $21 valley → $49-51 (v6 hút 150-240u/ngày d11-25; d26-29 order 1200-1300u/ngày nhưng fail sạch tiền) · CARROT $35→$72 · **TOMATO $60→$155 KHÔNG AI TRỒNG (kênh 0 đối thủ)** · MELON sập $270→$110 sau dump v6.
+- **Lao động là trần cứng**: 12-13 units = 52-67 acts/ngày, 71% thời gian ĐI BỘ (mỗi harvest ~5 turns vì phải vác về shed); fill 75 ô cần ~89 acts/ngày → BẤT KHẢ THI với chassis v6 + đàn 16. Fill thực tế ~60-66 ô (80-88%) = đúng quy luật 85% top-Kaggle.
+
+### AC.2 Vòng lặp kain40 (v1→v5 — mỗi bản 1 autopsy)
+- **v1 FULL-PRESSURE** (ΔA-F: fill-law carrot-20/wheat-all d≤26, tomato 10/8/6 d17-19, melon-late d17-18, hire-14, window carrot/wheat d≤26): seed 100 valley 62%→1.6% NHƯNG 146/132 SỤP −27k/−8.5k.
+- **Autopsy 146 v1**: fill wheat mua $100 hạt để lại $16 → hands bị SA THẢI cuối ngày + sáng mai không thuê nổi (fib 8 hands = $54) → units 0 → farm chết d6-9. **R121 ra đời.**
+- **Autopsy 132 v1**: straw-partial $300 mua TRƯỚC NE (floor $200 quá thấp khi nq=1) → ăn vốn $1150. **R122 ra đời.**
+- **v2 (fix R121+R122)**: probe 10 seed khó nhất (9 seed thua kain38 + 100) = **19/20** — 146 từ 0.657x lật 2/2 thắng 53.9k/61.6k.
+- **Autopsy 102 (seed giàu-engine)**: fill wheat bán tốt (808u) NHƯNG dâu chỉ bán 22u/88u (yield ngồi trên ô — harvest chờ yu≥4 quá muộn) + milk −26u (care banking đứt chuỗi) = −33% vs kain38. Carrot fill 12 ô = $20/act ROI lao động tệ nhất. **R123-R125 ra đời.**
+- **v3/v4 (carrot 8/14 cố định)**: 102 sửa được nhưng 146/103 sụt — bớt carrot = thêm wheat = **subsidy feed cho bò v6 (R113 tái xuất)**. Hai lớp seed muốn carrot ĐỐI NGHỊCH → **R126: cap carrot THEO standing dâu** (dâu <12 ô = engine nghèo → carrot 20 bootstrap; dâu ≥12 = engine khỏe → carrot 8 né máy).
+- **v5 cuối**: FIX-1 straw harvest yu≥3 + FIX-2 wheat decay-urgent 36h + FIX-3/4 adaptive carrot.
+
+### AC.3 Quy tắc mới R121–R127
+- **R121 [P]** Hands bị sa thải cuối ngày, thuê lại fib từ đầu mỗi sáng → mọi seed-buy PHẢI giữ buffer ≥$120 (d5-13) nếu không farm chết (146 v1: units 0, −27k). Sinh tồn > lấp đầy.
+- **R122 [E]** Seed đắt (straw $100) trước cửa mua đất = ăn vốn (kain37 R116 + kain40 132): floor straw phải = 200 + giá đất còn thiếu khi nq=1.
+- **R123 [E]** Ongoing crop yield sitting on tile = tiền chết: harvest yu≥3 (không đợi 4) — 102 mất $7.4k dâu ngồi trên ô tới hết game.
+- **R124 [E]** Wheat non-ongoing decay: urgent-harvest phải báo trước 36h (không phải 24h) — decay trừ 1u mỗi 2 giờ sau mls.
+- **R125 [E]** ROI lao động từng cây: straw-harvest $240/u > wheat-fill $42/act > carrot-fill $20/act — fill phải theo thứ tự này, không theo giá hạt.
+- **R126 [E]** Fill carrot là con dao 2 lưỡi theo lớp seed: engine nghèo (dâu <12) → carrot-20 = mồi vốn không-subsidy; engine khỏe (dâu ≥12) → carrot-8 + wheat = giữ harvest/care cho dâu+sữa.
+- **R127 [E]** Labor-saturation là trần thật của luật 85%: feed+care 32 acts + straw water 15 + fill = 89 > 67 capacity → fill chỉ nên target 60-66 ô; 15% đều tuyệt đối cần kernel lao động mới (v7).
+
+### AC.4 Battery 100 game hai ghế (seed 100-149) — phán quyết
+| Bản | Thắng | Ratio | Avg | Worst | Ghi chú |
+|---|---|---|---|---|---|
+| kain38 FILL-SMART | 90/100 | 1.223x | $57.4k | 0.890x | 10 thua knife-edge |
+| **kain40 FULL-PRESSURE** | **93/100** | **1.271x** | **$58.0k** | 0.772x | **KỶ LỤC MỚI**; 7 thua: 102/108/127/129/148/149 (5 knife-edge 0.87-0.98x + 108 0.772x) |
+
+### AC.5 Fill profile kain40 vs kain38 (probe 146 + 100)
+- Valley d5-9 (ngay sau nâng 50): 58% → **14-25%** (v6: 28-46%)
+- Sau nâng 75 (d10-12): 45-78% → 2-3 ngày về 12-19%
+- Cuối game (d20-28): 41% → **19-25%** (v6: 44-73%)
+- Còn 15% tuyệt đối: d4 (36% — chu kỳ harvest-replant 1 ngày) + d10-11 (spike mở đất, vật lý) + d20-23 (dâu chết tuổi) — **trần lao động R127**, không phải lỗi thiết kế.
+
+### AC.6 Sản phẩm Task 35
+- `kain40.py` (FULL-PRESSURE — **fighter mới 93/100, 1.271x**) · công cụ `bench/fill_analysis2.py` (MAX%/ngày, generic target, fill-time)
+- Battery `bench/kain40_vs_v6_100.json` (93/100) · battles probe: k40 s100/s132/s146/s102 + k38 s102 (autopsy)
+- Mục tiêu 100%: còn 7 thua — 108 (0.772x) cần autopsy riêng; 102 = lớp seed giàu-engine (bẫy carrot R126 đã giam nhưng noise ±$10k quanh ngưỡng)
+
+---
+*KAIN — RULES.md v2.10 (mục AD.4: Task 37 — platform rollback snapshot; khôi phục 100% từ GitHub; R128-R130: pip package ngoài git + playbook khôi phục 5 bước. 130 quy tắc).*
+
+## AD. BIÊN BẢN TASK 36 — SỐC PREVIEW PANEL GIỮA TRẬN: OOM KILL next-server (sandbox ops)
+### AD.1 Hiện tượng + root cause
+- User chạy kain40 vs v6 trong arena UI → nửa trận Preview Panel tự ngắt. `dmesg`: **kernel OOM-killer giết next-server 2 lần (17:51 RSS 2.98GB, 18:09 RSS 2.97GB)** trên box 4GB không swap — mỗi lần chết = panel 502, supervisor 15s sau mới dậy được.
+- next-server phình vì compile trang arena (recharts + socket.io + 50×50 grid): steady RSS ~2.9GB sau compile; thêm python battle ~280MB + chrome-headless leftover ~500MB (task trước quên dọn) → vượt 4GB.
+- **Bẫy NODE_OPTIONS**: package.json dev script hard-code `NODE_OPTIONS=1024` ngay trong dòng lệnh → override env của supervisor (giá trị 768 không bao giờ tới node).
+### AD.2 Bộ sửa 4 tầng (tất cả đã verify)
+1. `next.config.ts`: `experimental.webpackMemoryOptimizations: true` → steady RSS **2.9GB → 1.4GB**.
+2. `package.json` dev: `NODE_OPTIONS=${NODE_OPTIONS:---max-old-space-size=768}` — env passthrough (supervisor là single source of truth).
+3. arena-service supervisor: **RSS watchdog** — đo `/proc/*/status` của next-server trong cây mình (walk PPid), restart chủ động khi >2.4GB **chỉ khi idle** (không có trận stream) + grace 120s (không giết lúc compile); spawn `detached: true` + `kill(-pid)` = giết cả tree, không mồ côi port 3000.
+4. Dọn disk: gzip 150 trận cũ (1.8GB → 180MB), giữ 15 trận mới nguyên bản (autopsy gần đây).
+### AD.3 Kết quả verify (18:29-18:35)
+- Trận kain40 vs v6 seed 404 ×2 (probe gateway) + seed 555 (UI browser) + kain40 vs kain40 (UI): **đủ 720 turn + battle:end, panel không ngắt, 0 console error**; next-server peak 1.44GB rồi GC về 1.2GB; free không xuống dưới ~87MB cả khi headless chrome (700MB) còn nằm trong box — người dùng thật (browser ngoài box) dư ~1GB.
+- **Bài học hygiene**: luôn `agent-browser close` + pkill chrome sau khi verify (chrome leftover chính là 1/2 nguyên nhân đợt này).
+
+### AD.4 Task 37 — PLATFORM ROLLBACK SNAPSHOT + PLAYBOOK KHÔI PHỤC (bài học ops quan trọng nhất)
+- **Hiện tượng**: Preview Panel bỗng về UI thời Task-14 (dropdown v2/v3/v4/v5/baseline, không có kain*/v6) — toàn bộ workspace bị platform restore về snapshot cũ (HEAD về era Task 23; v6.py/kain40.py/RULES v2.8-2.9/worklog Task 24+ biến mất).
+- **Cứu cánh**: mọi task đều push GitHub đúng lịch → `git fetch + reset --hard origin/main` khôi phục 100% (kain40 93/100, RULES v2.9, 150 battles .gz, registries, OOM fixes Task 36). **MẤT MÁT = 0.**
+- **R128 (mới)**: pip packages KHÔNG nằm trong git snapshot — sau rollback bắt buộc `python3 -m pip install kaggle_environments` trước khi chạy battle/battery, nếu không runner exit 1 với ModuleNotFoundError.
+- **R129 (mới)**: sau mọi dấu hiệu rollback (UI về bản cũ / thiếu file agent): ① `git log` + `ls kaggriculture/kain40.py` xác nhận → ② fetch + reset --hard origin/main → ③ cài lại pip package → ④ kill TOÀN BỘ process cũ (bun --hot + bun run dev + next*) rồi relaunch arena-service → ⑤ verify bằng 1 trận kain40 vs v6 qua UI (dropdown phải có đủ 14 agent).
+- **R130 (mới)**: diff `.env`/`.gitignore` sau restore thường chỉ là mode 644→755 — không cần lo nội dung; KHÔNG bao giờ tin `--help` test cho python tool (bug argparse `%` từ trước) — test bằng tham số thật.

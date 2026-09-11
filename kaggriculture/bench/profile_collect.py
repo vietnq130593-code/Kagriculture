@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 """Phase 5.5 — HỌC PROFILE L1 OFFLINE từ thư viện bot (PLAN §4.1 gốc).
 
-Chạy v5 đấu từng bot (v4 / v3 / melon / baseline) trên N seed, đọc thẳng
+Chạy v5 đấu từng bot (v4 / melon) trên N seed, đọc thẳng
 tm["opp_daily"] từ module v5 sau khi trận kết thúc (telemetry $0-residual đã
 kiểm chứng) → bảng flow trung bình từng mặt hàng theo archetype đối thủ.
+(v3/baseline đã bị xóa khỏi kho 2025-09-10 — profile lịch sử của chúng
+vẫn còn trong profiles_learned.json)
 
 Dùng để: (1) đối chiếu PROFILES viết tay trong _bayes_step, (2) cập nhật
 profile đúng số liệu nếu lệch — L1 bớt đọc nhầm (bài học r1-r4: flow-mix của
@@ -26,9 +28,7 @@ from kaggle_environments import make  # noqa: E402
 
 BOTS = {
     "v4": (os.path.join(ROOT, "v4.py"), "agent", "CONTEST"),
-    "v3": (os.path.join(ROOT, "v3.py"), "agent", "CONTEST-v3"),
     "melon": (os.path.join(BENCH, "melon.py"), "melon_maxxer", "DUMP-melon"),
-    "baseline": (os.path.join(BENCH, "baseline.py"), "agent", "PASSIVE-base"),
 }
 
 

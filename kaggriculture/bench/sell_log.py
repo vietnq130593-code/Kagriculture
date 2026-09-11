@@ -1,4 +1,4 @@
-# Probe: log every committed SELL unit with price for a given seed/agents.
+# Probe: log every committed market unit (SELL/BUY) with price for a seed.
 # Usage: python3 bench/sell_log.py <a_path> <b_path> <seed> [item_filter]
 import sys, os, glob
 ROOT = glob.glob('/home/z/my-project/kag*')[0]
@@ -59,7 +59,7 @@ for side, item, price in LOG:
         a_[1] -= price
 for (side, item), (n, tot) in sorted(agg.items()):
     sign = "+" if tot >= 0 else "-"
-    print(f"side{side} {item:16s} n={n:4d} net={sign}${abs(tot):11,.0f} avg=${abs(tot)/max(1,n):7.1f}")
+    print(f"side{side} {item:22s} n={n:4d} net={sign}${abs(tot):11,.0f} avg=${abs(tot)/max(1,n):7.1f}")
 for side in (0, 1):
     net = sum(t for (s, i), (n, t) in agg.items() if s == side)
     print(f"side{side} LEDGER NET: ${net:+,.0f}")
