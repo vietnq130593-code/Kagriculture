@@ -5,3 +5,6 @@ db/*.db
 __pycache__/
 .env
 upload/
+kaggriculture/battles/
+kaggriculture/tool-results/
+*.jsonl

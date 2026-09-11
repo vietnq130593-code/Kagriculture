@@ -350,11 +350,20 @@ async function checkOnce() {
     gSup.restarts = 0
     return
   } catch (e: any) {
-    if (String(e?.name) === 'TimeoutError' && gSup.child && Date.now() - gSup.lastStart > 240_000) {
+    // 2026-09-11 fix: during the first 240s after spawn the Next.js dev
+    // server ACCEPTS then CLOSES sockets while compiling the first page —
+    // bun's fetch raises "socket connection was closed unexpectedly" (NOT
+    // a TimeoutError), which the old code treated as DOWN → kill → respawn
+    // → EADDRINUSE → exit-0 loop that never recovered. Tolerate ANY
+    // connection error inside the 240s startup grace window; only a
+    // >240s failure (or timeout beyond grace) triggers a restart.
+    const grace = gSup.child && Date.now() - gSup.lastStart <= 240_000
+    if (grace) {
+      return // still compiling/starting — wait
+    }
+    if (String(e?.name) === 'TimeoutError') {
       console.log('[supervisor] dev server stuck >240s — SIGKILL + restart')
       killDevTree()
-    } else if (String(e?.name) === 'TimeoutError') {
-      return // still compiling — wait
     }
     gSup.busy = true
     gSup.restarts += 1
