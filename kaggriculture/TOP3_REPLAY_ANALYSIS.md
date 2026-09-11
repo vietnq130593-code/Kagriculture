@@ -396,3 +396,95 @@ kain41 = kain40 + 6 biến thể differential trên 10 seed khó: bản đầy �
 - **R155 [E] — STICKY-VALIDATION LÀ ĐIỂM NỔ:** mọi nhánh trong _task_still_valid phải test với task thật tồn tại qua giờ — NameError tại đây biến cả đội thành đứng im mà không có exception nào lộ ra ngoài (bắt bằng trace "hands=[]").
 
 **Bàn giao v9:** WATER 580 (top-3 982-1.387) | HARVEST 196 (410-615) | weeds 11.5 | FERTILIZE 16-21 (91-186) | herd theo shop-draw còn thua v6 ở seed wool/milk-deep (s129: v6 62u wool) — các trụ còn lại của Phần 9.5.
+
+### 11.9 VÒNG 43 — ĐỐI CHIẾU PHONG CÁCH CHƠI v8 vs TOP-3 (user yêu cầu: động vật/vị trí/nhân công/đất trống)
+
+**Phương pháp:** extract thống nhất 2 format (Kaggle replay + arena JSONL, quy ước god-replay) → 16 player-traces: top-3 ×4 (SpaTaro×2, UMG, Otter) + v8 ×6 + v7 ×6 (v8 vs v7, 3 seed × 2 ghế; tool: `tool-results/v8_style/`). Đo đạc theo TỪNG GIỜ với vị trí đầy đủ (10×10 grid) — lần đầu có hình học ô nuôi + khoảng cách đi bộ thật.
+
+#### 43.1 Phân bổ mua & khai thác động vật — v8 trễ 11 NGÀY và sổng đàn cuối mùa
+
+| Hệ số | TOP-3 (4 trận) | v8 (6 trận) | v7 (6 trận) |
+|---|---|---|---|
+| Mua con đầu tiên | **d0** (SpaTaro $1.800; UMG $2.400 còn $29; Otter $1.700) | **d11** (sau melon-payday) | d11 |
+| Đàn d15 / d20 | 7-15 / 7-22 | 16-17 / 20-21 | 18-19 / 18-19 |
+| Sổng con (structure rỗng) cả mùa | 0 (chỉ d29 thanh lý) | **7-8 con d26-28** | tương tự |
+| FEED/đàn mỗi ngày | **1.00** (tới d28) | 0.94-1.00 → tụt **0.47-0.67** d24-28 | 0.8-1.0 |
+| Animal-days cả mùa (ước) | 500-630 | **260-280** | ~250 |
+
+- **Cơ chế**: engine `_daily_refresh_animals`: `consecutive_unfed >= 2` → **con vật bỏ trốn, structure ở lại thành ô chết**. Top-3 cho ăn đủ 100% đàn mỗi ngày đến tận d28 (care-bonus max). v8 dừng feed d24+ khi dồn lực thanh lý → 7-8 con trốn = mất $2.5-3.5k vốn + ô structure chết + đứt dòng trứng/sữa.
+- **Chi phí cơ hội của 11 ngày trễ** (nhân quả): bò mua d0 → sữa đầu d8 (first_yield=8); bò mua d11 → sữa đầu d19. Mỗi bò mất ~5 lượt sữa ($169/lượt ×6 bò ≈ $5k) + ngỗng 6 con × 7 ngày trứng ($2.1k) + cừu → **tổng bỏ lại $8-12k** — đúng cỡ khoảng cách $51-62k vs $93-109k (có pha pie).
+- Gốc rễ trong code v8: cổng `day<5 cow/sheep=0`, `day<=10: cow≤1+money//900` — thiết kế cho tư duy "bootstrap nghèo vốn", trong khi **startingMoney=3000** (engine default, arena dùng y hệt) thừa sức mua đàn d0 VÀ vẫn chạy melon. v8 tự đặt mình vào thung lũng vốn nhân tạo d5-9 ($57-959).
+
+#### 43.2 Vị trí ô nuôi động vật — top-3 ôm shed, v8 đẩy đàn ra SW
+
+| Hệ số (d20) | SpaTaro×2 | UMG | Otter | v8 | v7 |
+|---|---|---|---|---|---|
+| Số con | 7-11 | 14 | 22 | 20-21 | 18-19 |
+| d̄shed (Manhattan từ (4,4)) | **1.9-2.2** | 2.1 | 3.0-3.7 | **3.3-4.3** | 3.3-4.1 |
+| bbox đàn | 5-8 | 8-9 | 12-17 | 13-17 | 14-18 |
+| Phân bố quadrant | NW 6-9 | NW 8-9 | NW 9, NE 8, SW 5 | **SW 13-14**, NW 4-6 | NE 6-10, SW 6-9 |
+
+- Top-3 **BUILD coop/pasture TRƯỚC khi trồng** (d0-1 grab 5-7 ô đẹp sát shed), cây trồng bao quanh. v8 lấp full 25 ô NW bằng cây d0 (melon/carrot/wheat) → structure d11 chỉ nhận ô rìa SW (sort từ tâm (5,5) nhưng NW đã kín).
+- Vị trí cây trồng thì NGANG nhau giữa các nhóm (d̄shed 4.2-5.8, dâu top-3 thậm chí xa hơn v8: 5.44 vs 4.68) → **chênh lệch hình học nằm ở đàn, không ở cây**.
+
+#### 43.3 Tác động vị trí → nhân công — v8 cháy 59% lệnh vào di chuyển
+
+| Hệ số | TOP-3 | v8 | v7 |
+|---|---|---|---|
+| Hired units/ngày (d8-26) | 9-13 (TB 11.75) | **12-13** | 12-13 |
+| Lệnh/ngày | 230-247 | 248 | 242-245 |
+| MOVE% | **40-43%** | **59%** | 62-64% |
+| Đi bộ ô/ngày | **91-98** | **132-133** | 139-140 |
+| → Lệnh hữu ích/ngày | **133-145** | **~101** | ~88-92 |
+| FEED/CARE/CFERT d̄shed | 1.8-2.1 (S/UMG), 3.3-3.4 (Otter) | 3.3-3.6 | 3.3-3.7 |
+| WATER (mùa × d̄) | 982-1.388 × 4.9-5.0 | 554-580 × 4.2-4.3 | 560-602 × 3.9-4.1 |
+| HARVEST (mùa) | 410-615 | 194-209 | 168-227 |
+
+- v8 thuê NHIỀU hands hơn (12-13 vs 9-12) nhưng mỗi lệnh làm việc phải trả ~1.45 lệnh MOVE (top-3: ~0.7). Hai nguồn: (a) đàn ở SW → chuyến service gấp đôi độ dài; (b) **bàn cờ phân mảnh** — 20-30 ô chết rải rác khiến các cụm việc không liền kề, unit phải băng qua đất chết; top-3 đầy 75/75 nên các dải việc liền lạc, bước 1 ô là tới việc mới.
+- Đây là vòng lặp tự củng cố: đất trống → đi bộ nhiều → ít lệnh fill/plant → đất lại trống (R151 phiên vị trí).
+
+#### 43.4 Tỷ lệ đất trống toàn trận + cửa sổ trống lớn nhất
+
+**% ô đang sản xuất / ô đã mở** (cây đứng + con sống; "chết" = empty+weed+structure rỗng):
+
+| Giai đoạn | TOP-3 | v8 | v7 |
+|---|---|---|---|
+| Mở đầu d1-7 | 81.5% | **86.5%** (v8 lấp NW tốt hơn!) | 84.9% |
+| Giữa d8-20 | **97.5%** (chết 1.9 ô) | 68.6% (chết 22.3) | 53.0% |
+| Cuối d21-28 | **86.7%** (chết 10.0) | **48.4%** (chết 38.7 — trong đó weed 32.3!) | 48.2% |
+
+**Chuỗi ô chết theo ngày (TB nhóm, empty+weed+null):**
+- TOP-3: `d7-d26: 0-6 ô` (20 ngày liên tiếp gần tuyệt đối) → chỉ d27-29 thanh lý (19→35→57)
+- v8: d10 hố **48 ô** (mua SW khi chưa có vốn lấp) → d14 hố 29 (máy wheat chết) → mạn tính **20-38 ô suốt d15-27** → d28-29 (61-64)
+- v7: mạn tính 30-40 ô từ d11.
+
+**Diễn giải "thời gian trống nhiều nhất":**
+- Cả hai đều trống nhất ở d27-29 — nhưng top-3 là thanh lý CÓ CHỦ ĐÍCH (không gì chín kịp nữa; d29 sell-till-$1); v8 cũng vậy ở d29 nhưng bị phạt thêm weed.
+- Khoảng cách THẬT nằm ở 2 cấu trúc lỗi riêng của v8: (1) **hố d10 = 48 ô** — mua SW land đúng ngày melon-payday nhưng đàn/hạt/fert chỉ về d11-15 (top-3 sau khi mua NE chỉ hố 25-39 và vá xong trong 4-5 ngày); (2) **mãn tính 20-38 ô chết d15-27** — phần lớn là weed 17-32 ô (cây chết vì không tưới + không nhổ + không replant; top-3 giữ weed 0.1-3.1).
+
+#### 43.5 Loại cây lấp đất + kênh doanh thu
+
+| Kênh bán (units/mùa) | TOP-3 | v8 | Ghi chú |
+|---|---|---|---|
+| WHEAT | 657 | 765 | v8 bán nhiều — nhưng mua thêm **814** (top-3 mua 318, phần lớn rác SpaTaro) |
+| STRAWBERRY | **316** | 60 | dâu đứng top-3 25-34 (replant 4-8/ngày) vs v8 18-26 không duy trì |
+| FERTILIZER | 247 | 212 | gần |
+| MILK | **181** | 79 | hậu quả của 11 ngày trễ + sổng đàn |
+| CARROT | 166 | 42 | top-3 gieo carrot d24-27 làm kênh đứng cuối |
+| EGG | 138 | 174 | v8 tốt hơn (ngỗng nhiều) |
+| MELO | 107 | 86 | tương đương |
+
+- Máy wheat của v8 **chết từ d14** (đứng 0-9 ô vs top-3 13-32 cả mùa) → v8 phải MUA wheat trên thị trường để feed đàn = rò rỉ vốn vào thứ top-3 sản xuất miễn phí trên đất của họ.
+
+#### 43.6 Quy tắc mới vòng 43
+
+- **R156 [E] — VỐN $3.000 LÀ CHO MUA ĐÀN D0:** cổng `day<5 = 0` và cap money-based của v8 là tư duy kinh tế $500-era; bò d0 cho sữa đầu d8. Trễ tới d11 = bỏ lại $8-12k (nhân quả). Dòng tiền top-3 về 0 sớm lành mạnh — con vật tự trả lãi.
+- **R157 [E] — ĐÀN LÀ BẤT ĐỘNG SẢN TRUNG TÂM:** structure phải giành 5-7 ô sát shed TRƯỚC khi trồng (service d̄ 1.9-2.2 vs 3.3-4.3 = ~2× chiều dài mỗi chuyến CARE/FEED/CFERT). Đàn SW + cây trung tâm là cấu trúc ngược.
+- **R158 [E] — FEED ĐẾN NGÀY CUỐI:** `consecutive_unfed>=2` = con trốn, structure thành ô chết + mất vốn. Top-3 feed/đàn = 1.00 tới d28; v8 tụt 0.47 d24-28 → 7-8 con trốn. Thanh lý d29 KHÔNG có dump cuối ngày — mọi thứ trên tay h22 mất trắng, nhưng con vật vẫn nhả tới d29 nếu còn sống.
+- **R159 [E] — WHEAT ĐỨNG LÀ NHÀ MÁY THỨC ĂN:** 13-32 ô wheat đứng cả mùa = feed tự cấp + 657u bán; phụ thuộc BUY_PRODUCT wheat (814u của v8) là thuê ngoài chức năng cốt lõi của đất.
+- **R160 [E] — NGÂN SÁCH ĐẤT CHẾT ≤6 Ô GIỮA MÙA:** hố duy nhất chấp nhận được = sau BUY_LAND, ≤12 ô, vá trong ≤5 ngày (chuẩn UMG d3-6: 25→39→23→9). Hố d10=48 của v8 + mạn tính 20-38 ô là 2× vi phạm. Weed là "đất trống ngụy trang" — phải đo empty+weed+structure-rỗng, không chỉ empty.
+- **R161 [E] — CỬA SỔ TRỐNG ĐỊNH MỆNH CÓ 2 CÁI:** d27-29 (thanh lý — ai cũng trống, vô hại) và SAU-BUY_LAND (phải vá nhanh). Mọi ô trống KHÔNG thuộc 2 cửa sổ đó = lỗi sử dụng đất. v8 vi phạm ở d8-27 mạn tính.
+
+#### 43.7 Phán quyết vòng 44
+
+NGUYÊN NHÂN-GỐC còn sống sót sau v8 (xếp theo tiền để bàn): (1) **trễ đàn d11** (R156) — $8-12k; (2) **đàn ra SW thay vì ôm shed** (R157) — ~30-45 lệnh hữu ích/ngày; (3) **weed 17-32 + không replant dâu/wheat liên tục** (R160) — 20-38 ô chết mạn tính; (4) sổng đàn d24-28 (R158) — $2.5-3.5k; (5) dựa wheat thị trường (R159). Đây là 5 trụ cho v9 — không cần vòng phân tích thụ động mới (nguồn đã đo exact từng giờ); vòng counterfactual chỉ cần khi kiểm chứng "mua đàn d0 + lấp NW đồng thời có hỏng melon window không".

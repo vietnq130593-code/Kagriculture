@@ -1051,3 +1051,24 @@ Stage Summary:
 - 4 quy tắc mới: R152 (nước dâu chỉ có giá trị qua fert), R153 (phân công lai tier/geo), R154 (tưới cứu hạt tier thấp), R155 (sticky-validation là điểm nổ thầm lặng)
 - Bom NameError tồn tại NGẦM trong v7 từ Task 40 (may hiếm nổ) — đã fix cho cả hai
 - Bàn giao v9: WATER/HARVEST/weeds/FERTILIZE còn dưới chuẩn top-3 + herd shop-draw (s129)
+
+---
+Task ID: 43
+Agent: KAIN (main-agent)
+Task: User yêu cầu đối chiếu phong cách chơi v8 vs top-3 — phân bổ mua/khai thác động vật, vị trí ô nuôi, tác động đến nhân công, tỷ lệ đất trống toàn trận, thời gian đất trống nhiều nhất
+
+Work Log:
+- Chạy 6 trận v8 vs v7 (seed 100/115/130 × 2 ghế) lưu JSONL đầy đủ vị trí từng giờ — 6/6 v8 thắng ($51-63k vs $34-44k)
+- Viết bộ tool hợp nhất 2 format (Kaggle replay + arena JSONL): analyze_style.py (16 player-traces: top-3 ×4 + v8 ×6 + v7 ×6), phase2_herd.py (timeline đàn + feed + escape), phase3_landuse.py (kế toán tile-days theo 3 giai đoạn), phase4_economy.py (kênh bán + wheat + cửa sổ đất chết)
+- Phát hiện cấu hình: cả replay top-3 LẪN arena đều dùng startingMoney=3000 (engine default) — đối chiếu công bằng, v8 có đủ vốn mua đàn d0 nhưng cổng logic day<5=0 + money-cap tự đặt mình vào thung lũng vốn nhân tạo
+- Đo hình học lần đầu: top-3 đặt coop/pasture ôm shed (d̄shed 1.9-2.2, bbox 5-8, BUILD trước khi trồng); v8 đẩy đàn ra SW (13-14/20 ô, d̄shed 3.3-4.3) vì lấp full NW bằng cây trước
+- Định lượng nhân công: v8 248 lệnh/ngày nhưng MOVE 59% (đi bộ 132 ô/ngày) vs top-3 230-247 lệnh MOVE 40-43% (91-98 ô) → ~101 vs 133-145 lệnh hữu ích/ngày; v8 thuê nhiều hands hơn (12-13 vs 9-12) — vị trí đàn + bàn cờ phân mảnh là 2 nguồn chênh
+- Đất trống: giữa mùa top-3 97.5% ô sản xuất vs v8 68.6%; cuối mùa 86.7% vs 48.4% (weed v8 phình 32 ô); hố lớn nhất của v8 = d10 (48 ô chết sau khi mua SW land); top-3 giữ ≤6 ô chết suốt 20 ngày d7-d26
+- Đàn: top-3 mua d0 (UMG $2.400 còn $29) feed/đàn=1.00 tới d28, 0 con trốn; v8 mua d11 (sau melon-payday), animal-days chỉ ~50% top-3, 7-8 con bỏ trốn d26-28 vì feed tụt 0.47 (engine: consecutive_unfed>=2 → trốn, structure thành ô chết)
+- Kênh bán: v8 bỏ trống STRAWBERRY (60u vs 316) + MILK (79 vs 181) + CARROT (42 vs 166); máy wheat v8 chết từ d14 → mua 814 wheat thị trường để feed
+- Cập nhật TOP3_REPLAY_ANALYSIS.md mục 11.9 (6 bảng + quy tắc mới R156-R161 + phán quyết vòng 44)
+
+Stage Summary:
+- 5 nguyên nhân-gốc ranked cho v9: (1) trễ đàn d11 = $8-12k; (2) đàn SW thay vì ôm shed = 30-45 lệnh/ngày; (3) weed 17-32 + không replant = 20-38 ô chết mạn tính; (4) sổng đàn d24-28; (5) phụ thuộc wheat thị trường
+- Tools tái sử dụng: tool-results/v8_style/ (4 script + style_agg.json + 6 JSONL replay) — mọi câu hỏi vị trí/lao động giờ đo được exact từng giờ
+- Phán quyết vòng 44: KHÔNG cần phân tích thụ động mới — 5 trụ đã đủ định lượng; counterfactual chỉ để kiểm chứng "đàn d0 + melon window song song có vỡ không" trước khi build v9
