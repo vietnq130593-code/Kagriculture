@@ -1029,3 +1029,25 @@ Stage Summary:
 - v7 đã HIỆN DIỆN đầy đủ trong UI: chọn được, thi đấu được, thắng hiển thị đúng — user có thể test trực tiếp trên Preview Panel
 - Ghi nhớ vận hành: mọi thay đổi mảng AGENTS của arena-service bắt buộc restart process (bun --hot không đủ vì __arenaListening guard) — lệnh: cd kaggriculture && BG_LOG=/tmp/arena_service.log python3 bench/run_bg.py bun --hot ../mini-services/arena-service/index.ts
 - Kiểm thử UI arena trong sandbox này phải mở qua http://127.0.0.1:81/ (gateway Caddy) — port 3000 trực tiếp không có socket
+
+---
+Task ID: 42
+Agent: KAIN (main-agent)
+Task: User báo v7 để trống quá nhiều đất so top-3 — nghiên cứu lại tài liệu, tìm nguyên nhân gốc, nâng cấp v7
+
+Work Log:
+- Đọc lại TOP3_REPLAY_ANALYSIS.md V3.0 + RESEARCH_V7.md mục 12 (R151 cổ chai lao động) + engine source (CROPS/ANIMALS/daily refresh/decay/market)
+- Viết bench/v8_autopsy.py — đo v7 trên chuẩn top-3: empty d9-27 = 25-37 ô (top-3: 0-5), máy wheat chết d15 (1-6 ô vs 17-29), MOVE 4.962 (top-3 2.7-3.1k), FERTILIZE 0 (91-186), PLANT 3,9/ngày (10-15), không kênh đứng cuối mùa
+- 7 nguyên nhân gốc định lượng: tưới dâu tier-0 hằng ngày (0 giá trị — nước chỉ có giá trị QUA fert ngày event), HARVEST/PLANT tier 5 đói, sort lexicographic zigzag, FERTILIZE tier 7, quota wheat không standing-target, service 22.7/45, không danh mục cuối
+- Xây v8.py qua 6 biến thể differential: v8a (geo toàn phần — lấp tốt nhưng MILK −$8k), v8b (sụp 33.9k), v8c (phát hiện BOM NGẦM TỪ v7: _task_still_valid nhánh FERTILIZE tham chiếu `day` ngoài scope → NameError → agent() trả hands=[] = CẢ ĐỘI ĐỨNG IM HẾT NGÀY), v8d (tier-first toàn phần sụp), v8e (LAI 2 pha: 20/20 thắng v7 nhưng 65/100 vs v6), v8f (seedling-survival tier 4 — lật s115 28.9k→62.4k, s130 32.0k→61.6k, s105 45.7k→64.5k)
+- Battery 100 game v8f vs v6: 94/100, ratio 1.284x, avg $58.081 (v7: 96/100, 1.278x, $57.972 — ngang thống kê)
+- Differential mở rộng v8f vs v7: 57/60 game (30 seed, 2 ghế), ratio 1.434x/1.285x theo lô — ÁP ĐẢO ĐẦU TRỰC
+- Cấu trúc đạt: empty 6.6 ô, wheat đứng 9-20 cả mùa, PLANT 165, FERTILIZE 16-21, wave-2 dâu + carrot d24-26 + tomato + fert machine chạy thật, service ngang v7
+- Đăng ký v8 vào UI 3 lớp (run_battle.py + arena-service + constants.ts), restart service sạch, verify browser: default v8 vs v7, trận seed 115 → "🏆 v8 THẮNG $62.688 vs $34.558 (1.81×)"
+- Cập nhật TOP3_REPLAY_ANALYSIS.md 11.8 (R152-R155 + bảng 6 biến thể) + header v8.py; lint sạch; screenshot tool-results/ui_v8_victory.png
+
+Stage Summary:
+- v8 "REGION-FLOW" SHIP: kernel lai giải R151 — 57/60 thắng v7 đầu trực tiếp, 94/100 vs v6, empty 6.6 ô (từ 25.3), máy wheat sống cả mùa
+- 4 quy tắc mới: R152 (nước dâu chỉ có giá trị qua fert), R153 (phân công lai tier/geo), R154 (tưới cứu hạt tier thấp), R155 (sticky-validation là điểm nổ thầm lặng)
+- Bom NameError tồn tại NGẦM trong v7 từ Task 40 (may hiếm nổ) — đã fix cho cả hai
+- Bàn giao v9: WATER/HARVEST/weeds/FERTILIZE còn dưới chuẩn top-3 + herd shop-draw (s129)

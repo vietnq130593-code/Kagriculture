@@ -360,3 +360,39 @@ Cùng cơ chế này đã giết CF1 bản đầu (−$87k: mua 6 ngỗng $1,800
 ### 11.7 PHỤ LỤC TRIỂN KHAI (Task 40, khép vòng lặp phân tích → build → kiểm chứng)
 
 kain41 = kain40 + 6 biến thể differential trên 10 seed khó: bản đầy đủ (Trụ 1+2) = **67/100 (1.097x) — thua kain40 (93/100, 1.271x)**. Autopsy: mọi tác vụ thêm (bón event, thu fert riêng, trồng dâu liên tục, thêm hands) đều TRỪ lao động khỏi thu hoạch vì kernel chỉ chạy 52-67 lệnh hữu ích/ngày (top-3: 90-105) → **R151: cổ chai lao động** (chi tiết bảng biến thể: RESEARCH_V7.md mục 12). kain41-final = kain40 + ΔA collect-first (biến thể duy nhất trung tính-dương). Bài học kiến trúc cho v8: cần kernel hiệu suất-lao động MỚI trước khi nạp playbook top-3.
+
+### 11.8 VÒNG 42 — KERNEL v8 "REGION-FLOW": GIẢI R151 BẰNG LAI TIER/GEO (user báo v7 để trống 30-37% đất)
+
+**Vấn đề user xác nhận bằng mắt** (v7 đấu v6/kain40 trên UI): đất trống rất cao so với 2 trận mẫu top-3. Đo lại bằng autopsy 3 seed (bench/v8_autopsy.py):
+
+| Chỉ số | v7 | top-3 (chuẩn exact) |
+|---|---|---|
+| Empty d9-27 | **25-37 ô** (max 72%) | 0-5 ô |
+| Máy wheat từ d15 | **chết (1-6 ô)** | 17-29 ô đứng cả mùa |
+| MOVE | 4.962/mùa | 2.700-3.100 |
+| FERTILIZE | 0 | 91-186 |
+| PLANT | 3,9/ngày | 10-15 |
+| Kênh đứng cuối mùa | không có | carrot d24-27 + tomato |
+
+**7 nguyên nhân gốc (định lượng được):** (1) T_WATER_CRIT tier-0 hằng ngày cho dâu — trong khi nước chỉ có giá trị NGÀY EVENT và CHỈ khi kết hợp FERT (engine: `+2 if (was_watered AND fert_active) else +1` — tưới không bón = 0 cộng thêm); (2) T_HARVEST=5 và T_PLANT=5 chết đói dưới 30-50 task tier 0-4; (3) sort (tier, dist) thuần lexicographic → zigzag (farmer v7 đi 6 tiếng chỉ để FEED 1 con); (4) FERTILIZE=7 + thu fert 43%; (5) quota wheat flat 20-24/ngày không có standing-target; (6) service đàn 22.7 ops/ngày (cần ~45); (7) không danh mục đứng cuối mùa.
+
+**Quá trình 6 biến thể (a/b/c/d/e/f)** — mỗi lần sai là một bài học engine/scheduler:
+
+| Biến thể | Thiết kế | Kết quả | Bài học |
+|---|---|---|---|
+| v8a | geo-assign toàn phần + 7 delta | 56.9/51.1/56.6 (3 seed) | lấp đất tốt nhưng money-ops pha loãng (MILK −$8k) |
+| v8b | + cap-6 + service-all tier-1 + aging | **33.8k/34.9k — THUA v6** | 19 task tier-1 nuốt phase-1 |
+| v8c | + fix NameError | 51.5/57.6/50.8 | **BOM NGẦM TỪ v7**: `_task_still_valid` nhánh FERTILIZE tham chiếu `day` ngoài scope → NameError → `agent()` trả `hands=[]` — CẢ ĐỘI ĐỨNG IM HẾT NGÀY mỗi khi task fert dính sticky qua giờ (v7 hiếm nổ vì fert melon hiếm) |
+| v8d | tier-first toàn phần + task-set mới | 38.6-47.2k, v6 lên 62-67k | PLANT tier-2 cướp service/tưới — phi truyền tiếp |
+| v8e | LAI: pha-1 tier-first (tier≤2 money-ops) + pha-2 geo+aging (fill) | **20/20 thắng v7, 1.380×** | đúng cấu trúc — nhưng thua v6 65/100 |
+| v8f | + seedling-survival tier 4 | **94/100 vs v6 1.284×; 57/60 vs v7 1.434×** | tưới hạt age 0-1 = 0 yield nhưng tier-2 → tràn phase-1 → bỏ đói tưới WINDOW → wheat không chín (s115: d8 harvest 1/12) → thung lũng vốn sâu → domino thua |
+
+**Cấu trúc v8 sau đích (3 seed TB):** empty 6.6 ô | wheat đứng 9-20 cả mùa | PLANT 165 (v7: 116) | FERTILIZE 16-21 (v7: 0) | FEED/CARE/COLLECT 247/234/233 (v7: 240/218/223) | MOVE 4.362 (v7: 4.962) | đàn CO×7 GO×7 SH×2-4 đứng tới d27.
+
+**Quy tắc mới:**
+- **R152 [E] — NƯỚC DÂU CHỈ CÓ GIÁ TRỊ QUA FERT:** ongoing crop event +1u vô điều kiện; +2u chỉ khi (tưới hôm đó AND fert còn hiệu lực). Tưới dâu ngày thường (v7 làm hằng ngày 18-23 ô tier-0) = thuần lãng phí. Tưới event không kèm bón = cũng chỉ +1. Cặp nước+fert ngày event là đơn vị năng suất thật.
+- **R153 [E] — PHÂN CÔNG LAI (tier-first money-ops + geo fill-ops):** geo toàn phần pha loãng SERVICE/HARVEST (MILK −$8k); tier-first toàn phần làm PLANT cướp service. Money-ops cần bảo đảm phủ, fill-ops cần hiệu quả gần — 2 pha tách bạch.
+- **R154 [E] — TƯỚI CỨU HẠT NON PHẢI TIER THẤP:** tưới age 0-1 (ngoài window) = 0 yield nhưng buộc phase-1 khi tier 2 → nuốt units đúng buổi tưới window → wheat trễ 2 ngày → domino thung lũng vốn (s115 chứng minh nhân-quả: 28.9k → 62.4k chỉ từ 1 dòng tier).
+- **R155 [E] — STICKY-VALIDATION LÀ ĐIỂM NỔ:** mọi nhánh trong _task_still_valid phải test với task thật tồn tại qua giờ — NameError tại đây biến cả đội thành đứng im mà không có exception nào lộ ra ngoài (bắt bằng trace "hands=[]").
+
+**Bàn giao v9:** WATER 580 (top-3 982-1.387) | HARVEST 196 (410-615) | weeds 11.5 | FERTILIZE 16-21 (91-186) | herd theo shop-draw còn thua v6 ở seed wool/milk-deep (s129: v6 62u wool) — các trụ còn lại của Phần 9.5.
