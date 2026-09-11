@@ -1170,3 +1170,25 @@ Stage Summary:
 - Quy tắc mới R183 (pha-1 bão hòa — không nâng tier tưới được), R184 (carrot kênh chết với kernel hiện tại), R185 (salvage > chết trắng), R186 (shop-luck path-dependent → battery ≥10 seed)
 - Gap còn lại đến 90-110k: P2/P3 khối lượng (dâu 67,6u vs 254u, melon 19,7u vs 82u) = kernel MOVE 62% + 21-23 ô chết (R151/R164) — chờ vòng kernel nếu user yêu cầu; v9/kain41 vẫn搁置
 - Tools mới: phase7.py (tăng trưởng theo pha) + bat48d/bat48base (battery chuẩn 10 seed đối chứng)
+
+---
+Task ID: 49
+Agent: KAIN (main-agent)
+Task: User báo "Preview panel đang hiển thị phiên bản cũ — có cách nào khôi phục lại không?" — chẩn đoán + khôi phục toàn bộ công việc Task 26-48 sau sandbox rollback
+
+Work Log:
+- Chẩn đoán: sandbox reboot lúc 11.09 18:44 (boot-timeline.log) → /home/z/my-project bị revert về snapshot ~Task 25 (11.09 18:44); mọi file Task 26-48 biến mất (v6/v7/v8, kain16-41, TOP3_REPLAY_ANALYSIS.md, đăng ký UI/arena-service); git HEAD cũ 9c854d2 (11.09 16:07); preview panel hiển thị app cũ vì CHÍNH FILE là cũ, không phải cache
+- Tìm thấy kho cứu hộ: /tmp/my-project = mirror sống của project (cập nhật đến 11.11 18:21, chứa đủ 1.773 file theo manifest .initial_snapshot.json; 0 file mất thật) — đủ v8.py (11.11 18:02), TOP3_REPLAY_ANALYSIS.md 90KB (11.11 18:01), worklog Task 26-48
+- Khôi phục 90 file theo manifest (bỏ qua battles/ 1,7GB + tool-results/ 842MB — vẫn an toàn trong /tmp mirror): v6/v7/v8/v6_twin_trap/cell4_v6, kain16-41, RESEARCH_V7.md, RULES.md v2.8+ (101KB), TOP3_REPLAY_ANALYSIS.md, bench tools+JSON (run_bg.py, phase7.py, autopsy_k41.py...), arena/run_battle.py (AGENTS v8/v7/v6/kain16-40), UI constants/ControlPanel/EmptyState (16 thẻ agent), arena-service index.ts (supervisor v2 + RSS watchdog), next.config.ts (webpackMemoryOptimizations), package.json, worklog.md — verify diff -rq = IDENTICAL với mirror
+- Git commit be4c93b "Restore Tasks 26-48..." — bảo hiểm chống rollback tiếp theo (.gitignore đã có upload/ nên PAT + replay JSON không bị commit)
+- Lỗi thứ 2 phát hiện khi test UI: trận đấu tạo file 0 byte, runner chết âm thầm → nguyên nhân: rollback cũng xóa pip package kaggle_environments → cài lại đúng version theo tiền lệ R476: pip3 install kaggle_environments==1.32.7
+- Khởi động lại dịch vụ: kill đúng 6 PID cũ (không kill PGID 908 chung để bảo vệ Caddy) → arena-service daemon qua bench/run_bg.py (bun --hot, PPid 1) → supervisor tự spawn dev server mới (768MB cap)
+- Kiểm chứng ĐỒNG TỪNG ĐÔ-LA (thủ tục chuẩn R476): v8 vs v7 seed 103 qua arena runner = rewards [74341, 46950] winner 0 — KHỚP TUYỆT ĐỐI với 3 bản ghi trận arena trước rollback → engine 1.32.7 + v8.py/v7.py + run_battle.py = phục hồi bit-perfect
+- Agent-browser e2e qua gateway Caddy :81 (đúng như Preview Panel): 16 thẻ agent (v8 "nhà vô địch" → melon), "đã kết nối arena", seed 103 → 719/719 lượt stream, banner "🏆 v8 THẮNG! 1.58× · $74.341 vs $46.950", 0 console error, 0 dòng stderr runner, supervisor RSS 1.881GB ổn định; screenshot /tmp/ui_restored_final.png
+
+Stage Summary:
+- **APP ĐÃ KHÔI PHỤC HOÀN TOÀN về trạng thái Task 48**: v8 vòng 48 ($61,5k TB, 10/10 vs v7) làm nhà vô địch, kèm toàn bộ chuỗi phân tích (TOP3_REPLAY_ANALYSIS.md §11.13 trả lời 90-110k bằng 4 pha) — user chỉ cần refresh Preview Panel
+- Cơ chế 3 lớp cứu hộ: (1) /tmp/my-project mirror (sống qua reboot), (2) git commit be4c93b, (3) RULES.md R476 ghi sẵn quy trình pip install kaggle_environments==1.32.7
+- Bài học rollback: hiện tượng "preview cũ" có thể do FILE thật sự cũ (snapshot revert) chứ không phải cache browser — kiểm tra mtime + git log trước khi kết luận
+- Quy trình khôi phục nếu tái diễn: git checkout be4c93b (hoặc clone) → pip3 install kaggle_environments==1.32.7 → restart arena-service qua bench/run_bg.py → verify dollar-identical v8-vs-v7-s103 = [74341, 46950]
+- Battles/tool-results của session cũ còn lưu tại /tmp/my-project (1,7GB + 842MB) — copy thêm vào /home nếu user cần phân tích sâu
