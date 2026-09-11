@@ -1217,3 +1217,22 @@ Stage Summary:
 - Luật âm R193: giá slot bán sáng d11-h0 KHÔNG đáng đổi unit cuối ô fertilized + lao động rush
 - Push code còn nợ: cần PAT mới từ user (token cũ bị redact); mọi thứ đã commit local
 - Tools mới: bat50v6/bat50a/bat50b/bat50c/bat50d + ext 30 seed + god-replay trận mới — chuẩn đo tiếp
+
+---
+Task ID: 50b
+Agent: KAIN (main-agent)
+Task: Khôi phục preview panel sau khi dev-server chết trong lúc chạy battery + commit infra fixes
+
+Work Log:
+- Trong lúc chạy battery 50 game (5 engine Python song song), next-server bị kernel OOM-kill (RSS phình). Chuỗi sự kiện: OOM → supervisor restart loop có bug → UI chết hoàn toàn (gateway 502)
+- Chẩn đoán层层: (1) bug supervisor — fetch "socket closed unexpectedly" trong lúc Next compile lần đầu bị coi là DOWN → kill/respawn → EADDRINUSE loop không hồi phục; (2) root cause OOM — .gitignore KHÔNG có kaggressure/battles/ (1.1GB) + tool-results/ (2.4GB, tôi vừa copy batteries vào) → tailwind v4 oxide scanner quét toàn bộ 3.5GB JSONL vào RAM khi compile → vượt 4GB box; (3) cold compile sau khi .next/cache bị xóa cần đúng ~3.45GB > 3.46GB available
+- Đò thử: turbopack dev → panic ở globals.css PostCSS worker (loại); --max-old-space-size 500/768 → không tác dụng (memory nằm ngoài V8 heap — đúng bản chất oxide native); stub page → VẪN OOM 3.45GB (chứng minh thủ phạm = app shell/globals.css, không phải arena page); stub layout không css/font → 200 NGAY
+- Fix 3 lớp: (1) .gitignore += battles/ + tool-results/ + *.jsonl + git rm --cached (untrack 3.5GB khỏi index); (2) supervisor catch: grace 240s đầu mọi connection error = chờ (không phải DOWN); (3) next.config webpack dev: config.devtool = false (sourcemap dev là phần memory lớn nhất của webpack — flag CLI --disable-source-maps bị bỏ qua)
+- Kết quả: full page compile 11.7s, RSS ổn 1.5GB, 2.4GB RAM dư; cả chuỗi (arena-service :3005 + dev :3000 + gateway :81) sống lại
+- E2E agent-browser qua gateway :81: trang arena load, chọn v8 vs v7, seed 105 → server-side rewards [69396, 50105] winner v8; seed 106 → banner "🏆 v8 THẮNG! 1.36× · $58.966 vs $43.273 · 20.3s · 720 lượt", live turn counter (turn 89/719 bắt giữa chừng), 0 console error; screenshot /tmp/ui_v8_round50_victory.png
+- Commit c0f51f0 (infra) sau c9704a3 (round-50 v8); lint sạch
+
+Stage Summary:
+- PREVIEW PANEL KHÔI PHỤC HOÀN TOÀN + chống tái phát: JSONL dữ liệu đã bị loại khỏi scan tailwind (gitignore), supervisor khoan dung phase startup, devtool tắt
+- Bài học quan trọng: thêm dữ liệu lớn vào project (battles/tool-results) mà không gitignore = bom giờ OOM cho mọi cold compile (tailwind oxide quét theo gitignore, KHÔNG theo tsconfig include)
+- Chuỗi verified end-to-end: UI → gateway → dev server → socket.io → arena-service → python runner → engine → replay jsonl
