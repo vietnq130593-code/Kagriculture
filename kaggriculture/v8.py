@@ -1,5 +1,25 @@
 # v8 "REGION-FLOW" (Task 42) — kernel lao động lai theo mô hình top-3
 # (TOP3_REPLAY_ANALYSIS.md V3.0 + R151): v7 + 8 delta chọn lọc bằng differential.
+# VÒNG 50 (R188-R191 — fix tỷ số thua v6; god-ledger 4 trận thua đậm
+#   s118/s114/s108/s111, battery 20 seed 15/20):
+#   GAP#1 MELON WAVE-1 (−$8.5-16.4k/trận): v6 d0 mua 14 hạt melon + 0
+#     thú, thu $11.8-18.5k ngay d11; v8 chỉ 8 hạt (starter thú $1.600 ăn
+#     vốn) → $1.6-6.7k. R188: starter 2 bò+1 cừu+1 ngỗng → 1 cừu+1 ngỗng
+#     ($800, giữ sheep-AD d0 của R179), quota d0 wheat 14→12 + carrot
+#     8→4 + MELON 8→14 (đủ 32 ô; luật 45% không còn cắt mất 1 hạt).
+#     Bò vào lại d2+ qua trajectory R180 (v6 mở 0 thú vẫn đạt 13 con d15).
+#   R189 WHEAT HOLD SỚM d≤11: 1.50 → 0.90 — bán ngay vụ d4-6 để có vốn
+#     mua hạt dâu từ d5 (v6 trồng dâu d5, v8 d7 → mất 1 chu kỳ thu;
+#     cửa sổ an toàn: đàn v6 0-4 con chưa hút feed — R162 chỉbinding d12+).
+#   R190 WHEAT CUTOFF d26 → d21: hạt/task wheat d22+ chỉ còn 1 mứ chín,
+#     cướp đúng lao động tưới/thu dâu (s118: P10 wheat d24 → 22 ô dâu
+#     chết trắng $8-12k). Áp cho cả seed-buy refill + fill-law plan.
+#   R191 CỪU-6: trajectory 1+day//4 → 1+day//3 + cắt cap ngỗng→bò→cừu
+#     (cũ cừu trước) — v6 6 cừu WOOL $19.7-24.7k vs v8 4 con $5.6-18.3k.
+#   R192 MELON SURVIVAL: ô melon cu>=1 trong cửa sổ chín (age 6-12) mà
+#     trượt nước HÔM NAY = chết trắng — lên tier-0 budget riêng cap 4/h.
+#     Root-cause các trận $39-46k: 12 ô melon d0-9 chết sạch d9-10 (s132/
+#     146/123) → melon rev $4-6.4k vs v6 $20-23.6k (gap #1, −$14-18k).
 # VÒNG 48 (11.13 — lượt fix thứ 2, R178/R179/R180 + R184/R185):
 #   R178 d29 = NGÀY LÀM VIỆC ĐẦY: bỏ gate `day < 29` hire (0 hands d29 cũ =
 #     $2.288 vs $7.484 top-3); d29 drop từ h8 + MỞ lại bán wheat d29 (R175
@@ -713,7 +733,7 @@ def _daily_plan(tiles, shed, seeds, inv, prices, shops, day, opp_farm, money, tm
                 cow_target = max(cow_target, 6)
         except Exception:
             pass
-    sheep_target = max(2, min(6, int(wool_room // 30)))
+    sheep_target = max(3, min(6, int(wool_room // 30)))
     try:
         if mode != "MIRROR":
             milk_shops = sum(1 for s in (shops or [])
@@ -736,34 +756,45 @@ def _daily_plan(tiles, shed, seeds, inv, prices, shops, day, opp_farm, money, tm
         # đàn dồn burst d8-18. Top-3 drip 0.5-1 con/2 ngày d4-18 (AD d0-10 =
         # 77 vs 41 của v8): bò d0 = 22 ngày sản xuất, bò d14 = 8. Trajectory
         # cap theo NGÀY — budget vẫn do cash_floor (250+land_reserve) kìm.
+        # R191 (Vòng 50): cừu 1+day//4 → 1+day//3 — god-ledger 4 trận thua:
+        # v6 giữ 6 cừu (WOOL $19.7-24.7k) vs v8 đứng 4 (WOOL $5.6-18.3k);
+        # sheep-AD top-3 = 71. Trajectory d15 = 6 (trước: 4).
         cow_target = min(cow_target, 2 + day // 2)
-        sheep_target = min(sheep_target, 1 + day // 4)
+        sheep_target = min(sheep_target, 1 + day // 3)
     _herd_cap = 13 if day >= 3 else 15  # R168: đàn 13 = top-3 parity (đàn 19 + máy chết = mua 610u wheat $31k net -$8k; top-3: đàn 13 + máy 20 = net +$10k + lao động dư tưới)
     tot = cow_target + sheep_target + goose_target
     if tot > _herd_cap:
         # autopsy 146 + R168: floors 2/5/5 — cho phép cap 13 hạ THẬT (floor cũ
         # 4+6+7=17 chặn cap 14 → đàn thực 19)
+        # R191 (Vòng 50): đổi thứ tự cắt ngỗng→bò→cừu (cũ cừu→bò→ngỗng):
+        # WOOL $200/u là kênh động vật đắt nhất — v6 giữ 6 cừu thắng
+        # $6.4-6.8k WOOL ở 2 trận thua đậm; slot 13-14 phải về cừu trước.
         over = tot - _herd_cap
-        sheep_target = max(2, sheep_target - over)
+        goose_target = max(4, goose_target - over)
         tot = cow_target + sheep_target + goose_target
         if tot > _herd_cap:
-            cow_target = max(5, cow_target - (tot - _herd_cap))
+            cow_target = max(4, cow_target - (tot - _herd_cap))
             tot = cow_target + sheep_target + goose_target
             if tot > _herd_cap:
-                goose_target = max(5, goose_target - (tot - _herd_cap))
+                sheep_target = max(3, sheep_target - (tot - _herd_cap))
     # Trụ 1 (R156): ĐÀN TỪ D0 — top-3 mua $1.700-2.400 ngay d0 (SpaTaro
     # 2C+2S, UMG 5C+1S, Otter 2S+2G+1C). Starter $1.100 = 2 bò + 1 ngỗng
     # giữ ≥$1.6k cho hạt melon-wave + wheat/carrot (R147 domino: không
     # được hút vốn hạt). d1-4 ramp bằng dòng FERT (~$285/ngày từ 3 con).
     # Cấu trúc đích giữ nguyên room-based + shop-draw phía trên.
+    # R188 (Vòng 50): MELON-14 là kênh #1 gap vs v6 (god-ledger 4 trận thua:
+    # v6 d0 mua 14 hạt melon + 0 thú, bán $11.8-18.5k ngay d11; v8 8 hạt
+    # + $1.600 thú → chỉ $1.6-6.7k). Starter còn đúng 1 cừu + 1 ngỗng
+    # ($800) — giữ sheep-AD d0 (R179) nhưng trả $800 = 10 hạt melon;
+    # bò vào lại từ d2 qua trajectory R180 (v6: thú đầu d7 vẫn đạt 13 con
+    # d15 bằng tiền melon).
     if day == 0:
-        cow_target = min(cow_target, 2 if money >= 2300 else 1)
+        # R188b (Vòng 50b): 1 bò + 1 cừu + 1 ngỗng ($1.200, 3 ô) — giữ
+        # milk-AD (battery 50a: cắt sạch bò d0 mất MILK −$22k ở game
+        # 5-milk-shop s100) + sheep-AD d0 (R179); 3 ô trả cho 5 hạt melon.
+        cow_target = min(cow_target, 1 if money >= 1600 else 0)
         goose_target = min(goose_target, 1)
-        # R179 (Vòng 48): CỪU PHẢI CÓ TỪ D0 — top-3 budget thú d0 $1.8-2.5k
-        # (SpaTaro 2C+2S, UMG 5C+1S, Otter 2S+2G+1C); cừu d0 → 8 lượt thu +
-        # wool sớm vs cừu d9 → 6-7 lượt (AD 71 vs 29). 2C+1S+1G = $1.600,
-        # còn $1.400 ≥ $940 kế hoạch hạt d0 (wheat 14 + carrot 8 + melon 8).
-        sheep_target = min(sheep_target, 1 if money >= 1600 else 0)
+        sheep_target = min(sheep_target, 1 if money >= 800 else 0)
     elif day <= 2:
         cow_target = min(cow_target, 3)
         goose_target = min(goose_target, 3)
@@ -976,12 +1007,15 @@ def _daily_plan(tiles, shed, seeds, inv, prices, shops, day, opp_farm, money, tm
             # (floor 8 đã TẮT — không còn dòng quotas["CARROT"] = max(..., 8))
 
     if day <= 1:
-        # Trụ 1: d0-1 = wheat 14 (máy tự cấp cho đàn — KHÔNG mua thị trường
-        # nuôi đàn sớm, đẩy giá cho đối thủ máy-wheat như v6) + carrot 8 +
-        # melon 8 + ĐÀN $1.100 mua TRƯỚC hạt
-        quotas["WHEAT"] = 14
-        quotas["CARROT"] = 8
-        quotas["MELON"] = 8
+        # Trụ 1 + R188b: d0-1 = máy wheat 10 + carrot 2 (đúng opening v6:
+        # 10 wheat + 2 carrot + 14 melon) + MELON 14. Tiền: $1.200 thú +
+        # $1.120 melon + $100 wheat + $40 carrot = $2.460, buffer $540.
+        # 45%-fast-crop CUT đã TẮT ở d0-1 (R188b) — melon-14 giờ CHÍNH là
+        # kế hoạch vốn (d11 = $12-18k) và 3 thú cho dòng FERT $285/ngày,
+        # không cần 45% wheat như v6 thuần cây.
+        quotas["WHEAT"] = 10
+        quotas["CARROT"] = 2
+        quotas["MELON"] = 14
         quotas.pop("STRAWBERRY", None)
 
     if day <= 2:
@@ -1029,8 +1063,11 @@ def _daily_plan(tiles, shed, seeds, inv, prices, shops, day, opp_farm, money, tm
                 remaining += _mk - _mseed
         except Exception:
             pass
-    if remaining > 0 and day <= 26:
-        # ΔB FILL-LAW: mọi ô trống còn lại PHẢI đi làm — thay _late_cap 8/16
+    if remaining > 0 and day <= 21:
+        # R190 (Vòng 50): 26 → 21 — fill wheat endgame cướp lao động tưới/
+        # thu dâu (xem R190 ở seed-buy); d22+ đất trống để trống còn hơn
+        # trồng wheat không kịp chín (đo s118: P10 wheat d24 vô nghĩa,
+        # dâu chết d24-27) — ΔB FILL-LAW: mọi ô trống còn lại PHẢI đi làm
         # cứng của kain38. Thứ tự theo thời kỳ:
         #   d4-13 : CARROT tới cap 20 (hạt $20; không phải feed — v6
         #           không arbitrage được) -> WHEAT hết phần còn lại
@@ -1073,16 +1110,13 @@ def _daily_plan(tiles, shed, seeds, inv, prices, shops, day, opp_farm, money, tm
             remaining = 0
 
     if day <= 1 and plantable:
+        # R188b (Vòng 50b): TẮT nhánh CUT của luật 45% fast-crop ở d0-1 —
+        # nó sinh ra để bảo đảm dòng tiền cây non, nhưng melon-14 + 3 thú
+        # FERT $285/ngày đã là kế hoạch vốn (đo 50a: đứng 11-13 thay vì 14
+        # vì 1-2 hạt bị cắt). Chỉ GIỮ nhánh fill-up wheat khi còn ô trống.
         fast = sum(v for c, v in crop_tiles.items() if c in ("WHEAT", "CARROT"))
         if fast < 0.45 * len(plantable):
             need = int(0.45 * len(plantable)) - fast
-            for c in list(crop_tiles):
-                if c not in ("WHEAT", "CARROT") and need > 0:
-                    cut = min(crop_tiles[c], need)
-                    crop_tiles[c] -= cut
-                    need -= cut
-                    if crop_tiles[c] == 0:
-                        del crop_tiles[c]
             if need > 0:
                 crop_tiles["WHEAT"] = crop_tiles.get("WHEAT", 0) + need
 
@@ -1208,8 +1242,20 @@ def _build_tasks(tiles, shed, seeds, plan, day, hour, step, inventories, n_units
                         # không có dư địa — carrot/melon phải sống bằng tier-3
                         # như cũ; gap −$5.7k carrot / −$6.2k melon belongs
                         # vòng kernel (R151/R164), KHÔNG fix được tại chỗ.
-                        tasks.append(_mk(T_WATER_YIELD, x, y, "WATER"))
-                        stats["water_yield"] = stats.get("water_yield", 0) + 1
+                        # R192 (Vòng 50) — MELON SURVIVAL carve-out: R183 đúng
+                        # cho tưới THƯỜNG, nhưng ô melon cu>=1 trong cửa sổ
+                        # chín mà trượt thêm HÔM NAY = chết trắng $900-1.500/ô
+                        # (god-ledger s132/146/123: 12 ô đứng d0-9 → d10 = 4-5,
+                        # melon rev $4-6.4k vs v6 $20-23.6k = gap #1 của các
+                        # trận 40-46k). Budget RIÊNG cap 4/h (không giành chỗ
+                        # seedling của R172); service không bị đẩy vì số task
+                        # = đúng số ô đang chết (0-12, không hằng ngày).
+                        if cu >= 1 and crop == "MELON" and stats.get("melon_crit", 0) < 4:
+                            tasks.append(_mk(T_WATER_CRIT, x, y, "WATER"))
+                            stats["melon_crit"] = stats.get("melon_crit", 0) + 1
+                        else:
+                            tasks.append(_mk(T_WATER_YIELD, x, y, "WATER"))
+                            stats["water_yield"] = stats.get("water_yield", 0) + 1
                     elif cu >= 1:
                         # R172 [E] — CÂY NON CHẾT NGAY EOD ĐẦU TIÊN: engine
                         # _new_plant sinh consecutive_unwatered=1 (ngày trồng
@@ -1245,6 +1291,10 @@ def _build_tasks(tiles, shed, seeds, plan, day, hour, step, inventories, n_units
                         # window, cây chết tuổi 13-14 = 0u (6u cả mùa vs 42-48u
                         # baseline). Thu TẠI age 11 bất kể yu: 4-5u×$150-190
                         # cứu được thay vì chết trắng thành weed.
+                        # [R193 THỬ VÀ LOẠI ở Vòng 50: age 10 + cargo-rush
+                        # battery 15/20 $64.9k < R192 15/20 $66.5k — thu sớm
+                        # mất unit cuối của ô fertilized, rush giữa ngày
+                        # tốn lao động; s117 −$16.6k. Giữ age 11.]
                         if crop == "MELON" and age >= cd["max_yield_day"] - 1:
                             ready = True
                     if ready:
@@ -1712,6 +1762,8 @@ def _assign_and_act(units, tasks, tiles, shed, inventories, day, hour, board, se
         need_drop = sellable >= 18 or (hour >= 20 and sellable >= 3) \
             or (day >= 28 and hour >= 14 and sellable >= 1) \
             or (day >= 29 and hour >= 8 and sellable >= 1)  # R178b: d29 rửa sớm từ h8
+        # [R193b THỬ VÀ LOẠI ở Vòng 50 — xem ghi chú R193 ở nhánh salvage;
+        # cargo-rush melon làm s117 −$16.6k, battery avg −$1.6k. Bỏ.]
         if need_drop:
             act = _drop_action(ux, uy, board)
         elif tk is not None:
@@ -1923,7 +1975,11 @@ def _build_orders(me, shed, seeds, inventories, inv, prices, day, hour, plan,
             # need 1 → không mua hạt; giữa ngày wheat chết/harvest → refill
             # không có hạt. Seed-buy wheat nhìn standing SỐNG hiện tại:
             # floor 16 − live (đúng 3 layer: plan/refill/seed-buy).
-            if crop == "WHEAT" and 2 <= day <= 24:
+            # R190 (Vòng 50): 24 → 21 — hạt wheat trồng d22+ chỉ kịp 1 mứ
+            # chín d26-28 (4-6u × $30-40 = $150-240/ô cho 7 task) trong
+            # khi dâu d22-26 cần đúng task đó cho $120-180/harvest (s118:
+            # P10 wheat d24 cướp nước → 22 ô dâu chết trắng $8-12k).
+            if crop == "WHEAT" and 2 <= day <= 21:
                 _wt_live = sum(1 for row in tiles for t in row
                                if isinstance(t, dict) and t.get("kind") == "PLANT"
                                and t.get("crop") == "WHEAT")
@@ -2079,6 +2135,14 @@ def _build_orders(me, shed, seeds, inventories, inv, prices, day, hour, plan,
         h = HOLD.get(it, 0.90)
         if it in glutted:
             return min(h, 0.40)
+        # R189 (Vòng 50) — VAN HẠT SÓNG DÂU: wheat HOLD 1.50 ($37.5) chỉ bán
+        # được d7/d10 rải rác (s118: shed 39u ngồi im d5-6) — v6 bán d5
+        # $1.035 ngay → có vốn trồng dâu d5 vs v8 d7 (mất 1 chu kỳ thu
+        # $2-4k). Cửa sổ d≤11 = đàn v6 còn 0-4 con (buyW chỉ từ d10) →
+        # bán $22.5 không nuôi đối thủ (R162 chỉ áp dụng d12+ khi v6 hút
+        # 30-40u/ngày).
+        if it == "WHEAT" and day <= 11:
+            return 0.90
         if 22 <= day <= 27:
             try:
                 _np_ = float(shed.get(it, 0) or 0) + float(pipe_rest.get(it, 0.0) or 0.0)

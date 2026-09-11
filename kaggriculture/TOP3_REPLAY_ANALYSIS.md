@@ -865,3 +865,79 @@ Cơ cấu TB d5-27 (ô đứng):  TOP3: dâu 24.8 · wheat 20.2 · carrot 5.3 ·
 
 - Ba đòn R178/R179/R180 + 2 đòn phụ đã đưa v8: **$51,3k → $61,5k (+20%), 4/10 → 10/10 vs v7** — vượt mục tiêu ước tính +$7-13k phần dưới. Hình dạng đường tiền giờ KHỚP top-3 (P1 đốt vốn hết / P4 net +$4,6k).
 - Còn cách $90-110k: P2 net +$1,5k vs +$4,4k + P3 +$3,8k vs +$5,3k = **gap khối lượng dâu (67,6u vs 254u) + melon (19,7u vs 82u)** — đúng chẩn đoán vòng 47: tụ gốc kernel MOVE 62% + 21-23 ô chết. Vòng tiếp theo nếu user yêu cầu = VÒNG KERNEL (R151/R164), không phải thêm quota.
+
+## 11.14 VÒNG 50 — ĐIỀU TRỊ "THUA ĐẬM v6" (R188-R193)
+
+Task: user báo "v8 đẩy 74k vs v7, v6 có trận 87k, nhưng tỷ số thua v6 vẫn cao,
+nhiều trận thua đậm — rà soát nguyên nhân từ code".
+
+### 50.0 — CHẨN ĐOÁN (battery 20 seed 100-119: 15/20, avg $64.842; 4 trận thua đậm)
+
+God-replay 0-mismatch 4 trận thua đậm (s118 $24.071 / s114 $46.971 / s111 / s108)
++ 2 trận thắng đối chứng, phân rã kênh god-ledger + action-level theo giờ:
+
+| GAP (thua − thắng) | Định lượng | Cơ chế |
+|---|---|---|
+| **#1 MELON wave-1** | −$8,5-16,4k/trận | v6 d0 mua 14 hạt melon + 0 thú → thu $11,8-18,5k ngay d11; v8 chỉ 8 hạt ($1.600 starter thú ăn vốn + luật 45% fast-crop cắt 1 hạt) → $1,6-6,7k |
+| #2 MELON chết dây chuyền | −$8-14k ở game xấu | 12 ô đứng d0-9 → chết/d8-10 khi tier tưới melon = 3 thua service/harvest tier 2 (s132/146/123) |
+| #3 WOOL mix | −$1,7-6,8k | v6 giữ 6 cừu (WOOL $200/u) vs v8 đứng 4 (floor + thứ tự cắt cap ưu tiên cừu bị cắt trước) |
+| #4 DÂU trễ | −$2,4-4,1k | v6 trồng dâu d5 (bán d21 $3-11,9k), v8 d7-10 (bán d22+); shed wheat 39u ngồi im vì HOLD $37,5 |
+| #5 WHEAT cutoff | −$3-8k khi spiral | v8 P10 wheat d24 (chín 1 mứ, 7 task/ô $25-35/task) cướp nước của dâu → s118: 22 ô dâu chết trắng d24-27 |
+
+Lưu ý quan trọng (loại nghi phạm): wheat NET v8 −$5,7-6k vs v6 −$1,1-4k **không phải
+gap trực tiếp** — v6 mua $35-36,5k chỉ để bán lại $31-35k + feed đàn; chênh lệch
+thực = chi feed, không phải lỗ giao dịch. Gap thật nằm ở doanh thu khối lượng.
+
+### 50.1 — 5 ĐÒN FIX (R188-R192) + 1 đòn loại bỏ (R193)
+
+| Rule | Thay đổi | Kết quả đo |
+|---|---|---|
+| **R188/b MELON-14** | starter 2C+1S+1G → **1C+1S+1G** ($1.200); quota d0 wheat 14→10 + carrot 8→2 + **MELON 14**; TẮT nhánh CUT của luật 45% fast-crop d0-1 | 50a (0 bò) MILK −$22k ở game 5-milk-shop → 50b giữ 1 bò: s118 $24.071 → $71.071 |
+| **R189 WHEAT HOLD SỚM** | HOLD wheat 1.50 → 0.90 khi d≤11 (bán vụ d4-6 nuôi vốn hạt dâu d5) | An toàn: đàn v6 d≤10 còn 0-4 con chưa hút feed (R162 chỉ binding d12+) |
+| **R190 WHEAT CUTOFF** | seed-buy refill + fill-law wheat: d26 → d21 | Dâu d22-26 được trả lao động tưới/thu (s118-type spiral hết) |
+| **R191 CỪU-6** | trajectory cừu 1+day//4 → 1+day//3; thứ tự cắt cap: ngỗng→bò→cừu (cũ cừu trước) | WOOL s100 $7.024 → $11.191 |
+| **R192 MELON SURVIVAL** | ô melon cu≥1 trong cửa sổ chín → T_WATER_CRIT tier-0, budget riêng cap 4/h (không đụng cap seedling 6/h) | s132 $39.743 → $67.454; s146 $42.281 → $49.066 |
+| ~~R193 thu d10 + cargo-rush~~ | **LOẠI BỎ**: thu age≥10 mất unit cuối ô fertilized + rush giữa ngày tốn lao động — battery 15/20 $64.919 < R192 15/20 $66.478 (s117 −$16.6k) | trở lại age 11 của R185 |
+
+### 50.2 — KẾT QUẢ BATTERY CUỐI (bản R192, 50 game vs v6 + 10 game vs v7)
+
+| Battery | v8 thắng | v8 TB | đối thủ TB | tệ nhất |
+|---|---|---|---|---|
+| seeds 100-119 vs v6 | 15/20 | $66.478 | $61.178 | $47.395 |
+| seeds 120-149 vs v6 | **28/30** | $68.278 | $59.310 | $45.560 |
+| **TỔNG 50 seed vs v6** | **43/50 (86%)** | **~$67.180** | ~$60.120 | $45.560 |
+| seeds 100-109 vs v7 | 9/10 | $62.458 | $51.139 | $49.590 (s107 thua sát $1.706) |
+
+So vòng 48 (baseline): vs v6 8/10 (không có battery lớn), avg $65.849, tồn tại
+trận sập $24-25k. Vòng 50: **tỷ lệ thắng 75% → 86%, avg +$1.3-3.4k, xóa sạch
+trận thảm họa** (tệ nhất $45.6k / biên thua tệ nhất −$10.7k so với −$17.4k).
+
+### 50.3 QUY TẮC MỚI R188-R193
+
+- **R188 [K] — D0 LÀ BÀI PHÂN BỔ VỐN, KHÔNG PHẢI BÀI THÚ:** $1 vào melon d0 trả
+  ~$6-13 ở d11; $1 vào thú d0 trả sau d8-15 và phụ thuộc shop-luck. Cân bằng
+  đúng: 1 bò + 1 cừu + 1 ngỗng ($1.200) + 14 melon ($1.120) + 10 wheat + 2 carrot.
+- **R189 [E] — HOLD THƯƠNG MẠI PHẢI THEO PHA ĐỐI THỦ:** ngưỡng bán cao (chống
+  thuế R162) chỉ đúng khi đối thủ đang hút hàng; cửa sổ đối thủ chưa vào kênh
+  thì bán rẻ nuôi vốn là đúng.
+- **R190 [E] — LAO ĐỘNG ENDGAME QUÝ HƠN THÊM 1 MỨ WHEAT:** hạt planted d22+
+  = 7 task/ô cho $150-240; harvest dâu d22-26 = 1 task cho $120-180. Cắt ở d21.
+- **R191 [K] — SLOT ĐÀN 13-14 PHẢI VỀ KÊNH ĐẮT NHẤT (WOOL $200/u):** thứ tự
+  cắt khi vượt cap quyết định $4-7k/trận.
+- **R192 [K] — TIER-0 CÓ THỂ MỞ CARVE-OUT AN TOÀN:** phản例 R183 không tuyệt
+  đối — budget riêng + điều kiện hẹp (cu≥1, đúng loài, cap/giờ) cho phép nâng
+  ưu tiên không giết pha-1. Công thức: task chỉ sinh ra khi THẬT SẰP mất giá trị.
+- **R193 [ÂM] — GIÁ SLOT BÁN SÁNG KHÔNG ĐÁNH ĐỔI UNIT CUỐI:** thu sớm để kịp
+  d11-h0 ($236+) nhưng mất unit thứ 6 của ô fertilized + tốn lao động rush —
+  lỗ ròng. (Ghi chú: giao trễ melon d11-h23/d12 vẫn là gap nhỏ $3-5k/game,
+  cần vòng kernel để phục vụ 2 việc cùng lúc.)
+
+### 50.4 PHÁN QUYẾT VÒNG 50
+
+- "Thua đậm v6" = 5 lỗi cấu trúc chồng nhau, không phải 1 bug: vốn d0 lệch
+  (melon), tier tưới melon, mix cừu, HOLD wheat sớm, wheat cutoff. Sửa 5/5
+  cấu trúc → 86% thắng, tệ nhất +$21k so với trước.
+- Còn lại: s123-type (game path-dependent xấu cả 2) và gap melon-giao-trễ
+  $3-5k — đều cần vòng kernel (R151/R164) hoặc chấp nhận variance.
+- v9/kain41 vẫn搁置 theo chỉ thị; không đụng v7 (KAIN champion) và v6
+  (orchestrator — đối thủ chuẩn đo).

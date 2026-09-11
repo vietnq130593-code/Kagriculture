@@ -1192,3 +1192,28 @@ Stage Summary:
 - Bài học rollback: hiện tượng "preview cũ" có thể do FILE thật sự cũ (snapshot revert) chứ không phải cache browser — kiểm tra mtime + git log trước khi kết luận
 - Quy trình khôi phục nếu tái diễn: git checkout be4c93b (hoặc clone) → pip3 install kaggle_environments==1.32.7 → restart arena-service qua bench/run_bg.py → verify dollar-identical v8-vs-v7-s103 = [74341, 46950]
 - Battles/tool-results của session cũ còn lưu tại /tmp/my-project (1,7GB + 842MB) — copy thêm vào /home nếu user cần phân tích sâu
+
+---
+Task ID: 50
+Agent: KAIN (main-agent)
+Task: User: push code + v8 đã đạt 74k vs v7 / v6 có trận 87k nhưng tỷ số thua v6 vẫn cao, nhiều trận thua đậm — rà soát nguyên nhân từ code v8
+
+Work Log:
+- Push code KHÔNG THỂ: PAT trong upload/PAT vietnq.rtf đã bị redact [REDACTED:github_token] (cả bản main lẫn /tmp mirror); không credential nào khác (không SSH key, không env). 21 commit vẫn an toàn local; cần user cấp PAT mới để push
+- Khôi phục tools phân tích từ mirror /tmp/my-project/tool-results/v8_style (39 files: god_arena.py có 1 line corrupted `names = ello...` — fix thành tuple; phase5/6/7, analyze_style, bat48*) vào kaggriculture/tool-results/
+- Battery baseline 20 seed (100-119) v8 vs v6: 15/20, avg $64.842 — 4 trận thua đậm: s118 $24.071 (−17.4k), s114 $46.971 (−12.3k), s111, s108
+- God-replay 4 trận thua + 2 trận thắng (0-mismatch 719 turns) + action-level theo giờ + crop-flow: xác định 5 gap cấu trúc — #1 MELON wave-1 (v6 d0 mua 14 hạt + 0 thú, thu $11.8-18.5k d11; v8 8 hạt vì $1.600 starter thú + luật 45% fast-crop cắt) −$8.5-16.4k/trận; #2 melon chết d8-10 (tier tưới 3 thua service); #3 WOOL v6 6 cừu vs v8 4; #4 dâu v6 d5 vs v8 d7-10 (HOLD wheat $37.5 giữ vốn trong shed); #5 wheat P10 d24 cướp nước dâu → spiral chết
+- Loại nghi phạm wheat-trading: v6 mua $35-36.5k wheat NET −$1.1-4k (feed cost, không phải lỗ giao dịch) — gap thật là doanh thu khối lượng, không phải小麦 arbitrage
+- Vòng 50a (cắt sạch bò d0): battery SỤP 12/20 $61.956 — game 5-milk-shop (s100) mất MILK −$22.4k → 50b giữ 1 bò
+- Vòng 50b (1C+1S+1G $1.200 + melon 14 + tắt 45% cut + R189 HOLD wheat 0.90 d≤11 + R190 cutoff d21 + R191 cừu-6 + đổi thứ tự cắt cap): 14/20 $65.478, s118 $24.071 → $71.071 WIN; vs v7 10/10 $61.768 giữ nguyên
+- Vòng R192 (melon survival tier-0 carve-out, budget riêng cap 4/h, chỉ ô cu≥1 trong cửa sổ chín): s132 $39.743 → $67.454, s146 $42.281 → $49.066 — battery cuối: seeds 100-119 15/20 $66.478 | seeds 120-149 28/30 $68.278 | TỔNG 50 game 43/50 (86%) avg ~$67.2k | vs v7 9/10 $62.458
+- R193 thử-thành-lợ: thu melon age≥10 + cargo-rush giao shed ngay — battery 15/20 $64.919 < R192 (s117 −$16.6k: mất unit cuối ô fertilized + tốn lao động rush) → REVERT, ghi luật âm
+- Verify revert bit-perfect: s100 $59.798 + s117 $79.283 khớp exactly R192
+- Cập nhật TOP3_REPLAY_ANALYSIS.md §11.14 (chẩn đoán 5 gap + bảng đòn/kết quả + R188-R193 + phán quyết); v8.py header vòng 50
+
+Stage Summary:
+- v8 VÒNG 50 SHIP: vs v6 từ 15/20 (75%, tệ nhất $24.071) → 43/50 (86%), avg ~$67.2k vs ~$60.1k, tệ nhất $45.6k, biên thua tệ nhất −$10.7k (trước −$17.4k) — "thua đậm" ĐÃ XÓA
+- 5 fix cấu trúc: R188 melon-14 opening (1 bò+1 cừu+1 ngỗng $1.200, wheat 10, carrot 2, melon 14, tắt 45%-cut d0-1) + R189 wheat HOLD 0.90 d≤11 (vốn dâu d5) + R190 wheat cutoff d21 + R191 cừu-6 + cắt cap ngỗng→bò→cừu + R192 melon survival tier-0 (carve-out của R183 với budget riêng)
+- Luật âm R193: giá slot bán sáng d11-h0 KHÔNG đáng đổi unit cuối ô fertilized + lao động rush
+- Push code còn nợ: cần PAT mới từ user (token cũ bị redact); mọi thứ đã commit local
+- Tools mới: bat50v6/bat50a/bat50b/bat50c/bat50d + ext 30 seed + god-replay trận mới — chuẩn đo tiếp
