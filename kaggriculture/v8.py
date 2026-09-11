@@ -1,5 +1,20 @@
 # v8 "REGION-FLOW" (Task 42) — kernel lao động lai theo mô hình top-3
 # (TOP3_REPLAY_ANALYSIS.md V3.0 + R151): v7 + 8 delta chọn lọc bằng differential.
+# VÒNG 44 (11.10) — 5 TRỤ CỘT FIX TẠI CHỖ (mục tiêu: đạt chỉ số 3 hạng đầu):
+#   Trụ 1 (R156) ĐÀN D0: starter 2 bò + 1 ngỗng ($1.100) ngay d0-h2 — mô phỏng
+#     SpaTaro/Otter; d1-4 ramp bằng dòng FERT ($95-100/con/ngày vô điều kiện);
+#     bỏ cổng day<2/day<5/day<6=0 của _daily_plan.
+#   Trụ 2 (R157) ĐÀN ÔM SHED: reserved sort theo khoảng cách shed thật
+#     ((4,4)-(5,5)) từ d0-h0 TRƯỚC khi planting claim ô trung tâm; BUILD
+#     tier-urg d0-3; _struct_reserve bỏ money-gate (BUILD miễn phí engine).
+#   Trụ 3 (R160) ĐẤT CHẾT ≤6: T_DIG 5→3; wheat-refill TRONG NGÀY (standing<18
+#     → PLANT tier 1-2, không chờ plan h0 — plan không thấy ô vừa harvest).
+#   Trụ 4 (R158) FEED TỚI d28: wheat_reserve giữ tới d28 (base bán sạch từ d26
+#     → 7-8 con trốn); mua feed mở gate d≤3 (pw≤45) + d≥20 (pw≤70, need 14).
+#   Trụ 5 (R159) MÁY WHEAT CẢ MÙA: refill floor 18 + plan quota 24-standing
+#     giữ nguyên; không còn phụ thuộc BUY_PRODUCT wheat 814u.
+# ĐÍCH ĐO: empty d9-27 ≤6 | d̄shed ≤2.5 | feed 1.00 tới d28 + 0 trốn |
+#   wheat đứng 13-32 ô | MOVE ≤48% | lệnh hữu ích ≥125/ngày.
 # VẤN ĐỀ v7 (đo bằng autopsy 3 trận + god-replay chuẩn top-3):
 #   empty d9-27 = 25-37 ô (top-3: 0-5) | MOVE 4.962/mùa (top-3 2.700-3.100)
 #   wheat chết d15 (1-6 ô đứng vs top-3 17-29) | FERTILIZE = 0 (top-3 91-186)
@@ -206,7 +221,9 @@ T_HARVEST_ANIMAL = 2
 T_HARVEST = 2
 # v8e: PLANT 5 -> 4 (phase-2 geo; phase-1 không đụng money-ops)
 T_PLANT = 4
-T_DIG = 5
+T_DIG = 4  # Trụ 3-fix: 3 bị DIG-backlog át PLANT tier-4 (probe s130: 29 DIG
+            # nuốt tomato cả ngày — tomato 0 ô dù seed đã mua); 4 = ngang
+            # PLANT, phase-2 geo tự phân giải theo khoảng cách + age
 T_WATER_MAINT = 3
 # v8 Δ5: FERTILIZE 7 -> 3 (phase-2 geo; bón dâu/tomato NGÀY EVENT
 # +1u ≈ $130-190; top-3 bón 91-186/mùa, v7 = 0)
@@ -217,7 +234,7 @@ FERT_FLOOR = 38
 ANIMAL_CAP = 16
 TOM_QUOTA = 6
 HOLD = {"MILK": 0.98, "WOOL": 0.94, "STRAWBERRY": 0.80, "EGG": 0.86,
-        "CARROT": 0.70, "WHEAT": 0.76, "MELON": 0.52, "TOMATO": 0.82, "FERTILIZER": 0.50}
+        "CARROT": 0.70, "WHEAT": 1.50, "MELON": 0.52, "TOMATO": 0.82, "FERTILIZER": 0.50}
 
 _STATE = {}
 _ARCHES = ("CONTEST", "MIRROR", "COOP", "PASSIVE")
@@ -502,16 +519,12 @@ def _pipeline(tiles, shed):
 
 
 def _struct_reserve(need, unit_cost, money):
+    # Trụ 2 (R157): BUILD_COOP/BUILD_PASTURE MIỄN PHÍ trong engine (chỉ tốn
+    # labor) — money-gate 300/500 cũ là tự đặt, chặn vòng đàn sát shed d0.
+    # Cap theo need thuần; chỉ giữ floor mềm 1 để không đùng khi phá sản.
     if need <= 0:
         return 0
-    r = 0
-    if money >= unit_cost + 250:
-        r = 1
-    if need >= 2 and money >= 2 * unit_cost + 500:
-        r = 2
-    if need >= 3 and money >= 3 * unit_cost + 900:
-        r = 3
-    return min(need, r)
+    return min(need, 3 if money >= 500 else (2 if money >= 250 else 1))
 
 
 
@@ -669,7 +682,7 @@ def _daily_plan(tiles, shed, seeds, inv, prices, shops, day, opp_farm, money, tm
     if day <= 10:
         cow_target = min(cow_target, 1 + int(money // 900))
         sheep_target = min(sheep_target, 2 + int(money // 1500))
-    _herd_cap = 16 if (day >= 11 or money >= 3000) else 14
+    _herd_cap = 14 if day >= 3 else 16  # Trụ 4-fix: kernel 90-100 lệnh hữu ích/ngày không nuôi nổi 16-18 thú + dâu 24 + máy 24 (s306: dâu chết 24→7, weed 31) — 14 thú giữa mùa, top-3 service dc 133-145 lệnh/ngày mới chạy 15-22
     tot = cow_target + sheep_target + goose_target
     if tot > _herd_cap:
         # autopsy 146: cắt cừu trước (floor 4), rồi bò (floor 6), ngỗng cuối (floor 7)
@@ -681,15 +694,23 @@ def _daily_plan(tiles, shed, seeds, inv, prices, shops, day, opp_farm, money, tm
             tot = cow_target + sheep_target + goose_target
             if tot > _herd_cap:
                 goose_target = max(7, goose_target - (tot - _herd_cap))
-    if day < 2:
-        goose_target = 0
-        cow_target = 0
+    # Trụ 1 (R156): ĐÀN TỪ D0 — top-3 mua $1.700-2.400 ngay d0 (SpaTaro
+    # 2C+2S, UMG 5C+1S, Otter 2S+2G+1C). Starter $1.100 = 2 bò + 1 ngỗng
+    # giữ ≥$1.6k cho hạt melon-wave + wheat/carrot (R147 domino: không
+    # được hút vốn hạt). d1-4 ramp bằng dòng FERT (~$285/ngày từ 3 con).
+    # Cấu trúc đích giữ nguyên room-based + shop-draw phía trên.
+    if day == 0:
+        cow_target = min(cow_target, 2 if money >= 2300 else 1)
+        goose_target = min(goose_target, 1)
         sheep_target = 0
-    elif day < 5:
-        cow_target = 0
-        sheep_target = 0
-    elif day < 6:
-        sheep_target = 0
+    elif day <= 2:
+        cow_target = min(cow_target, 3)
+        goose_target = min(goose_target, 3)
+        sheep_target = min(sheep_target, 1 if money >= 1600 else 0)
+    elif day <= 4:
+        cow_target = min(cow_target, 4)
+        goose_target = min(goose_target, 4)
+        sheep_target = min(sheep_target, 2 if money >= 1200 else 1)
     owned_total = animals_now + shed_geese + shed_cows + shed_sheep
     if owned_total >= ANIMAL_CAP:
         goose_target = min(goose_target, animals_now + shed_geese)
@@ -701,17 +722,22 @@ def _daily_plan(tiles, shed, seeds, inv, prices, shops, day, opp_farm, money, tm
     coop_need = _struct_reserve(goose_target + shed_geese - coops, 300, money)
     past_need = _struct_reserve(cow_target + shed_cows + sheep_target + shed_sheep - pastures, 500, money)
     if day <= 2:
-        coop_need = min(coop_need, 2)
-        past_need = min(past_need, 2)
+        coop_need = min(coop_need, 3)
+        past_need = min(past_need, 3)
 
     board = len(tiles)
     cx = board // 2
+    # Trụ 2 (R157): sort theo khoảng cách SHED thật (4 ô shed quanh tâm
+    # (4,4)-(5,5)) — không phải tâm bàn (5,5): ô (4,3) d_shed=1 nhưng
+    # d_center=3; vòng đàn phải bám shed để SERVICE ngắn (top-3 d̄ 1.9-2.2).
+    _shed_xy = _shed_tiles(board)
     empties = []
     for y in range(board):
         for x in range(board):
             if tiles[y][x] is None:
                 empties.append((x, y))
-    empties.sort(key=lambda c: abs(c[0] - cx) + abs(c[1] - cx))
+    empties.sort(key=lambda c: min(abs(c[0] - sx) + abs(c[1] - sy)
+                                  for sx, sy in _shed_xy))
     reserved = []
     ri = 0
     for _ in range(coop_need):
@@ -733,7 +759,7 @@ def _daily_plan(tiles, shed, seeds, inv, prices, shops, day, opp_farm, money, tm
     # premium BEFORE the collision, while the visible pipeline pressures
     # v5's room() into yielding.
     if day <= 1:
-        quotas["MELON"] = 14
+        quotas["MELON"] = 8
     elif 2 <= day <= 7:
         quotas["MELON"] = 14
     elif 8 <= day <= 14:
@@ -745,6 +771,10 @@ def _daily_plan(tiles, shed, seeds, inv, prices, shops, day, opp_farm, money, tm
             quotas["MELON"] = 10
         else:
             quotas["MELON"] = 7
+        # Trụ-fix (R144): melon kênh 0-drain — top-3 CẢ HAI cùng bán
+        # 66-90u; không nhượng vì pipeline đối thủ khi mình đứng < 10
+        if standing.get("MELON", 0) < 10 and m_m >= 0.52:
+            quotas["MELON"] = max(quotas["MELON"], 12)
     elif 15 <= day <= 16:
         # S4 LATE-MELON: trồng d15 chín d28 — dùng đất trống endgame
         if _marg("MELON", 36, day + 13) >= 0.78:
@@ -770,7 +800,7 @@ def _daily_plan(tiles, shed, seeds, inv, prices, shops, day, opp_farm, money, tm
         # pipeline dâu 30-từ-d5 là ÁP LỰC làm v5 room() nhượng kênh (R94/R96
         # market-share yield); ramp theo v5 = v5 lấy lại $1.9k. Vốn đàn d5-12
         # giờ đến từ ngỗng-4-sớm ΔB (egg+$fert từ d4) thay vì cắt dâu)
-        want_straw = 30
+        want_straw = 24  # Trụ 3-fix: vượt công suất tưới của kernel → chết giữa mùa (s306: 24→9→7 ô)
         # KAIN-10: v5's minimax + scarcity straw escalation — don't subtract
         # the opponent pipeline when the market is deep enough for both.
         try:
@@ -790,38 +820,51 @@ def _daily_plan(tiles, shed, seeds, inv, prices, shops, day, opp_farm, money, tm
         # dù pipeline đối thủ lớn (chỉnh theo đường cầu, không theo pipeline)
         if _marg("STRAWBERRY", 110, min(28, day + 14)) >= 0.98:
             s_room = max(s_room, 120)
+        # Trụ 3-fix (R36-mở-rộng): kênh dâu SÂU — trong cửa sổ sóng chính,
+        # khi mình đứng < 14 ô thì KHÔNG nhượng kênh vì pipeline đối thủ
+        # (trace s105: base trồng dâu 25 trước → room() tự đầu hàng → NEW
+        # đứng 10-12 ô cả d14-19 → thua kênh $12-20k).
+        # (thử cap 16 khi đối thủ dâu 24: 11/50 vs v6 — rút lui làm v6 độc
+        # quyền premium → TỆ HƠN; reverted)
+        if day <= 13 and standing.get("STRAWBERRY", 0) < 14:
+            s_room = max(s_room, want_straw * 4 + 40)
         quotas["STRAWBERRY"] = want_straw if s_room > 100 else max(0, min(want_straw, int(s_room // 4)))
     elif 14 <= day <= 15:
         # S3b LATE-STRAW (v8 Δ7 nâng 8/6 -> 12/10 — CF4-variant đã đo +$3-4k
         # trên ô trống thật; giờ PLANT tier 2 + geo-assign có sức trồng):
-        # trồng d14 chín d24-28 (3 event), hạt từ melon-window
+        # Trụ 3-fix: standing-target 18 — nếu sóng chính bị kẹt (đứng <14 vì
+        # farm đầy d11-12) thì cửa sổ này PHẢI đuổi kịp, không phải cố định
+        # 12/10 nhìn standing 12 rồi không trồng lại bao giờ (trace s105)
+        _st_now = standing.get("STRAWBERRY", 0)
         if _marg("STRAWBERRY", 40, min(28, day + 12)) >= 1.0:
-            quotas["STRAWBERRY"] = 12
+            quotas["STRAWBERRY"] = max(12, 18 - _st_now)
         else:
-            quotas["STRAWBERRY"] = 10
+            quotas["STRAWBERRY"] = max(10, 16 - _st_now)
     elif 16 <= day <= 19:
         # Δ5 LATE-STRAW-2 (kain35): engine dâu 2 bên chết tuổi ~17 -> d21-28
         # kênh dâu thiếu cung, giá $180-303. d16-17 = 2 event (d26-28),
         # d18-19 = 1 event (d28-29). Gate marg mềm hơn S3b (giá đang cao).
+        _st2 = standing.get("STRAWBERRY", 0)
         _sm2 = _marg("STRAWBERRY", 30, min(28, day + 11))
         if _sm2 >= 0.82:
-            quotas["STRAWBERRY"] = 8 if day <= 17 else 5
+            quotas["STRAWBERRY"] = max(8 if day <= 17 else 5, 14 - _st2)
         elif _sm2 >= 0.70:
-            quotas["STRAWBERRY"] = 4 if day <= 17 else 3
+            quotas["STRAWBERRY"] = max(4 if day <= 17 else 3, 12 - _st2)
     if day <= 26:
         if day <= 4:
             quotas["WHEAT"] = 17
         else:
-            # v8 Δ4b WHEAT STANDING-TARGET: quota/ngày flat 20-24 không giữ
-            # được máy (autopsy: WHEA 16 -> 1-6 ô từ d15 — thu hoạch xong
-            # không trồng lại vì PLANT tier-5 đói). Nhắm ô ĐỨNG 24: sập <14
-            # -> trồng lại tối đa 10/ngày; đủ -> 2-4 duy trì (chu kỳ ~5 ngày)
+            # Trụ 5-fix (R159) — WHEAT STANDING-TARGET THẬT: quota cũ
+            # max(2, min(10, 24-standing)) là "số trồng/ngày" nhưng crop_tiles
+            # tính need = quota − standing → TỰ TRIỆT TIÊU (standing 10 →
+            # quota 10 → need 0 → không mua hạt → refill đói hạt → máy chết
+            # d14+, phải mua 814u wheat thị trường). Đứng đích = max(14,
+            # đàn×1.0+4) cap 20 — đủ feed + bán vừa sức tưới của kernel
+            # (s306: máy 24 + dâu 24 + đàn 18 = tưới 14.6/ngày vs cần 32).
             wt_stand = standing.get("WHEAT", 0)
-            quotas["WHEAT"] = max(2, min(10, 24 - wt_stand))
-            daily_q = int((animals_now + shed_geese + shed_cows + shed_sheep
-                          + goose_target + cow_target + sheep_target) * 1.25) + 3
-            if wt_stand >= 22:
-                quotas["WHEAT"] = max(quotas["WHEAT"], 4)
+            _wt_target = max(14, int((animals_now + shed_geese + shed_cows + shed_sheep
+                                      + goose_target + cow_target + sheep_target) * 1.0) + 4)
+            quotas["WHEAT"] = min(20, _wt_target)
             # KAIN-8: strawberry ~2x wheat $/action — shift tiles wheat->
             # straw only when straw quota will actually fill them.
             if (standing.get("STRAWBERRY", 0) < 24 and 6 <= day <= 16
@@ -848,9 +891,12 @@ def _daily_plan(tiles, shed, seeds, inv, prices, shops, day, opp_farm, money, tm
                 quotas["CARROT"] = 0
 
     if day <= 1:
-        quotas["WHEAT"] = 10
+        # Trụ 1: d0-1 = wheat 14 (máy tự cấp cho đàn — KHÔNG mua thị trường
+        # nuôi đàn sớm, đẩy giá cho đối thủ máy-wheat như v6) + carrot 8 +
+        # melon 8 + ĐÀN $1.100 mua TRƯỚC hạt
+        quotas["WHEAT"] = 14
         quotas["CARROT"] = 8
-        quotas["MELON"] = 14
+        quotas["MELON"] = 8
         quotas.pop("STRAWBERRY", None)
 
     if day <= 2:
@@ -1052,7 +1098,13 @@ def _build_tasks(tiles, shed, seeds, plan, day, hour, step, inventories, n_units
                                 tasks.append(_mk(1, x, y, "WATER"))
                         elif cu >= 1 and prod_n <= cd["max_yield"]:
                             # survival mỗi 2 ngày (chưa tới event / lỡ event)
-                            tasks.append(_mk(T_SERVICE, x, y, "WATER"))
+                            # — dâu/tomato non tier 1: 1 task tier-2 trượt =
+                            # chết dây chuyền (s306: dâu 24→9→7, mất kênh
+                            # $30k cho v6 độc quyền premium d21-28)
+                            if crop in ("STRAWBERRY", "TOMATO"):
+                                tasks.append(_mk(1, x, y, "WATER"))
+                            else:
+                                tasks.append(_mk(T_SERVICE, x, y, "WATER"))
                         # sau vách (prod_n > max_yield): không tưới — chỉ thu
                     elif in_win:
                         tasks.append(_mk(T_WATER_YIELD, x, y, "WATER"))
@@ -1104,6 +1156,13 @@ def _build_tasks(tiles, shed, seeds, plan, day, hour, step, inventories, n_units
                     # v8b straw chỉ bán 23u): ngỗng tier 1, bò/cừu tier 2
                     _sv_tier = T_SERVICE_URG if starve else (
                         1 if t.get("animal") == "GOOSE" else T_SERVICE)
+                    # Trụ 4 (R143): con đang có sản lượng chờ (event sắp
+                    # tính) → tier 1 — care-bonus +1 chỉ ăn khi feed+care
+                    # đúng hôm đó; bò/cừu tier 2 trượt feed = mất 50% milk/
+                    # wool (s203: NEW milk 54u vs base 95u cùng cỡ đàn)
+                    if (_sv_tier == T_SERVICE
+                            and (t.get("yield_units", 0) or 0) >= 1):
+                        _sv_tier = 1
                     tasks.append(_mk(_sv_tier, x, y, "SERVICE",
                                      want_wheat=need_feed, feed=need_feed))
                 yu = t.get("yield_units", 0) or 0
@@ -1124,7 +1183,10 @@ def _build_tasks(tiles, shed, seeds, plan, day, hour, step, inventories, n_units
             if 0 <= y < board and 0 <= x < board and tiles[y][x] is None:
                 animal_waiting = ((shed.get("GOOSE", 0) or 0) + (shed.get("COW", 0) or 0)
                                   + (shed.get("SHEEP", 0) or 0)) > 0
-                tasks.append(_mk(T_BUILD_URG if animal_waiting else T_BUILD, x, y, bop))
+                # Trụ 2: d0-3 BUILD luôn urg — vòng đàn phải đứng trước
+                # planting claim ô trung tâm (top-3 BUILD d0-1)
+                _urg2 = animal_waiting or day <= 3
+                tasks.append(_mk(T_BUILD_URG if _urg2 else T_BUILD, x, y, bop))
                 built += 1
 
     if shed:
@@ -1181,9 +1243,42 @@ def _build_tasks(tiles, shed, seeds, plan, day, hour, step, inventories, n_units
             _tier = _pt
             if _tier > 1 and (
                     (c == "WHEAT" and wheat_standing_n < 14)
-                    or (c == "CARROT" and day >= 24)):
+                    or (c == "CARROT" and day >= 24)
+                    or (c == "STRAWBERRY" and day <= 16
+                        and (plan.get("standing", {}).get("STRAWBERRY", 0) or 0) < 14)
+                    or (c == "TOMATO" and 17 <= day <= 19)):
+                # TOMATO tier-1 (probe s130 d17): cửa sổ 3 ngày + hạt đã mua
+                # mà task tier-4 thua 29 DIG — kênh $2-3k mất trắng
                 _tier = 1
             tasks.append(_mk(_tier, x, y, "PLANT", crop=c))
+
+    # Trụ 5 (R159) WHEAT-REFILL: máy feed không được chết — plan h0 không
+    # thấy ô vừa harvest giữa ngày (v8-base đứng 0-9 ô từ d14 vì quota
+    # only-morning). Refill độc lập: standing < 18 → trồng thêm ngay trong
+    # giờ, tier 1 khi < 14 (top-3 giữ 13-32 ô cả mùa bằng 4-8 lần trồng/ngày).
+    try:
+        if 2 <= day <= 26 and hour <= 20 and seeds and wheat_standing_n < 18:
+            _wt_planted = (planted.get("WHEAT", 0) or 0)
+            _want = min(8, 18 - wheat_standing_n - _wt_planted)
+            _have = seeds.get("WHEAT", 0) or 0
+            if _want > 0 and _have > 0:
+                _pl_xy = {(tk["x"], tk["y"]) for tk in tasks if tk["op"] == "PLANT"}
+                _re = []
+                for y2 in range(board):
+                    for x2 in range(board):
+                        if (tiles[y2][x2] is None and (x2, y2) not in reserved_xy
+                                and (x2, y2) not in _pl_xy):
+                            _re.append((x2, y2))
+                _re.sort(key=lambda c: min(abs(c[0] - sx) + abs(c[1] - sy)
+                                           for sx, sy in _shed_tiles(board)))
+                _tr = 1 if wheat_standing_n < 14 else 2
+                for (x2, y2) in _re[:_want]:
+                    if _have <= 0:
+                        break
+                    tasks.append(_mk(_tr, x2, y2, "PLANT", crop="WHEAT"))
+                    _have -= 1
+    except Exception:
+        pass
 
     if fert_available > 0 and day < 27:
         # v8 Δ5 FERT-EVENT: bón dâu/tomato NGÀY EVENT (nước+fert = +2u thay
@@ -1604,7 +1699,7 @@ def _build_orders(me, shed, seeds, inventories, inv, prices, day, hour, plan,
         land_reserve = 1150
     elif nq == 2 and 8 <= day <= 14 and bought.get("LAND", 0) < 1:
         land_reserve = 2150
-    if hour <= 8 and 1 <= day <= 22:
+    if hour <= 8 and 0 <= day <= 22:
         struct_free = {"COOP": 0, "PASTURE": 0}
         for row in tiles:
             for t in row:
@@ -1626,30 +1721,40 @@ def _build_orders(me, shed, seeds, inventories, inv, prices, day, hour, plan,
         milk_shops_n = sum(1 for s in (shops or [])
                            if s in ("PIZZA_SHOP", "ICE_CREAM_SHOP", "SMOOTHIE_SHOP"))
         yarn_n = sum(1 for s in (shops or []) if s == "YARN_STORE")
-        for animal, target, w0, w1 in (("COW", plan.get("cow_target", 0), 4,
+        for animal, target, w0, w1 in (("COW", plan.get("cow_target", 0), 0,
                                         16 + (2 if pxm >= 200 else 0) + (2 if milk_shops_n >= 2 else 0)),
-                                       ("GOOSE", plan.get("goose_target", 0), 2,
+                                       ("GOOSE", plan.get("goose_target", 0), 0,
                                         14 + (2 if pxg >= 62 else 0)),
-                                       ("SHEEP", plan.get("sheep_target", 0), 4,
+                                       ("SHEEP", plan.get("sheep_target", 0), 2,
                                         15 + (2 if pxw >= 250 else 0) + (2 if yarn_n >= 1 else 0))):
             owned = sum(1 for row in tiles for t in row
                         if isinstance(t, dict) and t.get("animal") == animal)
             owned += (shed.get(animal, 0) or 0) if shed else 0
             ad = ANIMALS[animal]
             cash_floor = 250 + land_reserve
-            buy_per_day = 2 if (day <= 14) else 1
+            # Trụ 1: d0-2 mua nhanh 3 con/ngày (top-3 mua 3-5 con d0);
+            # ngược lại ramp d1-4 bị buy_per_day=2 kìm hãm
+            buy_per_day = 3 if day <= 2 else (2 if day <= 14 else 1)
+            # Trụ 1-fix (D): cap TỔNG 3 con/ngày từ d3 — top-3 mua rải 1-4
+            # con/ngày d0-d10 (không splurge); trace s105: NEW rút $2.800 mua
+            # 7 con d11-12 đúng lúc cần $2.000 SW + $1.400 hạt dâu → sóng dâu
+            # chết đói vốn
+            _tot_today = bought.get("GOOSE", 0) + bought.get("COW", 0) + bought.get("SHEEP", 0)
+            if day >= 3 and _tot_today >= 3:
+                continue
             if (owned < target and w0 <= day <= w1
                     and bought.get(animal, 0) < buy_per_day
-                    and struct_free[ad["structure"]] > 0
+                    and (day <= 2 or struct_free[ad["structure"]] > 0)
                     and money >= ad["cost"] + cash_floor and shed_total < 92
                     and (wt_supply >= (animals_total + 1) * 1.3 or animals_total == 0)):
                 orders.append(["BUY_ANIMAL", animal, 1])
                 bought[animal] = bought.get(animal, 0) + 1
                 money -= ad["cost"]
-        if 4 <= day <= 15:
+        if 0 <= day <= 15:
             try:
                 for animal, tgt in (("COW", plan.get("cow_target", 0)),
-                                    ("SHEEP", plan.get("sheep_target", 0))):
+                                    ("SHEEP", plan.get("sheep_target", 0)),
+                                    ("GOOSE", plan.get("goose_target", 0))):
                     own_n = sum(1 for row in tiles for t in row
                                 if isinstance(t, dict) and t.get("animal") == animal)
                     own_n += (shed.get(animal, 0) or 0) if shed else 0
@@ -1660,7 +1765,16 @@ def _build_orders(me, shed, seeds, inventories, inv, prices, day, hour, plan,
 
     seed_spent = 0
     if hour <= 17 and seeds is not None:
-        for crop in ("WHEAT", "CARROT", "STRAWBERRY", "MELON", "TOMATO"):
+        # Trụ 5-fix: melon lên TRƯỚC dâu trong cửa sổ wave-2 (8-14) khi
+        # đứng < 8 — s311: melon 35u vs v6 78u, seed-buy thua queue
+        # dâu/đàn cả mùa (BUY_SEED:MELON chỉ 3 lệnh) = mất kênh $8-10k
+        _seed_order = ["WHEAT", "CARROT", "STRAWBERRY", "MELON", "TOMATO"]
+        _mel_stand_now = sum(1 for row in tiles for t in row
+                             if isinstance(t, dict) and t.get("kind") == "PLANT"
+                             and t.get("crop") == "MELON")
+        if 8 <= day <= 14 and _mel_stand_now < 8:
+            _seed_order = ["WHEAT", "MELON", "CARROT", "STRAWBERRY", "TOMATO"]
+        for crop in _seed_order:
             n_tiles = plan.get("crop_tiles", {}).get(crop, 0)
             if not n_tiles:
                 continue
@@ -1712,6 +1826,10 @@ def _build_orders(me, shed, seeds, inventories, inv, prices, day, hour, plan,
                     floor = 700
                 if crop == "MELON" and pending_animal_cost > 0:
                     floor = max(floor, min(pending_animal_cost, 1100))
+                # Trụ 5-fix: wave-2 đứng < 8 → floor phẳng 300 (pending-animal
+                # bump $1.1-1.4k bóp chết seed-buy melon cả mùa vs v6)
+                if crop == "MELON" and 8 <= day <= 14 and _mel_stand_now < 8:
+                    floor = 300
                 max_afford = max(0, int((money - floor) // unit)) if unit > 0 else 0
                 buy = min(need, max_afford)
                 if buy > 0:
@@ -1734,8 +1852,27 @@ def _build_orders(me, shed, seeds, inventories, inv, prices, day, hour, plan,
                 wheat_want = int(animals * 2.0) + 6
         except Exception:
             pass
-        if shed_wheat < wheat_want and money >= 400:
-            need = min(10, wheat_want - shed_wheat)
+        # Trụ 4 (R158) + churn-fix: mua feed 3 pha. BÀI HỌC s203: gate _late
+        # pw≤70 + buffer 2-ngày = chu kỳ mua-cao-bán-thấp (tối mua $45-70,
+        # sáng sau bán $19-40 → rút $4-7k + nâng giá cho đối thủ). Sửa:
+        # (a) trừ đi dòng máy wheat ĐANG ĐỨNG (~0.9u/ô/ngày) trước khi mua;
+        # (b) d20+ chỉ mua KHẨN CẤP (shed<6); (c) đàn non d0-3 mua ≤$45.
+        _early = day <= 3
+        _late = day >= 20
+        _acute2 = shed_wheat < 6
+        _wheat_standing_now = sum(1 for row in tiles for t in row
+                                  if isinstance(t, dict) and t.get("kind") == "PLANT"
+                                  and t.get("crop") == "WHEAT"
+                                  and (day - t.get("planted_day", day)) >= 1)
+        _machine_inflow = 0.8 * _wheat_standing_now * 0.9
+        # Trụ 4-fix (v6 lesson) + churn-stop: máy wheat là dòng TƯƠNG LAI
+        # nhiều ngày — x2 dòng hôm nay; muốn mua thật = 2 ngày feed còn thiếu
+        # sau khi trừ máy. s311: ta vẫn churn 85 lệnh (mua $35-45 tuần đầu,
+        # sáng sau bán $19-25 — từng unit −$10-15)
+        _eff_want = max(3, int(wheat_want - _machine_inflow * 2.0))
+        _floor_money = 250 if (_early or (_late and _acute2)) else 400
+        if shed_wheat < _eff_want and money >= _floor_money:
+            need = min(14 if (_late and _acute2) else 10, _eff_want - shed_wheat)
             pw = _price("WHEAT", inv.get("WHEAT", MARKET_I0) - 1)
             afford = int((money * 0.35) // pw) if pw > 0 else 0
             n = min(need, afford)
@@ -1748,7 +1885,9 @@ def _build_orders(me, shed, seeds, inventories, inv, prices, day, hour, plan,
             _dairy_deep = (_pxm >= 200 or _pxw2 >= 220) and day <= 23
             _tgt_unmet = (animals < (plan.get("cow_target", 0) + plan.get("sheep_target", 0)))
             if n >= 1 and (pw <= 38 or (acute and pw <= 62)
-                           or (_dairy_deep and _tgt_unmet and pw <= 52)):
+                           or (_dairy_deep and _tgt_unmet and pw <= 52)
+                           or (_early and pw <= 45)
+                           or (_late and _acute2 and pw <= 70)):
                 orders.append(["BUY_PRODUCT", "WHEAT", n])
                 money -= n * pw
 
@@ -1765,9 +1904,13 @@ def _build_orders(me, shed, seeds, inventories, inv, prices, day, hour, plan,
         if over > absorb.get(it, 0) * 0.8 and pr_now < 0.75 * MARKET_PARAMS[it]["base"]:
             glutted.add(it)
 
-    # KAIN-15: 3 days of feed reserve (the $52 dairy-gated feed buys work;
-    # sell the rest — v5 outsold us 880u vs 684u on wheat).
-    wheat_reserve = min(animals * 3 + 6, shed.get("WHEAT", 0) or 0) if day < 26 and shed else 0
+    # KAIN-15 + Trụ 4 (R158): reserve feed — giữ TỚI d28 VÀ muộn mùa = phủ
+    # toàn bộ nhu cầu còn lại của đàn (đàn×số ngày còn) — không bao giờ bán
+    # thức ăn khi máy không đủ tự cấp (s203: bán 810u d20+ trong khi đàn đói
+    # care-bonus → thua kênh milk/egg $14k cho base)
+    _wheat_feed_need_late = animals * max(0, (29 - day)) if day >= 18 else 0
+    wheat_reserve = min(max(animals * 3 + 6, _wheat_feed_need_late),
+                        shed.get("WHEAT", 0) or 0) if day < 28 and shed else 0
 
     # v6 ΔF (E8-lite): drain-aware endgame — d22-27 nếu drain còn đủ hút
     # TOÀN BỘ nguồn chờ bán thì KHÔNG hạ ngưỡng (bán dần vào drain giá đẹp)
@@ -1814,8 +1957,11 @@ def _build_orders(me, shed, seeds, inventories, inv, prices, day, hour, plan,
         for it in PRODUCTS:
             if it == "FERTILIZER" and day < 26:
                 nf = shed.get("FERTILIZER", 0) or 0
-                if nf > 2 and day >= 1:
-                    k = _sell_count("FERTILIZER", nf - 2, inv.get("FERTILIZER", MARKET_I0), FERT_FLOOR)
+                # Trụ 1-fix: d1-3 bán SẠCH FERT (bootstrap $95-100/con/ngày
+                # — chưa có dâu để bón); giữ 2 chỉ từ d4 khi dâu vào event
+                if nf > 0 and day >= 1:
+                    keep = 2 if day >= 4 else 0
+                    k = _sell_count("FERTILIZER", nf - keep, inv.get("FERTILIZER", MARKET_I0), FERT_FLOOR)
                     if k > 0:
                         cands.append((k * 60, ["SELL", "FERTILIZER", k]))
                 continue

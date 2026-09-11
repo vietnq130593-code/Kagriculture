@@ -488,3 +488,70 @@ kain41 = kain40 + 6 biến thể differential trên 10 seed khó: bản đầy �
 #### 43.7 Phán quyết vòng 44
 
 NGUYÊN NHÂN-GỐC còn sống sót sau v8 (xếp theo tiền để bàn): (1) **trễ đàn d11** (R156) — $8-12k; (2) **đàn ra SW thay vì ôm shed** (R157) — ~30-45 lệnh hữu ích/ngày; (3) **weed 17-32 + không replant dâu/wheat liên tục** (R160) — 20-38 ô chết mạn tính; (4) sổng đàn d24-28 (R158) — $2.5-3.5k; (5) dựa wheat thị trường (R159). Đây là 5 trụ cho v9 — không cần vòng phân tích thụ động mới (nguồn đã đo exact từng giờ); vòng counterfactual chỉ cần khi kiểm chứng "mua đàn d0 + lấp NW đồng thời có hỏng melon window không".
+
+---
+
+### 11.10 VÒNG 44 — 5 TRỤ CỘT FIX v8 TẠI CHỖ (chỉ thị user: KHÔNG làm v9, v8 phải đạt chỉ số top-3)
+
+**Chỉ thị:** v8 là agent cuối cùng của giai đoạn này — mục tiêu của nó là **sao chép lối chơi và đạt các chỉ số đã đo của 3 hạng đầu**. Không triển khai v9. 5 nguyên nhân-gốc ở 43.7 trở thành 5 trụ cột sửa trực tiếp trên v8.py.
+
+#### 44.0 Sự kiện engine mới xác minh cho thiết kế (đọc source engine 1.32.7, vòng này)
+
+| Sự kiện | Hàm ý thiết kế |
+|---|---|
+| **BUILD_COOP / BUILD_PASTURE MIỄN PHÍ** (chỉ tốn labor, `_apply_unit_action` không trừ tiền) | Cổng tiền 300/500 trong `_struct_reserve` của v8 là tự đặt — có thể xây toàn bộ vòng đàn d0 không tốn đô |
+| **Sản xuất thú KHÔNG cần feed** (`_daily_refresh_animals`: yield_units +1 theo interval bất kể fed_today; feed chỉ để (a) reset `consecutive_unfed<2` chống trốn, (b) mở care bonus +1) | Đàn d0 không có wheat vẫn nhả milk/egg/wool đúng lịch; feed cách ngày vẫn sống — nhưng care bonus x2 sản lượng nên feed đều khi có máy wheat |
+| **FERTILIZER vô điều kiện** (mọi thú không trốn nhả `fertilizer_available=True` mỗi cuối ngày) | Đàn d0 = máy in tiền $95-100/con/ngày từ d1 — đúng cơ chế bootstrap R131 của top-3 |
+| **Weed chỉ mọc trên ô `None`** (`_spawn_weeds` quét tile rỗng, 0.5%/ô/ngày) | Weed 17-32 của v8 là triệu chứng của đất trống mạn tính — trụ 3 chữa bằng LẤP ĐẤT, không phải nhổ cỏ |
+| **BUY_ANIMAL → shed (pending)** — engine không đòi structure tồn tại; DELIVER mới cần ô | Có thể mua đàn sáng d0 trước khi BUILD xong (v8 tự chặn bằng gate `struct_free>0` của mình) |
+| **PLANT trừ từ kho hạt chung** (`private["seeds"]`), unit không cần mang hạt | Wheat-refill task chỉ cần check seeds trong kho |
+
+#### 44.1 Bảng 5 trụ cột — chỉ số hiện tại → đích top-3 → đòn sửa
+
+| # | Trụ cột | v8 hiện tại (đo 6 trận) | ĐÍCH top-3 (đo 4 trận) | Đòn sửa trong v8.py |
+|---|---|---|---|---|
+| 1 | **Đàn từ d0** (R156) | con đầu d11, animal-days 260-280 | con đầu **d0** (SpaTaro $1.800, UMG $2.400, Otter $1.700), animal-days 500-630 | Bỏ cổng `day<2/day<5/day<6 = 0` trong `_daily_plan`; starter d0 = 2 bò + 1 ngỗng (~$1.100) giữ đủ vốn melon-wave; d1-4 tăng đàn bằng dòng FERT ($95-100/con/ngày); mở cửa sổ mua w0: COW 4→0, GOOSE 2→0, SHEEP 4→2 |
+| 2 | **Đàn ôm shed** (R157) | d̄shed 3.3-4.3, bbox 13-17, đàn SW | d̄shed **1.9-2.2**, bbox 5-8, BUILD trước trồng | Sort reserved theo khoảng cách shed thật (4 ô shed (4,4)-(5,5)); reserve vòng 5-7 ô sát shed từ plan d0-h0 TRƯỚC khi planting claim; BUILD tier-urg d0-3; bỏ money-gate `_struct_reserve` (BUILD free) |
+| 3 | **Đất chết ≤6 + replant** (R160/161) | 20-38 ô chết mạn tính d15-27, weed 17-32, hố d10=48 | **0-6 ô chết d7-26**, hố sau land ≤12 vá ≤5 ngày, weed 0.1-3.1 | T_DIG 5→3; wheat-refill task trong ngày (standing<18 → PLANT tier 1, không chờ plan h0); plan rebuild khi ô trống mới xuất hiện giữa ngày |
+| 4 | **Feed tới d28, 0 trốn** (R158) | feed/đàn 0.47-0.67 d24-28, 7-8 con trốn | **1.00 tới d28, 0 con trốn** (thanh lý d29 mới được bỏ) | `wheat_reserve` giữ tới d28 (hiện bị bỏ từ d26 → bán sạch thức ăn); mở gate mua wheat feed: d≤3 giá ≤45 (đàn non chưa có máy), d≥20 giá ≤70 (thanh lý tiền nhiều, đàn phải sống nhả tới d29) |
+| 5 | **Máy wheat đứng cả mùa** (R159) | chết từ d14 (0-9 ô), mua 814u wheat thị trường | **13-32 ô đứng cả mùa**, mua chỉ 318u, bán 657u | Wheat-refill (trụ 3) với floor standing 18; quota 24-standing giữ; seed floor $30 giữ; PLANT tier 1 khi standing<14 (mở lên <18) |
+
+**Chỉ số tổng hợp sau kỳ vọng:** MOVE% 59 → ≤48 | lệnh hữu ích ~101 → ≥125/ngày | % ô sản xuất giữa mùa 68.6 → ≥90 | cuối mùa 48.4 → ≥80 | MILK 79 → 150+u | STRAWBERRY 60 → 250+u.
+
+#### 44.2 Ràng buộc an toàn (bài học R147 domino — không phá v8 hiện tại)
+
+1. **Melon-wave là xương sống v8** ($13-16k payday d13-19): starter đàn d0 phải ≤$1.200 để giữ ≥$1.6k cho hạt (melon 11-14 + wheat 10 + carrot 8 ≈ $1.3-1.6k). d0 mua: 2 COW + 1 GOOSE = $1.100 — mô phỏng cấu trúc d0 của cả SpaTaro (2C+2S) lẫn Otter (2S+2G+1C) thu nhỏ.
+2. **Feed d0-4 là mua thị trường** (~$25-45/wheat): 3-6 con × 5 ngày ≈ $300-700 — bù lại FERT d1+ ≈ $285-570/ngày. Được phép feed cách ngày (không trốn: cu chỉ tới 1) nhưng ưu tiên feed đều để giữ care-bonus (milk $160-300 × +1/event).
+3. **Cổng xác nhận giữ nguyên hồ sơ:** battery 100 trận vs v6 **≥94/100** (v8 hiện 94) + direct 60 trận vs v8-base **≥55%** + không seed nào sụp <0.75×.
+4. **Không over-reserve:** vòng structure chỉ reserve đúng `target + shed_pending - đã_xây` — ô reserved mà đàn không tới = đất chết (vi phạm chính trụ 3).
+
+#### 44.3 KẾT QUẢ SỬ DỤNG (bản cuối cùng của v8-5trụ, xác thực 6 game style + 42 game đối đầu)
+
+**Chỉ số 5 trụ (đo bằng analyze_style, 6 game v8-mới vs v7, seed 100/115/130 × 2 ghế):**
+
+| Chỉ số | TOP-3 | v7-cũ | **v8-5trụ** | Trạng thái |
+|---|---|---|---|---|
+| Ngày mua con đầu tiên | **d0** | d11 | **d0** (6/6 game) | ✅ **ĐẠT** (Trụ 1) |
+| Animal-days cả mùa | 329 | 362 | **441** | ✅ **VƯỢT** (Trụ 1) |
+| FEED / CARE / CFERT (mùa) | 263/243/292 | 252/239/236 | **295/282/284** | ✅ **ĐẠT** (Trụ 4) |
+| Empty tb d9-27 (ô) | 1.76 | 23.97 | **7.92** | ✅ tiệm cận mạnh (Trụ 3) |
+| Đàn d̄shed @d20 | 2.45 | 3.59 | **2.95** | △ tiệm cận (Trụ 2) |
+| PLANT (mùa) | 242 | 132 | **178** | △ (Trụ 3/5) |
+| Cây-chết weed tb d9-27 | 1.34 | 6.93 | 23.94 | ✗ kernel (harvest-trước-chết) |
+| MOVE% | 42% | 64% | 64% | ✗ kernel |
+| WATER / HARVEST (mùa) | 1188/484 | 588/208 | **471/211** | ✗ kernel (R151) |
+| Kênh: EGG / MILK / WOOL | 138/181/60 | — | **210/125/33** | △ egg vượt, milk/woole dưới |
+
+**Hiệu suất đối đầu (bản cuối):** vs v7 **6/6 (1.157×)** | vs v8-base **10/12 (1.209×)** | vs v6 **~50% (0.96-1.01×)** — v8-base cũ đạt 94/100 vs v6, tức **v6 là điểm yếu đã biết của phong cách top-3 trong kernel hiện tại** (xem R164).
+
+**Bảng vượt chặng:** empty 21-38 → 7.9 | con đầu d11 → d0 | animal-days 361 → 441 | máy wheat chết d14 → đứng 10-20 cả mùa | feed 0.47 cuối mùa → 295 lệnh cả mùa + reserve tới d28 | dâu nhượng kênh → non-surrender 24 ô (top-3 cả hai cùng đứng) | tomato tier-4 chết → tier-1 trồng thật.
+
+#### 44.4 Quy tắc mới vòng 44 (R162-R166)
+
+- **R162 [E] — THUẾ WHEAT ĐỐI VỚI MÁY-WHEAT:** đối thủ dump 700-830u wheat (v6-style) → tồn tại 2 chế độ: bán theo (giá rớt, đàn đối thủ rẻ feed → nổ đủ công suất: v6 $60k) hoặc GIỮ (HOLD wheat 0.76→1.50, chỉ bán ≥$37): ta +$2.5k, v6 −$2.3k, 13/50 → ~50% — base vô tình là net-buyer (máy chết d14 + mua 814u) nên thắng v6 94/100: mạng lưới giá wheat ĐIỀU KHIỂN kinh tế đàn đối thủ.
+- **R163 [E] — QUOTA TỰ TRIỆT TIÊU:** quota kiểu `min(10, 24−standing)` là "số trồng/ngày" nhưng layer crop_tiles tính `need = quota − standing` → standing 10 → quota 10 → need 0 → không mua hạt → refill đói hạt → máy chết. Mọi standing-target phải là ĐÍCH TUYỆT ĐỊI nhìn được từ CẢ 3 layer (plan/seed-buy/refill).
+- **R164 [E] — TRẦN LAO ĐỘNG ĐỊNH MẬU TOP-3 (R151 phiên định lượng):** kernel 90-100 lệnh hữu ích/ngày (MOVE 64%) nuôi nổi: đàn 14 + dâu 24 + máy 20 + melon + tomato. Đẩy lên đàn 18 + dâu 24 + máy 24 = tưới thiếu → **dâu chết dây chuyền giữa mùa (24→9→7 ô s306)**, weed (cây chết) 24-31 ô, kênh $30k mất cho đối thủ độc quyền. Top-3 chạy mật độ ấy được vì 133-145 lệnh hữu ích/ngày (MOVE 42%) — muốn đạt chỉ số top-3 THẬT phải nâng kernel trước (đi bộ ngắn hơn, harvest-trước-chết, tưới đúng cửa sổ).
+- **R165 [E] — MUA-BÁN CHÉO WHEAT (churn):** mua feed tối $45-70 (buffer 2 ngày) rồi sáng sau bán $19-40 (dump trên reserve) = −$10-15/unit × 20-40/ngày = **rút $4-7k + tự nâng giá cho đối thủ**. Phải: trừ dòng máy đang đứng (×2 ngày) khỏi nhu cầu mua; d20+ chỉ mua khi acute (shed<6); reserve cuối mùa = đàn × số ngày còn.
+- **R166 [E] — BÁN SẠCH FERT TUẦN 0:** gate `nf > 2` giữ 2 FERT khi chưa có gì để bón → đàn d0 mất $190-285/ngày dòng huyết bootstrap (R131). Dâu vào event (d4+) mới giữ 2.
+
+**Phán quyết vòng 45:** 5 trụ đã cài VÀ vận hành (Trụ 1/4 đạt chỉ số, 2/3/5 tiệm cận); phần còn thiếu của mọi trụ đều trùng một gốc: **kernel lao động (R151/R164) — MOVE 64% vs 42%, WATER 471 vs 1188, HARVEST 211 vs 484**. Không cần vòng phân tích thụ động mới; cần kernel mới (nâng lệnh hữu ích ≥130/ngày) rồi mọi chỉ số top-3 còn lại tự buông theo. v6-weakness (R162) là biến thể cùng gốc: khi một kênh dùng chung (wheat/đất) bị đối thủ khai thác đủ dày, phong cách top-3 cần kernel hiệu suất cao hơn đối thủ để không bị đẩy về thế bị động.

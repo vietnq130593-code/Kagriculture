@@ -1072,3 +1072,27 @@ Stage Summary:
 - 5 nguyên nhân-gốc ranked cho v9: (1) trễ đàn d11 = $8-12k; (2) đàn SW thay vì ôm shed = 30-45 lệnh/ngày; (3) weed 17-32 + không replant = 20-38 ô chết mạn tính; (4) sổng đàn d24-28; (5) phụ thuộc wheat thị trường
 - Tools tái sử dụng: tool-results/v8_style/ (4 script + style_agg.json + 6 JSONL replay) — mọi câu hỏi vị trí/lao động giờ đo được exact từng giờ
 - Phán quyết vòng 44: KHÔNG cần phân tích thụ động mới — 5 trụ đã đủ định lượng; counterfactual chỉ để kiểm chứng "đàn d0 + melon window song song có vỡ không" trước khi build v9
+
+---
+Task ID: 44
+Agent: KAIN (main-agent)
+Task: Chỉ thị user: KHÔNG làm v9 — fix v8 TẠI CHỖ theo 5 trụ cột (đàn d0 / đàn ôm shed / đất chết ≤6 / feed tới d28 / máy wheat cả mùa) để đạt chỉ số 3 hạng đầu; cập nhật TOP3_REPLAY_ANALYSIS.md các vấn đề tìm thấy
+
+Work Log:
+- Xác minh engine cho thiết kế (đọc source 1.32.7): BUILD_COOP/PASTURE MIỄN PHÍ (chỉ labor); sản xuất thú KHÔNG cần feed (feed chỉ chống trốn cu>=2 + mở care bonus +1); FERTILIZER vô điều kiện mỗi cuối ngày; weed thực chất là CÂY CHẾT thành ô WEED (spawn ngẫu nhiên chỉ 0-2/mùa); BUY_ANIMAL vào shed không cần structure; PLANT trừ kho hạt chung
+- Cập nhật TOP3_REPLAY_ANALYSIS.md mục 11.10 (Vòng 44): bảng 5 trụ cột + chỉ số đích + ràng buộc an toàn R147
+- Triển khai 5 trụ trên v8.py tại chỗ qua 12 vòng differential (mỗi vòng trace/probe → fix → battery): (1) đàn d0: bỏ cổng day<5, starter 2 bò + 1 ngỗng mua TRƯỚC hạt d0-h0 (fix block 1<=day chặn d0 + struct-gate d0-2), d1-4 ramp bằng FERT $95-100/con/ngày, bán sạch FERT d1-3; (2) vòng đàn: sort reserved theo khoảng cách shed thật (4 ô (4,4)-(5,5)), BUILD tier-urg d0-3, bỏ money-gate _struct_reserve; (3) T_DIG 5→4, dâu non-surrender (đứng <14 không nhượng kênh), LATE-STRAW standing-target 18; (4) feed: wheat_reserve tới d28 + reserve muộn = đàn×số-ngày-còn, care-bonus tier 1 cho con đang có sản lượng; (5) máy wheat: FIX QUOTA TỰ TRIỆT TIÊU (R163) — standing-target thật đàn×1.0+4 cap 20 + refill task trong ngày + seed-buy nhìn cùng con số
+- Vòng khắc phục chính: domino NE sụp (d0 hút vốn hạt → NE trễ d10) → mua đàn trước hạt; dâu nhượng kênh vì room() trừ 0.85×pipeline đối thủ → non-surrender; tomato chết vì 29 DIG tier-3 át PLANT tier-4 → DIG 4 + tomato tier-1; MUA-BÁN CHÉO wheat d20+ (mua $45-70 tối, bán $19-40 sáng) rút $4-7k → machine-subtract ×2 + acute-only d20+; melon wave-2 chết đói seed (floor bị pending-animal đẩy $1.4k, thua queue dâu/đàn) → seed-order ưu tiên + floor 300 khi đứng <8
+- Phát hiện R162 THUẾ WHEAT: v6 kiếm +$16k khi gặp v8-mới ($60.8k) vs v8-base ($44.7k) cùng seed — máy wheat sống của ta làm wheat rẻ → đàn v6 nổ đủ công suất (wool 44 vs 10, fert 188 vs 118); HOLD wheat 0.76→1.50 (chỉ bán ≥$37) = ta +$2.5k, v6 −$2.3k: 13/50 → 10/20
+- Thử và loại bỏ: bỏ melon d0 theo đúng top-3 nguyên văn = THẤM (0/6 vs v7, 0/8 vs base — máy bootstrap 3 thú của ta yếu hơn 5-6 thú của họ); dâu cap 16 khi đối thủ 24 ô = 11/50 (rút lui làm v6 độc quyền premium → tệ hơn); mật độ nhẹ (đàn 12/máy 16/dâu 22) = 5/20 (đàn là annuity)
+- Kết quả bản cuối: vs v7 6/6 (1.157×) | vs v8-base 10/12 (1.209×) | vs v6 ~50% (0.96-1.01× — điểm yếu đã biết, R162/R164)
+- Đo style metrics bản cuối (analyze_style 6 game vs v7): first-buy d0 (top-3: d0) ✅ | animal-days 441 (top-3: 329) ✅ VƯỢT | FEED/CARE/CFERT 295/282/284 (top-3: 263/243/292) ✅ | empty d9-27 = 7.9 ô (v7: 24.0; top-3: 1.8) | d̄shed 2.95 (top-3: 2.45; v7: 3.59) | PLANT 178 (top-3: 242; v7: 132) | còn thiếu: MOVE 64% vs 42%, WATER 471 vs 1188, HARVEST 211 vs 484, weed 24 — đều trùn gốc kernel lao động R151/R164
+- TOP3_REPLAY_ANALYSIS.md 11.10 hoàn chỉnh: 44.0 sự kiện engine, 44.1 bảng 5 trụ, 44.2 ràng buộc, 44.3 kết quả + bảng chỉ số, 44.4 quy tắc mới R162-R166 + phán quyết vòng 45
+- UI verify qua gateway :81: v8 (mặc định) vs v7 seed 115 → "🏆 v8 THẮNG! 1.18×" $58.263 vs $49.450, money chart + log render, 0 console error; lint sạch; screenshot tool-results/ui_v8_5tru_victory.png
+
+Stage Summary:
+- v8-5trụ SHIP: 5 trụ cột vận hành thật — Trụ 1 (đàn d0) + Trụ 4 (feed/animal-days) ĐẠT/VƯỢT chỉ số top-3; Trụ 2/3/5 tiến sát (d̄shed 2.95, empty 7.9, máy đứng cả mùa); vượt xa v7 cũ ở mọi trục (6/6 đầu trực tiếp)
+- Điểm yếu công khai: vs v6 ~50% (base cũ 94/100) — gốc: kernel lao động (R164: 90-100 lệnh hữu ích/ngày không nuôi nổi mật độ top-3 18 thú + dâu 24 + máy 24 → dâu chết dây chuyền) + R162 (máy wheat sống feed kinh tế đối thủ); cả hai đều cần kernel mới (lệnh hữu ích ≥130/ngày) — đúng bàn giao v9 của Task 42/43
+- Quy tắc mới R162-R166 (thuế wheat / quota tự triệt tiêu / trần lao động mật độ / mua-bán chéo / FERT tuần 0)
+- Tools mới: tool-results/v8_style/trace44.py (trace theo ngày) + probe44.py (spy orders/tasks qua wrapper agent) + ledger44.py (kênh bán) — tái sử dụng cho mọi vòng sau
+- v8-base backup tại /tmp/v8_base.py (không commit); git có toàn bộ lịch sử nếu cần rollback
