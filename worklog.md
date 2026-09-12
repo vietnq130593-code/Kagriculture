@@ -1470,3 +1470,18 @@ Stage Summary:
 - 3 CỬA CHẾT xác nhận bằng số: fresh-harvest (DROP+SELL cùng step — muốn thắng phải harvest sớm = kernel surgery, để v13), buy-side front-run (v12k −3.8k — cả hai cùng mất tiền vào void), shadow-tail (đối xứng tuyệt đối)
 - GAP HIỆN TẠI +3.2k: CHƯA tới ngưỡng +5k-10k user yêu cầu — thị trường market-race đã cạn (mọi lô chung đều bán trước 2 lượt); đòn tiếp theo cần đổi kiến trúc: harvest sớm (melon wave 12k + mọi fresh-flow), V231 sabotage (đảo giá sữa s216-227 đổi hướng đàn kme3), R53 thêm worker cuối game
 - Chờ đối thủ mới của user khi gap đủ lớn
+
+---
+Task ID: 61
+Agent: KAIN (main-agent)
+Task: User yêu cầu kiểm tra v12.py có lỗi cú pháp không
+
+Work Log:
+- python3 -m py_compile v12.py: PASS
+- ast.parse toàn file: PASS; quét còn sót: 0 comment dòng-đầy, 0 docstring (bản sạch 1.779 dòng giữ nguyên)
+- So AST với v12_backup_commented.py: 90 def/class trùng tên hoàn toàn; chỉ 3 khối khác = đúng 3 đòn tinh chỉnh v12z đã ghi ở Task 60 (_V12_R36_LO 288→144; planner 64/1/4→256/2/16; _r36_reserve nocap+WHEAT+FERT) — không có code hỏng
+- Import module 0.1s OK; gọi agent() step 0 trả action dict hợp lệ
+- Smoke battle v12 vs kme3 48 step (seed 4242): chạy đủ 48 turn, 0 Traceback, 0 Error, 0 warning, action 2 bên hợp lệ từng turn
+
+Stage Summary:
+- v12.py KHÔNG có lỗi cú pháp: compile + AST + import + trận thật đều sạch; khác biệt với backup đúng 100% là 3 đòn tuning v12z chủ đích (gap +3.2k, 32/32)
