@@ -1052,3 +1052,63 @@ ngày) → **+2 units thay vì +1**. Hệ quả theo cây (tham số engine):
 | R195 CARROT-FERT | hồi sinh carrot: trồng + bón khi tồn FERT (2 nước = 4u) | +$3-6k/trận |
 | R196 MELON-3-NƯỚC | bón melon đầu window → 3 nước chạm 6u, dư lao động cho dâu | giải phóng ~18-24 op/ô |
 | R197 DÂU CHU KỲ 2 | bón dâu ngày sản xuất → chết sớm → replant | cần đo thêm |
+
+## 11.16 VÒNG 53 — TRIỂN KHAI R194-R197: 5 BIẾN THỂ, 138 GAME, KẾT LUẬN ÂM (FERT BỊ CHẶN BỞI KERNEL)
+
+Task: user duyệt triển khai R194-R197 ("v8 mới học bề ngoài, chỉ số chưa khớp") + chạy
+thực nghiệm ngay. Đã triển khai đủ 4 đòn + 1 đòn gia tăng (R198), 5 biến thể a-e, tổng
+138 game battery (8 trắng 200-207 + 20 chính 100-119 A/B sạch + 30 ext 120-149 + ablation).
+
+### 53.0 — CÁC BIẾN THỂ VÀ KẾT QUẢ (v8 seat A vs v6)
+
+| Biến thể | Cấu hình | Battery | Kết quả | Phán quyết |
+|---|---|---|---|---|
+| 53a | đủ 4 đòn, dâu+melon FERT **tier 1** (sfert 6/h, mfert 4/h) | trắng 200-207 | 2/8, $58.752 | SỤP — service đàn chết |
+| 53b | tier về 2, keep theo "need" (~30 FERT/ngày kể cả wheat) | trắng 200-207 | 7/8, $62.630 | −$2.2k vs vòng-50 |
+| 53c | keep CỨNG 8 + carrot floor 6 + melon ws-1 tier2 + dâu tier2 cap6 | 100-119 + trắng | 16/20 $68.092 (+$1.6k) / 5/8 trắng $65.868 | tốt NHƯNG variance lớn |
+| 53d | 53c bỏ carrot floor (ablation) | 100-119 | 16/20 $66.927 | floor NET DƯƠNG (+$1.2k, thua 13/20 cặp) |
+| 53e | 53c + wheat-rescue tier1 cap 4/h (R198) | 100-119 | 6/20 $58.720 | THẢM HỌA — luật R183 lần 3 |
+| 53c (ext) | kiểm chứng độc lập | 120-149 | 23/30 $64.881 | REGRESSION vs 28/30 $68.278 |
+
+**TỔNG 58 game so trực tiếp: 53c 44/58 (76%) vs vòng-50 50/58 (86%) — REVERT về
+vòng-50 (md5 bc0d5523, s100=$59.798 bit-perfect).**
+
+### 53.1 — BA LUẬT ÂM MỚI (bổ sung R183)
+
+1. **R183-lần-2 (53a)**: FERTILIZE tier-1 cướp giờ CARE/FEED của đàn — care
+   9.8 → 7.0/ngày, WOOL −67u (−$13k), MILK −36u; battery 2/8 $58.752.
+   Tier-1 LÀ CỦA SERVICE. FERT giữ tier 2.
+2. **R198 (53e)**: carve-out wheat-rescue tier-1 cap 4/h = 96 task/ngày tràn
+   phase-1 (wheat cu≥1 là trạng KINH NIÊM dưới phase-2 bão hòa, không phải
+   sự kiện cấp tính như melon R192) — 6/20 $58.720. Không cứu wheat bằng tier.
+3. **R194-upper (53b)**: giữ FERT > 8 = hàng chết — kernel thực thi chỉ
+   ~2.7 FERTILIZE/ngày (đo: supply 15-20/ngày, thực thi 59-72/mùa). Need-
+   based keep ~30/ngày → −$3.2k tiền mặt d6-14 → cascade hạt/thú (s202 −$23k).
+
+### 53.2 — PHÁT HIỆN BIÊN KERNEL-FERT (quan trọng nhất vòng 53)
+
+Cơ chế FERT đúng như lý thuyết (engine +2u/lần tưới trên ô fertilized; dâu
+event nước+fert = +2u chạm vách 4u sau 2 event → 8u/cây; carrot 2 nước = 4u;
+melon 3 nước = 6u + thu sớm d8) — các seed thắng cho thấy đủ: s103 +$17.9k,
+s105 +$20.9k, s107 +$17.9k, s111 +$12.7k, s119 +$24.3k, dâu bán +10-13u,
+carrot +20-40u.
+
+NHƯNG: mỗi lệnh FERT cần 1 unit-hour + pickup trip; ngân sách phase-1/2 chỉ
+hấp thụ ~2.7 lệnh/ngày. Mọi biến thể vượt biên này đều triệt hạ 1 trong 3
+trụ khác (service đàn / máy wheat / dòng vốn hạt) vì **kernel 62%-MOVE đã
+chạy sát 100% công suất** (xác nhận định lượng R151/R164). Cái chết của
+máy wheat d16-24 (s112: 18→2 đứng, WEED 24; s149: 14→3, WEED 24) là triệu
+chứng cuối: phase-2 không còn 1 slot dự phòng nào.
+
+### 53.3 — PHÁN QUYẾT & ĐƯỜNG TIẾP
+
+- v8 CHÍNH THỨC = VÒNG 50 (R188-R192, 43/50 = 86%, $67.4k) — R194-R198 ghi
+  luật âm, KHÔNG deploy. Điểm mạnh 53c (peak $84.6k s107, avg +$1.6k trên
+  100-119) không đủ bền qua 58 game.
+- Gap còn lại tới top-3 ($67k vs $102k) KHÔNG thể đóng bằng tài nguyên FERT
+  hay chiến lược bón — cần tái cấu trúc KERNEL lao động (MOVE 63% → ~37%):
+  giảm chiều dài trung bình mỗi op (layout gia-tốc/shed gần), batching
+  pickup/deliver, hoặc giảm tổng op qua cycle nhanh hơn. Đây là phạm vi v9
+  (user đã quyết không deploy v9 ở giai đoạn này).
+- Tools mới: bat53*.py (a-f) + new53/new53b/new53d/new53e/new53f/new53r50
+  (jsonl đầy đủ 138 game + A/B sạch round-50) — chuẩn đối chứng vòng sau.

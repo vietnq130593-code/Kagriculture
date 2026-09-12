@@ -1279,3 +1279,25 @@ Stage Summary:
 - BÀI HỌC MỚI SỐ 1: FERT — v8 đang bán 200 FERT/game $64/u (82% lượng thu từ đàn) thay vì bón (+2u/ ngày tưới trong window); carrot hồi sinh được với FERT (đảo ngược một phần R184)
 - Đề xuất R194-R197 (FERT-KEEP, CARROT-FERT, MELON-3-nước, DÂU chu kỳ 2) — CHƯA triển khai, chờ user duyệt
 - Tools mới: phase8.py + new52/ (8 jsonl + god) — chuẩn đo vòng sau
+
+---
+Task ID: 53
+Agent: KAIN (main-agent)
+Task: User duyệt triển khai R194-R197 (bài học FERT vòng 52) + chạy thực nghiệm ngay
+
+Work Log:
+- Triển khai đủ 4 đòn vào v8.py: R194 FERT-KEEP (bán FERT theo nhu cầu), R195 CARROT-FERT (floor + nhánh FERTILIZE + nước carve-out carrot_crit), R196 MELON-3-NƯỚC (bón đầu window + mở age ws-1), R197 DÂU CHU KỲ 2 (event FERT + _task_still_valid ws-1)
+- 53a (dâu/melon FERT tier 1): battery trắng 200-207 SỤP 2/8 $58.752 — tier-1 cướp giờ CARE/FEED đàn (care 9.8→7.0/ngày, WOOL −67u, MILK −36u) — luật R183 tái phát → hạ tier 2
+- 53b (keep theo need ~30/ngày): 7/8 $62.630 — autopsy: kernel chỉ thực thi ~2.7 FERTILIZE/ngày → ~50 FERT × $64 chết shelved + đứt vốn P2 (gap tiền mở từ d6-12 trước khi dâu có event) → s202 −$23k
+- 53c (keep CỨNG 8 + carrot floor 6 + wheat ws-1 revert): trắng 5/8 $65.868; A/B sạch 20 seed 100-119 (chạy song song v8r50.py trích từ git): 16/20 $68.092 vs vòng-50 15/20 $66.478 (+$1.6k/game, peak s107 $84.6k, s119 +$24.3k)
+- 53d ablation (bỏ carrot floor): 16/20 $66.927 < 53c — floor NET DƯƠNG (+$1.2k, thắng 13/20 cặp đôi) → hoàn nguyên 53c
+- 53e (53c + R198 wheat-rescue tier-1 cap 4/h): THẢM HỌA 6/20 $58.720 — wheat cu≥1 là trạng KINH NIÊM → 96 task tier-1/ngày tràn phase-1 — luật R183 lần 3 → REVERT branch
+- Kiểm chứng ext-30 seed 120-149: 53c 23/30 $64.881 vs vòng-50 28/30 $68.278 — REGRESSION; tổng 58 game 53c 44/58 (76%) vs vòng-50 50/58 (86%)
+- QUYẾT ĐỊNH REVERT: git checkout v8.py về vòng-50; verify md5 bc0d5523 + s100=$59.798 bit-perfect khớp A/B; viết §11.16 (bảng 5 biến thể + 3 luật âm mới + phát hiện biên kernel-FERT)
+
+Stage Summary:
+- v8 CHÍNH THỨC GIỮ NGUYÊN VÒNG 50 (43/50 = 86%, $67.4k) — R194-R198 là vòng thử nghiệm ÂM, không deploy
+- 3 LUẬT ÂM MỚI: (1) FERTILIZE tier-1 cướp service đàn (R183-lần-2); (2) wheat-rescue tier-1 = tràn phase-1 kinh niên (R183-lần-3); (3) giữ FERT > 8 = hàng chết (kernel hấp thụ chỉ 2.7 lệnh/ngày)
+- PHÁT HIỆN BIÊN KERNEL-FERT: cơ chế +2u hoạt động thật (seed thắng +$18-24k: s103/105/107/111/119) nhưng tổng 58 game không bền — mọi FERT thêm đều giết 1 trụ khác (service/máy wheat/vốn hạt) vì kernel 62%-MOVE chạy sát 100%
+- Gap tới top-3 ($67k vs $102k) = việc của KERNEL (R151/R164: MOVE 63%→37%), không phải tài nguyên/chiến lược — phạm vi v9
+- Tools: bat53a-f + 138 game jsonl (new53*/new53r50) + autopsy53/crop_daily53/day_curve53/diff50_53 — đối chứng sẵn cho vòng kernel
