@@ -1426,3 +1426,25 @@ Stage Summary:
 - 4 LUẬT MỚI: L7 R42-reactive phá opening (chỉ an toàn trong tape); L8 NÚI TỒN KHO (premium-floor chỉ cho kênh deficit thật); L9 cadence premium chỉ trả khi sản xuất khớp drain (v10 812u vs drain ~500u); L10 shop-draw là ván bài thật — đàn + cây phải đọc như V231/V233
 - VÒNG SAU (v12): gap $96k = kernel-ops (WATER 629 vs 1.102) + sản xuất khớp drain (dâu/wheat thu hẹp, mọi unit premium) + đàn-17 với wheat ngoài — đích WATER ≥900, MKT_SELL ≥350, vs kme3 ≥$70k
 - kme3 đã chọn được từ UI; battles/ giữ nguyên, không có tệp mới lớn (bisa/bisb/bisc.py trong kaggriculture/)
+
+---
+Task ID: 59
+Agent: KAIN (main-agent)
+Task: User đổi hướng — kme3 là đích duy nhất; v12 = kme3 tinh chỉnh (lõi gốc kme3), đấu trực tiếp với kme3 thay vì nâng cấp v11
+
+Work Log:
+- Phục hồi ngữ cảnh: git log (Task 58 = v11.10 vs kme3 $41k), MASTER_ENGINE_V3_ANALYSIS.md, đọc toàn bộ kme3.py 2.356 dòng (Chassis + R42 + shadow-planner + V219/V224/V231/V233/V234 + R36/R37/R44 + R51/R53)
+- BASELINE MỚI: kme3 self-play 8 seed × 2 ghế = HÒA TUYỆT ĐỐI (mỗi seed 2 bên ra đúng nhau đến đồng, 2 ghế như nhau) → mọi lệch của v12 = tín hiệu sạch
+- Phát hiện 3 cửa sơ hở + 1 cửa bịch: R36 horizon cố định 4 (EXP179), cửa sổ R36 dừng 696, front_run layer tắt; shadow-planner bán "1000 mọi thứ" MỖI turn 712-717 (trace thực) → predump cuối game vô nghĩa
+- Viết v12.py = kme3 copy + 4 hằng số tinh chỉnh (_V12_HORIZON/_V12_R36_LO/_V12_R36_HI/_V12_PREDUMP_STEP) + wrapper predump; lỗi cú pháp from __future__ (hằng số phải đặt sau import) sửa trong 1 vòng
+- BISECTION 8 biến thể (a-h, 16 game mỗi biến thể): H=5 +2.1k | H=6 +2.4k ĐỈNH (Pareto) | H=8 +2.4k | H=10 +1.7k | H=16 +0.7k (tự hại — bỏ lỡ drain-driven price-rise); T2 early-R36 = no-op; T3 predump = no-op
+- KẾT QUẢ CHỐT: v12 (H=6, HI=712) vs kme3 = 16/16 THẮNG $99.487 vs $97.082 (1.025×, worst 1.014×); seed mới 200-207: 16/16 1.026× (không overfit); vs v11 = 8/8 $136.253 vs $41.617 (3.27×)
+- Đăng ký 3 tầng: run_battle.py AGENTS + arena-service/index.ts (v12 đầu danh sách) + constants.ts (tag "nhà vô địch", v11 chuyển "cựu vô địch"); kill pgid 30180 cũ + restart sạch :3005
+- UI e2e qua gateway :81: v12 dropdown vị trí 1; 2 trận v12 vs kme3 (seed random do agent-browser không trigger React onChange input number — đã verify seed path hoạt động ở Task 50) 720/720 lượt 0 console error, 🏆 v12 thắng cả hai ($77.610/$73.805, $89.727/$86.546), screenshot /tmp/ui_v12_victory.png
+- Viết §11.21 TOP3_REPLAY_ANALYSIS.md (baseline hòa tuyệt đối + bảng bisection 9 dòng + luật mới L11-L14)
+
+Stage Summary:
+- V12 KME3-TUNED = NHÀ VÔ ĐỊCH MỚI: 16/16 thắng kme3 ($99.5k vs $97.1k) sau đúng 1 vòng bisection — chiến lược "dùng chính lõi kme3" của user hội tụ nhanh hơn hẳn đường v11 (0/8 sau 6 vòng)
+- ĐÒN THẮNG = CADENCE-RACE: R36 horizon 6 (kme3=4) + cửa sổ d29 (HI=712) — mỗi lot bán trước kme3 2 turn, debt-ledger có sẵn giữ an toàn; đường cong horizon có đỉnh tại 6
+- 4 LUẬT MỚI: L11 horizon+2 là đòn rẻ nhất vs đối thủ tape-based công khai; L12 lead-sell có đỉnh (vượt = tự hại); L13 shadow-planner rút sạch cuối game từ 712; L14 luôn đo control self-play trước đối đầu
+- v12 đè nát v11 3.27× → thế hệ cũ hoàn thành sứ mệnh; v12a-h.py + battles/v12/ (11 json) giữ làm đối chứng

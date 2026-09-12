@@ -42,6 +42,7 @@ AGENTS = {
     "bisb": (os.path.join(ROOT, "bisb.py"), "agent"),
     "bisc": (os.path.join(ROOT, "bisc.py"), "agent"),
     "kme3": (os.path.join(ROOT, "kme3.py"), "agent"),
+    "v12": (os.path.join(ROOT, "v12.py"), "agent"),
     "v11": (os.path.join(ROOT, "v11.py"), "agent"),
     "v10": (os.path.join(ROOT, "v10.py"), "agent"),
     "v9": (os.path.join(ROOT, "v9.py"), "agent"),

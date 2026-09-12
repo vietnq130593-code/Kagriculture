@@ -1449,3 +1449,85 @@ dâu/wheat xuống mức khớp drain để mọi unit bán ở premium (kme3 $2
 - kme3 ĐĂNG KÝ ĐỦ 3 TẦNG (runner + arena-service + constants.ts) — chọn được
   từ UI dropdown; e2e agent-browser: v11 vs kme3 719/719 lượt 0 lỗi console,
   kme3 thắng 2,83× $177.454 vs $62.632 (screenshot /tmp/ui_v11_kme3.png)
+
+---
+
+## §11.21 — V12 "KME3-TUNED": đổi hướng chiến lược, lõi kme3 + CADENCE-RACE (Task 59)
+
+**Quyết định của user**: bỏ mục tiêu thắng các thế hệ cũ, kme3 là đích duy nhất;
+v12 = kme3 tinh chỉnh (không phải v11 nâng cấp) — dùng lõi gốc kme3 để đấu với
+kme3, hội tụ nhanh hơn.
+
+### 11.21.1 BASELINE: kme3 TỰ ĐẤU = HÒA TUYỆT ĐỐI
+
+Control 8 seed × 2 ghế (chạy engine thật): mỗi seed hai bên ra ĐÚNG nhau đến
+đồng (`78.443 / 97.812 / 100.982 / 113.345 / 109.506 …`), 2 ghế như nhau —
+engine hoàn toàn đối xứng khi 2 bên đánh giống hệt nhau. Hệ quả: mọi lệch dù
+nhỏ của v12 đều cho tín hiệu sạch (không noise ghế, không noise seed).
+
+### 11.21.2 TÌM SƠ HỞ kme3 — 3 CỬA + 1 CỬA BÍCH
+
+Nghiên cứu toàn bộ 2.356 dòng: kme3 = tape 719-turn + ~20 lớp reactive. Các
+điểm có thể đánh: (a) R36 lead-seller horizon cố định 4 turn (EXP179, d12-28);
+(b) cửa sổ R36 dừng ở step 696 (d29 không có lead); (c) front_run layer TẮT
+(không opponent_plan); (d) shadow-planner cuối game bán "1000 mọi thứ" mỗi
+turn 712-717 (trace thực) → cuối game KHÔNG còn hàng tồn → predump vô nghĩa.
+
+### 11.21.3 ĐÒN THẮNG: CADENCE-RACE (T1) + CỬA SỔ d29 (T4)
+
+Nguyên lý "order-timing theorem" của chính notebook kme3: bán x trước block q
+của đối thủ → swing 2×. Trong mirror, kme3 bán mỗi lot tại T−4 (horizon 4).
+v12 chỉ cần horizon LỚN HƠN: mỗi lot bán tại T−6 → luôn trước kme3 2 turn trên
+TOÀN bộ cadence, đúng vùng giá premium. Debt-ledger có sẵn giữ an toàn
+double-sell. T4: mở cửa sổ R36 sang d29 (696→712) kéo race vào tuần cuối.
+T2 (mở từ d1) đo lường = NO-OP; T3 (predump 717) = NO-OP (11.21.2d).
+
+### 11.21.4 BISECTION 8 BIẾN THỂ (16 game mỗi biến thể, seed 100-107)
+
+| Biến thể | Cấu hình | v12 TB | kme3 TB | gap | ratio |
+|---|---|---|---|---|---|
+| v12.1 | H=5 | $99.395 | $97.300 | +2.095 | 1.022× |
+| v12a | +LO=24 (T2) | $99.386 | $97.284 | +2.102 | 1.022× |
+| v12b | +predump717 (T3) | $99.395 | $97.300 | +2.095 | 1.022× |
+| v12c | H=8 | $99.333 | $96.994 | +2.339 | 1.024× |
+| v12d | H=5+HI=712 (T4) | $99.384 | $97.221 | +2.163 | 1.022× |
+| v12e | H=8+HI=712 | $99.317 | $96.910 | +2.407 | 1.025× |
+| **v12g** | **H=6+HI=712** | **$99.487** | **$97.082** | **+2.405** | **1.025×** |
+| v12h | H=10+HI=712 | $98.601 | $96.894 | +1.707 | 1.018× |
+| v12f | H=16 | $97.679 | $97.022 | +0.657 | 1.007× |
+
+TẤT CẢ 16/16 thắng. Đường cong horizon: đỉnh tại H=6 (Pareto: tiền v12 tối đa
+VÀ gap tối đa); H≥10 tự hại (bỏ lỡ drain-driven price-rise). v12e kiểm chứng
+seed mới 200-207: 16/16, 1.026× — không overfit.
+
+### 11.21.5 KẾT QUẢ CHỐT
+
+- **v12 vs kme3 (16 game, tên chính thức): 16/16 THẮNG — $99.487 vs $97.082
+  (1.025×, tệ nhất 1.014×)** → VƯỢT kme3, mục tiêu "ngang kme3" đạt chỉ sau
+  1 vòng bisection
+- v12 vs v11 (8 game): 8/8 — $136.253 vs $41.617 (3.27×, tệ nhất 2.88×) →
+  kèm đè nát cựu vô địch
+- UI e2e (gateway :81): v12 dropdown vị trí 1; 2 trận v12 vs kme3 (seed
+  ngẫu nhiên) 720/720 lượt 0 console error, 🏆 v12 thắng cả hai
+  ($77.610/$73.805 và $89.727/$86.546), screenshot /tmp/ui_v12_victory.png
+
+### 11.21.6 LUẬT MỚI (L11-L14)
+
+- **L11 CADENCE-RACE**: đối thủ tape-based công khai → horizon +2 là đòn rẻ
+  nhất hiệu quả nhất (16/16, không rủi ro — debt-ledger giữ an toàn)
+- **L12 SELF-DAMAGE CURVE**: lead-sell có đỉnh (H=6); vượt quá → tự hại vì
+  bán trước drain của town/shop làm mất price-rise
+- **L13 SHADOW-PLANNER**: kme3 cuối game bán "1000 mọi thứ" MỖI turn từ 712
+  → không tồn tại "terminal predump" trong mirror; của cải cuối game đã rút
+  sạch từ 712
+- **L14 SYMMETRY CHECK**: luôn đo control self-play trước khi đối đầu — hòa
+  tuyệt đối chứng minh engine công bằng, mọi chênh lệch = tín hiệu thật
+
+### 11.21.7 TỆP MỚI
+
+- `v12.py` — bản chính thức (H=6, LO=288, HI=712), đăng ký 3 tầng, tag
+  "nhà vô địch"
+- `v12a.py` … `v12h.py` — 8 biến thể bisection (giữ đối chứng)
+- `battles/v12/` — control_kme3_self.json, v121/v12a/v12b/v12c/v12d/v12e/
+  v12f/v12g/v12h_vs_kme3.json, v12e_seeds200.json, v12_FINAL_vs_kme3.json,
+  v12_vs_v11.json

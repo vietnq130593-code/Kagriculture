@@ -98,8 +98,9 @@ export interface AgentDesc {
 }
 
 export const AGENT_INFO: AgentDesc[] = [
-  { name: 'v11', desc: 'CADENCE+ADAPT — 6 vòng luyện với kme3: premium-floor kênh deficit + buffer lot-cap + distress-unclog + carrot/đàn thích ứng shop-draw (V231) · 12/12 vs v6 $83k · 6/10 vs v10 $71k · vs kme3 $41k (chi tiết §11.20)', tag: 'nhà vô địch' },
-  { name: 'kme3', desc: 'MASTER ENGINE V3 (Kaggle public, Apache 2.0) — route-tape 719-turn + 20 lớp overlay, Public Score 600 · đè bẹp mọi agent của ta ($142k TB) · sparring partner chuẩn top-leaderboard', tag: 'đối thủ chuẩn' },
+  { name: 'v12', desc: 'KME3-TUNED — lõi kme3 + CADENCE-RACE: R36 horizon 6 (kme3 = 4) + cửa sổ d29 (HI=712) · 16/16 thắng kme3 $99.5k vs $97.1k (1.025×) · đè v11 8/8 3.27× ($136k) · bisection 8 biến thể, đỉnh đường cong H=6 (chi tiết §11.21)', tag: 'nhà vô địch' },
+  { name: 'v11', desc: 'CADENCE+ADAPT — 6 vòng luyện với kme3: premium-floor kênh deficit + buffer lot-cap + distress-unclog + carrot/đàn thích ứng shop-draw (V231) · 12/12 vs v6 $83k · 6/10 vs v10 $71k · thua kme3 0/8 $41k (chi tiết §11.20)', tag: 'cựu vô địch' },
+  { name: 'kme3', desc: 'MASTER ENGINE V3 (Kaggle public, Apache 2.0) — route-tape 719-turn + 20 lớp overlay, Public Score 600 · tự đấu hòa tuyệt đối · bị v12 vượt 16/16 (chi tiết §11.21)', tag: 'đối thủ chuẩn' },
   { name: 'v10', desc: 'AD+KHO — opening 2 bò + melon-12 + drip thú d3-10 (AD 44,5) · 5 kho d0 · carrot cap 10/8 · đồng bộ 75,3% · $79,8k TB', tag: 'thế hệ mới' },
   { name: 'v9', desc: 'STACK-SWEEP — tái cấu trúc kernel lao động: continuation-claims gap-0/1 + morning-cascade + FERT-stack · mục tiêu $90-110k', tag: 'thế hệ mới' },
   { name: 'v8', desc: 'REGION-FLOW — kernel lao động lai: event-water + hybrid tier/geo + wheat-standing + fert · 57/60 vs v7', tag: 'nhà vô địch' },
