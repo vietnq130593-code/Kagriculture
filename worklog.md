@@ -1301,3 +1301,28 @@ Stage Summary:
 - PHÁT HIỆN BIÊN KERNEL-FERT: cơ chế +2u hoạt động thật (seed thắng +$18-24k: s103/105/107/111/119) nhưng tổng 58 game không bền — mọi FERT thêm đều giết 1 trụ khác (service/máy wheat/vốn hạt) vì kernel 62%-MOVE chạy sát 100%
 - Gap tới top-3 ($67k vs $102k) = việc của KERNEL (R151/R164: MOVE 63%→37%), không phải tài nguyên/chiến lược — phạm vi v9
 - Tools: bat53a-f + 138 game jsonl (new53*/new53r50) + autopsy53/crop_daily53/day_curve53/diff50_53 — đối chứng sẵn cho vòng kernel
+
+---
+Task ID: 54
+Agent: KAIN (main-agent)
+Task: User duyệt nâng cấp v8 → v9 với kế hoạch tái cấu trúc KERNEL LAO ĐỘNG + kiểm thử đối đầu v9 vs v6/v7/v8 + đo % đồng bộ chỉ số vs top-3 + đánh giá final money đã lọt top-3 chưa
+
+Work Log:
+- KERNEL-AUTOPSY trước thiết kế (3 tool mới: kautopsy9.py/kgap.py/ktop3.py): phân rã 28 game v8-vòng-50 + 4 seat top-3 god-replay → v8 walk-per-useful 2,49 (chuỗi TB 3,1 bước, gap≥2 = 37,7%) vs top-3 1,02-1,52; top-3 CHIẾN THẮNG bằng op-STACKING gap-0 (35-45% op kế tiếp CÙNG Ô: WATER→FERTILIZE, FEED→CARE→COLLECT) + sweep gap-1 (25-30%) + ops/ngày 92-123 vs 64
+- Viết v9.py (nền v8-vòng-50 nguyên vẹn md5 bc0d5523 + 6 đòn): K1 CONTINUATION CLAIMS (phase-0: unit free claim task d≤1 tier≤2 hoặc d=0 tier-3 → serpentine + gap-0 stack), K2 MORNING CASCADE (h≤2 sort theo d_shed — commute sáng thành lao động), K3 FERT-KEEP 8, K4 CARROT-FLOOR + nhánh FERTILIZE tier-2, K5 MELON-FERT ws-1 (mở cả _task_still_valid), K6 dâu-FERT cap 6/h
+- Đăng ký v9 3 tầng: arena/run_battle.py AGENTS + arena-service/index.ts + constants.ts (tag "thế hệ mới"); restart arena-service (supervisor EADDRINUSE-graceful, dev :3000 + gateway :81 sống)
+- Battery v9.0 (80 game): vs v6 100-119 **20/20 $73.044** (vòng-50: 15/20 $66.478) | vs v6 ext 120-149 **30/30 $72.532** (53c từng sụp 23/30 $64.881) | vs v8 đầu-trực 16/20 ($66.720 vs $62.019) | vs v7 10/10
+- Kernel-metrics v9.0 đo trên replay: walk/op **1,30** (v8 1,58; top-3 1,02-1,52) | gap-0 45,4% + gap-1 27,6% = đúng profile top-3 | WATER 658 (v8 610) FERTILIZE 96 (v8 40) HARVEST 246 (v8 200) | PASS 920 unit-h/game = lao động rảnh
+- v9.1 SUPPLY-BUMP (nạp cây cho kernel rảnh): dâu standing 24→28/20/16-14/16-12 + carrot floor 8 → vs v6 100-119 **20/20 $76.380** (max $87.755) + ext **30/30 $74.195** (max **$96.972 s127**) | đầu-trực vs v8 15/20 ($68.133 vs $62.730), vs v7 10/10
+- Sync-table 26 chỉ số (god-replay 0-mismatch 8 game + sync91.py): TỔNG ĐỒNG BỘ **74,9%** (v8 vòng-50 ~62%) — 100% nhóm: MELON/WOOL/EGG/FEED/CARE/Tổng-chi/P4-net/MOVE-positional; 80-97%: TOMATO/COLLECT_FERT/chi-SEED/chi-ANIMAL/P1; còn thiếu SUPPLY: dâu 41,6% (106u vs 254u), máy wheat 20%, carrot 10,5% (dâu chiếm đất), P2-net 33%
+- Final money: v9.1 TB $75.238 (50 game) = **75,1% mức TB top-3 $102.372, 82,4% mức min $93.281 — CHƯA lọt top-3**; 1 game s127 $96.972 chạm đáy khoảng; gap $20-27k đã TẬP TRUNG hoàn toàn vào supply cây trồng (kernel đã đồng bộ xong)
+- UI e2e agent-browser qua gateway :81: chọn v9 vs v8 seed 127 → **🏆 v9 THẮNG 1.12× $79.819 vs $71.166**, live turn counter 342/719 giữa chừng, 0 console error, screenshot /tmp/ui_v9_victory.png
+- Disk đầy giữa chừng (battles/ 1,3GB + /tmp 2,7GB) → giữ 20 jsonl mới nhất, dọn /tmp god cũ, df về 1,1G trống
+- TOP3_REPLAY_ANALYSIS.md §11.17 đầy đủ (autopsy → 6 đòn → 130 game → kernel-metrics → sync-table → final money → bàn giao v10)
+
+Stage Summary:
+- v9 STACK-SWEEP CHÍNH THỨC LÊP NGÔI: vs v6 50/50 (100%) TB $75.238 (vòng-50 v8: 43/50 $67.2k → +$8k/game), vượt đầu-trực v8 15/20, áp đảo v7 10/10 — KERNEL RESTRUCTURING THÀNH CÔNG
+- Chỉ số kernel ĐÃ ĐỒNG BỘ top-3: walk/op 1,30-1,33 (top-3 1,02-1,52), positional-walk 2.864/game (ÍT HƠN top-3 3.550-3.948), gap-profile 45/27,6 đúng hình
+- ĐỒNG BỘ TỔNG 74,9%/26 chỉ số (từ ~62%); final money 75,1% top-3 avg — CHƯA lọt top-3; gap còn lại = SUPPLY (dâu −$15k, máy wheat −$10k, carrot), không còn kernel
+- Luật quan trọng: FERT-KEEP 8 + tier-2 FERTILIZE chỉ hoạt động khi có stack gap-0 (53c đã chứng minh âm trên kernel cũ, dương trên kernel mới); mũ dâu 24 (R151/s306) là giới hạn kernel cũ — 28 đứng ổn
+- Bàn giao v10 (chờ duyệt): dâu FLAT 24-28 cả mùa, máy wheat 574u (harvest window), carrot chung sống dâu (order theo marg), AD sớm

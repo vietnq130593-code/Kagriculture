@@ -31,7 +31,7 @@ const RUNNER = '/home/z/my-project/kaggriculture/arena/run_battle.py'
 const BATTLE_DIR = '/home/z/my-project/kaggriculture/battles'
 const PYTHON = 'python3'
 
-const AGENTS = ['v8', 'v7', 'v6', 'kain40', 'kain39', 'kain38', 'kain33', 'kain32', 'kain31', 'kain30', 'kain25', 'kain16', 'kain3', 'v5', 'v4', 'melon']
+const AGENTS = ['v9', 'v8', 'v7', 'v6', 'kain40', 'kain39', 'kain38', 'kain33', 'kain32', 'kain31', 'kain30', 'kain25', 'kain16', 'kain3', 'v5', 'v4', 'melon']
 
 mkdirSync(BATTLE_DIR, { recursive: true })
 

@@ -38,6 +38,7 @@ sys.path.insert(0, BENCH)
 
 # name -> (file, entry function)
 AGENTS = {
+    "v9": (os.path.join(ROOT, "v9.py"), "agent"),
     "v8": (os.path.join(ROOT, "v8.py"), "agent"),
     "v7": (os.path.join(ROOT, "v7.py"), "agent"),
     "v6": (os.path.join(ROOT, "v6.py"), "agent"),

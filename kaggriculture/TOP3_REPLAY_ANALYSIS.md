@@ -1112,3 +1112,103 @@ chứng cuối: phase-2 không còn 1 slot dự phòng nào.
   (user đã quyết không deploy v9 ở giai đoạn này).
 - Tools mới: bat53*.py (a-f) + new53/new53b/new53d/new53e/new53f/new53r50
   (jsonl đầy đủ 138 game + A/B sạch round-50) — chuẩn đối chứng vòng sau.
+
+## 11.17 VÒNG 9 (Task 54) — v9 "STACK-SWEEP": TÁI CẤU TRÚC KERNEL THÀNH CÔNG
+
+User duyệt: nâng cấp v8 → v9 với kế hoạch tái cấu trúc kernel lao động + đo
+đồng bộ % vs top-3 + final money.
+
+### 54.1 — KERNEL-AUTOPSY TRƯỚC KHI THIẾT KẾ (kautopsy9.py + kgap.py + ktop3.py)
+
+Phân rã 28 game v8-vòng-50 (new52 + new53r50) + 4 seat top-3 god-replay:
+
+| Đo | v8 vòng-50 | TOP-3 | Ghi chú |
+|---|---|---|---|
+| walk-per-useful-op | **2,49** | **1,02-1,52** | kernel gap gốc |
+| Chuỗi đi TB | 3,1 bước | — | 1126 chuỗi/game |
+| gap-0 (op kế tiếp CÙNG Ô) | 43,5% | 35-45% | v8 ok nhờ animal-service |
+| gap-1 (ô kề) | 18,8% | **25-30%** | v8 thiếu sweep |
+| gap ≥ 2 | 37,7% | ~30% | v8 scatter (dâu/carrot rải) |
+| ops hữu ích/ngày | 64 | 92-123 | R151 xác nhận |
+| PASS | 8,9% unit-hour | — | 686/game |
+
+→ **Top-3 không đi XA hơn v8 — họ LẶP NHIỀU OP TRÊN CÙNG Ô (stack gap-0:
+WATER→FERTILIZE, FEED→CARE→COLLECT, HARVEST→PLANT) và sweep ô kề (gap-1).**
+Phần còn lại = morning-commute hands (spawn shed → đi ra ruộng mỗi sáng).
+
+### 54.2 — V9 KERNEL "STACK-SWEEP" (6 đòn, nền v8-vòng-50 nguyên vẹn)
+
+| Đòn | Nội dung |
+|---|---|
+| K1 CONTINUATION CLAIMS | phase-0 assignment: unit free claim NGAY task d≤1 (tier≤2) hoặc d=0 (tier 3) → serpentine sweep + op-stacking gap-0 |
+| K2 MORNING CASCADE | h≤2 phase-1 sort (tier, d_shed) — hands quét đàn (gần shed) trên đường ra, commute thành lao động |
+| K3 FERT-KEEP 8 | giữ 8 FERT shed từ d4 (cũ 2) — nuôi chuỗi FERTILIZE gap-0 |
+| K4 CARROT-FLOOR 6→8 | carrot không chết chỉ thiếu FERT (2 nước trên ô fertilized = 4u) + nhánh FERTILIZE tier-2 |
+| K5 MELON-FERT ws-1 | bón trước window 1 ngày — 3 nước chạm 6u (khớp _task_still_valid) |
+| K6 DÂU-FERT cap 6/h | tier 2, dàn đều giờ (kernel gap-0 hút dần) |
+| v9.1 SUPPLY-BUMP | kernel đồng bộ → PASS 920 unit-h/game rảnh → dâu standing 24→28/20/16-14/16-12 + carrot floor 8 |
+
+### 54.3 — KẾT QUẢ ĐỐI ĐẦU (130 game, engine thật, 720 lượt)
+
+| Suite | Kết quả | So baseline |
+|---|---|---|
+| v9.0 vs v6 (100-119) | **20/20**, TB $73.044, max $85.6k | vòng-50: 15/20 $66.478 |
+| v9.0 vs v6 ext (120-149) | **30/30**, TB $72.532 | vòng-50: 28/30 $68.278; 53c SỤP 23/30 $64.881 |
+| v9.1 vs v6 (100-119) | **20/20**, TB $76.380, max $87.8k | +$3.3k vs v9.0 |
+| v9.1 vs v6 ext (120-149) | **30/30**, TB $74.195, **max $96.972 (s127)** | +$1.7k vs v9.0 |
+| **TỔNG v9.1 vs v6 (50)** | **50/50 (100%)**, TB **$75.238** | vòng-50 v8: 43/50 (86%) $67.2k → **+$8k/game** |
+| v9.1 vs v8 đầu-trực (100-119) | 15/20, $68.133 vs $62.730 | v8 mất ngôi |
+| v9.1 vs v7 (100-109) | 10/10, $59.749 vs $44.614 | giữ áp đảo |
+| UI e2e (gateway :81) | v9 THẮNG v8 1.12× — $79.819 vs $71.166 (s127), 0 console error | toàn chuỗi sống |
+
+### 54.4 — KERNEL-METRICS SAU TÁI CẤU TRÚC (đo trên replay battery)
+
+| Chỉ số kernel | v8 vòng-50 | v9 | TOP-3 | Phán quyết |
+|---|---|---|---|---|
+| walk/op (positional) | 1,58 | **1,30-1,33** | 1,02-1,52 | ✅ ĐỒNG BỘ |
+| positional walk/game | ~4.800 MOVE | **2.864** | 3.550-3.948 | ✅ VƯỢT (đi ÍT hơn top-3) |
+| gap-0 / gap-1 | 43,5%/18,8% | **45,0%/27,6%** | 35-45%/25-30% | ✅ đúng profile |
+| ops hữu ích/ngày | 64 | 70-71 | 92-123 | ⚠ 71% — còn giới hạn bởi NHIỆU CÂY (supply) |
+| WATER / HARVEST / FERT | 610/200/40 | 679/251/97 | 1187/484/129 | 57%/52%/76% |
+
+### 54.5 — BẢNG ĐỒNG BỘ % v9.1 vs TOP-3 (26 chỉ số đo được, 8 game god 0-mismatch)
+
+✅ ĐỒNG BỘ 100%: MELON 82u, WOOL 65u, EGG 161u, FEED 259, CARE 260,
+Tổng chi $32,6k vs $33,2k, P4 net +$7.951/ng, MOVE (positional) ≤ top-3.
+✅ ≥ 80%: TOMATO 84%, COLLECT_FERT 85%, Chi SEED 90%, Chi ANIMAL 93%,
+P1 đốt vốn −$133 vs −$138 (97%).
+⚠ 60-80%: FERTILIZE 76%, P3 net 80%, MILK 67%.
+❌ CHƯA (gap còn lại — SUPPLY cây trồng, không còn kernel):
+- STRAWBERRY 105,8u vs 254,5 (41,6%) — gap $-15k
+- WHEAT máy resale 114,6u vs 574 (20%) — gap $-10k
+- CARROT 14,1u vs 135 (10,5% — dâu 28 chiếm đất, carrot bị đẩy)
+- P2 net +$1.475 vs +$4.489/ng (33%) — hệ quả 3 kênh trên
+- AD d0-10 45,6 vs 67,5 (68% — melon-14 opening đổi vốn)
+
+**TỔNG ĐỒNG BỘ: 74,9%** (26 chỉ số) — từ ~62% của v8 vòng-50 (§11.15).
+
+### 54.6 — FINAL MONEY: CHƯA LỘT TOP-3
+
+| | min | TB | max |
+|---|---|---|---|
+| TOP-3 (4 seat) | $93.281 | $102.372 | $109.084 |
+| v9.1 (50 game vs v6) | $45.811 | **$75.238** | **$96.972** |
+
+- v9.1 đạt **75,1% mức TB top-3** / 82,4% mức min top-3 — CHƯA vào top-3.
+- 1 game riêng lẻ (s127 $96.972) đã chạm đáy khoảng top-3.
+- Gap còn $20-27k TẬP TRUNG ở 3 kênh supply: dâu (−$15k), máy wheat (−$10k),
+  carrot — kernel đã đồng bộ, việc còn lại là NỐI CÂY (standing/plant volume),
+  không phải đi lại.
+
+### 54.7 — PHÁT HIỆN & BÀN GIAO
+
+1. **Luật 53c bị kernel cứu sống**: FERT-KEEP 8 từng sụp ext-seed (23/30) vì
+   mỗi FERTILIZE = 1 chuyến đi riêng (hấp thụ 2,7/ngày) — với stack gap-0
+   chi phí biên = 1 unit-hour, 50/50 thắng + $75.2k.
+2. **Mũ dâu 24 của R151/s306 ĐÃ HẠ ĐƯỢC** (28 standing, không chết dây chuyền)
+   — mũ cũ là giới hạn kernel 62%-MOVE, không phải giới hạn game.
+3. Đường tiếp (v10 nếu user duyệt): standing dâu FLAT 24-28 cả mùa + máy
+   wheat harvest đúng window (574u resale) + carrot chung sống dâu (order
+   planting theo marg thay vì dâu ăn hết đất) + AD sớm (starter thú).
+4. Tools mới: kautopsy9.py, kgap.py, ktop3.py, bat9.py, bat9ext.py, bat91.py,
+   sync9.py/sync91.py, god9.py + new9/new9ext/new91/new91hh (130 jsonl).
