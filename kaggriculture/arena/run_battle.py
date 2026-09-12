@@ -38,6 +38,9 @@ sys.path.insert(0, BENCH)
 
 # name -> (file, entry function)
 AGENTS = {
+    "bisa": (os.path.join(ROOT, "bisa.py"), "agent"),
+    "bisb": (os.path.join(ROOT, "bisb.py"), "agent"),
+    "bisc": (os.path.join(ROOT, "bisc.py"), "agent"),
     "kme3": (os.path.join(ROOT, "kme3.py"), "agent"),
     "v11": (os.path.join(ROOT, "v11.py"), "agent"),
     "v10": (os.path.join(ROOT, "v10.py"), "agent"),

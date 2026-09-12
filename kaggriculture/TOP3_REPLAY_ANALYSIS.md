@@ -1385,3 +1385,67 @@ Muốn copy kme3 (WATER 1.102, 101 op/ngày, $142k) phải xây TRẢ TIỀN TR�
   cách task-pair cùng unit, MOVE/unit/ngày — đo gap-0 40,7% vs kme3 48,1%)
 - `bench/bat11.py` — battery thread-pool 4 song song (thay battery cũ)
 - battles/: v11prep/v11k/v11k2/v112/v113/v113b/v113c/v11.4 series + bat logs
+
+## 11.20 VÒNG LUYỆN V11 VS KME3 (Task 58) — 7 BƯỚC LẶP "ĐIỀU CHỈNH ĐẾN KHI NGANG"
+
+> User duyệt: v11 mục tiêu đạt bằng kme3; nâng cấp với phát hiện mới, đưa kme3 vào
+> danh sách đối đầu, lặp lại điều chỉnh tới khi ngang. Kỷ luật: mỗi vòng = đo
+> đầu-trực vs v10 (10 seed) + vs kme3 (8 seed 100-107) + autopsy 1 trận thảm.
+
+### 11.20.1 HÀNH TRÌNH 7 VÒNG (mỗi vòng 1 autopsy → 1 redesign)
+
+| Vòng | Nội dung | vs v10 | vs kme3 | Bài học rút ra |
+|---|---|---|---|---|
+| v11.5 CADENCE-ENGINE | D1 premium-floor 1.00 toàn bộ + lot-cap drain + canh giờ h%4==1 + D2 R42 turn-0 + feed-buy | $34k (thua s103) | — | R42 wheat bị xả sạch d0h1 (reserve không tính thú trong shed); cadence tuyệt đối giết vốn lumpy |
+| v11.6 GROWTH-VALVE | lumpy khi tiền < nhu cầu tăng trưởng; đàn 15 + trajectory 8C/6S; 2-pass thú d1-2 | $28k s103 | — | feed-buy churn (bán 28 rồi mua lại 18); melon lump bị floor chặn = mất $10k d11 |
+| v11.7 | chống churn + melon exempt + d0 4 thú | $28k | — | R42 3-slot + kìm h0-hires phá trật tự opening: sóng melon-1 chết trắng d0-14 |
+| v11.8 | GỠ R42 hoàn toàn, phục hồi opening v10e | $50,2k (0/10) | — | cadence vẫn là thủ phạm chính |
+| BISECTION | bisa (đàn) / bisb (cadence) / bisc (feed) riêng lẻ 8 seed | +$1,4k / **−$32k** / +$0,8k | — | **NÚI TRỨNG**: bisb s207 shed 50 EGG — floor 1.00 + lot-cap chặn kênh glut cấu trúc → tắc pipeline |
+| v11.9 | _PREMIUM_SET chỉ 5 kênh deficit + buffer valve ≤2×drain + bỏ hour-gate | $65,6k (3/10) | $34,0k | gần v10; kme3 vẫn đè |
+| **v11.10 ADAPT** | + floor chỉ khi inv≤I0−50 + distress-unclog shed≥70 + CARROT-ADAPT (2+ pet-cafe → 30 ô, kme3 31) + ĐÀN-ADAPT (0 milk-shop → cap bò 4, V231) | **$71,0k (6/10) ✅** | **$41,3k** | s106 catastrophe sống lại: $6,7k → $18,1k; kme3 tụt $104k → $67k trên seed đó |
+
+### 11.20.2 KẾT QUẢ CHÍNH THỨC v11.10
+
+- **vs v6: 12/12 (100%) TB $83.041** — mức cao nhất từ trước tới nay của mọi
+  thế hệ (v10: 96% $76,3k; v9: 100% $75,2k)
+- **vs v10 đầu-trực: 6/10, $71.002 vs $64.434** — V11 LẦN ĐẦU VƯỢT V10, lên
+  ngôi nhà vô địch nội bộ
+- **vs kme3: 0/8, TB $41.327 vs $137.387** — chưa ngang: mỗi seed đều thua
+  nhưng nhóm catastrophe (s101/102/106/107: $6-20k) sống lại thành $18-31k;
+  kme3 cũng tụt trên chính các seed đó ($104k→$67k s106 = ta giành thị phần)
+
+### 11.20.3 BỐN LUẬT MỚI (đúc từ 7 vòng + autopsy s106/s207)
+
+- **L7 R42-REACTIVO**: vòng mua-bán net-zero của kme3 chỉ an toàn trong
+  route-tape có lịch định trước; trong agent phản ứng, 3 slot + $340 đỉnh +
+  kìm h0-hires PHÁ VỠ trật tự vốn d0 (sóng melon-1 chết = mất $10k d11).
+- **L8 NÚI TỒN KHO (EGG-MOUNTAIN)**: premium-floor + lot-cap áp cho kênh
+  GLUT CẤU TRÚC (trứng: 2 đàn ngỗng cùng sản xuất vượt drain 7-13/ngày)
+  → 50 trứng chất shed → PICKUP/DROP tắc → wheat machine + dâu chết theo.
+  Floor cao CHỈ cho kênh deficit thật (milk/wool/dâu/carrot/tomato).
+- **L9 ĐẦU-CƠ LUMPY vs DÒNG CADENCE**: v10 bán WHEAT-30 d5 + MELON-36 d11
+  là động cơ vốn nuôi sóng dâu + đàn; bóp nó khi vốn đang đói = tự sát.
+  Cadence premium chỉ trả tiền khi SẢN XUẤT khớp drain (kme3: ~550-650u
+  bán cả mùa; v10: 812u = gấp 1,5 lần drain → phần vượt phải tự đổ).
+- **L10 SHOP-DRAW LÀ VÁN BÀI THẬT**: s106 bốc 3 PET_CAFE (drain carrot
+  37/ngày) + 0 milk-shop → kme3 route-switch trồng 31 ô carrot thu tiền,
+  ta đứng 0-5 ô và 56 sữa chết shed. Đàn + cây PHẢI đọc shop-draw như
+  V231/V233 của kme3.
+
+### 11.20.4 VÒNG SAU (V12) — ĐƯỜNG CÒN LẠI TỚI PARITY
+
+Gap còn lại $96k/trận chia 3 phần: (1) KERNEL-OPS WATER 629 vs 1.102 (từ
+§11.18, vẫn nguyên vẹn); (2) sản xuất 812u vs drain ~500u — phải thu hẹp
+dâu/wheat xuống mức khớp drain để mọi unit bán ở premium (kme3 $227-248 dâu);
+(3) 17 thú + 155 wheat ngoài nuôi đàn sữa. Đích đo: WATER ≥ 900, MKT_SELL
+≥ 350, vs kme3 TB ≥ $70k (mức self-play kme3 $78-98k).
+
+### 11.20.5 TỆP & CÔNG CỤ MỚI
+
+- `v11.py` — v11.10 CADENCE+ADAPT (đăng ký 3 tầng, tag "nhà vô địch")
+- `bisa.py/bisb.py/bisc.py` — 3 biến thể bisection (đăng ký runner, giữ làm
+  đối chứng); `/tmp/v115_s103.jsonl`, `/tmp/v116_s103.jsonl`, `/tmp/v117_s103.jsonl`,
+  `/tmp/bisb_s207.jsonl`, `/tmp/v119_k106.jsonl` — replay autopsy các vòng
+- kme3 ĐĂNG KÝ ĐỦ 3 TẦNG (runner + arena-service + constants.ts) — chọn được
+  từ UI dropdown; e2e agent-browser: v11 vs kme3 719/719 lượt 0 lỗi console,
+  kme3 thắng 2,83× $177.454 vs $62.632 (screenshot /tmp/ui_v11_kme3.png)

@@ -1,100 +1,3 @@
-# v11.10 (Task 58, vòng 6) — THÍCH ỨNG SHOP-DRAW (tinh thần 13-route
-#   kme3/V231) + 3 valve chống chết kênh, từ autopsy s106 (v11 $6,7k vs
-#   kme3 $104k khi bốc BAKERY+3×PET_CAFE+FARMERS×2+PIZZA — KHÔNG có
-#   milk-shop/yarn sâu):
-#   • SỮA +75 tồn (giá $3) + shed 56 milk + 24 wool CHẾT → floor 1.00
-#     chặn hết cả kênh → shed tắc 100 → wheat machine + dâu chết theo;
-#     kme3 lấy cửa sổ premium d5-8 ($154-217) XONG dừng (cadence).
-#   • Giải pháp: (1) floor 1.00 CHỈ khi inv ≤ I0−50 (deficit thật —
-#     giữa I0±50 dùng floor v10 tránh chặn nhầm cửa sổ pre-glut);
-#     (2) DISTRESS-UNCLOG: shed ≥ 70 + kênh glut → bán giải phóng kho
-#     ở giá ≥ $2 (giá trị shed-free > giá bán — pipeline quan trọng hơn);
-#     (3) CARROT-ADAPT: ≥2 PET_CAFE = kênh sâu nhất ván (drain 27-40/
-#     ngày, kme3 trồng 31 ô) → quota 8+9×cafe cap 26; (4) ĐÀN-ADAPT:
-#     0 milk-shop d5+ → cap bò 4; 1 shop d8+ → cap 6; 0 yarn d8+ →
-#     cap cừu 4 — không bơ vào kênh cạn.
-#
-# v11.9 (Task 58, vòng 5) — THIẾT KẾ LẠI CADENCE sau bisection 3 đòn
-#   (A đàn: 5/8 +$1,4k ✓ | B cadence: 0/8 −$32k ✖ | C feed: 5/8 +$0,8k ✓).
-#   GIẾT B = NÚI TRỨNG: EGG floor 1.00 + lot-cap drain chặn bán khi thị
-#   trường trứng GLUT CẤU TRÚC (đàn ngỗng 2 bên cùng sản xuất, drain
-#   chỉ 7-13/ngày) → 50 trứng chất shed → tắc pipeline thu hoạch → cả
-#   mùa −$32k (bisb s207: bisb $37k vs v10 $89k, shed EGG 50 quả d22).
-#   BÀI HỌC LÕI: cadence premium CHỈ đúng cho kênh deficit THẬT (có shop
-#   hút sâu hơn sản xuất 2 bên); kênh glut (EGG/WHEAT/FERT) phải giữ
-#   floor thấp của v10 + không lot-cap.
-#   D1v4: (a) _PREMIUM_SET = {MILK, WOOL, STRAW, CARROT, TOMATO} — floor
-#   1.00×base d1-18 / 0.92 d19-21; (b) lot-cap = drain CHỈ khi buffer
-#   mỏng ≤ 2×drain (buffer dày = sản xuất vượt drain → nhả tự do theo
-#   floor như v10 — không đổ núi); (c) BỎ hour-gate (v10 bán 82/31 lệnh
-#   tại h0 — chặn h0 là mất nguồn thu buổi sáng). v11.9 = carrot-tail
-#   + A (đàn 15, 8C/6S, 2-pass d1-2) + C (feed-buy chống churn + reserve
-#   thú-shed + không bán wheat d0) + D1v4.
-#
-# v11.8 (Task 58, vòng 4) — RỎ R42 HOÀN TOÀN + phục hồi opening v10e.
-#   Autopsy v11.7 s103: d0 [R42×3 + 2 bò 2-pass + hires h1] ăn sạch chỗ
-#   slot + tiền của HẠT MELON → sóng melon-1 KHÔNG TỒN TẠI (M=0 suốt
-#   d0-14, chỉ 3-4 ô d15) → mất lump $10k ở d11 (v10 bán 75u melon) →
-#   dâu wave d10-15 + đàn đói cả mùa → $28k. Bài học: R42 net-zero chỉ
-#   an toàn trong TAPE có lịch định trước; trong agent phản ứng, 3 slot
-#   + $340 đỉnh + kìm h0-hires PHÁ VỠ trật tự vốn d0 đã chứng minh của
-#   v10e (hires → 4 thú → wheat/melon seeds → cow thứ 2 h1). Deficit
-#   wheat I0−13 thay bằng: KHÔNG bán wheat d0 + feed-buy khi rẻ (D2b).
-#   Giữ nguyên các đòn khác của v11.7: growth-valve cadence (D1v3,
-#   melon exempt), đàn cap 15 + trajectory 8C/6S, feed-buy chống churn.
-#
-# v11.7 (Task 58, vòng 3) — 4 sửa từ autopsy v11.6 ($28k vs $92k s103):
-#   (1) FEED-BUY CHURN: d9 bán 28 wheat rồi MUA LẠI 18 (gate pw≤38/28
-#       bắt đúng vùng giá ta vừa bán xuống) — cấm mua wheat ngày đã bán
-#       wheat + không mua d0 (13 wheat R42 đủ feed 2 ngày đầu);
-#   (2) MELON exempt cadence — melon lump d11 ($5k+) là động cơ vốn
-#       chứng minh của v10 (A3); premium floor chặn nó khi v10 dump làm
-#       giá < base → v11 đói vốn đúng sóng dâu+đàn d11-14;
-#   (3) d0-2 mua 2 thú/loại/giờ (v10 đạt 4 con d0, v11.6 chỉ 3 vì
-#       1 pass/type/giờ + h1 hết tiền);
-#   (4) pending_animal_cost cap 1400→4500 + dâu-refill vào grow_due —
-#       valve phải thấy ĐÀN là nhu cầu tăng trưởng (kme3: 8C d7 = động
-#       cơ sữa $1,2k/ngày nuôi cả mùa).
-#
-# v11.6 "CADENCE + GROWTH-VALVE" (Task 58, vòng 2): sửa 3 lỗi v11.5 (thua
-# v10 $34k vs $76k s103): (1) WHEAT-reserve không tính thú trong shed →
-#   13 wheat R42 bị xả sạch ngay d0h1; (2) cadence áp dụng cả lúc vốn
-#   đang đói tăng trưởng → v10 bán WHEAT-30 d5 + MELON-36 d11 MỚI là động
-#   cơ vốn lumpy nuôi sóng dâu + đàn — bóp nó = chết đói; (3) đàn nhỏ
-#   (5 con cuối trận vs 16 của v10) vì không có tiền mua.
-#   GIẢI PHÁP: GROWTH-VALVE — khi money < nhu cầu tăng trưởng (hạt sóng
-#   dâu d5-13 + melon-2 d8-14 + đất NE/SW + thú pending) → LUMPY mode
-#   (giữ nguyên hành vi v10: _hold floor, không lot-cap, không canh giờ);
-#   khi vốn đủ → CADENCE mode (sàn 1.00×base d1-18, lot ≤ drain, bán
-#   h1/h5/h9 sau drain). MILK/WOOL/EGG LuÔN cadence (thu nhập đều, không
-#   giao dịch lumpy). Đàn: cap 15, bò trajectory 2+day (8C d6+), cừu
-#   1+day//2 (6S d9+) — kme3 schedule rút gọn, cash-gate giữ kỉ luật.
-#
-# v11.5 "CADENCE-ENGINE" (Task 58) — mục tiêu: NGANG kme3 (§11.19.3 đường
-# "tái thiết động cơ vốn"). 2 đòn từ autopsy god-replay kme3:
-#   D1 CADENCE GIỌT NHỎ + PREMIUM-FLOOR: kme3 MKT_SELL 479 lệnh vs ta 171,
-# bán 1-9u/ngày/mặt hàng đúng lượng drain, giữ tồn 9.600-9.800 (vùng
-#   premium) cả mùa → dâu $227-248 (1,9-2,1× base), WOOL $215-238. Ta
-#   dump batch tới HOLD 0.52-0.80×base (MELON 0.52! DÂU 0.80!) = bán rẻ
-#   hàng premium. Đổi: sàn 1.00×base d1-18 (0.92 d19-21) + lot/ngày =
-#   drain (6×shop-vector + town 1) + bán ngay SAU drain (h%4==1 — engine:
-#   actions→market→drain, nên h1/h5/h9... là inventory thấp nhất chu kỳ).
-#   Valve khẩn cấp (glut/shed≥80/money<250) vẫn hạ sàn như cũ.
-#   D2 R42 TURN-0 (kme3 tape): BUY WHEAT 13 + BUY 30 rồi SELL 30 ngay h0 —
-#   vòng tròn net ~$0 (engine quote buy tại inv-1, sell tại inv — đối
-#   xứng), để lại 13 wheat feed + TỒN WHEAT ÂM 13 SUỐT MÙA (vùng premium
-#   từ step 0 — kme3 wheat $29→$44 cả mùa). HIRE d0 dồn sang h1.
-#   D2b FEED-BUY sâu hơn: d0-11 pw≤28 mua tới animals*2+8 (kme3 mua 155u
-#   rẻ d0-11 nuôi đàn-17; ta ~11 con → ~25-30u).
-#   (ĐÃ thử & loại ở v11.0-v11.4: đàn-17/wheat-22/FERT-tier1/EMA-lock —
-#   bundle không có vốn sớm; xem §11.19. V11.5 = vốn TRƯỚC, đàn SAU.)
-#
-# v11 "CARROT-TAIL" (Task 57) — v10e nguyên vẹn + 1 đòn duy nhất qua ablation
-# 8 biến thể từ Master Engine V3 (kme3): F3 CARROT SÓNG CUỐI d22-26 quota 14
-# khi marg ≥ 0.62 — kme3 s103 god-replay d25 đứng 18 ô carrot trên đất dâu
-# zombie chết event, giá cuối mùa $56-72/u, hạt $20 chín 2 ngày đúng đỉnh.
-# (đã thử & loại: đàn-17/wheat-22/FERT-tier1/EMA-lock/cadence — xem báo cáo)
-#
 # v10 "AD+KHO" (Task 55) — KẾ THỪA v9.1 + BÀI HỌC KHO + 3 KÊNH SUPPLY (thử
 # nghiệm đầy đủ, luật âm cho 2 kênh). Nền = v9.1 STACK-SWEEP (50/50 vs v6,
 # TB $75.238, đồng bộ 74,9% — kernel đã đồng bộ, còn thiếu SUPPLY — §11.17).
@@ -484,11 +387,6 @@ ANIMAL_CAP = 14
 TOM_QUOTA = 6
 HOLD = {"MILK": 0.98, "WOOL": 0.94, "STRAWBERRY": 0.80, "EGG": 0.86,
         "CARROT": 0.70, "WHEAT": 1.50, "MELON": 0.52, "TOMATO": 0.82, "FERTILIZER": 0.50}
-
-# v11.9 D1v4: kênh deficit THẬT SỰ — chỉ những mặt hàng có shop hút sâu
-# hơn tổng sản xuất 2 bên mới được nâng floor lên 1.00×base; EGG/WHEAT/
-# FERT/MELON bị glut cấu trúc → giữ floor v10 (chặn bán = núi tồn kho)
-_PREMIUM_SET = {"MILK", "WOOL", "STRAWBERRY", "CARROT", "TOMATO"}
 
 _STATE = {}
 _ARCHES = ("CONTEST", "MIRROR", "COOP", "PASSIVE")
@@ -909,13 +807,6 @@ def _daily_plan(tiles, shed, seeds, inv, prices, shops, day, opp_farm, money, tm
     # ngỗng 7 + bò 6 + cừu 4 = floor 17 chặn cap — đàn thực tế phình 19)
     if opp_counts["GOOSE"] <= 6 and day >= 4:
         goose_target = max(goose_target, 5)
-    # V11.10 ĐÀN-ADAPT (tinh thần kme3 V231 cattle-switch): dừng bơ
-    # bò/cừu khi shop-draw lộ kênh sữa/len CẠN — s106: 0 milk-shop tới
-    # d18, sữa +75 tồn giá $3, 56 unit chết shed trong khi kme3 bán
-    # xong cửa sổ premium d5-8 rồi chuyển hướng
-    _msn_ad = sum(1 for s in (shops or [])
-                  if s in ("PIZZA_SHOP", "ICE_CREAM_SHOP", "SMOOTHIE_SHOP"))
-    _yarn_ad = sum(1 for s in (shops or []) if s == "YARN_STORE")
     cow_target = max(2, min(8, int(milk_room // 30)))
     # ΔB MILK-COMMIT: kênh sữa sâu nhất game — KHÔNG nhượng (first-mover:
     # v6 commit 9 bò trước thì ta mất $16.7k; floor 6 khi giá còn khỏe)
@@ -936,13 +827,6 @@ def _daily_plan(tiles, shed, seeds, inv, prices, shops, day, opp_farm, money, tm
         except Exception:
             pass
     sheep_target = max(3, min(6, int(wool_room // 30)))
-    # V11.10 ĐÀN-ADAPT (tiếp): áp cap SAU khi cow/sheep target đã dựng
-    if _msn_ad == 0 and day >= 5:
-        cow_target = max(2, min(4, cow_target))
-    elif _msn_ad == 1 and day >= 8:
-        cow_target = min(6, cow_target)
-    if _yarn_ad == 0 and day >= 8:
-        sheep_target = min(4, sheep_target)
     try:
         if mode != "MIRROR":
             milk_shops = sum(1 for s in (shops or [])
@@ -968,11 +852,9 @@ def _daily_plan(tiles, shed, seeds, inv, prices, shops, day, opp_farm, money, tm
         # R191 (Vòng 50): cừu 1+day//4 → 1+day//3 — god-ledger 4 trận thua:
         # v6 giữ 6 cừu (WOOL $19.7-24.7k) vs v8 đứng 4 (WOOL $5.6-18.3k);
         # sheep-AD top-3 = 71. Trajectory d15 = 6 (trước: 4).
-        cow_target = min(cow_target, 8 if day >= 7 else 2 + day)
-        sheep_target = min(sheep_target, 6 if day >= 9 else 1 + day // 2)
-    _herd_cap = 15  # v11.6: 13 → 15 (kme3 17 con; 8C+6S trajectory trên +
-    # trajectory trên + cash-gate giữ kỉ luật vốn — v11.0 từng thua vì
-    # đóng gói đàn-17+wheat-22+dâu-24 CÙNG LÚC, giờ chỉ đổi đàn một mình)
+        cow_target = min(cow_target, 2 + day // 2)
+        sheep_target = min(sheep_target, 1 + day // 3)
+    _herd_cap = 13 if day >= 3 else 15  # R168: đàn 13 = top-3 parity (đàn 19 + máy chết = mua 610u wheat $31k net -$8k; top-3: đàn 13 + máy 20 = net +$10k + lao động dư tưới)
     tot = cow_target + sheep_target + goose_target
     if tot > _herd_cap:
         # autopsy 146 + R168: floors 2/5/5 — cho phép cap 13 hạ THẬT (floor cũ
@@ -1190,11 +1072,6 @@ def _daily_plan(tiles, shed, seeds, inv, prices, shops, day, opp_farm, money, tm
             _wt_target = max(16, int((animals_now + shed_geese + shed_cows + shed_sheep
                                       + goose_target + cow_target + sheep_target) * 1.0) + 3)
             quotas["WHEAT"] = min(20, _wt_target)
-    # V11-F3: CARROT SÓNG CUỐI d22-26 (kme3 s103 d25: 18 ô carrot đứng trên
-    # đất dâu zombie chết event — giá cuối mùa $56-72/u)
-    if 22 <= day <= 26:
-        if _marg("CARROT", 24, min(28, day + 5)) >= 0.62:
-            quotas["CARROT"] = max(quotas.get("CARROT", 0), 14)
     if day <= 26:
         if day <= 2:
             quotas["CARROT"] = 12
@@ -1229,17 +1106,6 @@ def _daily_plan(tiles, shed, seeds, inv, prices, shops, day, opp_farm, money, tm
             # = 4u/ô × $45-70; giữ NHỎ (6) để không tái phát R184 (cũ 8).
             if 3 <= day <= 26:
                 quotas["CARROT"] = max(quotas.get("CARROT", 0), 8)
-            # V11.10 CARROT-ADAPT (kme3 13-route/V233 tinh thần — autopsy
-            # s106: 3 PET_CAFE = drain carrot 37/ngày, kênh SÂU NHẤT ván,
-            # kme3 trồng 31 ô thu tiền đều; ta đứng 0-5 vì ladder cap 12):
-            # ≥2 pet-cafe → quota 8+9×cafe (cap 26), d3-22 (chín kịp 2 sóng)
-            try:
-                _pet_n = sum(1 for s in (shops or []) if s == "PET_CAFE")
-                if _pet_n >= 2 and 3 <= day <= 23:
-                    quotas["CARROT"] = max(quotas.get("CARROT", 0),
-                                            min(30, 8 + 9 * _pet_n))
-            except Exception:
-                pass
 
     if day <= 1:
         # v10d: melon 12 + 2 bò (opening v10.0 — thắng 19/20 vs v6)
@@ -2209,43 +2075,42 @@ def _build_orders(me, shed, seeds, inventories, inv, prices, day, hour, plan,
                                         14 + (2 if pxg >= 62 else 0)),
                                        ("SHEEP", plan.get("sheep_target", 0), 0,
                                         15 + (2 if pxw >= 250 else 0) + (2 if yarn_n >= 1 else 0))):
-            for _pass in range(2 if 1 <= day <= 2 else 1):
-                owned = sum(1 for row in tiles for t in row
-                            if isinstance(t, dict) and t.get("animal") == animal)
-                owned += (shed.get(animal, 0) or 0) if shed else 0
-                ad = ANIMALS[animal]
-                cash_floor = 250 + land_reserve
-                # R180b (Vòng 48): VAN HẠT SÓNG DÂU — trajectory thú (R180) sẽ
-                # ăn sạch dòng tiền d9-13 (thú mua TRƯỚC hạt trong giờ) → sóng
-                # refill dâu d11 ×14 hạt của vòng 45 biến mất (đo new48: S d7=5,
-                # d14=12 vs 24). Khi dâu chưa đủ 14 ô trong cửa sóng: thú chờ,
-                # hạt đi trước (máy wheat/carrot rẻ vẫn mua được qua floor riêng).
-                if 5 <= day <= 14:
-                    try:
-                        _st_st = (plan.get("standing", {}).get("STRAWBERRY", 0) or 0)
-                        if _st_st < 14 and (plan.get("crop_tiles", {}).get("STRAWBERRY", 0) or 0) > 0:
-                            cash_floor += 700
-                    except Exception:
-                        pass
-                # Trụ 1 + V10-S6: d0-2 mua nhanh 3-4 con/ngày; d3-10: 3 (cũ 2 —
-                # kho10: top-3 drip 1-4 con/ngày d0-d10, đàn 6-8 lúc d5, 13-15
-                # lúc d10; v9 cũ d10 mới 4 con vì buy_per_day=2 + burst d11-16)
-                buy_per_day = 4 if day <= 0 else (3 if day <= 2 else (3 if day <= 10 else (2 if day <= 14 else 1)))
-                # Trụ 1-fix (D): cap TỔNG 3 con/ngày từ d3 — top-3 mua rải 1-4
-                # con/ngày d0-d10 (không splurge); trace s105: NEW rút $2.800 mua
-                # 7 con d11-12 đúng lúc cần $2.000 SW + $1.400 hạt dâu → sóng dâu
-                # chết đói vốn
-                _tot_today = bought.get("GOOSE", 0) + bought.get("COW", 0) + bought.get("SHEEP", 0)
-                if day >= 3 and _tot_today >= 3:
-                    continue
-                if (owned < target and w0 <= day <= w1
-                        and bought.get(animal, 0) < buy_per_day
-                        and (day <= 2 or struct_free[ad["structure"]] > 0)
-                        and money >= ad["cost"] + cash_floor and shed_total < 92
-                        and (wt_supply >= (animals_total + 1) * 1.3 or animals_total == 0)):
-                    orders.append(["BUY_ANIMAL", animal, 1])
-                    bought[animal] = bought.get(animal, 0) + 1
-                    money -= ad["cost"]
+            owned = sum(1 for row in tiles for t in row
+                        if isinstance(t, dict) and t.get("animal") == animal)
+            owned += (shed.get(animal, 0) or 0) if shed else 0
+            ad = ANIMALS[animal]
+            cash_floor = 250 + land_reserve
+            # R180b (Vòng 48): VAN HẠT SÓNG DÂU — trajectory thú (R180) sẽ
+            # ăn sạch dòng tiền d9-13 (thú mua TRƯỚC hạt trong giờ) → sóng
+            # refill dâu d11 ×14 hạt của vòng 45 biến mất (đo new48: S d7=5,
+            # d14=12 vs 24). Khi dâu chưa đủ 14 ô trong cửa sóng: thú chờ,
+            # hạt đi trước (máy wheat/carrot rẻ vẫn mua được qua floor riêng).
+            if 5 <= day <= 14:
+                try:
+                    _st_st = (plan.get("standing", {}).get("STRAWBERRY", 0) or 0)
+                    if _st_st < 14 and (plan.get("crop_tiles", {}).get("STRAWBERRY", 0) or 0) > 0:
+                        cash_floor += 700
+                except Exception:
+                    pass
+            # Trụ 1 + V10-S6: d0-2 mua nhanh 3-4 con/ngày; d3-10: 3 (cũ 2 —
+            # kho10: top-3 drip 1-4 con/ngày d0-d10, đàn 6-8 lúc d5, 13-15
+            # lúc d10; v9 cũ d10 mới 4 con vì buy_per_day=2 + burst d11-16)
+            buy_per_day = 4 if day <= 0 else (3 if day <= 2 else (3 if day <= 10 else (2 if day <= 14 else 1)))
+            # Trụ 1-fix (D): cap TỔNG 3 con/ngày từ d3 — top-3 mua rải 1-4
+            # con/ngày d0-d10 (không splurge); trace s105: NEW rút $2.800 mua
+            # 7 con d11-12 đúng lúc cần $2.000 SW + $1.400 hạt dâu → sóng dâu
+            # chết đói vốn
+            _tot_today = bought.get("GOOSE", 0) + bought.get("COW", 0) + bought.get("SHEEP", 0)
+            if day >= 3 and _tot_today >= 3:
+                continue
+            if (owned < target and w0 <= day <= w1
+                    and bought.get(animal, 0) < buy_per_day
+                    and (day <= 2 or struct_free[ad["structure"]] > 0)
+                    and money >= ad["cost"] + cash_floor and shed_total < 92
+                    and (wt_supply >= (animals_total + 1) * 1.3 or animals_total == 0)):
+                orders.append(["BUY_ANIMAL", animal, 1])
+                bought[animal] = bought.get(animal, 0) + 1
+                money -= ad["cost"]
         if 0 <= day <= 15:
             try:
                 for animal, tgt in (("COW", plan.get("cow_target", 0)),
@@ -2257,7 +2122,7 @@ def _build_orders(me, shed, seeds, inventories, inv, prices, day, hour, plan,
                     pending_animal_cost += max(0, int(tgt) - own_n) * ANIMALS[animal]["cost"]
             except Exception:
                 pending_animal_cost = 0
-    pending_animal_cost = min(pending_animal_cost, 4500)
+    pending_animal_cost = min(pending_animal_cost, 1400)
 
     seed_spent = 0
     if hour <= 17 and seeds is not None:
@@ -2387,18 +2252,6 @@ def _build_orders(me, shed, seeds, inventories, inv, prices, day, hour, plan,
         # sau khi trừ máy. s311: ta vẫn churn 85 lệnh (mua $35-45 tuần đầu,
         # sáng sau bán $19-25 — từng unit −$10-15)
         _eff_want = max(3, int(wheat_want - _machine_inflow * 2.0))
-        # D2b FEED-BUY SÂU (kme3 mua 155u rẻ d0-11 nuôi đàn-17): d1-11 khi
-        # pw ≤ $28 (tồn ≤ I0−~30 — chỉ khi thị trường thật sự rẻ) nới want
-        # lên animals*2+8 cap 30. V11.7: KHÔNG mua d0 (13 wheat R42 đủ) và
-        # KHÔNG mua ngày đã bán wheat (chống churn bán-then-mua s203/d9)
-        try:
-            if 1 <= day <= 11:
-                _pw_now = _price("WHEAT", inv.get("WHEAT", MARKET_I0) - 1)
-                _sold_w_today = (_STATE.get(("sold", day), {}).get("WHEAT", 0) or 0)
-                if (_pw_now <= 28 and _sold_w_today == 0 and money >= 800):
-                    _eff_want = min(30, max(_eff_want, int(animals * 2) + 8))
-        except Exception:
-            pass
         _floor_money = 250 if (_early or (_late and _acute2)) else 400
         if shed_wheat < _eff_want and money >= _floor_money:
             need = min(14 if (_late and _acute2) else 10, _eff_want - shed_wheat)
@@ -2434,15 +2287,8 @@ def _build_orders(me, shed, seeds, inventories, inv, prices, day, hour, plan,
     # toàn bộ nhu cầu còn lại của đàn (đàn×số ngày còn) — không bao giờ bán
     # thức ăn khi máy không đủ tự cấp (s203: bán 810u d20+ trong khi đàn đói
     # care-bonus → thua kênh milk/egg $14k cho base)
-    # v11.6-fix1: đếm CẢ thú trong shed (d0 thú mới mua chưa đặt xuống ô —
-    # reserve cũ chỉ tính thú trên tiles = 0 → 13 wheat R42 bị coi thừa, xả
-    # sạch tại d0h1 với valve tiền)
-    _shed_an = 0
-    if shed:
-        _shed_an = ((shed.get("COW", 0) or 0) + (shed.get("SHEEP", 0) or 0)
-                    + (shed.get("GOOSE", 0) or 0))
-    _wheat_feed_need_late = (animals + _shed_an) * max(0, (29 - day)) if day >= 18 else 0
-    wheat_reserve = min(max((animals + _shed_an) * 3 + 6, _wheat_feed_need_late),
+    _wheat_feed_need_late = animals * max(0, (29 - day)) if day >= 18 else 0
+    wheat_reserve = min(max(animals * 3 + 6, _wheat_feed_need_late),
                         shed.get("WHEAT", 0) or 0) if day < 28 and shed else 0
 
     # v6 ΔF (E8-lite): drain-aware endgame — d22-27 nếu drain còn đủ hút
@@ -2494,15 +2340,33 @@ def _build_orders(me, shed, seeds, inventories, inv, prices, day, hour, plan,
         return h
 
     cands = []
-    # ==== D1v4 CADENCE AN TOÀN (kme3 §11.19.3 — viết lại sau bisection) ====
-    # Chỉ 2 cơ chế còn sống sót từ 5 vòng thử: PREMIUM-FLOOR cho kênh
-    # deficit thật + LOT-CAP drain khi buffer mỏng. Không hour-gate, không
-    # floor cho kênh glut, không _grow_valve (bài học bisb: valve lẫn lộn
-    # chế cả kênh khỏe → mất thu nhập giữa mùa).
     _sold = _STATE.setdefault(("sold", day), {})
     _sv_drain = _shop_vector(shops)
     _drain_day = {it: int(6.0 * _sv_drain.get(it, 0.0))
                   + (0 if it == "FERTILIZER" else 1) for it in PRODUCTS}
+    _grow_due = 0
+    try:
+        if 5 <= day <= 13:
+            _grow_due += 1440
+            _st_straw = sum(1 for row in tiles for t in row
+                            if isinstance(t, dict) and t.get("kind") == "PLANT"
+                            and t.get("crop") == "STRAWBERRY")
+            if _st_straw < 20:
+                _grow_due += 1440
+        if 8 <= day <= 14:
+            _grow_due += 640
+        if day <= 4:
+            _grow_due += 400
+        if 21 <= day <= 26:
+            _grow_due += 300
+        if nq == 1 and 5 <= day <= 9:
+            _grow_due += 1150
+        elif nq == 2 and 10 <= day <= 16:
+            _grow_due += 2150
+        _grow_due += int(min(pending_animal_cost, 4500) or 0)
+    except Exception:
+        _grow_due = 0
+    _grow_ok = money >= _grow_due
     if shed:
         for it in PRODUCTS:
             if it == "FERTILIZER" and day < 26:
@@ -2521,40 +2385,28 @@ def _build_orders(me, shed, seeds, inventories, inv, prices, day, hour, plan,
             n = shed.get(it, 0) or 0
             if it == "WHEAT":
                 n = max(0, n - wheat_reserve)
-                # v11.6-fix2: d0 KHÔNG bán wheat — 13 wheat R42 là feed đã
-                # trả giá, để xác lập deficit I0−13 cho cả mùa (kme3 $29→$44)
-                if day == 0 or 27 <= day <= 28:
-                    n = 0
+                if 27 <= day <= 28:
+                    n = 0  # R175: không bán wheat d27-28 (churn vòng tròn); R178b:
                     # d29 MỞ LẠI — game kết thúc h22 không có EOD, feed tồn
                     # shed = giá trị chết, thanh lý nốt (top-3 shed cuối ~rỗng)
             if n <= 0:
                 continue
             frac = _hold(it)
-            # D1v5 PREMIUM-FLOOR: chỉ kênh deficit thật (xem _PREMIUM_SET)
-            _inow = float(inv.get(it, MARKET_I0) or MARKET_I0)
-            if (1 <= day <= 21 and it in _PREMIUM_SET and it not in glutted
-                    and shed_total < 80 and money >= 250
-                    and _inow <= MARKET_I0 - 50):
+            _cad_it = (1 <= day <= 25 and it != "MELON"
+                      and (it in ("MILK", "WOOL", "EGG") or _grow_ok))
+            if _cad_it and it not in glutted and shed_total < 80 and money >= 250:
                 frac = max(frac, 1.00 if day <= 18 else 0.92)
             thresh = frac * MARKET_PARAMS[it]["base"]
             k = _sell_count(it, n, inv.get(it, MARKET_I0), thresh)
-            # D1v4 LOT-CAP (buffer valve): meter đúng drain CHỈ khi buffer
-            # mỏng ≤ 2×drain — chống dump cả kho một lần vào deficit;
-            # buffer dày (sản xuất > drain) → nhả tự do theo floor như v10
-            if 1 <= day <= 25 and it in _PREMIUM_SET and k > 0:
-                _dd = _drain_day.get(it, 0)
-                if 0 < _dd and n <= 2 * _dd:
-                    _left = _dd - _sold.get(it, 0)
-                    k = (min(k, _left) if _left > 0 else 0)
-            # D2 DISTRESS-UNCLOG (s106: shed 56 milk + 24 wool chết → kho
-            # tắc 100 → PICKUP/DROP kẹt → wheat machine + dâu chết theo):
-            # shed gần đầy (≥70) + kênh glut (inv > I0+10) → bán giải phóng
-            # kho ở giá ≥ $2 — pipeline sống quan trọng hơn giá bán
-            if (day <= 27 and shed_total >= 70 and _inow > MARKET_I0 + 10
-                    and k < n):
-                _kfree = _sell_count(it, n, inv.get(it, MARKET_I0), 2)
-                if _kfree > 0:
-                    k = max(k, _kfree)
+            if _cad_it and k > 0:
+                _dd = _drain_day.get(it, 1)
+                _left = _dd - _sold.get(it, 0)
+                if (_left <= 0
+                        or not (hour % 4 == 1 or hour >= 21 or money < 250)):
+                    k = 0
+                else:
+                    _per_h = max(1, (_dd + 2) // 3) if hour < 20 else _left
+                    k = min(k, _per_h, _left)
             # KAIN-16: deep-drain channels (MILK/WOOL/EGG) recover price
             # between hours as the town drains inventory — tranche at 8/hour
             # instead of dumping 19 at once down the curve (v5 sells 3-9 per
@@ -2568,17 +2420,11 @@ def _build_orders(me, shed, seeds, inventories, inv, prices, day, hour, plan,
         if len(orders) >= MAX_ORDERS:
             break
         orders.append(o)
-        # D1: đếm lot đã submit hôm nay (để lot-cap ngày mai đúng)
         try:
             if o[0] == "SELL" and o[1] != "FERTILIZER":
                 _sold[o[1]] = _sold.get(o[1], 0) + max(0, int(o[2]))
         except Exception:
             pass
-
-    # (v11.8: R42 turn-0 ĐÃ GỠ — autopsy v11.7: 3 slot + $340 đỉnh + kìm
-    # h0-hires phá trật tự opening v10e, sóng melon-1 chết trắng d0-14,
-    # mất lump vốn $10k d11. Deficit wheat giờ đến từ KHÔNG bán d0 +
-    # feed-buy D2b khi pw rẻ.)
 
     return orders[:MAX_ORDERS]
 

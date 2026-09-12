@@ -1400,3 +1400,29 @@ Stage Summary:
 - 3 PHÁT HIỆN LỚN: (1) kme3 đứng ĐẦY 74/72 ô = 101 op/ngày (task = standing, MOVE là bọt xốp); (2) động cơ vốn riêng (cadence bán giọt nhỏ từ d1 + R42 + 155 wheat rẻ) nuôi mọi thứ khác — ta thiếu NÓ, không thiếu quota; (3) đồng hồ sinh tử dâu: trồng trước d10 hay sau quyết định $10-20k/trận
 - LUẬT ÂM V11 (ghi cho v12): gộp bundle đòn supply đều tự ăn nhau qua vốn + queue + 70op sàn cứng; EMA/radius-lock KHÔNG giảm MOVE; dâu-FERT tier-1 tự cướp slot nước event; nới velocity thú đẩy hạt dâu khỏi queue
 - Đường v12 đã bàn giao: cadence giọt nhỏ (MKT_SELL 171→479) là đòn vốn đầu tiên, rồi máy wheat trước đàn, R42, cuối cùng đàn-17 + FERT-EVENT khi kernel rảnh thật
+
+---
+Task ID: 58
+Agent: KAIN (main-agent)
+Task: User duyệt: v11 mục tiêu đạt bằng kme3 — nâng cấp với phát hiện mới, đưa kme3 vào danh sách lựa chọn, đối đầu v11 vs kme3, lặp điều chỉnh tới khi ngang kme3, push code + báo cáo
+
+Work Log:
+- Phục hồi ngữ cảnh từ §11.19 (bàn giao v12 "tái thiết động cơ vốn") + MASTER_ENGINE_V3_ANALYSIS.md; đọc engine kag_gressure: market quote buy tại inv−1/sell tại inv (R42 net-zero), drain 6×/ngày shop + 1 town, interpreter actions→market→drain
+- v11.5 CADENCE-ENGINE: D1 premium-floor 1.00 + lot-cap drain + canh giờ h%4==1, D2 R42 turn-0 (BUY13+BUY30+SELL30) + feed-buy pw≤28 — thua v10 $34k (s103): R42 wheat bị xả d0h1 vì wheat_reserve không tính thú trong shed; cadence giết vốn lumpy
+- v11.6: GROWTH-VALVE (lumpy khi money < grow_due) + đàn cap 15 + trajectory bò 2+day (8C d7), cừu 1+day//2 + 2-pass thú d1-2 — s103 $28k: feed-buy CHURN (bán 28 wheat d9 rồi mua lại 18) + melon lump bị floor chặn
+- v11.7: chống churn (không mua wheat ngày đã bán) + melon exempt + d0 2 thú/loại — vẫn $28k: R42 3-slot + kìm h0-hires phá opening → sóng melon-1 CHẾT TRẮNG d0-14 (M=0 tới d15) → mất lump $10k d11
+- v11.8: GỠ R42 hoàn toàn, phục hồi opening v10e — battery 0/10 $50,2k
+- BISECTION 3 đòn (bisa/bisb/bisc, 8 seed mỗi đòn): đàn +$1,4k (5/8) | cadence −$32k (0/8!) | feed +$0,8k (5/8) — autopsy bisb s207: NÚI TRỨNG 50 quả trong shed (EGG floor 1.00 + lot-cap chặn kênh glut cấu trúc → tắc pipeline thu hoạch)
+- v11.9: _PREMIUM_SET = 5 kênh deficit thật (MILK/WOOL/STRAW/CARROT/TOMATO) + buffer valve (lot-cap chỉ khi buffer ≤2×drain) + bỏ hour-gate — 3/10 $65,6k vs v10 $67,7k
+- Autopsy s106 (v11 $6,7k vs kme3 $104k, bốc 3 PET_CAFE + 0 milk-shop): sữa +75 tồn giá $3, shed 56 milk + 24 wool CHẾT, wheat machine tắc; kme3 trồng 31 ô carrot (drain 37/ngày) thu tiền đều
+- v11.10 ADAPT: floor chỉ khi inv ≤ I0−50 (tránh chặn cửa sổ pre-glut $154-181) + DISTRESS-UNCLOG (shed ≥70 + glut → bán ≥$2 giải phóng kho) + CARROT-ADAPT (≥2 pet-cafe → quota 30 ô, tinh thần V233) + ĐÀN-ADAPT (0 milk-shop d5+ → cap bò 4, 1 shop → 6, 0 yarn → cap cừu 4, tinh thần V231) + carrot cap 26→30
+- KẾT QUẢ v11.10: vs v6 **12/12 (100%) TB $83.041** (kỷ lục mọi thế hệ) | vs v10 đầu-trực **6/10 $71.002 vs $64.434** (v11 vượt v10 lần đầu) | vs kme3 0/8 TB $41.327 vs $137.387 — 4 seed catastrophe sống lại ($6-20k → $18-31k), kme3 cũng tụt trên các seed đó (s106 $104k→$67k)
+- Đăng ký kme3 đủ 3 tầng: run_battle.py (từ Task 56) + arena-service/index.ts AGENTS + constants.ts (tag "đối thủ chuẩn") + cập nhật desc v11 (tag "nhà vô địch"); kill pgid cũ + restart arena-service sạch :3005, dev :3000 + gateway :81 sống
+- UI e2e agent-browser qua gateway :81: kme3 xuất hiện dropdown vị trí 2; trận v11 vs kme3 chạy 719/719 lượt 0 console error, 🏆 kme3 thắng 2,83× ($177.454 vs $62.632), screenshot /tmp/ui_v11_kme3.png
+- Viết §11.20 TOP3_REPLAY_ANALYSIS.md (bảng 7 vòng + 4 luật mới L7-L10 + đường v12 parity)
+
+Stage Summary:
+- V11.10 CADENCE+ADAPT = NHÀ VÔ ĐỊCH MỚI: 12/12 vs v6 $83k (vượt v10 96% $76,3k), 6/10 đầu-trực vs v10 $71k, 10/10-level với mọi thế hệ cũ — nhưng CHƯA ngang kme3 (0/8, $41k vs $137k; tương đương 30% mức kme3, cải từ 26% của v10)
+- 4 LUẬT MỚI: L7 R42-reactive phá opening (chỉ an toàn trong tape); L8 NÚI TỒN KHO (premium-floor chỉ cho kênh deficit thật); L9 cadence premium chỉ trả khi sản xuất khớp drain (v10 812u vs drain ~500u); L10 shop-draw là ván bài thật — đàn + cây phải đọc như V231/V233
+- VÒNG SAU (v12): gap $96k = kernel-ops (WATER 629 vs 1.102) + sản xuất khớp drain (dâu/wheat thu hẹp, mọi unit premium) + đàn-17 với wheat ngoài — đích WATER ≥900, MKT_SELL ≥350, vs kme3 ≥$70k
+- kme3 đã chọn được từ UI; battles/ giữ nguyên, không có tệp mới lớn (bisa/bisb/bisc.py trong kaggriculture/)
