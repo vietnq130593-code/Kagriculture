@@ -1531,3 +1531,56 @@ seed mới 200-207: 16/16, 1.026× — không overfit.
 - `battles/v12/` — control_kme3_self.json, v121/v12a/v12b/v12c/v12d/v12e/
   v12f/v12g/v12h_vs_kme3.json, v12e_seeds200.json, v12_FINAL_vs_kme3.json,
   v12_vs_v11.json
+
+## 11.22 — VÒNG 60: V12 SẠCH 0 CHÚ THÍCH + CADENCE-RACE V2 (bỏ day-cap, WHEAT/FERT vào reserve)
+
+**Yêu cầu user**: viết lại v12 không chú thích + tinh chỉnh mở rộng gap tới +5k-10k.
+
+### 11.22.1 — Bản sạch (comment-free)
+Stripper tokenize: xóa comment + docstring, giữ chuỗi chứa `#`. 2.403 → 1.779 dòng.
+Verify 2 lớp: (1) AST-identical (modulo docstring); (2) battery 16 game dollar-identical 32/32 số
+trùng bản ghi Task 59 (seeds 100-107: avg $99.487 vs $97.082).
+
+### 11.22.2 — Bản đồ dòng tiền s103 (instrumented)
+- d0-d11: HÒA TUYỆT ĐỐI (chưa có cửa đua); d12-d28: gap tích lũy +2.0k (đua từng lô nhỏ);
+  d29: −109 (đua sáng sớm thua nhẹ + đuôi đối xứng)
+- Sóng melon d10 (~$12k/ngày): HARVEST→PLACE→SELL cùng step — stock không tồn tại trước,
+  KHÔNG THỂ pre-sell (xác nhận cơ chế); muốn thắng phải thu hoạch sớm hơn = kernel surgery
+- Đuôi 712-718: cả hai shadow-dump 9×SELL-1000, tiền bằng nhau từng bước (đối xứng tuyệt đối)
+
+### 11.22.3 — Bảng bisection 13 biến thể (i-z)
+| Biến thể | Đòn | Kết quả (seeds 100-107) |
+|---|---|---|
+| v12i/j | predump 708/704-711 | no-op (shed chỉ 6-14u cuối game) |
+| v12k | R42 mở rộng ×2 | **0/8, −3.8k — THUA** (buy-side tự hại) |
+| v12l | native-lead align 712 | no-op |
+| v12m | bỏ day-cap reserve | 16/16, +2.46k |
+| v12n | +WHEAT vào reserve | 16/16, **+3.07k** |
+| v12o | +FERTILIZER | 16/16, +3.19k |
+| v12p/r | H=8 (có/không FERT) | +3.69k smoke ≈ H=6 (plateau; FERT no-op ở H=8) |
+| v12q | H=4 | sụp +1.1k — horizon là giá trị lõi |
+| v12s | H=10 | giảm |
+| v12t/u/v | H=7 / LO=144 / tail-split | ≈ noise |
+| v12w | planner 256/2/16 | no-op s103 (baseline đã đủ) |
+
+### 11.22.4 — CHỐT: v12z (deploy làm v12.py)
+nocap + WHEAT+FERT reserve + H=6 + HI=712 + LO=144 + planner 256/2/16:
+- Seeds 100-107: **16/16, $99.839k vs $96.630k, gap +3.209k** (worst 1.018×)
+- Seeds mới 200-207: **16/16, $94.202k vs $91.040k, gap +3.162k** (worst 1.008×) — không overfit
+- UI e2e: v12 vs kme3 s103 🏆 $114.227 vs $111.571, 720/720 lượt, 0 lỗi, dollar-identical
+
+### 11.22.5 — Luật mới
+- **L15 (ranh giới ngày)**: cap day-boundary trong reserve là sơ hở cấu trúc — kme3 không bao giờ
+  pre-sell lô sáng hôm sau; bỏ cap = thắng đua bán sáng sớm (một phần +661 của kênh wheat)
+- **L16 (kênh loại trừ)**: item bị reserve loại trừ (WHEAT/FERT) = kênh đua miễn phí — đối thủ
+  không bao giờ pre-sell; đưa vào = +2 đòn (v12 +294, kme3 −365)
+- **L17 (fresh-flow bất khả xâm)**: HARVEST→PLACE→SELL cùng step: không thể pre-sell bằng market;
+  muốn thắng sóng tươi (melon 12k, strawberry, carrot) phải thu hoạch sớm = thay kernel
+- **L18 (buy-side là bẫy)**: mua đón đầu lệnh mua của đối thủ: cả hai mất tiền vào void (v12k −3.8k)
+- **L19 (planner bão hòa)**: 64 sims đã đủ cho tail 712-718; 256 không thêm (nhưng vô hại, 40→160ms)
+
+### 11.22.6 — Bàn giao v13 (nếu cần gap > 5k)
+Market-race đã cạn (mọi lô chung bán trước 2 lượt — đúng đỉnh đường cong). Đòn kế tiếp:
+1. Thu hoạch sớm sóng tươi (kernel surgery — melon wave d10 12k + các sóng)
+2. V231 sabotage: phá giá sữa s216-227 đổi hướng đàn kme3 (cattle-switch condition)
+3. R53 thêm worker d26-28 (cần biết layout nhóm tile)
