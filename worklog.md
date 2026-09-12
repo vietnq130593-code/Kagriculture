@@ -1350,3 +1350,27 @@ Stage Summary:
 - 4 LUẬT ÂM V10: A1 dâu-flat cuối mùa ăn vốn hạt giết melon wave-2; A2 wheat-20+FERT không thành sản lượng vì FERT-flow không có; A3 opening 2 bò + melon-12 NET dương; A4 buy_per_day không tăng AD khi vốn kẹt
 - ĐỒNG BỘ 75,3% (từ 74,9%); final CHƯA lọt top-3 (77,9% avg / 85,5% min) nhưng đáy đã chạm ($97,1k > min $93,3k)
 - BÀN GIAO V11: nút chặn = KERNEL-OPS 70→90+ (WATER 53%, HARVEST 50,6%) — khi có ops thì quota supply (luật A1/A2) mới trả tiền
+
+---
+Task ID: 56
+Agent: KAIN (main-agent)
+Task: User yêu cầu nghiên cứu link Kaggle notebook "kaggriculture-master-engine-v3" (guruprasaathas111) — xác định & tổng hợp thông tin, dữ liệu, chiến lược hữu ích
+
+Work Log:
+- page_reader lấy metadata trang (JS-heavy, chỉ TOC + điểm): Public Score 600.0 / Best Score 2712.8 V3, 997 views, 56 votes, v9 cuối, Apache 2.0
+- Kaggle API v1 public (không cần auth) `/api/v1/kernels/pull?user_name=guruprasaathas111&kernel_slug=kaggriculture-master-engine-v3` → blob.source 201KB = .ipynb đầy đủ
+- Giải nén cell 3 (Base85+zlib 182KB) → main.py 285KB/2.356 dòng, syntax PASS; copy vào kaggriculture/kme3.py + đăng ký arena run_battle.py AGENTS
+- Phân tích kiến trúc: onion 20+ lớp trên nền 13 route-tape 719-turn (patch từ tape gốc); router chọn route tại step 144 theo cặp shop trong town.unlocked_shops, step 648 chuyển route 2
+- Xác thực _R37_MARKET_PARAMS (9 mặt hàng, base/I0/T/below/above func) KHỚP 100% MARKET_PARAMS engine 1.32.7
+- Battery engine thật: kme3 vs v10 = 16/16 (TB $142.737 vs $37.618, max $181.646) | vs v6 8/8 TB $165.769 | vs melon $172.495 | self-play $78.443/$97.812 (đúng khoảng top leaderboard thực chiến)
+- God-replay s103: WATER 1.102 HARVEST 475 (top-3 ~1.187/484; v10 629/245) — xác nhận lần 3 nút chặn = KERNEL-OPS; giữ 9 thị trường ở vùng 9.600-9.800 (premium $215-248) cả mùa bằng cadence lot nhỏ mỗi ngày
+- Trích lịch trình kinh tế tape: đàn 17 con đủ d11 (8C d0-7 + 6S d8-9 + 3G d10-11, $7.100); hạt $6.510 (163 W + 33 S + 31 C + 12 M); mua thêm 155 wheat + 46 FERT rẻ để bón; WATER ramp 19→62/ngày; bán lot nhỏ mọi mặt hàng + dump d29
+- Đọc toàn bộ các lớp đặc biệt: R42 turn-0 self-arbitrage (BUY 13+30 rồi SELL 30 tại giá nâng), sell_lead (step%4), R36 debt-ledger bán trước 2-4 turn, R37 quote-priority theo δ giá thật, R44 mirror probe $100, V224 sales-first, room_guard h23 shed≤99, V231 cattle-switch theo milk-shops, V233 SE sheep-paddock 6 cừu + 2 worker riêng (WOOL≥$220 & 2 YARN_STORE), V234 cứu đói, V219 d18+ late-invest, R51 FERT-input, R53 labor d26-28
+- Chuỗi nguồn gốc từ attribution: Thomas Tschinkel 93.8% router → yhay81 shop-router-0909 → prvsiyan V221B/V224C → Gluzdov E184/E182 → Ahmed Berat Ozer V35 tổng hợp
+- Viết kaggriculture/MASTER_ENGINE_V3_ANALYSIS.md (11 mục: metadata, gốc gác, kiến trúc, xác thực giá, battle, lịch trình tape, cơ chế timing, học thuyết kinh tế, 5 gap vs v10, 8 khuyến nghị v11, tệp); gzip 2 replay vào battles/kme3/
+
+Stage Summary:
+- SẢN PHẨM: agent đối thủ mạnh nhất từ trước đến nay dưới dạng MÃ NGUỒN ĐẦY ĐỦ (kme3.py) + tài liệu phân tích MASTER_ENGINE_V3_ANALYSIS.md — sparring partner chuẩn top-leaderboard (đè bẹp v10 16/16, $142k TB)
+- 5 GAP cấu trúc của v10 được lượng hóa: KERNEL-OPS (WATER 629 vs 1.102), đàn 17 con d11, máy wheat 163 ô, cadence lot nhỏ mọi mặt hàng, adaptive theo shop-draw
+- 8 khuyến nghị v11 theo thứ tự ưu tiên (kernel-ops trước, rồi đàn sớm, cadence, wheat, V231/V233, R42+sell_lead, R36, FERT-bón)
+- Kaggle API v1 public pull hoạt động không cần auth — phương pháp lấy notebook public để đối chứng meta
