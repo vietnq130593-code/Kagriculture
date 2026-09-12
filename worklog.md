@@ -1326,3 +1326,27 @@ Stage Summary:
 - ĐỒNG BỘ TỔNG 74,9%/26 chỉ số (từ ~62%); final money 75,1% top-3 avg — CHƯA lọt top-3; gap còn lại = SUPPLY (dâu −$15k, máy wheat −$10k, carrot), không còn kernel
 - Luật quan trọng: FERT-KEEP 8 + tier-2 FERTILIZE chỉ hoạt động khi có stack gap-0 (53c đã chứng minh âm trên kernel cũ, dương trên kernel mới); mũ dâu 24 (R151/s306) là giới hạn kernel cũ — 28 đứng ổn
 - Bàn giao v10 (chờ duyệt): dâu FLAT 24-28 cả mùa, máy wheat 574u (harvest window), carrot chung sống dâu (order theo marg), AD sớm
+---
+Task ID: 55
+Agent: KAIN (main-agent)
+Task: User duyệt v10 kế thừa v9 với 3 kênh supply còn thiếu + quan sát KHO của 3 hạng đầu (số lượng kho, vị trí nhà kho)
+
+Work Log:
+- KHO-AUTOPSY (kho10.py mới — 4 seat top-3 từ 2 replay Kaggle gốc upload/107559251+107573831 + 8 game v9): engine 1 shed cố định/player — "nhà kho" = COOP/PASTURE (1 thú/ô, BUILD free). Top-3: BUILD 4-6 kho NGAY d0 quanh shed (d̄shed 1,0-2,5, 1-4 cụm liền, adj 0,87-1,0), đàn 4-6 con d0 → 6-8 d5 → 13-15 d10, kho trống chỉ 0-1; v9 đã đặt đúng hình (R157/R167) nhưng d10 mới 4 con (burst muộn d11-16)
+- Viết v10.py (nền v9.1 + S1 dâu FLAT 26/24/24/20 + S2 wheat 20 flat + seed 20-live + S3 wheat-FERT tier-2 cap 6/h + S4 window-water fertilized tier-2 + S5 carrot cap 10/8 + S6 AD sớm 2 bò d0 + melon 12 + struct cap 5 + buy_per_day 3 d3-10)
+- Đăng ký 3 tầng v10 (run_battle.py + arena-service + constants.ts tag "thế hệ mới"); restart arena-service sạch
+- Disk đầy giữa battery (battles+tool-results phình; /tmp/my-project mirror là hardlink không xóa được nội dung thật) → gzip toàn bộ jsonl (715MB→16MB), df về 2,4G trống
+- V10 MATRIX 180 game: v10.0 (S1-S6 đủ) vs v6 19/20 $72,4k — melon 80→49u, wheat sell KHÔNG tăng (FERT không land, vẫn bán 160u); v10b (v9.1-opening + S1/S2/S3) 16/20 $70,3k TỆ NHẤT (AD 36,7 < v9.1 40,7); v10d 18/20 $74,1k; **v10e (chỉ opening-AD + S5 + struct5, REVERT S1/S2/S3/S4) 19/20 $76,3k + thắng v9 đầu-trực 6/10** → SHIP v10e
+- Đo kênh (meas10.py): dâu sell 75-95u (top-3 254), wheat net −19u (top-3 +326), carrot 5-13u (135), AD 45,8 — chốt: 3 kênh KHÔNG đóng bằng quota, nút là KERNEL-OPS (WATER 629 vs 1.187; HARVEST 245 vs 484)
+- v10e full battery: vs v6 48/50 (96%) TB $76,3k max $97,3k | vs v9 6/10 ($73,6k vs $72,1k) | vs v8 7/10 $74,4k | vs v7 10/10 $79,2k max $99,9k
+- Sync (god10.py 8 game 0-mismatch + sync10.py): TỔNG 75,3%/26 chỉ số (v9.1: 74,9%) — 100%: WOOL/EGG/FEED/CARE/MOVE/P4; 83-99%: chi ANIMAL/SEED/Tổng-chi, COLLECT_FERT, P3, MELON 86,9%, MILK 83,4%; còn thiếu dâu 37,5%, wheat 20,3%, carrot 9,4%, P2 33,7%, AD 65,9%. KHO ĐỒNG BỘ: d0 4 kho + đàn 4, empty 0,6-0,9, khối liền d̄shed 0,8
+- Final money: TB $79,8k (77,9% top-3 avg, 85,5% min) — CHƯA lọt top-3; game lẻ s127 $97.097 VƯỢT min top-3 $93.281
+- UI e2e agent-browser qua gateway :81: chọn v10 vs v9 seed 127 → 🏆 v10 THẮNG 1,06× $97.097 vs $91.695, 719/719 lượt, 0 console error (khớp dollar-identical server-side), screenshot /tmp/ui_v10_victory.png; giữa chừng dev-server bị supervisor restart 1 lần (page reload) — trận vẫn chạy xong server-side
+- TOP3_REPLAY_ANALYSIS.md §11.18 (kho-autopsy + matrix + 4 luật âm A1-A4 + sync + final money + bàn giao v11); header v10.py + desc UI cập nhật đúng bản v10e
+
+Stage Summary:
+- v10 "AD+KHO" CHÍNH THỨC LÊP NGÔI: 48/50 (96%) vs v6 TB $76,3k, THẮNG v9 đầu-trực 6/10, 10/10 vs v7 ($79,2k, max $99,9k) — v9 mất ngôi
+- TRẢ LỜI CÂU HỎI KHO CỦA USER: "nhà kho" = COOP/PASTURE; top-3 build 4-6 kho ngay d0 thành khối ôm shed, kho trống 0-1, đàn 4-6 con d0; v9/v10 đã đặt ĐÚNG VỊ TRÍ (không phải gap), gap thật là TIMING d0 (AD sớm) — đã đóng bằng opening 2 bò (AD 44,5-45,8, sync 65,9%)
+- 4 LUẬT ÂM V10: A1 dâu-flat cuối mùa ăn vốn hạt giết melon wave-2; A2 wheat-20+FERT không thành sản lượng vì FERT-flow không có; A3 opening 2 bò + melon-12 NET dương; A4 buy_per_day không tăng AD khi vốn kẹt
+- ĐỒNG BỘ 75,3% (từ 74,9%); final CHƯA lọt top-3 (77,9% avg / 85,5% min) nhưng đáy đã chạm ($97,1k > min $93,3k)
+- BÀN GIAO V11: nút chặn = KERNEL-OPS 70→90+ (WATER 53%, HARVEST 50,6%) — khi có ops thì quota supply (luật A1/A2) mới trả tiền

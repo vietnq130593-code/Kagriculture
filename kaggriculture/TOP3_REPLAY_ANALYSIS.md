@@ -1212,3 +1212,105 @@ P1 đốt vốn −$133 vs −$138 (97%).
    planting theo marg thay vì dâu ăn hết đất) + AD sớm (starter thú).
 4. Tools mới: kautopsy9.py, kgap.py, ktop3.py, bat9.py, bat9ext.py, bat91.py,
    sync9.py/sync91.py, god9.py + new9/new9ext/new91/new91hh (130 jsonl).
+
+## 11.18 VÒNG 10 (Task 55) — v10 "AD+KHO": 3 KÊNH SUPPLY (thử nghiệm đầy
+đủ — 2 luật âm) + KHO-AUTOPSY TRẢ LỜI CÂU HỎI USER
+
+User duyệt: v10 kế thừa v9 với 3 kênh supply còn thiếu + quan sát KHO của
+top-3 (số lượng kho, vị trí nhà kho) — "hình như đây lại là phần khác mà
+chúng ta bỏ quên".
+
+### 55.1 — KHO-AUTOPSY (kho10.py: 4 seat top-3 từ 2 replay Kaggle gốc
+107559251/107573831 + 8 game v9/v10)
+
+Đầu tiên: engine có **1 shed cố định mỗi player** ở tâm bàn (4 ô access
+NWSE, capacity 100) — "nhà kho" thật sự trên bàn = **COOP/PASTURE** (mỗi thú
+đúng 1 ô, BUILD miễn phí chỉ tốn lao động). Vậy "số lượng kho" = số ô
+chuồng, "vị trí nhà kho" = toạ độ chuồng.
+
+| Đo | TOP-3 (4 seat) | v9 | Ghi chú |
+|---|---|---|---|
+| **BUILD d0** | **4-6 kho NGAY d0** | 3 | top-3 xây kho TRƯỚC/rồi đặt đàn 4-6 con |
+| Kho trống (spare) | **0-1** | 0-2 | không pre-build thừa |
+| Số kho cuối mùa | 7 / 13-15 / 11 / 22 | 15 | = đàn + 0-1 |
+| Đàn d0 | **4-6 con** ($1.700-2.400) | 3 ($1.200) | AD sớm thật |
+| Đàn d5 / d10 | **6-8 / 7-15** | 4 / 4 | v9 burst muộn d11-16 |
+| Vị trí | d̄shed 1,0-2,5, 1-4 cụm, adj 0,87-1,0 | d̄shed 0,6-1,7, 1 cụm | v9 ĐÃ đồng bộ (R157/R167) |
+| Hình dáng d10 | SpaTaro dải dọc ôm shed; UMG khối (2,3)-(4,6); Otter trải 22 | BFS-khối ôm shed | cả nước đều ôm tâm |
+
+→ **KHO KHÔNG phải gap lớn**: v9/v10 đã đặt chuồng đúng (khối liền ôm shed,
+đúng hình top-3). Gap thật trong "kho" = **TIMING d0** (top-3 burst 4-6 kho
++ 4-6 thú ngay; v9 d10 mới 4 con) — chính là mặt "AD sớm" của bàn giao.
+
+### 55.2 — V10 MATRIX (4 biến thể, 180 game engine thật; bat10/bat10b/
+bat10b2/bat10e_ext)
+
+| Biến thể | Thay đổi | vs v6 (100-119) | Phán quyết |
+|---|---|---|---|
+| v10.0 S1-S6 đủ | dâu FLAT 26/24/24/20 + wheat 20 flat + wheat-FERT tier-2 + window-water tier-2 + carrot cap 10/8 + 2 bò d0 + melon 12 | 19/20 TB $72,4k (ext 29/30 $74,6k) | melon 80→49u, wheat sell KHÔNG tăng |
+| v10b | v9.1-opening (1 bò + melon 14) + S1/S2/S3 + drip | 16/20 $70,3k | TỆ NHẤT — AD 36,7 < v9.1 40,7 |
+| v10d | v10.0-opening + bỏ S1-late | 18/20 $74,1k | vẫn hụt |
+| **v10e = SHIP** | **chỉ opening-AD (2 bò+1 cừu+1 ngỗng $1.600 + melon 12) + buy_per_day 3 d3-10 + struct-cap 5 + carrot cap 10/8; REVERT S1/S2/S3/S4** | **19/20 TB $76,3k max $97,3k (ext 29/30 $76,3k)** | ngang v9.1 + **thắng v9 đầu-trực 6/10** |
+
+v10e full: vs v6 **48/50 (96%) TB $76,3k** | vs v9 đầu-trực **6/10**
+($73,6k vs $72,1k) | vs v8 7/10 $74,4k | vs v7 **10/10 $79,2k max $99,9k**
+| UI e2e: v10 thắng v9 s127 **$97.097 vs $91.695 (1,06×)**, 719/719 lượt,
+0 console error.
+
+### 55.3 — LUẬT ÂM V10 (quan trọng nhất của vòng — nạp cho v11)
+
+- **A1 DÂU-FLAT cuối mùa là bẫy vốn-lao động**: quota 24/20 d14-26 ăn vốn
+  hạt + giờ tưới event → melon wave-2 chết đứng 0,9 ô (v9.1: 3,1) = −$4,3k.
+  Kernel 70 op/ngày KHÔNG gánh nổi 24 dâu + 20 wheat + wave-2 melon + 13
+  thú cùng lúc. Top-3 làm được vì có 92-123 op/ngày. Thang tiered của v9.1
+  là tối ưu cho kernel hiện tại.
+- **A2 WHEAT-20-FLAT + FERT tier-2 không tự thành sản lượng**: FERT pool bị
+  kênh dâu/melon/carrot giữ ưu tiên (FERT bán 160u không giảm; sell wheat
+  117u ≈ 114u). Kênh wheat 574u cần FERT-FLOW thật (bón thật 20 ô/chu kỳ)
+  + nước window thật — là việc của KERNEL-ops, không phải quota.
+- **A3 Opening 2 bò + melon-12 NET DƯƠNG**: AD 45,8 (+5,1 vs v9.1), milk
+  +$2,2k, đổi melon −$3k; giữ 19/20 + GIÀNH NGÔI v9 đầu-trực 6/10.
+- **A4 buy_per_day-3 không tăng AD nếu vốn đã kẹt hạt** (v10b: AD 36,7) —
+  AD chỉ tăng khi opening nhả vốn thú thật (2 bò d0).
+
+### 55.4 — ĐỒNG BỘ v10e vs TOP-3 (sync10.py, 8 game god 0-mismatch, 26 chỉ số)
+
+✅ 100%: WOOL 66u, EGG 159u, FEED 281, CARE 283, MOVE ≤ top-3, P4-net
++$7.480/ng. ✅ ≥83%: Tổng chi 98,5%, Chi ANIMAL 97,3%, Chi SEED 97,2%,
+COLLECT_FERT 92,6%, P3-net 92,6%, MELON 86,9% (71u), MILK 83,4%.
+⚠ 50-80%: FERTILIZE 77,7%, P1 77,4%, TOMATO 74%, d29-rev 65,9%,
+**AD 65,9% (44,5 vs 67,5 — lên từ 68%... của v9.1 nhưng vẫn xa)**,
+HIRE 65,1%.
+❌ CHƯA: dâu 37,5% (95,5u vs 254,5), wheat máy 20,3% (116,8 vs 574),
+carrot 9,4% (12,8 vs 135), P2 33,7% — WATER 53% + HARVEST 50,6% là nút
+thắt thật (không phải standing).
+
+**TỔNG ĐỒNG BỘ: 75,3%** (v9.1: 74,9%). Kho: d0 4 kho + đàn 4 (top-3 4-6),
+empty 0,6-0,9 (top-3 0-1), khối liền d̄shed 0,8 — **ĐỒNG BỘ KHO**.
+
+### 55.5 — FINAL MONEY: CHƯA LỘT TOP-3 nhưng CHẠM ĐÁY
+
+| | min | TB | max |
+|---|---|---|---|
+| TOP-3 (4 seat) | $93.281 | $102.372 | $109.084 |
+| v10e (50 game vs v6) | — | $76,3k | **$97,3k** |
+| v10e (8 game god) | $63,9k | $79,8k | $95,6k |
+
+- TB $79,8k = **77,9% mức TB top-3 / 85,5% mức min** — CHƯA vào top-3.
+- Game đơn lẻ đã VƯỢT min top-3: s127 $97.097 (UI e2e), max $99.859 (vs
+  v7) — đáy khoảng top-3 đã chạm được.
+
+### 55.6 — PHÁT HIỆN & BÀN GIAO V11
+
+1. **Kho đã xong** (đặt đúng, burst d0 ✓ sau S6) — không còn là gap.
+2. **3 kênh supply không đóng được bằng quota** — chốt nút là KERNEL-OPS:
+   WATER 53% + HARVEST 50,6% (top-3 1.187/484 vs v10 629/245). Đường v11:
+   nâng ops/ngày 70 → 90+ (đa nhiệm 1 unit đi nước+kéo theo FERT, seed
+   stack SELL, move-batching) — lúc đó quota 24-dâu-flat + wheat-FERT mới
+   trả tiền (luật A1/A2 ghi sẵn điều kiện).
+3. AD 65,9% — còn ~23 animal-days: đường ngắn nhất = bỏ bớt melon wave-1
+   (top-3 melon standing chỉ 4,5!) đổi vốn thú d1-7 — nhưng phải đo lại
+   vs v6 (v6 đánh melon-14 race d11-13).
+4. Tools mới: kho10.py, bat10.py, bat10b.py, bat10b2.py, bat10e_ext.py,
+   meas10.py, god10.py, sync10.py + new10/ (110 game gz) + kho-sync đo
+   trong kho10.

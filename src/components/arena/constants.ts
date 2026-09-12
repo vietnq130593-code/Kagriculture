@@ -98,6 +98,7 @@ export interface AgentDesc {
 }
 
 export const AGENT_INFO: AgentDesc[] = [
+  { name: 'v10', desc: 'AD+KHO — opening 2 bò + melon-12 + drip thú d3-10 (AD 44,5) · 5 kho d0 · carrot cap 10/8 · đồng bộ 75,3% · $79,8k TB', tag: 'thế hệ mới' },
   { name: 'v9', desc: 'STACK-SWEEP — tái cấu trúc kernel lao động: continuation-claims gap-0/1 + morning-cascade + FERT-stack · mục tiêu $90-110k', tag: 'thế hệ mới' },
   { name: 'v8', desc: 'REGION-FLOW — kernel lao động lai: event-water + hybrid tier/geo + wheat-standing + fert · 57/60 vs v7', tag: 'nhà vô địch' },
   { name: 'v7', desc: 'KAIN Champion — kain40 + collect-first R149 · 96/100 vs v6, 1.278×', tag: 'cựu vô địch' },
