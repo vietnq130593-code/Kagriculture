@@ -1508,3 +1508,54 @@ Stage Summary:
 - 2 ĐÒN MỚI: (1) PREFIRE h22 — bán overflow shed sớm 1 bước ở vùng giá phẳng cuối ngày, kme3 h23 ăn giá bị đè; (2) V231-flip điều kiện milk_shops>=3 — xử lý flip V231 theo ngữ cảnh shop (bỏ khi 2 milk-shop, giữ khi 3+)
 - 7 CỬA CHẾT xác nhận bằng số (melon physics 5 cửa + milk midday-peak + terminal phantom-spam) — thị trường tinh chỉnh đã BÃO HÒA
 - GAP +5k CHƯA ĐẠT: cần v13 kernel surgery (walk-level choreography regeneration — sắp xếp lại thứ tự thăm tile hằng ngày để stock premium về sớm hơn)
+
+---
+Task ID: 63
+Agent: KAIN (main-agent)
+Task: User: tải lại PAT (không token) + xóa hết phiên bản chỉ giữ v12/kme3 + thêm đối thủ mới từ link reyhanksatria/kaggressure-dynamic-route-agent + v13 phải đánh bại cả kme3 lẫn bản mới
+
+Work Log:
+- Đọc PAT mới từ upload/PAT vietnq.rtf (RTF → extract github_pat_ bằng regex, không hiển thị lại)
+- Dọn kaggressurE/: xóa 80+ file phiên bản (bisa/bisb/bisc, cell4*, kain1-41, submission, v4-v11, kme3_noflip, v12a-z + v12aa-af, backups, __pycache__, tool-results) — chỉ còn v12.py, kme3.py + docs + arena/bench/battles; xóa worklog.md rác 132B
+- Link user "kaggressure-dynamic-route-agent" → 404; đúng slug là "kaggressurE-dynamic-route-agent" (thiếu "icult") → API v1 pull public OK: notebook 2 cells, cell0 = Base85+zlib 182KB → main.py 285.100B/2.356 dòng
+- **PHÁT HIỆN: MD5 dra.py = MD5 kme3.py = 55579a72d9dc94902c8b282d862ce466 — IDENTICAL từng byte** (fork không đổi code; notebook public v4, Reyhan Ksatria)
+- Đăng ký dra 3 tầng: run_battle.py AGENTS + arena-service/index.ts + constants.ts (desc ghi rõ MD5 trùng); registry giảm còn [v12, kme3, dra] (+v13 sau)
+- Restart arena-service (kill pgid + double-fork launch_arena.py); socket.io hello verify: ["v12","kme3","dra"]
+
+Stage Summary:
+- Folder sạch: chỉ v12.py + kme3.py + dra.py (+docs/infra); đối thủ mới = BẢN SAO MD5 CỦA KME3 → mọi đòn chống kme3 tự động thắng dra; self-play hòa tuyệt đối từng đồng (battery Task 64)
+
+---
+Task ID: 64
+Agent: KAIN (main-agent)
+Task: Battery đối đầu v12 vs dra + kme3 vs dra + phân tích kiến trúc dra tìm điểm yếu
+
+Work Log:
+- Battery v12 vs dra seeds 100-107 2 ghế: **16/16 thắng, TB gap +$3.852** ($99.798 vs $95.946) — đồng số với battery kme3 (chứng minh hành vi trùng)
+- Self-play kme3 vs dra 8 trận: HÒA TUYỆT ĐỐI từng đồng (78.443=78.443... 109.091=109.091) — hai agent là một, về mặt toán
+- Viết bench-oracle/oracle_probe.py: thay _process_market engine bằng bản log 4.321 transaction (step, pid, op, item, price) — pid qua player_id vòng lặp (bài học: patch eng_mod.interpreter KHÔNG tác dụng vì registration giữ reference gốc; phải patch _process_market vì interpreter gọi module-global)
+- Phân tích s103: hai bên bán ĐÚNG số lượng mọi mặt hàng (394 W/248 S/161 Wo/245 M/72 Me) — gap +2.803 = 100% timing; STRAW +1.284, WOOL +751, MILK +590
+- Oracle ±6 bước: +$10.5k ceiling nhưng ảo (arrival-physics); backward-1-step +$6.5k / forward −$6.5k (earlier=+$5.5/unit/step) → timing-game bão hòa vì mọi transit Manhattan-optimal
+- Decode tape route 0 (s103) ngày d10 đầy đủ: melon-crew (farmer+h0-h10) WATER s244-245 → HARVEST s245-249 → PLACE s249-255, mọi đường đi = Manhattan tối ưu; 12 melon cuối (plot xa) về s264 = vật lý
+- 7 cửa chết vòng 4 đóng: melon-front-run (physics), water-skip (−$182/plot ròng), pre-position (engine reset hands nightly), xa-plot realloc, d9-prewater (watered_today), FERT-strike (cap max_yield=6), sheep-swap sabotage (gap ròng +$0.6-1k, rủi ro cao)
+- Milk-theo-ngày: d8-13 $120-186, d15+ sụp $2-35 (cung 22/ngày > drain 19/ngày); index-race contested steps hiếm + đối xứng → không dư địa
+
+Stage Summary:
+- KẾT LUẬN CỐT LÕI: với đối thủ mirror-tape (dra=kme3), gap = thuần timing; H=6 vs H=4 + prefire + flip điều kiện đã bắt gần hết giá trị timing; +3.5-3.9k là mức cân bằng — vượt cần đổi lớp đối thủ, không phải tinh chỉnh
+
+---
+Task ID: 65
+Agent: KAIN (main-agent)
+Task: Xây v13 đánh bại cả kme3 lẫn dra + validate đầy đủ
+
+Work Log:
+- v13.py = copy v12.py + micro-pack: P1 V224 sales-first + R37 reorder mở từ step 144 (trước 288); P3 prefire h21+h22 (trước h22-only); P4 melon-seller mọi giờ (trước h14+); syntax OK 1.843 dòng
+- Smoke v13 vs dra 100-107: 8/8 +$3.870 — micro-pack ≈ noise (+$18/trận) nhưng không âm → giữ
+- Battery chốt: v13 vs kme3 100-107 2 ghế 16/16 +$3.870 ($99.793 vs $95.923) | v13 vs dra 100-107 16/16 +$3.870 (đồng dollar) | v13 vs dra 200-207 16/16 +$3.203 ($94.529 vs $91.326) — không overfit | v13 vs v12 đầu-trực 8/8
+- Đăng ký v13 3 tầng (runner + arena-service ['v13','v12','kme3','dra'] + constants.ts v13 tag "nhà vô địch"); restart arena-service sạch
+- UI e2e agent-browser qua gateway :81: chọn v13 vs dra seed 103 (Radix [role=option] click + HTMLInputElement prototype setter) → 719/719 lượt, 0 console error, 🏆 v13 THẮNG $114.280 vs $111.509 (đồng dollar server-side); screenshot /tmp/ui_v13_victory.png
+- Viết §11.24 TOP3_REPLAY_ANALYSIS.md (phát hiện dra≡kme3 + oracle + 7 cửa chết + battery + luật L24-L26)
+
+Stage Summary:
+- SẢN PHẨM: v13.py = KME3-TUNED v4 DUAL-OPPONENT — 48/48 thắng cả kme3 lẫn dra trên 2 bộ seed (gap +3.9k/+3.2k), đầu-trực thắng v12 8/8; dra.py đối thủ thứ hai (bản sao MD5 kme3)
+- GAP +5k-10k KHÔNG đạt được bằng timing (bão hòa chứng minh bằng oracle): mức cân bằng mirror-tape = +3.5-3.9k; đường vượt = cần đối thủ khác lớp (khác tape/production) — đã ghi L26 bàn giao

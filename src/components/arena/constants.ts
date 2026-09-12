@@ -98,26 +98,10 @@ export interface AgentDesc {
 }
 
 export const AGENT_INFO: AgentDesc[] = [
-  { name: 'v12', desc: 'KME3-TUNED v3 (code sạch 0 chú thích) — vòng 3: valve PREFIRE h22 (xả overflow sớm 1 bước) + V231 flip điều kiện milk-shops>=3 (bỏ flip hại 2-shop, giữ flip lời 3-shop) · 32/32 thắng kme3 (gap +3.9k/+3.2k hai bộ seed, worst 1.007x) · đè v11 8/8 3.27× (chi tiết §11.23)', tag: 'nhà vô địch' },
-  { name: 'v11', desc: 'CADENCE+ADAPT — 6 vòng luyện với kme3: premium-floor kênh deficit + buffer lot-cap + distress-unclog + carrot/đàn thích ứng shop-draw (V231) · 12/12 vs v6 $83k · 6/10 vs v10 $71k · thua kme3 0/8 $41k (chi tiết §11.20)', tag: 'cựu vô địch' },
-  { name: 'kme3', desc: 'MASTER ENGINE V3 (Kaggle public, Apache 2.0) — route-tape 719-turn + 20 lớp overlay, Public Score 600 · tự đấu hòa tuyệt đối · bị v12 vượt 16/16 (chi tiết §11.21)', tag: 'đối thủ chuẩn' },
-  { name: 'v10', desc: 'AD+KHO — opening 2 bò + melon-12 + drip thú d3-10 (AD 44,5) · 5 kho d0 · carrot cap 10/8 · đồng bộ 75,3% · $79,8k TB', tag: 'thế hệ mới' },
-  { name: 'v9', desc: 'STACK-SWEEP — tái cấu trúc kernel lao động: continuation-claims gap-0/1 + morning-cascade + FERT-stack · mục tiêu $90-110k', tag: 'thế hệ mới' },
-  { name: 'v8', desc: 'REGION-FLOW — kernel lao động lai: event-water + hybrid tier/geo + wheat-standing + fert · 57/60 vs v7', tag: 'nhà vô địch' },
-  { name: 'v7', desc: 'KAIN Champion — kain40 + collect-first R149 · 96/100 vs v6, 1.278×', tag: 'cựu vô địch' },
-  { name: 'v6', desc: 'ORCHESTRATOR-K · 93.75% vs v5, 100% vs v4/v3', tag: 'cựu vô địch' },
-  { name: 'kain40', desc: 'KAIN Full-Pressure — luật lấp đất 85%: fill-law + tomato channel + hire-buffer', tag: 'KAIN' },
-  { name: 'kain39', desc: 'KAIN Price-Blade — kain38 + wheat-hold + egg-fortress-8 (đòn tấn công giá)', tag: 'KAIN' },
-  { name: 'kain38', desc: 'KAIN Fill-Smart — tối ưu nguồn lực: lấp thung lũng d5-9 + late-straw + late-wheat', tag: 'KAIN' },
-  { name: 'kain33', desc: 'KAIN 4-Laws — 3 luật đất cứng top-Kaggle + plan-cache fix', tag: 'KAIN' },
-  { name: 'kain32', desc: 'KAIN Land-Lab — luật 85% utilization (nghiên cứu)', tag: 'KAIN' },
-  { name: 'kain31', desc: 'KAIN Solver-2 — 55/100 vs v6, phá tường R104', tag: 'KAIN' },
-  { name: 'kain30', desc: 'KAIN Solver-1 — kernel P3 giá-trị-biên + Egg Fortress', tag: 'KAIN' },
-  { name: 'kain25', desc: 'KAIN thách đấu v6 — Geese Fortress 75 đất', tag: 'KAIN' },
-  { name: 'kain16', desc: 'Đối thủ KAIN — 24 biến thể, tường 94%', tag: 'KAIN' },
-  { name: 'v5', desc: 'Não 6 lớp Bayes (97% vs v4)', tag: 'đối thủ chuẩn' },
-  { name: 'v4', desc: 'Orchestrator + 8 edges (97% bị v5 áp đảo)', tag: 'bản cũ' },
-  { name: 'melon', desc: 'Bot đơn giản — dưa hấu chậm', tag: 'bot đơn giản' },
+  { name: 'v13', desc: 'KME3-TUNED v4 DUAL-OPPONENT — giữ nguyên lõi v12 (H=6/LO=144/HI=712, prefire h22, V231-flip điều kiện) + micro-pack: V224 sales-first + R37 reorder mở rộng từ step 144 (trước 288), prefire h21+h22, melon-seller mọi giờ · 48/48 thắng kme3+dra (gap +3.9k/+3.2k hai bộ seed) · đối thủ dra = bản sao MD5 của kme3 (chi tiết §11.24)', tag: 'nhà vô địch' },
+  { name: 'v12', desc: 'KME3-TUNED v3 (code sạch 0 chú thích) — vòng 3: valve PREFIRE h22 + V231 flip điều kiện milk-shops>=3 · 32/32 thắng kme3 (gap +3.9k/+3.2k, worst 1.007x) · bị v13 thay thế (chi tiết §11.23)', tag: 'cựu vô địch' },
+  { name: 'kme3', desc: 'MASTER ENGINE V3 (guruprasaathas111, Kaggle public, Apache 2.0) — route-tape 719-turn + 20 lớp overlay, Public Score 600 · tự đấu hòa tuyệt đối · bị v12/v13 vượt 16/16 (chi tiết §11.21-23)', tag: 'đối thủ chuẩn' },
+  { name: 'dra', desc: 'DYNAMIC ROUTE AGENT (Reyhan Ksatria, Kaggle public) — đã kiểm tra MD5: GIỐNG HỆT kme3 từng byte (fork không đổi code; self-play hòa tuyệt đối từng đồng). Đối thủ thứ hai user chỉ định — v13 thắng 32/32 (chi tiết §11.24)', tag: 'đối thủ mới' },
 ]
 
 export const SPEED_OPTIONS: { value: number; label: string }[] = [

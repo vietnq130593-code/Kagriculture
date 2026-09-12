@@ -1616,3 +1616,49 @@ Market-race đã cạn (mọi lô chung bán trước 2 lượt — đúng đỉ
 - **L21**: Giá trị quyết định thích nghi (adaptive) theo ngữ cảnh shop — bisection từng loại seed (2-shop vs 3-shop) trước khi bật/tắt, không tắt toàn cục.
 - **L22**: Daily-gap attribution lừa ở ranh giới ngày — lệnh bán h22/h23 rơi vào bucket khác nhau; chỉ tin running total.
 - **L23**: Market-race đã bão hòa tại +3.5k — tier kế tiếp là walk-level choreography (v13): sắp thứ tự thăm tile mỗi ngày để stock premium (straw/milk/wool) về shed sớm 1-2 bước so với kme3.
+
+## 11.24 — VÒNG 4: ĐỐI THỦ THỨ HAI (dra) + V13 DUAL-OPPONENT + BẢN ĐỒ BÃO HÒA ORACLE
+
+### 11.24.1 — Phát hiện trọng炸弹: dra ≡ kme3 (byte-for-byte)
+User chỉ định đối thủ mới: `reyhanksatria/kaggressure-dynamic-route-agent` (link đúng: `kaggressurE-dynamic-route-agent` — link user gõ thiếu "icult", trang 404; API v1 pull public trả về 200). Notebooks 2 cells: cell 0 = Base85+zlib payload 182KB → main.py **285.100 bytes / 2.356 dòng = MD5 `55579a72d9dc94902c8b282d862ce466` = GIỐNG HỆT kme3.py**. Cell 1 = submission validator (tar.gz main.py). Notebook public (isPrivate=false), version 4, last-run 2026-09-09, tác giả "Reyhan Ksatria" — fork không đổi một byte code agent.
+- **Self-play kme3 vs dra 8 seed × 2 ghế: HÒA TUYỆT ĐỐI từng đồng** (78.443/78.443, ..., 109.091/109.091) — chứng minh toán học hai agent là một.
+- Hệ quả: mọi đòn chống kme3 tự động tác dụng lên dra; "đánh bại cả hai" = đánh bại một engine hai lần.
+
+### 11.24.2 — Oracle phân tích (instrumented engine, 4.321 transactions/trận)
+Viết `bench-oracle/oracle_probe.py`: thay `_process_market` của engine bằng bản log từng unit (step, pid, op, item, price) — replay s103 v12 vs dra:
+- **Cả hai bên bán ĐÚNG SỐ LƯỢNG ở mọi mặt hàng** (394 WHEAT, 248 STRAW, 161 WOOL, 245 MILK, 72 MELON...) — gap +2.803 s103 = 100% THỜI ĐIỂM GIÁ, 0% sản lượng.
+- Phân bổ gap s103: STRAW +1.284, WOOL +751, MILK +590, FERT +133, WHEAT +45.
+- **Oracle re-timing ±6 bước: +$10.546 ceiling** (MELON 3.625, MILK 2.553, STRAW 1.900, WOOL 1.426) — NHƯNG ảo: window-max vi phạm arrival-physics.
+- **Backward 1 bước: +$6.472 (earlier = better ~$5.5/unit/step); forward 1 bước: −$6.531.**
+- Milk theo ngày: d8-d13 $120-186 → d15+ sụp $2-35 (thị trường bão hòa ~19 drain/ngày vs 22 cung/ngày) — đàn bò hết giá từ d16.
+- Market-queue index race: contested same-good steps hiếm (FERT 93, MILK 44, WHEAT 35), A-behind ≈ B-behind (5/5, 2/3) — **không còn dư địa index**.
+
+### 11.24.3 — Bảy cửa chết vòng 4 (đóng vĩnh viễn phần choreography)
+1. **Melon-front-run**: tape route 0 d10 decode đầy đủ — mọi transit là Manhattan-optimal (h8: 3 bước đi + WATER + HARVEST + 3 bước về = PLACE s249 = sớm nhất vật lý cho plot k=3); không có detour nào của melon-crew để cắt.
+2. **Water-skip để sớm 1 bước**: −1 unit/plot ($250) > +1 bước × $25/unit — thiệt hại ròng −$182/plot (đo bằng mô phỏng giá per-unit walk).
+3. **Pre-position đêm d9**: engine `_end_of_day` reset `farm["hands"]=[]` + farmer về spawn — tay được thuê lại mỗi sáng, hire fib-cost theo ngày.
+4. **Xa-plot reallocation** (12 melon s264 @ $131): plot xa k=6-7, mọi reassignment vẫn về s264 — vật lý.
+5. **D9-evening pre-water**: `watered_today` reset mỗi ngày + d9 đã tưới — no-op.
+6. **Fertilizer strike**: melon cap `max_yield=6` chặn bonus +2 (min(6, 5+2)=6) — không thêm unit được.
+7. **Sheep-swap sabotage** (đổi 2 bò→2 cừu): mô hình giá SQ T=105 — tự hạ doanh thu wool mình −$9.4k để hạ đối thủ −$12k, cộng mất milk d8-15 −$1.5-2k = gap ròng +$0.6-1k, rủi ro phá tape: BỎ.
+
+### 11.24.4 — V13 = v12 + micro-pack (đo thực: +$18/trận = noise, giữ vì không âm)
+| Đòn | Thay đổi | Kết quả |
+|---|---|---|
+| P1 V224+R37 từ step 144 | mở rộng từ 288 | noise |
+| P3 prefire h21+h22 | từ h22-only | noise |
+| P4 melon-seller mọi giờ | từ h14+ | noise |
+| **v13 vs v12 đầu-trực** | — | **8/8, +$373-528/set** |
+
+### 11.24.5 — Battery chốt v13 (48/48 + 8/8)
+| Cặp | Seed | Kết quả |
+|---|---|---|
+| v13 vs kme3 (2 ghế) | 100-107 | **16/16, TB gap +$3.870** ($99.793 vs $95.923) |
+| v13 vs dra (2 ghế) | 100-107 | **16/16, TB gap +$3.870** (đồng dollar với kme3) |
+| v13 vs dra (2 ghế) | 200-207 | **16/16, TB gap +$3.203** ($94.529 vs $91.326) — không overfit |
+| v13 vs v12 (đầu-trực) | 100-107, 200-203 | 8/8 v13 thắng |
+
+### 11.24.6 — Luật mới vòng 4
+- **L24**: Đối thủ "mới" trên Kaggle cần kiểm MD5 + self-play trước khi xây chiến thuật — fork không đổi code là cùng một engine (tiết kiệm 1 vòng bisection).
+- **L25**: Cửa sổ re-timing (oracle) là thước đo THẬT chỉ khi tôn trọng arrival-physics: stock phải về shed trước khi bán được — mọi "max price trong cửa sổ" vượt arrival = ảo.
+- **L26**: Mirror-tape đối đầu (hai bên cùng production) → gap = thuần timing race; khi H=6 thắng H=4 và mọi transit Manhattan-optimal, timing game BÃO HÒA tại ~+3.5-3.9k. Vượt mức này cần đổi LỚP đối thủ (khác tape / khác production), không phải tinh chỉnh.
