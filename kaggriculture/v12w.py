@@ -1,6 +1,6 @@
 from __future__ import annotations
 _V12_HORIZON = 6
-_V12_R36_LO = 144
+_V12_R36_LO = 288
 _V12_R36_HI = 712
 _V12_PREDUMP_STEP = -1
 import copy

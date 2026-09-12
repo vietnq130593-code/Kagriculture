@@ -1,6 +1,6 @@
 from __future__ import annotations
-_V12_HORIZON = 6
-_V12_R36_LO = 144
+_V12_HORIZON = 7
+_V12_R36_LO = 288
 _V12_R36_HI = 712
 _V12_PREDUMP_STEP = -1
 import copy
@@ -702,7 +702,7 @@ def agent(observation,configuration=None):
     if actual!=baseline[0]:
         _UPGRADE_STATS['shadow_declines']+=1;return actual
     try:
-        plan=_PLANNER_NS['plan_terminal'](observation,configuration,baseline,max_simulations=256,passes=2,proposals_per_actor=16)
+        plan=_PLANNER_NS['plan_terminal'](observation,configuration,baseline,max_simulations=64,passes=1,proposals_per_actor=4)
         _UPGRADE_STATS['max_planning_ms']=max(_UPGRADE_STATS['max_planning_ms'],plan.get('planning_ms',0.0))
         if not plan.get('accepted'):return actual
         plan['parent_states_before']=states;_TERMINAL_PLANS[seat]=plan

@@ -1,6 +1,7 @@
 from __future__ import annotations
 _V12_HORIZON = 6
-_V12_R36_LO = 144
+_V12_HORIZON_TAIL = 10
+_V12_R36_LO = 288
 _V12_R36_HI = 712
 _V12_PREDUMP_STEP = -1
 import copy
@@ -702,7 +703,7 @@ def agent(observation,configuration=None):
     if actual!=baseline[0]:
         _UPGRADE_STATS['shadow_declines']+=1;return actual
     try:
-        plan=_PLANNER_NS['plan_terminal'](observation,configuration,baseline,max_simulations=256,passes=2,proposals_per_actor=16)
+        plan=_PLANNER_NS['plan_terminal'](observation,configuration,baseline,max_simulations=64,passes=1,proposals_per_actor=4)
         _UPGRADE_STATS['max_planning_ms']=max(_UPGRADE_STATS['max_planning_ms'],plan.get('planning_ms',0.0))
         if not plan.get('accepted'):return actual
         plan['parent_states_before']=states;_TERMINAL_PLANS[seat]=plan
@@ -1307,7 +1308,7 @@ def agent(observation, configuration=None):
     if step == 0:
         _R37_STATS.update(quote_reordered_turns=0, three_turn_calls=0, nocturne_errors=0)
     state['step'] = step
-    _R37_HORIZONS[player] = _V12_HORIZON if (_V12_R36_LO <= step < _V12_R36_HI) else 2
+    _R37_HORIZONS[player] = (_V12_HORIZON if step < 696 else _V12_HORIZON_TAIL) if (_V12_R36_LO <= step < _V12_R36_HI) else 2
     probe_state=_r44_before(observation)
     try:
         if _R37_ADAPTIVE and step < 648:
@@ -1320,7 +1321,7 @@ def agent(observation, configuration=None):
     if _R37_HORIZONS[player]==3 and probe_state['matched']:
         _R37_HORIZONS[player]=4
         _R44_REPORT['probe_four_turn_calls']+=1
-    if _V12_R36_LO <= step < _V12_R36_HI:_R37_HORIZONS[player] = _V12_HORIZON
+    if _V12_R36_LO <= step < _V12_R36_HI:_R37_HORIZONS[player] = _V12_HORIZON if step < 696 else _V12_HORIZON_TAIL
     action = _R37_PARENT(observation, configuration)
     _r44_after(observation,action,probe_state)
     if _R37_QUOTE and step >= 288:
