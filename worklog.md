@@ -1236,3 +1236,23 @@ Stage Summary:
 - PREVIEW PANEL KHÔI PHỤC HOÀN TOÀN + chống tái phát: JSONL dữ liệu đã bị loại khỏi scan tailwind (gitignore), supervisor khoan dung phase startup, devtool tắt
 - Bài học quan trọng: thêm dữ liệu lớn vào project (battles/tool-results) mà không gitignore = bom giờ OOM cho mọi cold compile (tailwind oxide quét theo gitignore, KHÔNG theo tsconfig include)
 - Chuỗi verified end-to-end: UI → gateway → dev server → socket.io → arena-service → python runner → engine → replay jsonl
+
+---
+Task ID: 51
+Agent: KAIN (main-agent)
+Task: User cấp PAT mới (upload/PAT vietnq.rtf) — thực hiện push code còn nợ từ Task 50
+
+Work Log:
+- Đọc PAT từ RTF: lần 1 cat bị cắt 27 ký tự (token 40 ký tự ghp_fQ...gLTQ) → hexdump od -c lấy đủ 40 ký tự → GitHub API /user HTTP 200 (login vietnq130593-code)
+- Push bị reject: remote main có 35 commit local thiếu (Task 38-44 gốc trước rollback) + local có 23 commit remote thiếu (Task 49-50b) — phân kỳ từ merge-base e3d523e (Task 23) do sandbox rollback
+- Giải pháp merge (KHÔNG force push, không mất gì): git merge FETCH_HEAD -X ours; resolve theo hướng local — (1) 257 file artifact remote re-add (battles jsonl/gz + tool-results) bị git rm khỏi index; (2) 20 file v2/v3/bench-cũ/submission-cũ giữ deletion của remote (đúng ý định Task 30 "cleanup xóa toàn bộ phiên bản v3 đổ về trước" mà /tmp mirror đã phục hồi sai); (3) v8.py + arena-service + next.config + worklog auto-merge = identical local HEAD (git diff --cached chỉ có 20 D, không có M nào)
+- Harden .gitignore: + tool-results/ (root), *.jsonl.gz, *.pyc
+- Push lần 1 timeout 180s (33.4 MiB @ ~560 KiB/s) — lần 2 với timeout 570s: THÀNH CÔNG 00657da..567f990 main -> main
+- Verify đồng bộ: rev-list left-right 0 0 (local = remote tuyệt đối); GitHub API confirm main = 567f990
+- Health check sau push: dev :3000 = 200, arena :3005 socket.io handshake OK (sid + websocket upgrade), gateway :81 = 200, v8.py = VÒNG 50 (R188-R192, md5 bc0d5523)
+
+Stage Summary:
+- PUSH HOÀN TẤT: 24 commit (Task 49 restore + Task 50 round-50 v8 + Task 50b infra + merge commit) lên github.com/vietnq130593-code/Train1
+- Merge commit 567f990 hợp nhất 2 nhánh (pre-rollback remote Task 38-44 + restored local Task 49-50b) không mất lịch sử nào; artifacts không bị re-track (giữ nguyên quyết định .gitignore Task 50b)
+- PAT lưu ý vận hành: token trong upload/ không bị commit (.gitignore có upload/) — an toàn
+- Nợ Task 50 (push code) ĐÃ TRẢ XONG; trạng thái v8 = vòng 50 (43/50 = 86% vs v6, thua đậm đã xóa, R188-R192)
