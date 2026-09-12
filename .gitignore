@@ -7,4 +7,7 @@ __pycache__/
 upload/
 kaggriculture/battles/
 kaggriculture/tool-results/
+tool-results/
 *.jsonl
+*.jsonl.gz
+*.pyc
