@@ -941,3 +941,114 @@ trận thảm họa** (tệ nhất $45.6k / biên thua tệ nhất −$10.7k so 
   $3-5k — đều cần vòng kernel (R151/R164) hoặc chấp nhận variance.
 - v9/kain41 vẫn搁置 theo chỉ thị; không đụng v7 (KAIN champion) và v6
   (orchestrator — đối thủ chuẩn đo).
+
+## 11.15 VÒNG 52 — ĐỐI CHIẾU STYLE v8-VÒNG-50 vs TOP-3 + PHÂN TÍCH CÔNG-THỦ (FERT = bài học mới)
+
+Task: user yêu cầu (1) đo lại các chỉ số xem v8 đã khớp top-3 chưa, (2) đánh giá chiến
+lược công-thủ của top-3 — bài học mới / thiếu sót còn tồn tại với v8, (3) báo cáo.
+
+Phương pháp: battery mới 8 seed TRẰNG (200-207, chưa từng dùng — tránh overfit đường
+RNG theo R186), v8 vòng-50 (R188-R192) vs v6, god-replay 8/8 game 0-mismatch 719 turns
+→ phase8.py (B1 style + B2 pha + B3 công-thủ) + đếm op đồng-ruộng từ replay gốc.
+
+### 52.0 — KẾT QUẢ BATTERY MỚI (seeds 200-207, v8 vs v6)
+
+7/8 thắng ($61.4k–74.0k), 1 thua sát (s207: 50.037 vs 51.235, −$1.2k).
+v8 TB **$64.841** | v6 TB $56.441. Nhất quán battery 50-game vòng 50 (86%).
+
+### 52.1 — B1 KHỚP CHỈ SỐ: ĐÃ KHỚP GÌ, CÒN THIẾU GÌ
+
+**✅ ĐÃ KHỚP / VƯỢT (so 4 seat top-3):**
+
+| Chỉ số | TOP-3 | v8 vòng-50 | Ghi chú |
+|---|---|---|---|
+| Cấu trúc chi | $33.2k | $31.9k | khớp — vòng 45-50 đã vá xong hố chi |
+| LAND 4 ô / $3k | 4 / $3k | 4 / $3k | khớp tuyệt đối |
+| P1 d0-9 net/ngày | −$138 | −$117 | **KHỚP** — đốt vốn đúng chuẩn |
+| P4 d26-29 net/ngày | +$5.652 | +$6.578 | **VƯỢT** — endgame v8 tốt hơn |
+| Shed cuối trận | sạch | sạch (0 leftovers) | v8 sạch hơn (top3 còn 4 WOOL) |
+| FEED/CARE/COLLECT_FERT | ~263/243/292 | 254/245/244 | khớp ~100% |
+| MELON units | 81.8 | 69.6 | 85% — R188 melon-14 + R192 đã closer |
+| TOMATO units | 38 | 28.8 | 76% |
+| WOOL $ / EGG units | $5.5k / 133 | $13.0k / 150.6 | **VƯỢT** (R191 cừu-6) |
+| Tổng $ động vật | $34.4k | $46.5k | **VƯỢT** — MILK premium 1.47 vs 0.81 |
+| Trốn thú / feed-cov | 1-2 con / 75-78% | 0 / 94-99% | **VƯỢT** — thiết kế an toàn đúng |
+
+**❌ CHƯA KHỚP (gap $37.5k/trận = final $102.4k − $64.8k):**
+
+| Chỉ số | TOP-3 | v8 | Gap → tiền |
+|---|---|---|---|
+| STRAWBERRY units | 254.5 | 62.0 | **−$28k/trận — gap số 1** |
+| WHEAT máy resale | 574u (net +$10k) | 120.5u | −$10k net |
+| CARROT units | 135 | 2.2 | −$6k (kênh bị R184 bỏ) |
+| WATER ops | 1.188 | 610 | 51% — gap nhân lực số 1 |
+| HARVEST ops | 484 | 200 | 41% |
+| FERTILIZE ops | 130 (92-186) | 40 | **31% — BÀI HỌC MỚI, xem 52.3** |
+| MOVE ops (share) | 2.963 (37%) | 4.842 (63%) | 1.900 op đi lại thừa |
+| P2 d10-18 net/ngày | +$4.489 | +$1.358 | × 9 ngày = **−$28k — nơi mất tiền chính** |
+| P3 d19-25 net/ngày | +$5.391 | +$3.496 | × 7 ngày = −$13k |
+| d29-rev | $7.484 | $5.135 | đang khớp dần (v48: $3.720) |
+| AD d0-10 | 77 | 41.8 | mua thú sớm ít hơn (melon-14 đổi vốn) |
+
+Phân rã nhất quán: gap $37.5k ≈ P2 (−$28k) + P3 (−$13k) − lợi P4 (+$4k).
+
+### 52.2 — B2 ĐƯỜNG TĂNG TRƯỞNG 4 PHA
+
+| Pha | TOP-3 rev | v8 rev | TOP-3 net/ng | v8 net/ng | phán quyết |
+|---|---|---|---|---|---|
+| P1 d0-9 | $12.3k | $5.8k | −$138 | −$117 | ✅ khớp (đốt vốn) |
+| P2 d10-18 | $50.6k | $28.1k | +$4.489 | +$1.358 | ❌ **gap chính** |
+| P3 d19-25 | $44.9k | $31.4k | +$5.391 | +$3.496 | ❌ gap phụ |
+| P4 d26-29 | $24.8k | $28.5k | +$5.652 | +$6.578 | ✅ vượt |
+
+→ v8 đã đóng xong 2 đầu (P1 đốt vốn chuẩn, P4 về đích sạch), toàn bộ khoảng cách
+còn lại nằm ở **P2 "MỞ RỘNG"** — cỗ máy chưa đạt tốc độ maximal d10-18.
+
+### 52.3 — B3 CÔNG THỦ: KHÔNG CÓ CHIẾN TRANH THỊ TRƯỜNG — CHỈ CÓ CÔNG SẢN XUẤT
+
+**Kết luận công-thủ (đo trên giờ + giá + khối lượng):**
+
+1. **KHÔNG tồn tại tấn công thị trường** ở top-3 (xác nhận lần 3, lần này bằng phân
+   tích giờ): mua wheat đều đặn $300-600 MỖI NGÀY d0-28 (nuôi đàn + máy resale, không
+   có spike nhắm giờ); bán rải đều h13-h20 + đỉnh h0/h21-23; không có dump nhắm giờ
+   đối thủ sắp bán. Engine price = f(inventory chung) cho phép "đánh" nhưng top-3
+   KHÔNG dùng — hoặc vì tự hại, hoặc vì zero-sum khiến nó vô nghĩa.
+2. **Phòng thủ top-3** = (a) feed-stock wheat liên tục; (b) mua thêm FERTILIZER
+   $1.226/trận khi đàn thu không đủ bón; (c) shed sạch cuối. v8 làm (a)+(c) tốt hơn
+   (0 trốn thú, feed-cov 99%), chỉ thiếu (b) — và đây là phát hiện lớn nhất vòng này.
+3. **v8 bán đúng giờ giá cao**: h0 gánh $55k/94k rev (59%), premium dâu 2.125 × base
+   vs top-3 1.4 (thị trường v8-vs-v6 ít bão hòa hơn top3-vs-top3 — khác môi trường,
+   không so thẳng).
+
+**BÀI HỌC MỚI — FERT = BỘ NHÂN ĐÔI HIỆU QUẢ WATER (phát hiện quan trọng nhất vòng 52):**
+
+Cơ chế engine (dòng 441 + 798): tưới trong cửa sổ chín trên ô FERTILIZED (kéo dài 3
+ngày) → **+2 units thay vì +1**. Hệ quả theo cây (tham số engine):
+- **MELON**: 6u cần 6 lần tưới → với FERT chỉ 3 lần. Tiết kiệm 3 WATER + ~6 MOVE
+  tương ứng/ô → giải phóng lao động cho dâu.
+- **CARROT**: window chỉ 2 ngày (age 2-3) → không FERT tối đa 2u/ô (R184 "kênh chết"
+  là KẾT LUẬN ĐÚNG CHO KERNEL KHÔNG FERT), có FERT = 4u/ô → top-3 135u × $45 ≈ $6k.
+  **CARROT KHÔNG CHẾT — CHỈ THIẾU FERT. R184 cần ghi đè có điều kiện.**
+- **STRAWBERRY** (ongoing, interval 2): FERT giúp chạm cap 4u sau 2 ngày sản xuất thay
+  vì 4 → cây chết sớm → **trồng lại chu kỳ 2** → top-3 plant 237-274 lần vs v8 178.
+- **Tài nguyên FERT của v8**: thu 244 FERT/game từ đàn (COLLECT_FERT khớp top-3!) nhưng
+  FERTILIZE chỉ 40 lần → **BÁN ~200 FERT ở $64** trong khi bón vào melon/carrot/dâu
+  trị $180-810/ô. v8 đang bán nguyên liệu chiến lược giá rẻ!
+
+**THIẾU SÓT v8 CÒN TỒN TẠI (xếp theo $):**
+1. MOVE 63% vs 37% — kernel lao động (R151/R164 đã biết, giờ quantify chắc: 4.842 op
+   đi lại, dư ~1.900 op so top-3 ≈ ~900 WATER bị mất) — gốc của gap dâu 62u vs 254u.
+2. **Chiến lược FERT vắng hoàn toàn** (0 mua + bán 82% lượng thu) — lỗ hổng mới tìm
+   thấy, có thể fix KHÔNG cần đụng kernel: tái phân bổ FERT đang bán → bón.
+3. P2 cỗ máy +$1.4k/ng vs +$4.5k — hệ quả của (1)+(2).
+4. HIRE v8 $8.4k vs top-3 $6.4k — 317 vs ~250 lượt: thừa ~$2k lao động低 hiệu quả
+   (triệu chứng của MOVE 63%, không phải lỗi độc lập).
+
+### 52.4 ĐỀ XUẤT VÒNG 53 (nếu user duyệt — chưa tự ý triển khai)
+
+| Đòn | Nội dung | Ước tính |
+|---|---|---|
+| R194 FERT-KEEP | tắt bán FERT khi có ô melon/carrot/dâu trong/chuẩn window; bón trước ngày window | chuyển 200 FERT từ $64/u → $180-810/ô |
+| R195 CARROT-FERT | hồi sinh carrot: trồng + bón khi tồn FERT (2 nước = 4u) | +$3-6k/trận |
+| R196 MELON-3-NƯỚC | bón melon đầu window → 3 nước chạm 6u, dư lao động cho dâu | giải phóng ~18-24 op/ô |
+| R197 DÂU CHU KỲ 2 | bón dâu ngày sản xuất → chết sớm → replant | cần đo thêm |

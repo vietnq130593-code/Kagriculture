@@ -1256,3 +1256,26 @@ Stage Summary:
 - Merge commit 567f990 hợp nhất 2 nhánh (pre-rollback remote Task 38-44 + restored local Task 49-50b) không mất lịch sử nào; artifacts không bị re-track (giữ nguyên quyết định .gitignore Task 50b)
 - PAT lưu ý vận hành: token trong upload/ không bị commit (.gitignore có upload/) — an toàn
 - Nợ Task 50 (push code) ĐÃ TRẢ XONG; trạng thái v8 = vòng 50 (43/50 = 86% vs v6, thua đậm đã xóa, R188-R192)
+
+---
+Task ID: 52
+Agent: KAIN (main-agent)
+Task: User yêu cầu: (1) đo lường so sánh chỉ số v8 hiện tại vs chiến lược top-3 — đã khớp chưa; (2) đánh giá chiến lược công-thủ top-3 — bài học mới / thiếu sót v8; (3) báo cáo
+
+Work Log:
+- Copy r2_god_M1/M2.json từ /tmp mirror → tool-results/ (2 god-replay top-3); viết phase8.py mới (B1 style + B2 pha + B3 công-thủ: giờ bán, premium, mua SP, đường giá, dump-detection)
+- Battery 8 seed TRẮNG 200-207 (v8 vòng-50 vs v6): 3 lần bật lỗi vận hành (biến $OUT không export; mkdir nhầm cây root thay vì kaggriculture/; sandbox GIẮT process tree khi tool call kết thúc — nohup không đủ, phải chạy battery trong 1 tool call foreground; rm s2* lỡ xóa s203 → chạy lại) — kết quả 7/8 thắng, v8 TB $64.841
+- God-replay 8/8 game 0-mismatch 719 turns (xác nhận deterministic: s203 chạy 2 lần dollar-identical $64.846)
+- phase8.py chạy đủ: B1 units theo kênh từ commit_log + loài + pha + công-thủ; đếm op đồng ruộng (farmer/hands/market) cho v8 (8 game) + top-3 (2 replay Kaggle gốc 4 seat)
+- Phát hiện bài học mới FERT (quan trọng nhất): engine +2u/ngày tưới khi ô fertilized (3 ngày) → melon 3 nước thay 6; carrot 4u thay 2 (R184 "kênh chết" chỉ đúng cho kernel không-FERT); dâu chạm cap nhanh → chu kỳ 2; v8 thu 244 FERT nhưng bón 40, BÁN ~200 ở $64 trong khi bón trị $180-810/ô
+- Công-thủ top-3: KHÔNG có tấn công thị trường (xác nhận lần 3 bằng dữ liệu giờ: mua wheat đều $300-600/ngày d0-28, bán rải h13-20, không dump nhắm đối thủ); phòng thủ = feed-stock + mua thêm FERT $1.226 + shed sạch; v8 phòng thủ tốt hơn (0 trốn, cov 99%, premium dâu 2.125 vs 1.4)
+- Khớp đã đạt: chi $32k, LAND, P1 (−$117/ng vs −$138), P4 (+$6.6k/ng VƯỢT), FEED/CARE/COLLECT_FERT, melon 85%, tomato 76%, WOOL/EGG/animal-$ vượt
+- Chưa khớp: final $64.8k vs $102.4k; dâu 62u vs 254u (−$28k); wheat 574 vs 120; carrot 2 vs 135; WATER 610 vs 1.188; FERTILIZE 40 vs 130; MOVE 63% vs 37% (4.842 op, dư 1.900); P2 net +$1.4k/ng vs +$4.5k
+- Viết TOP3_REPLAY_ANALYSIS.md §11.15 (bảng khớp/thiếu + 4 pha + công-thủ + bài học FERT + đề xuất R194-R197 chờ duyệt)
+
+Stage Summary:
+- v8 vòng 50 ĐÃ KHỚP top-3 ở 2 đầu mùa (P1 đốt vốn, P4 về đích) + toàn bộ mảng động vật (vượt $46.5k vs $34.4k) + cấu trúc chi; còn thiếu $37.5k tập trung P2-P3 = khối lượng cây trồng (dâu −$28k)
+- CÔNG THỦ top-3 = không tồn tại chiến tranh thị trường; "công" của họ là sản xuất: WATER 2×, FERTILIZE 3×, MOVE chỉ 37%
+- BÀI HỌC MỚI SỐ 1: FERT — v8 đang bán 200 FERT/game $64/u (82% lượng thu từ đàn) thay vì bón (+2u/ ngày tưới trong window); carrot hồi sinh được với FERT (đảo ngược một phần R184)
+- Đề xuất R194-R197 (FERT-KEEP, CARROT-FERT, MELON-3-nước, DÂU chu kỳ 2) — CHƯA triển khai, chờ user duyệt
+- Tools mới: phase8.py + new52/ (8 jsonl + god) — chuẩn đo vòng sau
