@@ -1584,3 +1584,35 @@ Market-race đã cạn (mọi lô chung bán trước 2 lượt — đúng đỉ
 1. Thu hoạch sớm sóng tươi (kernel surgery — melon wave d10 12k + các sóng)
 2. V231 sabotage: phá giá sữa s216-227 đổi hướng đàn kme3 (cattle-switch condition)
 3. R53 thêm worker d26-28 (cần biết layout nhóm tile)
+
+---
+
+## §11.23 — Vòng 3: valve prefire + flip điều kiện — 2 cửa sống, 7 cửa chết (Task 62)
+
+### 11.23.1 — Kết quả chốt
+| Biến thể | seeds 100-107 | seeds 200-207 | Ghi chú |
+|---|---|---|---|
+| v12 v2 (Task 60) | 16/16, +3.209 | 16/16, +3.162 | baseline |
+| v12aa (4 đòn) | s103 −555 | — | M8 milk-horizon phá hỏng |
+| v12ab (+prefire) | 16/16, +3.503 | — | M1 sống |
+| v12ae (noflip) | 16/16, +3.852 | **14/16, +2.641** | thua s202 −3.5k — overfit |
+| **v12af (prefire + flip≥3)** | **16/16, +3.852** | **16/16, +3.210** | **worst 1.007× — DEPLOY** |
+
+### 11.23.2 — Hai đòn sống
+1. **PREFIRE h22 (R51-valve)**: van xả overflow chạy ở h23 (ngày 12-28) — bán sớm 1 bước ở vùng giá phẳng h21-h23 (không drain %4==0 giữa chúng). v12 giữ nguyên giá, kme3 h23 ăn giá bị đè. Cơ chế mô phỏng lookahead 1 bước: clone state → apply action h22 + tape h23 → needed = shed+cargo−100 → bán item premium.
+2. **V231-flip điều kiện milk_shops≥3**: flip SHEEP→COW tại s216-227 có giá trị theo ngữ cảnh shop — HẠI khi 2 milk-shop (s105: −$1.938 cho người flip), LỜI khi 3+ (s202: +$4.224). Cơ chế: drain sữa 3+/4-bước hấp thụ sản lượng bò thêm → giá sữa giữ → bò có lãi. v12af bỏ flip 2-shop, giữ flip 3-shop.
+
+### 11.23.3 — Bảy cửa chết (đo bằng số, chôn vĩnh viễn)
+1. Harvest melon trước d10: engine chặn `day − planted_day < first_yield_day` (no-op dù yield 5)
+2. WATER-then-HARVEST +1 unit: 12 melon × $150 > sớm 1 bước × $25 — tape đã đúng
+3. Pre-position qua đêm: `_end_of_day` reset farmer+hands về spawn — không thể
+4. Relocate melon về trong: d≤2 toàn pasture (đàn $50k+/game) — dời là phá tape toàn bộ
+5. Milk horizon sâu: milk có ĐỈNH GIỮA NGÀY (~h9) — H=6 bán đúng đỉnh, h0-dump bán đáy
+6. Terminal momentum-hold: stock 712-716 = 0 (spam 1000 là ảo, thật bán hết từ 709, đuôi về 718)
+7. Melon-tail accelerant: 12 melon cuối nằm trong inventory workers đang đi — auto-drop cuối ngày, không tồn tại trong shed để bán sớm
+
+### 11.23.4 — Luật mới
+- **L20**: Mọi "same-step symmetric sell" là cuộc đua 1 bước: v12 bán T−1 giữ nguyên giá (vùng phẳng cuối ngày), kme3 ăn full impact tồn kho v12.
+- **L21**: Giá trị quyết định thích nghi (adaptive) theo ngữ cảnh shop — bisection từng loại seed (2-shop vs 3-shop) trước khi bật/tắt, không tắt toàn cục.
+- **L22**: Daily-gap attribution lừa ở ranh giới ngày — lệnh bán h22/h23 rơi vào bucket khác nhau; chỉ tin running total.
+- **L23**: Market-race đã bão hòa tại +3.5k — tier kế tiếp là walk-level choreography (v13): sắp thứ tự thăm tile mỗi ngày để stock premium (straw/milk/wool) về shed sớm 1-2 bước so với kme3.
