@@ -98,6 +98,7 @@ export interface AgentDesc {
 }
 
 export const AGENT_INFO: AgentDesc[] = [
+  { name: 'v11', desc: 'CARROT-TAIL — v10e + sóng carrot cuối mùa d22-26 (14 ô, kme3 d25: 18 ô) · 8 biến thể MÁY 2× đã ablate: đàn-17/wheat-22/FERT-tier1 đều âm trên nền v10 (vốn + 70op bão hòa) — chi tiết §11.19', tag: 'thế hệ mới' },
   { name: 'v10', desc: 'AD+KHO — opening 2 bò + melon-12 + drip thú d3-10 (AD 44,5) · 5 kho d0 · carrot cap 10/8 · đồng bộ 75,3% · $79,8k TB', tag: 'thế hệ mới' },
   { name: 'v9', desc: 'STACK-SWEEP — tái cấu trúc kernel lao động: continuation-claims gap-0/1 + morning-cascade + FERT-stack · mục tiêu $90-110k', tag: 'thế hệ mới' },
   { name: 'v8', desc: 'REGION-FLOW — kernel lao động lai: event-water + hybrid tier/geo + wheat-standing + fert · 57/60 vs v7', tag: 'nhà vô địch' },

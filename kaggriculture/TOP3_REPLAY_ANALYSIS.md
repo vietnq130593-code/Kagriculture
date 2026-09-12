@@ -1314,3 +1314,74 @@ empty 0,6-0,9 (top-3 0-1), khối liền d̄shed 0,8 — **ĐỒNG BỘ KHO**.
 4. Tools mới: kho10.py, bat10.py, bat10b.py, bat10b2.py, bat10e_ext.py,
    meas10.py, god10.py, sync10.py + new10/ (110 game gz) + kho-sync đo
    trong kho10.
+
+## 11.19 VÀNG SẠCH V11 (Task 57) — ABLATION 8 BIẾN THỂ TỪ MASTER ENGINE V3
+
+> Nguồn: 8 khuyến nghị từ notebook kme3 (guruprasaathas111, §Master Engine
+> V3 Analysis). Kỷ luật: mỗi biến thể đo đầu-trực vs v10 (10 seed 200-209)
+> + vs v6 (12 seed 100-111). **TẤT CẢ bundle ĐỀU ÂM** — chỉ 1 đòn sống sót.
+
+### 11.19.1 BẢNG ABLATION (đầu-trực vs v10, 10 seed)
+
+| Biến thể | Nội dung | K/Q | TB v11 | TB v10 | Δ/game |
+|---|---|---|---|---|---|
+| v11.0 "MÁY 2×" | đàn17 + wheat22 + dâu24/20/18/16 + FERT-caps + feed-buy | 2/10 | $66,9k | $73,6k | **−$6,7k** |
+| v11.1-K | + EMA region-lock (λ 0.3/0.65) | s103 xấu hơn | $69,9k* | — | âm |
+| v11.1-K2 | + radius-gate phase-1 (R3/R7/∞) | s103 $59,7k | — | — | **âm, bỏ** |
+| v11.2 "BOARD-FULL" | v10 + kme3-schedule đàn + carrot sóng cuối + FERT | s103 $54,8k | — | — | âm |
+| v11.3 | + wheat 15 khi dâu < 20 (fix lấn đất) | s103 $59,7k | — | — | âm |
+| v11.3b | + dâu-FERT tier 1 + FERT-anchor | s103 $54,6k (dâu 23u!) | — | — | âm |
+| v11.3c | + dâu-deposit (cọc hạt trước thú) | s103 $67,9k | $67,3k | $77,3k | **−$10k** |
+| v11.4 "FERT-STRIKE" | v10 + F1(dâu-FERT t1) + F2(anchor) + F3(carrot) | 3/10 | $66,2k | $69,5k | −$3,3k |
+| **v11 CARROT-TAIL** | **v10 + F3 carrot sóng cuối (1 đòn)** | 3W4T3L | $69,7k | $70,0k | **−$317 (neutral)** |
+
+### 11.19.2 ROOT-CAUSE — TẠI SAO PLAYBOOK kme3 KHÔNG CHUYỂN ĐƯỢC
+
+1. **VỐN D0-10 LÀ THẮT CỔ CHAI**: kme3 có động cơ vốn riêng ta chưa xây —
+   R42 turn-0 arb (mua 13+30 đẩy giá bán 30) + mua 155 wheat ngoài rẻ d0-11
+   + bán giọt nhỏ 9 mặt hàng NGAY TỪ d1 (MKT_SELL 479 vs ta 171). Không có
+   dòng tiền sớm → đàn-17 + wheat-22 + hạt dâu cạnh tranh $114-1.5k → ai
+   cũng đói (s103: dâu 7/27 hạt khi vào d10; đàn 4 con lúc d7).
+2. **KERNEL 70 OP/NGÀY LÀ SÀN CỨNG**: useful 2.084-2.2k/mùa KHÔNG TĂNG
+   dù nạp thêm task — chỉ XẾP LẠI ưu tiên (đàn service +12 → dâu nước
+   −12). kme3 3.071 op vì board 74/72 ô ĐẦY (wheat 24-30 + dâu 33 + carrot
+   sóng cuối 18 + đàn 16) → MỌI Ô là task. Ta đứng ~55/72 = xốp.
+3. **MOVE 4.446 LÀ BỌT XỐP, KHÔNG PHẢI THÙNG NƯỚC**: EMA-lock + radius-
+   gate KHÔNG giảm MOVE (4.405-4.590) — khi task thưa, unit rảnh đi chơi
+   bằng MOVE; khi task dày (v11.2 d12: wheat 30 + dâu 29) MOVE vẫn 4.4k vì
+   standing sụp ngay sau (vốn cạn). Kết luận: MOVE theo standing, không
+   theo thuật toán gán việc.
+4. **DÂU = ĐỒNG HỒ SINH TỬ VỐN**: trồng d5-10 → event d15-24 (4 event/
+   ô); trồng d11+ → event d21+ (nén còn 2-3 event) = −$10-20k. Mọi thứ
+   ăn tiền/tǒ/đất d5-10 đều gián tiếp giết kênh $42k này. (v10 thắng nhờ
+   giữ mũi tiền hạt dâu d7-12 suốt tide vốn mỏng.)
+5. **FERT-EVENT ($454/lệnh) TÒA LẠI KHÔNG CHẠM ĐƯỢC**: cần nước+fert
+   CÙNG ô CÙNG ngày event — đòi unit vác FERT từ shed (PICKUP + 5-8 bước/
+   lệnh). Tier-1 cướp slot của... chính nước event. Chỉ trả tiền khi kernel
+   rảnh ≥ 15 op/ngày dư (điều kiện sàn cứng #2).
+6. **QUEUE MARKET 10 LỆNH/TURN**: HIRE 7-9 + hạt + thú + đất chia nhau
+   10 slot — nới velocity (B9: thú 4/ngày) sẽ đẩy hạt dâu ra khỏi queue
+   đúng gate vàng d7-10.
+
+### 11.19.3 BÀN GIAO V12 — ĐƯỜNG "TÁI THIẾT ĐỘNG CƠ VỐN" (không phải quota)
+
+Muốn copy kme3 (WATER 1.102, 101 op/ngày, $142k) phải xây TRẢ TIỀN TRƯỚC:
+1. **CADENCE giọt nhỏ từ d1**: bán 1-3u/ngày/mặt hàng giữ inv 9.600-9.800
+   (giá premium tự duy trì cả mùa — đo kme3: dâu $128→$239, wheat $29→$44)
+   — thay batch HOLD. Đây là nguồn vốn sớm nuôi đàn + đất + hạt.
+2. **Máy wheat TRƯỚC đàn**: kme3 wheat đứng 9 lúc d7 (nhỏ!), nở 24-30
+   d13-21 SAU khi dâu đầy + SW mua. Trật tự: máy → dâu → đàn → nở máy.
+3. **R42-style turn-0 probe** + feed-buy 155u rẻ d0-11 (pw ≤ 32) — dòng
+   tiền giả từ chính thị trường.
+4. Sau đó mới đàn 17 + FERT-EVENT (điều kiện sàn #2 thỏa).
+Đo đích: WATER ≥ 900, useful ≥ 2.800, final self-play ≥ $90k.
+
+### 11.19.4 TỆP & CÔNG CỤ MỚI (Task 57)
+
+- `kaggriculture/v11.py` — v10 + carrot sóng cuối (F3) — bản duy nhất neutral
+- `bench/kops11.py` — autopsy unit-hour (PASS/MOVE/WATER/FEED theo ngày +
+  nước được-tưới/sống-window theo crop — lộ trần WATER 613 = 55 ô đứng)
+- `bench/moveana.py` — move-anatomy (run-length trước useful op, khoảng
+  cách task-pair cùng unit, MOVE/unit/ngày — đo gap-0 40,7% vs kme3 48,1%)
+- `bench/bat11.py` — battery thread-pool 4 song song (thay battery cũ)
+- battles/: v11prep/v11k/v11k2/v112/v113/v113b/v113c/v11.4 series + bat logs

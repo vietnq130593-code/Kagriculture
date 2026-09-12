@@ -1374,3 +1374,29 @@ Stage Summary:
 - 5 GAP cấu trúc của v10 được lượng hóa: KERNEL-OPS (WATER 629 vs 1.102), đàn 17 con d11, máy wheat 163 ô, cadence lot nhỏ mọi mặt hàng, adaptive theo shop-draw
 - 8 khuyến nghị v11 theo thứ tự ưu tiên (kernel-ops trước, rồi đàn sớm, cadence, wheat, V231/V233, R42+sell_lead, R36, FERT-bón)
 - Kaggle API v1 public pull hoạt động không cần auth — phương pháp lấy notebook public để đối chứng meta
+
+---
+Task ID: 57
+Agent: KAIN (main-agent)
+Task: User duyệt triển khai 8 khuyến nghị từ Master Engine V3 (kme3) + trả lời câu hỏi "lấy kme3.py có phải hack không"
+
+Work Log:
+- Trả lời câu hỏi pháp lý kme3.py: KHÔNG hack — Kaggle API v1 public endpoint /api/v1/kernels/pull (chính CLI chính thức kaggle dùng), notebook public 997 views/56 votes/55 copies, license Apache 2.0 cho phép reuse; ai cũng lấy được (Copy & Edit / kaggle kernels pull / API)
+- Autopsy v10 s103 (kops11.py mới): MOVE 4.455 = 62% unit-turn, useful 2.084 (28%), WATER 613 = TRẦN của ~55 ô đứng — kernel bão hòa tuyệt đối, không lười
+- Đọc engine: ongoing crops (dâu interval 2) tự +1u/event NGAY CẢ KHÔNG tưới (nước chỉ để sống + FERT bonus +2u); dâu 4 event/ô lifetime → 8u/ô khi full FERT (2 FERTILIZE/ô phủ 4 event nhờ fertilized_until=day+2)
+- Viết v11.0 "MÁY 2×" (đàn-17 kme3-schedule + wheat-22 + dâu taper nâng + FERT-caps + feed-buy sớm): đầu-trực vs v10 2/10 $66,9k vs $73,6k — ĐIỀU TRA: dâu 70u vs 119u (−$10k), milk −18u, wheat máy sập d17-21
+- v11.1-K EMA region-lock (home-EMA + phạt λ task xa): MOVE 4.405 (KHÔNG giảm); v11.1-K2 radius-gate R3/R7/∞: s103 $59,7k tệ hơn — REVERT cả hai
+- So sánh god-replay kme3 vs v11 chi tiết (moveana.py + census): kme3 WATER 1.102/HARVEST 475/MKT_SELL 479 vs ta 593/257/171; kme3 đứng 74/72 ô ĐẦY (wheat 24-30 + dâu 33 + carrot sóng cuối 18 d25 + đàn 16 từ d7 10 con) — 101 op/ngày vì MỌI Ô là task
+- Debug hook KAGG_V11_DEBUG (quota log theo ngày) — v11.2 s103: dâu 17/28 hạt khi vào d13 (vốn d5-10 $126-464); v11.3b: dâu 23u (bulk trồng d11 → event nén d21+); v11.3c dâu-deposit (cọc hạt trước thú): d10 burst 11 ô, $67,9k s103 nhưng đầu-trực 0/10 $67,3k vs $77,3k
+- Phát hiện queue market 10 lệnh/turn bị HIRE 7-9 + thú + hạt chia; B9 velocity thú 4/ngày đẩy hạt dâu ra khỏi queue đúng gate d7-10
+- v11.4 "FERT-STRIKE" (v10 + dâu-FERT tier-1 + FERT-anchor + carrot sóng cuối): 3/10 $66,2k vs $69,5k — FERT-EVENT vẫn không chạm đất (đòi nước+fert cùng ô cùng ngày event, unit phải vác FERT từ shed = 5-8 bước/lệnh)
+- ABLATION CHOT: 8 biến thể đều âm; v11 FINAL = v10 + F3 carrot sóng cuối d22-26 quota 14 marg≥0.62 (kme3 d25: 18 ô) — đầu-trực 3W4T3L $69,7k vs $70,0k = TRUNG TÍNH; vs v6 12/12 $80,3k (đồng dollar-identical v10 khi sóng không kích)
+- Đăng ký v11 3 tầng (runner + arena-service + constants.ts desc CARROT-TAIL); kill pgid arena-service cũ + relaunch sạch :3005; dev :3000 + gateway :81 sống
+- UI e2e agent-browser: v11 vs v10 seed 127 → 🏆 v11 THẮNG $86.284 vs $86.271, 719/719 lượt, 0 console error, screenshot /tmp/ui_v11_victory.png
+- TOP3_REPLAY_ANALYSIS.md §11.19 đầy đủ (bảng ablation 9 biến thể + 6 root-cause + bàn giao v12 "tái thiết động cơ vốn": cadence giọt nhỏ từ d1 → máy wheat trước đàn → R42 → sau đó mới đàn-17)
+
+Stage Summary:
+- SẢN PHẨM: v11.py = v10e + carrot sóng cuối (đòn duy nhất không âm qua 9 biến thể); v10 vẫn vô địch (48/50 vs v6 $76,3k); kme3 vẫn way ahead ($142k) — gap là KIẾN TRÚC không phải tham số
+- 3 PHÁT HIỆN LỚN: (1) kme3 đứng ĐẦY 74/72 ô = 101 op/ngày (task = standing, MOVE là bọt xốp); (2) động cơ vốn riêng (cadence bán giọt nhỏ từ d1 + R42 + 155 wheat rẻ) nuôi mọi thứ khác — ta thiếu NÓ, không thiếu quota; (3) đồng hồ sinh tử dâu: trồng trước d10 hay sau quyết định $10-20k/trận
+- LUẬT ÂM V11 (ghi cho v12): gộp bundle đòn supply đều tự ăn nhau qua vốn + queue + 70op sàn cứng; EMA/radius-lock KHÔNG giảm MOVE; dâu-FERT tier-1 tự cướp slot nước event; nới velocity thú đẩy hạt dâu khỏi queue
+- Đường v12 đã bàn giao: cadence giọt nhỏ (MKT_SELL 171→479) là đòn vốn đầu tiên, rồi máy wheat trước đàn, R42, cuối cùng đàn-17 + FERT-EVENT khi kernel rảnh thật
