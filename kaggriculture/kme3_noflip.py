@@ -1,9 +1,250 @@
+# EXP-173 isolate opening market sequence inspired by yhay81/shop-router-0911-simple (Apache-2.0).
+# Kaggriculture EXP-167 candidate. Not submitted automatically.
+# Attribution: thomastschinkel, yhay81, destbreso, aurax7, tetsutani,
+# prvsiyan and Dmitrii Gluzdov. Apache-2.0 derivations; notices retained below.
+# Kaggriculture v31 / EXP-157, Ahmed Berat Ozer, September 9 2026.
+# Selected mechanism: crop_public_order. New independent confirmation is required.
+# Public V221B/V224C production/timing lineage: prvsiyan, Apache-2.0.
+# Original economics and integration; retained upstream licenses follow.
+# Kaggriculture v28 / EXP-154, Ahmed Berat Ozer, September 9 2026.
+# Changes: aurax7 day-end storage guard; Dmitrii Gluzdov physical terminal rescue
+# adapted to v27, with 64 deterministic simulations. Apache-2.0.
+# New action tapes and ordered shop-pair map: yhay81/shop-router-0909, Apache-2.0.
+# Kaggriculture v25, EXP-149: Shop0908 production, sale lead, terminal cargo rescue.
+# Runtime chassis: Apache-2.0; thomastschinkel, yhay81, tetsutani.
+# Routing and public action data: yhay81/shop-router-0908, frozen September 8, 2026.
+# 
+#                                  Apache License
+#                            Version 2.0, January 2004
+#                         http://www.apache.org/licenses/
+# 
+#    TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION
+# 
+#    1. Definitions.
+# 
+#       "License" shall mean the terms and conditions for use, reproduction,
+#       and distribution as defined by Sections 1 through 9 of this document.
+# 
+#       "Licensor" shall mean the copyright owner or entity authorized by
+#       the copyright owner that is granting the License.
+# 
+#       "Legal Entity" shall mean the union of the acting entity and all
+#       other entities that control, are controlled by, or are under common
+#       control with that entity. For the purposes of this definition,
+#       "control" means (i) the power, direct or indirect, to cause the
+#       direction or management of such entity, whether by contract or
+#       otherwise, or (ii) ownership of fifty percent (50%) or more of the
+#       outstanding shares, or (iii) beneficial ownership of such entity.
+# 
+#       "You" (or "Your") shall mean an individual or Legal Entity
+#       exercising permissions granted by this License.
+# 
+#       "Source" form shall mean the preferred form for making modifications,
+#       including but not limited to software source code, documentation
+#       source, and configuration files.
+# 
+#       "Object" form shall mean any form resulting from mechanical
+#       transformation or translation of a Source form, including but
+#       not limited to compiled object code, generated documentation,
+#       and conversions to other media types.
+# 
+#       "Work" shall mean the work of authorship, whether in Source or
+#       Object form, made available under the License, as indicated by a
+#       copyright notice that is included in or attached to the work
+#       (an example is provided in the Appendix below).
+# 
+#       "Derivative Works" shall mean any work, whether in Source or Object
+#       form, that is based on (or derived from) the Work and for which the
+#       editorial revisions, annotations, elaborations, or other modifications
+#       represent, as a whole, an original work of authorship. For the purposes
+#       of this License, Derivative Works shall not include works that remain
+#       separable from, or merely link (or bind by name) to the interfaces of,
+#       the Work and Derivative Works thereof.
+# 
+#       "Contribution" shall mean any work of authorship, including
+#       the original version of the Work and any modifications or additions
+#       to that Work or Derivative Works thereof, that is intentionally
+#       submitted to Licensor for inclusion in the Work by the copyright owner
+#       or by an individual or Legal Entity authorized to submit on behalf of
+#       the copyright owner. For the purposes of this definition, "submitted"
+#       means any form of electronic, verbal, or written communication sent
+#       to the Licensor or its representatives, including but not limited to
+#       communication on electronic mailing lists, source code control systems,
+#       and issue tracking systems that are managed by, or on behalf of, the
+#       Licensor for the purpose of discussing and improving the Work, but
+#       excluding communication that is conspicuously marked or otherwise
+#       designated in writing by the copyright owner as "Not a Contribution."
+# 
+#       "Contributor" shall mean Licensor and any individual or Legal Entity
+#       on behalf of whom a Contribution has been received by Licensor and
+#       subsequently incorporated within the Work.
+# 
+#    2. Grant of Copyright License. Subject to the terms and conditions of
+#       this License, each Contributor hereby grants to You a perpetual,
+#       worldwide, non-exclusive, no-charge, royalty-free, irrevocable
+#       copyright license to reproduce, prepare Derivative Works of,
+#       publicly display, publicly perform, sublicense, and distribute the
+#       Work and such Derivative Works in Source or Object form.
+# 
+#    3. Grant of Patent License. Subject to the terms and conditions of
+#       this License, each Contributor hereby grants to You a perpetual,
+#       worldwide, non-exclusive, no-charge, royalty-free, irrevocable
+#       (except as stated in this section) patent license to make, have made,
+#       use, offer to sell, sell, import, and otherwise transfer the Work,
+#       where such license applies only to those patent claims licensable
+#       by such Contributor that are necessarily infringed by their
+#       Contribution(s) alone or by combination of their Contribution(s)
+#       with the Work to which such Contribution(s) was submitted. If You
+#       institute patent litigation against any entity (including a
+#       cross-claim or counterclaim in a lawsuit) alleging that the Work
+#       or a Contribution incorporated within the Work constitutes direct
+#       or contributory patent infringement, then any patent licenses
+#       granted to You under this License for that Work shall terminate
+#       as of the date such litigation is filed.
+# 
+#    4. Redistribution. You may reproduce and distribute copies of the
+#       Work or Derivative Works thereof in any medium, with or without
+#       modifications, and in Source or Object form, provided that You
+#       meet the following conditions:
+# 
+#       (a) You must give any other recipients of the Work or
+#           Derivative Works a copy of this License; and
+# 
+#       (b) You must cause any modified files to carry prominent notices
+#           stating that You changed the files; and
+# 
+#       (c) You must retain, in the Source form of any Derivative Works
+#           that You distribute, all copyright, patent, trademark, and
+#           attribution notices from the Source form of the Work,
+#           excluding those notices that do not pertain to any part of
+#           the Derivative Works; and
+# 
+#       (d) If the Work includes a "NOTICE" text file as part of its
+#           distribution, then any Derivative Works that You distribute must
+#           include a readable copy of the attribution notices contained
+#           within such NOTICE file, excluding those notices that do not
+#           pertain to any part of the Derivative Works, in at least one
+#           of the following places: within a NOTICE text file distributed
+#           as part of the Derivative Works; within the Source form or
+#           documentation, if provided along with the Derivative Works; or,
+#           within a display generated by the Derivative Works, if and
+#           wherever such third-party notices normally appear. The contents
+#           of the NOTICE file are for informational purposes only and
+#           do not modify the License. You may add Your own attribution
+#           notices within Derivative Works that You distribute, alongside
+#           or as an addendum to the NOTICE text from the Work, provided
+#           that such additional attribution notices cannot be construed
+#           as modifying the License.
+# 
+#       You may add Your own copyright statement to Your modifications and
+#       may provide additional or different license terms and conditions
+#       for use, reproduction, or distribution of Your modifications, or
+#       for any such Derivative Works as a whole, provided Your use,
+#       reproduction, and distribution of the Work otherwise complies with
+#       the conditions stated in this License.
+# 
+#    5. Submission of Contributions. Unless You explicitly state otherwise,
+#       any Contribution intentionally submitted for inclusion in the Work
+#       by You to the Licensor shall be under the terms and conditions of
+#       this License, without any additional terms or conditions.
+#       Notwithstanding the above, nothing herein shall supersede or modify
+#       the terms of any separate license agreement you may have executed
+#       with Licensor regarding such Contributions.
+# 
+#    6. Trademarks. This License does not grant permission to use the trade
+#       names, trademarks, service marks, or product names of the Licensor,
+#       except as required for reasonable and customary use in describing the
+#       origin of the Work and reproducing the content of the NOTICE file.
+# 
+#    7. Disclaimer of Warranty. Unless required by applicable law or
+#       agreed to in writing, Licensor provides the Work (and each
+#       Contributor provides its Contributions) on an "AS IS" BASIS,
+#       WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+#       implied, including, without limitation, any warranties or conditions
+#       of TITLE, NON-INFRINGEMENT, MERCHANTABILITY, or FITNESS FOR A
+#       PARTICULAR PURPOSE. You are solely responsible for determining the
+#       appropriateness of using or redistributing the Work and assume any
+#       risks associated with Your exercise of permissions under this License.
+# 
+#    8. Limitation of Liability. In no event and under no legal theory,
+#       whether in tort (including negligence), contract, or otherwise,
+#       unless required by applicable law (such as deliberate and grossly
+#       negligent acts) or agreed to in writing, shall any Contributor be
+#       liable to You for damages, including any direct, indirect, special,
+#       incidental, or consequential damages of any character arising as a
+#       result of this License or out of the use or inability to use the
+#       Work (including but not limited to damages for loss of goodwill,
+#       work stoppage, computer failure or malfunction, or any and all
+#       other commercial damages or losses), even if such Contributor
+#       has been advised of the possibility of such damages.
+# 
+#    9. Accepting Warranty or Additional Liability. While redistributing
+#       the Work or Derivative Works thereof, You may choose to offer,
+#       and charge a fee for, acceptance of support, warranty, indemnity,
+#       or other liability obligations and/or rights consistent with this
+#       License. However, in accepting such obligations, You may act only
+#       on Your own behalf and on Your sole responsibility, not on behalf
+#       of any other Contributor, and only if You agree to indemnify,
+#       defend, and hold each Contributor harmless for any liability
+#       incurred by, or claims asserted against, such Contributor by reason
+#       of your accepting any such warranty or additional liability.
+# 
+#    END OF TERMS AND CONDITIONS
+# 
+#    APPENDIX: How to apply the Apache License to your work.
+# 
+#       To apply the Apache License to your work, attach the following
+#       boilerplate notice, with the fields enclosed by brackets "[]"
+#       replaced with your own identifying information. (Don't include
+#       the brackets!)  The text should be enclosed in the appropriate
+#       comment syntax for the file format. We also recommend that a
+#       file or class name and description of purpose be included on the
+#       same "printed page" as the copyright notice for easier
+#       identification within third-party archives.
+# 
+#    Copyright [yyyy] [name of copyright owner]
+# 
+#    Licensed under the Apache License, Version 2.0 (the "License");
+#    you may not use this file except in compliance with the License.
+#    You may obtain a copy of the License at
+# 
+#        http://www.apache.org/licenses/LICENSE-2.0
+# 
+#    Unless required by applicable law or agreed to in writing, software
+#    distributed under the License is distributed on an "AS IS" BASIS,
+#    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#    See the License for the specific language governing permissions and
+#    limitations under the License.
+"""Kaggriculture route-replay chassis (pure Python, stdlib only).
+
+A *route* is a pre-computed tape of 719 Kaggle-format actions
+``{"farmer": [op, ...], "hands": [[op, ...], ...], "market": [[order, item, qty], ...]}``.
+The chassis replays the tape chosen by a caller-supplied ``router`` and wraps it
+in small reactive layers (each independently switchable via ``settings``):
+
+    hand_align            pad/truncate hands to the real hand count      (fieldbook_logic)
+    weed_repair           DIG a weed that blocks PLANT/BUILD, replay      (tetsutani + task spec)
+    sell_lead             sell next step's lots one step early            (fieldbook _lead_sale)
+    front_run             sell before the opponent's scheduled SELL       (hook; opponent_plan)
+    budget_guard          fund each 72-step block's purchases             (six_day_budget_guard.hpp)
+    room_guard            keep shed <= 99 at hour 23                      (tetsutani)
+    clamp_sells           trim SELL orders to the projected shed          (tetsutani)
+    dead_stock            sell stock the route will never sell            (tetsutani)
+    terminal_liquidation  step >= 718: sell the whole projected shed      (fieldbook _terminal_sale)
+
+Engine facts (verified against kaggle_environments 1.32.7, env_1_32_7.py):
+  observation["farms"][p] = {"money", "tiles"[y][x], "farmer"[x,y], "hands"[[x,y]..],
+                             "unlocked_quadrants", "hires_today"}
+  tiles: None (empty) | "LOCKED" | {"kind": WEED|COOP|PASTURE|PLANT, "crop"/"animal", ...}
+  observation["private"] = {"shed": {item: n}, "seeds": {crop: n}, "inventories": [{}...]}
+  observation["market"] = {"inventory": {...}, "prices": {...}}
+  observation["town"] = {"unlocked_shops": [...]}
+  Agents act on steps 0..718 (interpreter marks DONE once step >= episodeSteps-2).
+"""
 from __future__ import annotations
-_V12_HORIZON = 6
-_V12_R36_LO = 144
-_V12_R36_HI = 712
-_V12_PREDUMP_STEP = -1
+
 import copy
+
 PRODUCTS = ("WHEAT", "CARROT", "TOMATO", "STRAWBERRY", "MELON", "EGG", "MILK", "WOOL", "FERTILIZER")
 SEED_PRICE = {"WHEAT": 10, "CARROT": 20, "TOMATO": 50, "STRAWBERRY": 100, "MELON": 80}
 ANIMAL_COST = {"GOOSE": 300, "COW": 400, "SHEEP": 500}
@@ -13,6 +254,7 @@ MOVES = {"NORTH": (0, -1), "SOUTH": (0, 1), "EAST": (1, 0), "WEST": (-1, 0)}
 FRONT_RUN_ITEMS = ("MILK", "WOOL", "STRAWBERRY", "MELON")
 LAST_ACT_STEP = 718
 PASS_ACTION = {"farmer": ["PASS"], "hands": [], "market": []}
+
 DEFAULT_SETTINGS = {
     "hand_align": True,
     "weed_repair": True,
@@ -23,6 +265,7 @@ DEFAULT_SETTINGS = {
     "clamp_sells": True,
     "dead_stock": True,
     "terminal_liquidation": True,
+    # tunables
     "block_turns": 72,
     "shed_capacity": 100,
     "board_size": 10,
@@ -30,40 +273,57 @@ DEFAULT_SETTINGS = {
     "turns_per_day": 24,
     "min_sell_price": 2,
 }
+
+
+# --------------------------------------------------------------------------- helpers
 def _get(value, key, default=None):
+    """Field access that works for dicts and Kaggle Struct/attribute objects."""
     if isinstance(value, dict):
         return value.get(key, default)
     getter = getattr(value, "get", None)
     if callable(getter):
         return getter(key, default)
     return getattr(value, key, default)
+
+
 def _int(value, default=0):
     try:
         return int(value)
     except (TypeError, ValueError):
         return default
+
+
 def _fib(n):
     a, b = 1, 1
     for _ in range(n):
         a, b = b, a + b
     return a
+
+
 def _step_of(observation):
     raw = _get(observation, "step")
     if raw is not None:
         return _int(raw)
     return _int(_get(observation, "day", 0)) * 24 + _int(_get(observation, "hour", 0))
+
+
 def _shed_adjacent(pos, board):
     if not isinstance(pos, (list, tuple)) or len(pos) < 2:
         return False
     half = board // 2
     return pos[0] in (half - 1, half) and pos[1] in (half - 1, half)
+
+
 def _tile_at(tiles, pos):
     try:
         x, y = int(pos[0]), int(pos[1])
         return tiles[y][x]
     except (TypeError, ValueError, IndexError):
         return "LOCKED"
+
+
 def _is_noop(act, tile, inv, seeds, pos, board):
+    """True when the engine will certainly ignore ``act`` (mirrors _apply_unit_action)."""
     if not act:
         return True
     op = act[0]
@@ -108,7 +368,11 @@ def _is_noop(act, tile, inv, seeds, pos, board):
     if op == "CARE":
         return (not animal) or bool(_get(tile, "cared_today"))
     return True
+
+
 class _View:
+    """Cheap per-step snapshot of everything the layers read from the observation."""
+
     def __init__(self, observation, player, cfg):
         farms = list(_get(observation, "farms", []) or [])
         self.farm = farms[player] if player < len(farms) else {}
@@ -125,11 +389,25 @@ class _View:
         self.positions = [_get(self.farm, "farmer", None)] + [list(p) for p in (_get(self.farm, "hands", []) or [])]
         self.hires_today = _int(_get(self.farm, "hires_today", 0))
         self.quadrants = len(list(_get(self.farm, "unlocked_quadrants", []) or []))
+
     def inv(self, idx):
         return self.invs[idx] if idx < len(self.invs) else {}
+
     def in_hands(self, item):
         return sum(max(0, _int(_get(inv, item, 0))) for inv in self.invs)
+
+
+# --------------------------------------------------------------------------- chassis
 class Chassis:
+    """Replays ``routes[router(...)]`` with reactive safety/market layers.
+
+    routes         : {route_id: list of >= 719 Kaggle action dicts}
+    router         : callable(observation, step, state_dict) -> route_id, called every
+                     step; ``state_dict`` is per-player and persists across the game.
+    settings       : overrides for DEFAULT_SETTINGS (layer switches + tunables)
+    opponent_plan  : optional list of the opponent's expected actions (front_run hook)
+    """
+
     def __init__(self, routes, router=None, settings=None, opponent_plan=None):
         self.routes = {rid: list(tape) for rid, tape in routes.items()}
         self.router = router or (lambda observation, step, state: next(iter(self.routes)))
@@ -138,7 +416,9 @@ class Chassis:
         self.opponent_plan = opponent_plan
         self.players = {}
         self.diagnostics = {"layer_fallbacks": 0, "entry_fallbacks": 0}
-        self._future_sells = {}
+        self._future_sells = {}   # route id -> {item: [remaining planned SELL qty from step t]}
+
+    # ---- state -----------------------------------------------------------------
     def _state(self, player, step):
         st = self.players.get(player)
         if st is None or step == 0 or step <= st["last_step"]:
@@ -147,12 +427,15 @@ class Chassis:
             self.players[player] = st
         st["last_step"] = step
         return st
+
     def _route_action(self, route, step):
         tape = self.routes[route]
         if 0 <= step < len(tape) and isinstance(tape[step], dict):
             return copy.deepcopy(tape[step])
         return copy.deepcopy(PASS_ACTION)
+
     def future_sells(self, route, item, step):
+        """Planned SELL quantity of ``item`` in route steps >= ``step`` (suffix sums)."""
         table = self._future_sells.get(route)
         if table is None:
             tape = self.routes[route]
@@ -167,14 +450,17 @@ class Chassis:
             self._future_sells[route] = table
         col = table.get(item)
         return col[step] if col and 0 <= step < len(col) else 0
+
+    # ---- main entry -----------------------------------------------------------
     def act(self, observation, configuration=None):
         if len(_get(observation, "farms", []) or []) < 2:
-            raise ValueError("incomplete observation")
+            raise ValueError("incomplete observation")  # factory falls back to tape
         step = _step_of(observation)
         player = _int(_get(observation, "player", 0))
         st = self._state(player, step)
         cfg = self.cfg
         view = _View(observation, player, cfg)
+
         route = self.router(observation, step, st["router_state"])
         if route not in self.routes:
             route = st["route"] if st["route"] in self.routes else next(iter(self.routes))
@@ -211,12 +497,26 @@ class Chassis:
         except Exception:
             self.diagnostics["layer_fallbacks"] += 1
             return raw
+
+    # ---- layer: hand_align ----------------------------------------------------
     def _hand_align(self, action, view):
+        """Pad with PASS / truncate the tape's hand list to the real number of hands
+        (fieldbook_logic.act). Extra hands would be ignored by the engine anyway;
+        missing ones just idle, so alignment only tidies the action."""
         expected = max(0, len(view.positions) - 1)
         hands = list(action.get("hands") or [])
         hands.extend([["PASS"] for _ in range(max(0, expected - len(hands)))])
         action["hands"] = hands[:expected]
+
+    # ---- layer: weed_repair ---------------------------------------------------
     def _weed_repair(self, action, view, st, route, step):
+        """If a PLANT/BUILD_* target tile is a WEED, DIG now and queue the intended
+        action for that unit; the queue replays on a later step when the unit still
+        stands there and its tape action would be a no-op (the displaced no-op is
+        queued behind it, so PLANT -> WATER chains survive). A PLANT is only replayed
+        when the unit's next tape action is not a move, so the mandatory same-day
+        WATER can follow; otherwise the seed is kept. A no-op turn spent on a weed
+        is also converted to DIG (tetsutani weed_dig)."""
         units = [action.get("farmer") or ["PASS"]] + list(action.get("hands") or [])
         pending = st["pending"]
         tape = self.routes[route]
@@ -242,7 +542,7 @@ class Chassis:
             elif queue and noop:
                 _, replay = queue[0]
                 if replay[0] == "PLANT" and next_op in MOVES:
-                    pending.pop(i, None)
+                    pending.pop(i, None)          # WATER could never follow: keep the seed
                 else:
                     queue.pop(0)
                     if act and act[0] != "PASS" and act[0] not in MOVES:
@@ -255,7 +555,12 @@ class Chassis:
             units[i] = act
         action["farmer"] = units[0]
         action["hands"] = units[1:]
+
+    # ---- projected shed -------------------------------------------------------
     def _projected_shed(self, action, view):
+        """Shed contents after this step's unit actions but before the market runs:
+        PICKUP removes, DROP/PLACE(non-animal) near the shed adds up to capacity
+        (fieldbook _projected_shed / tetsutani projected shed)."""
         cap = self.cfg["shed_capacity"]
         proj = {p: view.shed.get(p, 0) for p in PRODUCTS}
         for k, v in view.shed.items():
@@ -286,8 +591,11 @@ class Chassis:
                     proj[item] = proj.get(item, 0) + take
                     total += take
         return proj
+
+    # ---- layer: sell_lead / front_run suppression ------------------------------
     @staticmethod
     def _apply_suppression(action, sell_state, step):
+        """Remove from this step's SELLs the quantities already sold a step early."""
         if sell_state.get("due_step") != step:
             return
         remaining = dict(sell_state.get("suppress", {}))
@@ -298,8 +606,10 @@ class Chassis:
                 removed = min(max(0, _int(order[2])), remaining[order[1]])
                 order[2] = _int(order[2]) - removed
                 remaining[order[1]] -= removed
+                # A zero-quantity order keeps later market race slots intact.
             kept.append(order)
         action["market"] = kept
+
     @staticmethod
     def _add_sell(action, item, qty, max_orders, merge=True):
         market = action.setdefault("market", [])
@@ -312,7 +622,13 @@ class Chassis:
             return False
         market.append(["SELL", item, qty])
         return True
+
     def _sell_lead(self, action, view, projected, route, step, next_sup):
+        """fieldbook _lead_sale: when step % 4 != 0 (no town consumption between the
+        two steps) sell the lots the tape plans to SELL next step now, for products
+        other than WHEAT/FERTILIZER we already hold, and suppress them next step.
+        Skipped at the last step, at shop-unlock boundaries and if a SELL for that
+        product is already queued this step."""
         cfg = self.cfg
         nxt = step + 1
         unlock_period = 3 * cfg["turns_per_day"]
@@ -337,7 +653,12 @@ class Chassis:
             next_sup["suppress"][item] = next_sup["suppress"].get(item, 0) + qty
         if next_sup["suppress"]:
             next_sup["due_step"] = nxt
+
     def _front_run(self, action, view, projected, route, step, next_sup):
+        """Hook: if ``opponent_plan`` (their expected tape) schedules a SELL of
+        MILK/WOOL/STRAWBERRY/MELON next step, sell what we hold of it now (before
+        their supply depresses the price) and suppress our own SELL of that quantity
+        next step. Bounded by our own remaining planned sales so it never dumps."""
         cfg = self.cfg
         nxt = step + 1
         plan = self.opponent_plan
@@ -362,7 +683,11 @@ class Chassis:
             next_sup["suppress"][item] = next_sup["suppress"].get(item, 0) + qty
         if next_sup["suppress"]:
             next_sup["due_step"] = nxt
+
+    # ---- layer: budget_guard --------------------------------------------------
     def _block_requirements(self, view, route, start, end):
+        """Planned purchase cost and item reserves for tape steps [start, end)
+        (six_day_budget_guard.hpp calculate_six_day_requirements)."""
         tape = self.routes[route]
         budget = 0.0
         seed_bal, item_bal = {}, {}
@@ -417,7 +742,13 @@ class Chassis:
             for k in range(n):
                 budget += _fib(first + k)
         return budget, item_need
+
     def _budget_guard(self, action, view, route, step):
+        """At every block boundary (step % 72 == 0) make sure cash + the value of
+        stock the block already plans to sell covers the block's purchases (hires,
+        land, seeds, animals, products). A shortfall is covered by extra SELLs of
+        unprotected shed stock, highest price first; SELLs are moved in front of
+        the buys so the money is there when they execute."""
         cfg = self.cfg
         block = cfg["block_turns"]
         if block <= 0 or step % block != 0:
@@ -458,7 +789,14 @@ class Chassis:
             sells = [o for o in market if o and o[0] == "SELL"]
             others = [o for o in market if not (o and o[0] == "SELL")]
             action["market"] = sells + others
+
+    # ---- layer: room_guard ----------------------------------------------------
     def _room_guard(self, action, view, route, step):
+        """tetsutani room_guard: at hour 23 the end-of-day drop pushes every unit's
+        inventory into the shed and overflow is destroyed. Estimate the shed after
+        this step (stock + carried + harvest/collect - feed/fertilize/place + buys -
+        sells) and, if it exceeds capacity-1, add SELLs preferring products with no
+        future planned sale, then highest price."""
         cfg = self.cfg
         if step % cfg["turns_per_day"] != cfg["turns_per_day"] - 1:
             return
@@ -507,8 +845,16 @@ class Chassis:
             needed -= qty
             if needed <= 0:
                 break
+
+    # ---- layer: clamp_sells ---------------------------------------------------
     @staticmethod
     def _clamp_sells(action, projected):
+        """Clamp against a sequential stock upper bound, retaining market slots.
+
+        Earlier BUY_PRODUCT orders can fund a wheat wash's sell leg. Their full
+        quantity is an upper bound; the engine enforces actual cash/capacity.
+        Removing empty orders would change the later lockstep market races.
+        """
         avail = dict(projected)
         kept = []
         for o in action.get("market") or []:
@@ -523,7 +869,12 @@ class Chassis:
                 if o and o[0] in ("BUY_PRODUCT", "BUY_ANIMAL") and len(o) >= 3:
                     avail[o[1]] = avail.get(o[1], 0) + max(0, _int(o[2]))
         action["market"] = kept
+
+    # ---- layer: dead_stock ----------------------------------------------------
     def _dead_stock(self, action, view, projected, route, step):
+        """tetsutani dead_stock: stock beyond everything the rest of the route still
+        plans to SELL is dead; sell it now when price > 1 (on day 29 everything not
+        already in this step's orders is dead). Highest value lots first."""
         planned = {}
         for o in action.get("market") or []:
             if o and o[0] == "SELL" and len(o) >= 3:
@@ -539,13 +890,24 @@ class Chassis:
                 extra.append(["SELL", item, surplus])
         extra.sort(key=lambda o: -view.prices.get(o[1], 0) * o[2])
         action["market"] = (action.get("market") or []) + extra
+
+    # ---- layer: terminal_liquidation -----------------------------------------
     def _terminal_liquidation(self, action, projected, step):
+        """fieldbook _terminal_sale: on the final acting step (>= 718) replace the
+        market orders with a SELL of the whole projected shed."""
         if step < LAST_ACT_STEP:
             return
         action["market"] = [["SELL", item, qty] for item, qty in projected.items()
                             if qty > 0 and item in PRODUCTS][: self.cfg["max_orders"]]
+
+
+# --------------------------------------------------------------------------- factory
 def make_agent(routes, router=None, opponent_plan=None, **settings):
+    """Build a Kaggle ``agent(observation, configuration)`` closure that never raises:
+    a failure inside a layer falls back to the raw tape action, and a failure even
+    before that falls back to PASS (with hands padded when possible)."""
     chassis = Chassis(routes, router, settings, opponent_plan)
+
     def agent(observation, configuration=None):
         try:
             return chassis.act(observation, configuration)
@@ -566,8 +928,11 @@ def make_agent(routes, router=None, opponent_plan=None, **settings):
                 return {"farmer": ["PASS"], "hands": [["PASS"] for _ in hands], "market": []}
             except Exception:
                 return copy.deepcopy(PASS_ACTION)
+
     agent.chassis = chassis
     return agent
+
+
 import base64
 import json
 import zlib
@@ -579,6 +944,7 @@ for _rid,_patch in _PAYLOAD['patches'].items():
     _ROUTES[int(_rid)]=_tape
 del _PAYLOAD
 _SETTINGS={'hand_align': True, 'weed_repair': True, 'sell_lead': True, 'budget_guard': False, 'room_guard': False, 'clamp_sells': False, 'dead_stock': False, 'terminal_liquidation': False, 'front_run': False}
+
 def _router(observation,step,state):
     if step>=144 and not state.get('day6'):
         shops=_get(_get(observation,'town',{}),'unlocked_shops',[]) or []
@@ -588,12 +954,14 @@ def _router(observation,step,state):
         state['route']=2
         state['day27']=True
     return state.get('route',0)
+
 _R42_OPENING=[['BUY_PRODUCT', 'WHEAT', 13], ['BUY_PRODUCT', 'WHEAT', 30], ['SELL', 'WHEAT', 30]]
 for _r42_tape in _ROUTES.values():
     _r42_tape[0]=dict(_r42_tape[0],market=[list(o) for o in _R42_OPENING])
 del _r42_tape
 _IMPL=make_agent(_ROUTES,router=_router,**_SETTINGS)
 _IMPL.chassis.diagnostics['terminal_rescue_errors']=0
+
 def agent(observation,configuration=None):
     try:
         action=_IMPL(observation,configuration)
@@ -601,8 +969,10 @@ def agent(observation,configuration=None):
         return action
     except Exception:
         return {'farmer':['PASS'],'hands':[],'market':[]}
+
 _SHOP_PARENT=agent
 del agent
+
 def agent(observation,configuration=None):
     action=_SHOP_PARENT(observation,configuration)
     try:
@@ -618,16 +988,24 @@ def agent(observation,configuration=None):
     except Exception:
         _IMPL.chassis.diagnostics['terminal_rescue_errors'] += 1
     return action
+
+# EXP-154 modifications: Ahmed Berat Ozer; public capabilities credited below.
+# Dmitrii Gluzdov Seven Turn Rescue and Kaggle engine contributors, Apache-2.0.
+
 _UNIT_NS={"__name__":"v28_own_unit_model"}
 exec('# SPDX-License-Identifier: Apache-2.0\n# Extracted Kaggle / kaggle-environments contributor code; see NOTICE.txt.\n"""Exact deterministic unit/decay semantics extracted from kaggle-environments 1.32.7.\nSource kaggriculture.py SHA256 bc8a54879ef02c7ea64b8b333d6a976f0ea65c4949149d01f463f23bccee653e.\nNo interpreter, market RNG, policy controls, or replay content is included.\n"""\n\nENGINE_VERSION = "1.32.7"\nSOURCE_SHA256 = "bc8a54879ef02c7ea64b8b333d6a976f0ea65c4949149d01f463f23bccee653e"\n\nCROPS = {\n    "WHEAT":      {"seed": 10, "first_yield_day": 2, "max_yield_day": 4, "interval": 0, "max_yield": 6, "ongoing": False},\n    "CARROT":     {"seed": 20, "first_yield_day": 2, "max_yield_day": 3, "interval": 0, "max_yield": 4, "ongoing": False},\n    "TOMATO":     {"seed": 50, "first_yield_day": 8, "max_yield_day": 8, "interval": 1, "max_yield": 4, "ongoing": True},\n    "STRAWBERRY": {"seed": 100, "first_yield_day": 10, "max_yield_day": 10, "interval": 2, "max_yield": 4, "ongoing": True},\n    "MELON":      {"seed": 80, "first_yield_day": 10, "max_yield_day": 12, "interval": 0, "max_yield": 6, "ongoing": False},\n}\n\nANIMALS = {\n    "GOOSE": {"cost": 300, "structure": "COOP",    "first_yield_day": 4, "interval": 1, "max_held": 4, "product": "EGG"},\n    "COW":   {"cost": 400, "structure": "PASTURE", "first_yield_day": 8, "interval": 2, "max_held": 6, "product": "MILK"},\n    "SHEEP": {"cost": 500, "structure": "PASTURE", "first_yield_day": 6, "interval": 3, "max_held": 6, "product": "WOOL"},\n}\n\nPRODUCTS = ["WHEAT", "CARROT", "TOMATO", "STRAWBERRY", "MELON", "EGG", "MILK", "WOOL", "FERTILIZER"]\n\nFARMER_MOVES = {\n    "NORTH": (0, -1),\n    "SOUTH": (0, 1),\n    "EAST":  (1, 0),\n    "WEST":  (-1, 0),\n}\n\ndef _shed_access_tiles(board_size):\n    """Four inner-corner tiles around the shed, in NWSE order."""\n    half = board_size // 2\n    return [(half - 1, half - 1), (half, half - 1), (half - 1, half), (half, half)]\n\ndef _is_shed_adjacent(pos, board_size):\n    return tuple(pos) in {(x, y) for (x, y) in _shed_access_tiles(board_size)}\n\ndef _new_plant(crop, day, turns_per_day):\n    cd = CROPS[crop]\n    return {\n        "kind": "PLANT",\n        "crop": crop,\n        "planted_day": day,\n        "watered_today": False,\n        "consecutive_unwatered": 1,  # planting day counts as unwatered\n        "yield_units": 0 if cd["ongoing"] else 1,\n        "max_lifespan_step": (-1 if cd["ongoing"] else (day + cd["max_yield_day"] + 1) * turns_per_day),\n        "fertilized_until_day": -1,\n    }\n\ndef _new_animal(animal, day):\n    a = ANIMALS[animal]\n    return {\n        "kind": a["structure"],\n        "animal": animal,\n        "placed_day": day,\n        "yield_units": 0,\n        "consecutive_unfed": 0,\n        "fed_today": False,\n        "cared_today": False,\n        "fertilizer_available": False,\n        "pending_care_bonus": 0,\n    }\n\ndef _farmer_position(farm, idx):\n    """idx 0 = main farmer, 1+ = hand index."""\n    if idx == 0:\n        return farm["farmer"]\n    return farm["hands"][idx - 1] if idx - 1 < len(farm["hands"]) else None\n\ndef _set_farmer_position(farm, idx, pos):\n    if idx == 0:\n        farm["farmer"] = list(pos)\n    else:\n        farm["hands"][idx - 1] = list(pos)\n\ndef _farmer_inventory(private, idx):\n    """Inventories list is [main_farmer, *hands]; grow it if idx is past the end."""\n    while len(private["inventories"]) <= idx:\n        private["inventories"].append({})\n    return private["inventories"][idx]\n\ndef _inv_add(inv, item, n=1):\n    inv[item] = inv.get(item, 0) + n\n\ndef _inv_take(inv, item, n=1):\n    if inv.get(item, 0) < n:\n        return False\n    inv[item] -= n\n    if inv[item] == 0:\n        del inv[item]\n    return True\n\ndef _apply_unit_action(farm, private, idx, action, board_size, day, turns_per_day, shed_capacity=100):\n    """Process one farmer/hand\'s action. Invalid / illegal actions are silent no-ops."""\n    if not isinstance(action, list) or not action:\n        return\n    op = action[0]\n    pos = _farmer_position(farm, idx)\n    if pos is None:\n        return\n    fx, fy = pos[0], pos[1]\n    inv = _farmer_inventory(private, idx)\n\n    if op in FARMER_MOVES:\n        dx, dy = FARMER_MOVES[op]\n        nx, ny = fx + dx, fy + dy\n        if not (0 <= nx < board_size and 0 <= ny < board_size):\n            return\n        # Movement onto LOCKED tiles is allowed: a hand can spawn on a locked\n        # shed-access tile, and blocking movement would strand it there forever.\n        # Tile operations (PLANT, WATER, etc.) still no-op on LOCKED tiles.\n        _set_farmer_position(farm, idx, (nx, ny))\n        return\n\n    if op == "PASS":\n        return\n\n    tile = farm["tiles"][fy][fx]\n\n    # Shed operations resolve before the LOCKED guard. They use the tile only as\n    # a standing position -- the shed itself is always owned -- and three of the\n    # four shed-access tiles start LOCKED, so guarding them first would make the\n    # shed unreachable from those tiles.\n    if op == "DROP":\n        if not _is_shed_adjacent((fx, fy), board_size):\n            return\n        shed = private["shed"]\n        for item, n in list(inv.items()):\n            if n <= 0:\n                del inv[item]\n                continue\n            room = max(0, shed_capacity - sum(shed.values()))\n            take = min(n, room)\n            if take > 0:\n                shed[item] = shed.get(item, 0) + take\n            del inv[item]\n        return\n\n    if op == "PICKUP":\n        if not _is_shed_adjacent((fx, fy), board_size):\n            return\n        if len(action) < 2:\n            return\n        item = action[1]\n        n = int(action[2]) if len(action) >= 3 else 1\n        if n <= 0:\n            return\n        # Seeds live in private["seeds"] and are consumed directly by PLANT;\n        # they never pass through farmer inventory or the shed.\n        available = private["shed"].get(item, 0)\n        n = min(n, available)\n        if n <= 0:\n            return\n        private["shed"][item] -= n\n        _inv_add(inv, item, n)\n        return\n\n    if op == "PLACE":\n        if len(action) < 2:\n            return\n        item = action[1]\n        # Animal placement: standing on a matching unoccupied structure. A LOCKED\n        # tile is the string "LOCKED", never a dict, so this branch cannot match\n        # there and PLACE falls through to the shed path below.\n        if (\n            item in ANIMALS\n            and isinstance(tile, dict)\n            and tile.get("kind") == ANIMALS[item]["structure"]\n            and "animal" not in tile\n        ):\n            if _inv_take(inv, item, 1):\n                farm["tiles"][fy][fx] = _new_animal(item, day)\n            return\n        # Shed drop: orthogonally adjacent to the shed; obeys shedCapacity.\n        if _is_shed_adjacent((fx, fy), board_size):\n            n = int(action[2]) if len(action) >= 3 else 1\n            if n <= 0:\n                return\n            n = min(n, inv.get(item, 0))\n            if n <= 0:\n                return\n            current = sum(private["shed"].values())\n            room = max(0, shed_capacity - current)\n            n = min(n, room)\n            if n <= 0:\n                return\n            inv[item] -= n\n            if inv[item] == 0:\n                del inv[item]\n            private["shed"][item] = private["shed"].get(item, 0) + n\n        return\n\n    # Everything below mutates the tile the unit stands on, so it requires that\n    # tile to be owned.\n    if tile == "LOCKED":\n        return\n\n    if op == "PLANT":\n        if len(action) < 2:\n            return\n        crop = action[1]\n        if crop not in CROPS:\n            return\n        if tile is not None:\n            return\n        if private["seeds"].get(crop, 0) <= 0:\n            return\n        private["seeds"][crop] -= 1\n        farm["tiles"][fy][fx] = _new_plant(crop, day, turns_per_day)\n        return\n\n    if op == "WATER":\n        if not (isinstance(tile, dict) and tile.get("kind") == "PLANT"):\n            return\n        if tile["watered_today"]:\n            return\n        tile["watered_today"] = True\n        crop_data = CROPS[tile["crop"]]\n        if not crop_data["ongoing"]:\n            age_days = day - tile["planted_day"]\n            window_start = (crop_data["max_yield_day"] + 1) // 2\n            if window_start <= age_days <= crop_data["max_yield_day"]:\n                bonus = 2 if tile["fertilized_until_day"] >= day else 1\n                tile["yield_units"] = min(crop_data["max_yield"], tile["yield_units"] + bonus)\n        return\n\n    if op == "HARVEST":\n        if not isinstance(tile, dict):\n            return\n        if tile.get("yield_units", 0) <= 0:\n            return\n        if tile.get("kind") == "PLANT":\n            crop_data = CROPS[tile["crop"]]\n            if day - tile["planted_day"] < crop_data["first_yield_day"]:\n                # Ongoing crops only accumulate yield_units after first_yield_day,\n                # so reaching here with yield_units > 0 indicates a bug.\n                if crop_data["ongoing"]:\n                    print(\n                        f"WARNING: HARVEST on immature ongoing {tile[\'crop\']} "\n                        f"(planted day {tile[\'planted_day\']}, current day {day}, "\n                        f"first_yield_day {crop_data[\'first_yield_day\']}, "\n                        f"yield_units {tile[\'yield_units\']}); should never happen"\n                    )\n                return\n            units = tile["yield_units"]\n            tile["yield_units"] = 0\n            _inv_add(inv, tile["crop"], units)\n            if not crop_data["ongoing"]:\n                farm["tiles"][fy][fx] = None\n        elif "animal" in tile:\n            units = tile["yield_units"]\n            tile["yield_units"] = 0\n            _inv_add(inv, ANIMALS[tile["animal"]]["product"], units)\n        return\n\n    if op == "FERTILIZE":\n        if not (isinstance(tile, dict) and tile.get("kind") == "PLANT"):\n            return\n        if not _inv_take(inv, "FERTILIZER", 1):\n            return\n        # Active for `day`, `day+1`, `day+2` (3 days inclusive).\n        tile["fertilized_until_day"] = max(tile.get("fertilized_until_day", -1), day + 2)\n        return\n\n    if op == "DIG":\n        if tile is None:\n            return\n        # Removes plants, weeds, empty coop/pasture. Does NOT remove a placed animal.\n        if isinstance(tile, dict) and "animal" in tile:\n            return\n        farm["tiles"][fy][fx] = None\n        return\n\n    if op == "BUILD_COOP":\n        if tile is not None:\n            return\n        farm["tiles"][fy][fx] = {"kind": "COOP"}\n        return\n\n    if op == "BUILD_PASTURE":\n        if tile is not None:\n            return\n        farm["tiles"][fy][fx] = {"kind": "PASTURE"}\n        return\n\n    if op == "FEED":\n        if not (isinstance(tile, dict) and "animal" in tile):\n            return\n        if tile["fed_today"]:\n            return\n        if not _inv_take(inv, "WHEAT", 1):\n            return\n        tile["fed_today"] = True\n        return\n\n    if op == "COLLECT_FERTILIZER":\n        if not (isinstance(tile, dict) and "animal" in tile):\n            return\n        if not tile["fertilizer_available"]:\n            return\n        tile["fertilizer_available"] = False\n        _inv_add(inv, "FERTILIZER", 1)\n        return\n\n    if op == "CARE":\n        if not (isinstance(tile, dict) and "animal" in tile):\n            return\n        if tile["cared_today"]:\n            return\n        tile["cared_today"] = True\n        return\n\ndef _decay_plants(farm, step):\n    board_size = len(farm["tiles"])\n    for y in range(board_size):\n        for x in range(board_size):\n            tile = farm["tiles"][y][x]\n            if not isinstance(tile, dict) or tile.get("kind") != "PLANT":\n                continue\n            mls = tile["max_lifespan_step"]\n            if mls < 0 or step < mls:\n                continue\n            if (step - mls) % 2 != 0:\n                continue\n            tile["yield_units"] -= 1\n            if tile["yield_units"] <= 0:\n                farm["tiles"][y][x] = {"kind": "WEED"}\n\n',_UNIT_NS)
 _PLANNER_NS=dict(_UNIT_NS)
 exec('"""E182 modification: Shop0909 last-seven-turn physical closure planner.\n\nNo engine imports, policy tapes, replay fixtures, RNG or remote calls.\nThe only supported market continuation is SELL; unknown execution abstains.\n"""\nfrom copy import deepcopy\nfrom time import perf_counter\nSTART, FINAL = (712, 718)\nOPS = set(FARMER_MOVES) | {\'PASS\', \'DROP\', \'PICKUP\', \'PLACE\', \'PLANT\', \'WATER\', \'HARVEST\', \'FERTILIZE\', \'DIG\', \'BUILD_COOP\', \'BUILD_PASTURE\', \'FEED\', \'CARE\', \'COLLECT_FERTILIZER\'}\nITEMS = tuple(PRODUCTS) + tuple(ANIMALS)\n\nclass Unsupported(ValueError):\n    pass\n\ndef _get(obj, key, default=None):\n    return obj.get(key, default) if isinstance(obj, dict) else getattr(obj, key, default)\n\ndef _settings(config):\n    size, turns, last = (_get(config, k, d) for k, d in [(\'boardSize\', 10), (\'turnsPerDay\', 24), (\'episodeSteps\', 720)])\n    if (size, turns, last) != (10, 24, 720):\n        raise Unsupported(\'requires pinned 10x10/24/720 terminal window\')\n    cap = int(_get(config, \'shedCapacity\', 100))\n    orders = min(10, int(_get(config, \'maxMarketOrdersPerTurn\', 10)))\n    if cap < 1 or orders < 1:\n        raise Unsupported(\'invalid capacity/order limit\')\n    return (size, turns, cap, orders)\n\ndef physical_state(obs):\n    """Comparable own physical state; market prices and bank are intentionally excluded."""\n    seat = int(_get(obs, \'player\', 0))\n    farm = _get(obs, \'farms\')[seat]\n    return ({k: v for k, v in farm.items() if k != \'money\'}, _get(obs, \'private\'))\n\ndef _commands(action, n):\n    return [action.get(\'farmer\', [\'PASS\']), *action.get(\'hands\', [])][:n] + [[\'PASS\'] for _ in range(max(0, n - 1 - len(action.get(\'hands\', []))))]\n\ndef _clone_state(farm, private):\n    f = dict(farm)\n    f[\'tiles\'] = [[dict(tile) if isinstance(tile, dict) else tile for tile in row] for row in farm[\'tiles\']]\n    f[\'farmer\'] = list(farm[\'farmer\'])\n    f[\'hands\'] = [list(pos) for pos in farm[\'hands\']]\n    f[\'unlocked_quadrants\'] = list(farm[\'unlocked_quadrants\'])\n    pr = dict(private)\n    pr[\'shed\'], pr[\'seeds\'] = (dict(private[\'shed\']), dict(private[\'seeds\']))\n    pr[\'inventories\'] = [dict(inv) for inv in private[\'inventories\']]\n    return (f, pr)\n\ndef _clone_schedule(schedule):\n    result = []\n    for action in schedule:\n        value = dict(action)\n        if \'farmer\' in action:\n            value[\'farmer\'] = list(action[\'farmer\'])\n        for key in [\'hands\', \'market\']:\n            if key in action:\n                value[key] = [list(command) for command in action[key]]\n        result.append(value)\n    return result\n\ndef _validate(schedule, n, orders):\n    for action in schedule:\n        if not isinstance(action, dict) or set(action) - {\'farmer\', \'hands\', \'market\'}:\n            raise Unsupported(\'unknown action shape\')\n        if not isinstance(action.get(\'hands\', []), list):\n            raise Unsupported(\'hands must be a list\')\n        for command in [action.get(\'farmer\', [\'PASS\']), *action.get(\'hands\', [])]:\n            if not isinstance(command, list) or not command or command[0] not in OPS:\n                raise Unsupported(\'unknown/malformed unit operation\')\n            if command[0] in {\'PICKUP\', \'PLACE\', \'PLANT\'}:\n                if len(command) < 2 or command[1] not in ITEMS:\n                    raise Unsupported(\'unknown unit item\')\n                if len(command) > 2 and (not isinstance(command[2], int)):\n                    raise Unsupported(\'noninteger unit quantity\')\n        market = action.get(\'market\', [])\n        if not isinstance(market, list) or len(market) > orders:\n            raise Unsupported(\'market order shape/cap\')\n        for order in market:\n            if not isinstance(order, list) or len(order) != 3 or order[0] != \'SELL\' or (order[1] not in PRODUCTS) or (not isinstance(order[2], int)) or (order[2] <= 0):\n                raise Unsupported(\'baseline market must contain positive integer SELL only\')\n\ndef liquidation(shed, inherited_market, max_orders=10):\n    """Use actual post-unit stock; retain first parent item ordering, then stable product order."""\n    items = []\n    for order in inherited_market:\n        if order[1] not in items:\n            items.append(order[1])\n    items += [item for item in PRODUCTS if item not in items]\n    orders = [[\'SELL\', item, int(shed.get(item, 0))] for item in items if shed.get(item, 0) > 0]\n    if len(orders) > min(10, max_orders):\n        raise Unsupported(\'actual final stock exceeds order slots\')\n    return orders\n\ndef shop_liquidation(farm, private, prices):\n    """Exact original final worker/drop and market rule, with current stock/prices."""\n    return liquidate(FarmView({\'player\': 0, \'farms\': [farm], \'private\': private, \'market\': {\'prices\': prices}}))\n\ndef simulate(obs, config, schedule, *, final_liquidate=False, detailed=False, preserve_final_commands=False):\n    """Exact own unit/decay and SELL-stock transitions. No claim to simulate shared prices."""\n    size, turns, cap, order_cap = _settings(config)\n    step = int(_get(obs, \'step\', -1))\n    if step < START or step + len(schedule) - 1 > FINAL or (not schedule):\n        raise Unsupported(\'outside 712..718; no day boundary or terminal auto-drop\')\n    if any(((t + 1) % turns == 0 for t in range(step, step + len(schedule)))):\n        raise Unsupported(\'day boundary\')\n    farm0, private0 = physical_state(obs)\n    farm, private = _clone_state(farm0, private0)\n    n = 1 + len(farm[\'hands\'])\n    if len(private[\'inventories\']) != n or n > 32:\n        raise Unsupported(\'invalid/unbounded worker inventory shape\')\n    _validate(schedule, n, order_cap)\n    deposited = [dict() for _ in range(n)]\n    sold = {}\n    snapshots, rows, events = ([], [], [])\n    executed = _clone_schedule(schedule)\n    overflow = 0\n    for offset, action in enumerate(executed):\n        t = step + offset\n        if detailed:\n            snapshots.append(_clone_state(farm, private))\n        if t == FINAL and (not preserve_final_commands):\n            action = shop_liquidation(farm, private, _get(obs, \'market\')[\'prices\'])\n            executed[offset] = action\n        all_commands = [action.get(\'farmer\', [\'PASS\']), *action.get(\'hands\', [])]\n        demand = {}\n        for command in all_commands:\n            if command[0] == \'PLANT\':\n                demand[command[1]] = demand.get(command[1], 0) + 1\n        blocked = {item for item, count in demand.items() if count > private[\'seeds\'].get(item, 0)}\n        for actor, command in enumerate(_commands(action, n)):\n            if command[0] == \'PLANT\' and command[1] in blocked:\n                command = [\'PASS\']\n            pos = farm[\'farmer\'] if actor == 0 else farm[\'hands\'][actor - 1]\n            xy = tuple(pos)\n            inv = private[\'inventories\'][actor]\n            before_inv = dict(inv) if command[0] in {\'DROP\', \'HARVEST\', \'COLLECT_FERTILIZER\'} else None\n            before_shed = dict(private[\'shed\']) if command[0] in {\'DROP\', \'PLACE\'} else None\n            _apply_unit_action(farm, private, actor, command, size, t // turns, turns, cap)\n            if before_shed is not None:\n                delta = {item: amount - before_shed.get(item, 0) for item, amount in private[\'shed\'].items() if amount > before_shed.get(item, 0)}\n                for item, amount in delta.items():\n                    deposited[actor][item] = deposited[actor].get(item, 0) + amount\n                if delta:\n                    events.append({\'offset\': offset, \'actor\': actor, \'op\': command[0], \'xy\': xy, \'deposited\': delta})\n                if command[0] == \'DROP\':\n                    overflow += sum((max(0, amount - inv.get(item, 0) - delta.get(item, 0)) for item, amount in before_inv.items()))\n            if command[0] in {\'HARVEST\', \'COLLECT_FERTILIZER\'}:\n                delta = {item: amount - before_inv.get(item, 0) for item, amount in inv.items() if amount > before_inv.get(item, 0)}\n                if delta:\n                    events.append({\'offset\': offset, \'actor\': actor, \'op\': command[0], \'xy\': xy, \'acquired\': delta})\n        pre_market = dict(private[\'shed\'])\n        if t == FINAL and preserve_final_commands and final_liquidate:\n            action[\'market\'] = liquidation(pre_market, [], order_cap)\n            prices = _get(obs, \'market\')[\'prices\']\n            action[\'market\'].sort(key=lambda order: -int(prices.get(order[1], 0)) * order[2])\n        for _, item, requested in action.get(\'market\', []):\n            quantity = min(requested, private[\'shed\'].get(item, 0), 99999)\n            if quantity > 0:\n                private[\'shed\'][item] -= quantity\n                sold[item] = sold.get(item, 0) + quantity\n        _decay_plants(farm, t)\n        rows.append({\'pre_market_shed\': pre_market, \'post_market_shed\': dict(private[\'shed\']), \'deposited_by_actor\': [dict(v) for v in deposited], \'sold\': dict(sold)})\n    if detailed:\n        snapshots.append(_clone_state(farm, private))\n    return {\'rows\': rows, \'states\': snapshots, \'events\': events, \'actions\': executed, \'overflow_units\': overflow, \'farm\': farm, \'private\': private, \'sold\': sold}\n\ndef _ge(left, right):\n    return all((left.get(item, 0) >= value for item, value in right.items()))\n\ndef dominates(candidate, baseline):\n    """Preserve every baseline worker\'s actual deposit prefixes and shed availability."""\n    if candidate[\'overflow_units\']:\n        return False\n    for new, old in zip(candidate[\'rows\'], baseline[\'rows\']):\n        if not _ge(new[\'pre_market_shed\'], old[\'pre_market_shed\']):\n            return False\n        if not _ge(new[\'sold\'], old[\'sold\']):\n            return False\n        if any((not _ge(a, b) for a, b in zip(new[\'deposited_by_actor\'], old[\'deposited_by_actor\']))):\n            return False\n    return True\n\ndef _value(run, prices):\n    shed = run[\'private\'][\'shed\']\n    return sum(((run[\'sold\'].get(item, 0) + shed.get(item, 0)) * prices[item] for item in PRODUCTS))\n\ndef _walk(start, end):\n    x, y = start\n    tx, ty = end\n    return [[\'EAST\']] * max(0, tx - x) + [[\'WEST\']] * max(0, x - tx) + [[\'SOUTH\']] * max(0, ty - y) + [[\'NORTH\']] * max(0, y - ty)\n\ndef _return(pos):\n    targets = _shed_access_tiles(10)\n    target = min(targets, key=lambda xy: (abs(pos[0] - xy[0]) + abs(pos[1] - xy[1]), targets.index(xy)))\n    return _walk(pos, target) + [[\'DROP\']]\n\ndef _proposals(run, actor, prices, max_per_actor):\n    """One/two resource bundles plus direct carry closure, replacing a baseline suffix."""\n    owners = {}\n    for event in run[\'events\']:\n        if \'acquired\' in event:\n            owners.setdefault((tuple(event[\'xy\']), event[\'op\']), set()).add(event[\'actor\'])\n    proposals = []\n    seen = set()\n    horizon = len(run[\'rows\'])\n    for offset in range(horizon):\n        farm, private = run[\'states\'][offset]\n        pos = tuple(farm[\'farmer\'] if actor == 0 else farm[\'hands\'][actor - 1])\n        inventory = private[\'inventories\'][actor]\n        carried = sum((prices.get(item, 0) * count for item, count in inventory.items()))\n        prefix_deposits = run[\'rows\'][offset - 1][\'deposited_by_actor\'][actor] if offset else {}\n        future_deposits = run[\'rows\'][-1][\'deposited_by_actor\'][actor]\n        obligation = sum((prices.get(item, 0) * (count - prefix_deposits.get(item, 0)) for item, count in future_deposits.items()))\n        bundles = []\n        for y, row in enumerate(farm[\'tiles\']):\n            for x, tile in enumerate(row):\n                if not isinstance(tile, dict):\n                    continue\n                xy, operations, value = ((x, y), [], 0)\n                if tile.get(\'yield_units\', 0) > 0:\n                    item = tile.get(\'crop\') if tile.get(\'kind\') == \'PLANT\' else ANIMALS.get(tile.get(\'animal\'), {}).get(\'product\')\n                    mature = item and (\'animal\' in tile or (START + offset) // 24 - tile[\'planted_day\'] >= CROPS[item][\'first_yield_day\'])\n                    if mature and (not owners.get((xy, \'HARVEST\'), set()) - {actor}):\n                        operations.append([\'HARVEST\'])\n                        value += prices[item] * tile[\'yield_units\']\n                if tile.get(\'fertilizer_available\') and \'animal\' in tile and (not owners.get((xy, \'COLLECT_FERTILIZER\'), set()) - {actor}):\n                    operations.append([\'COLLECT_FERTILIZER\'])\n                    value += prices[\'FERTILIZER\']\n                if operations:\n                    distance = len(_walk(pos, xy)) + len(operations) + len(_return(xy))\n                    if distance <= horizon - offset:\n                        bundles.append((xy, operations, value, distance))\n        bundles.sort(key=lambda b: (-b[2] / b[3], -b[2], b[0]))\n        variants = [([], carried)] if carried else []\n        for xy, ops, value, _ in bundles[:6]:\n            variants.append(([(xy, ops)], carried + value))\n        for first in bundles[:3]:\n            for second in bundles[:3]:\n                if first[0] != second[0]:\n                    variants.append(([(first[0], first[1]), (second[0], second[1])], carried + first[2] + second[2]))\n        for stops, value in variants:\n            route, cursor = ([], pos)\n            for xy, ops in stops:\n                route += _walk(cursor, xy) + ops\n                cursor = xy\n            route += _return(cursor)\n            if len(route) > horizon - offset:\n                continue\n            route += [[\'PASS\']] * (horizon - offset - len(route))\n            key = (offset, tuple((tuple(c) for c in route)))\n            if key not in seen:\n                seen.add(key)\n                proposals.append((value - obligation, offset, route, len(stops)))\n    proposals.sort(key=lambda p: (-p[0], p[1], p[2]))\n    direct = [p for p in proposals if p[3] == 0 and p[0] > 0][:2]\n    chosen = direct + [p for p in proposals if p not in direct]\n    return chosen[:max_per_actor]\n\ndef plan_terminal(obs, config, baseline_remaining, *, max_simulations=64, passes=1, proposals_per_actor=4):\n    """At 712 accept seven actions; positive physical delivery is mandatory."""\n    begun = perf_counter()\n    fallback = {\'accepted\': False, \'reason\': \'\', \'actions\': None, \'simulations\': 0}\n    try:\n        if int(_get(obs, \'step\', -1)) != START or len(baseline_remaining) != FINAL - START + 1:\n            raise Unsupported(\'planning requires step 712 and exactly seven actions through 718\')\n        max_simulations = min(256, max(1, int(max_simulations)))\n        passes = min(2, max(1, int(passes)))\n        proposals_per_actor = min(16, max(1, int(proposals_per_actor)))\n        baseline = simulate(obs, config, baseline_remaining, detailed=True)\n        prices = {item: max(1, float(_get(obs, \'market\', {}).get(\'prices\', {}).get(item, 1))) for item in PRODUCTS}\n        current, best = (_clone_schedule(baseline_remaining), baseline)\n        baseline_value = best_value = _value(baseline, prices)\n        changes, simulations = ([], 0)\n        n = len(baseline[\'private\'][\'inventories\'])\n        for sweep in range(passes):\n            improved = False\n            for actor in range(n):\n                winner = None\n                for _, offset, route, bundle_count in _proposals(best, actor, prices, proposals_per_actor):\n                    if simulations >= max_simulations:\n                        break\n                    trial = _clone_schedule(current)\n                    for i, command in enumerate(route, offset):\n                        if actor == 0:\n                            trial[i][\'farmer\'] = command\n                        else:\n                            trial[i].setdefault(\'hands\', [])\n                            while len(trial[i][\'hands\']) < n - 1:\n                                trial[i][\'hands\'].append([\'PASS\'])\n                            trial[i][\'hands\'][actor - 1] = command\n                    evaluated = simulate(obs, config, trial)\n                    simulations += 1\n                    score = _value(evaluated, prices)\n                    if score > best_value and dominates(evaluated, baseline):\n                        required = {(tuple(e[\'xy\']), e[\'op\'], e[\'actor\']): e[\'acquired\'] for e in best[\'events\'] if \'acquired\' in e and e[\'actor\'] != actor}\n                        acquired = {}\n                        for e in evaluated[\'events\']:\n                            if \'acquired\' in e:\n                                key = (tuple(e[\'xy\']), e[\'op\'], e[\'actor\'])\n                                dst = acquired.setdefault(key, {})\n                                for item, amount in e[\'acquired\'].items():\n                                    dst[item] = dst.get(item, 0) + amount\n                        if all((_ge(acquired.get(k, {}), v) for k, v in required.items())):\n                            winner, best_value = ((trial, offset, bundle_count), score)\n                if winner:\n                    current, offset, bundle_count = winner\n                    best = simulate(obs, config, current, detailed=True)\n                    changes.append({\'pass\': sweep, \'actor\': actor, \'from_step\': START + offset, \'resource_bundles\': bundle_count, \'estimated_stock_value\': best_value})\n                    improved = True\n                if simulations >= max_simulations:\n                    break\n            if not improved or simulations >= max_simulations:\n                break\n        if not changes or best_value <= baseline_value:\n            return {**fallback, \'reason\': \'no positive physical delivery gain\', \'simulations\': simulations, \'changed_workers\': [], \'changes\': [], \'certificate\': {\'stock_value_gain_at_initial_prices\': 0, \'sold_unit_delta\': dict.fromkeys(PRODUCTS, 0)}, \'planning_ms\': (perf_counter() - begun) * 1000}\n        final = simulate(obs, config, current, final_liquidate=True, detailed=True)\n        physical = simulate(obs, config, current)\n        if not dominates(physical, baseline):\n            raise Unsupported(\'no zero-overflow dominating continuation\')\n        delta = {item: final[\'sold\'].get(item, 0) - baseline[\'sold\'].get(item, 0) for item in PRODUCTS}\n        deposited_gain = any((final[\'rows\'][-1][\'deposited_by_actor\'][actor].get(item, 0) > baseline[\'rows\'][-1][\'deposited_by_actor\'][actor].get(item, 0) for actor in range(n) for item in PRODUCTS))\n        worker_change = any((_commands(new, n) != _commands(old, n) for new, old in zip(final[\'actions\'], baseline[\'actions\'])))\n        accepted = worker_change and deposited_gain and any((v > 0 for v in delta.values())) and all((v >= 0 for v in delta.values()))\n        plan = {\'accepted\': accepted, \'reason\': \'joint physical dominance\' if accepted else \'no improvement\', \'baseline\': _clone_schedule(baseline_remaining), \'actions\': final[\'actions\'], \'expected_states\': final[\'states\'][:-1], \'simulations\': simulations, \'changes\': changes, \'abandoned\': False, \'changed_workers\': sorted({c[\'actor\'] for c in changes}), \'certificate\': {\'baseline_rows\': baseline[\'rows\'], \'physical_rows\': physical[\'rows\'], \'baseline_overflow\': baseline[\'overflow_units\'], \'candidate_overflow\': final[\'overflow_units\'], \'sold_unit_delta\': delta, \'stock_value_gain_at_initial_prices\': best_value - baseline_value, \'baseline_final_shed\': baseline[\'private\'][\'shed\'], \'final_shed\': final[\'private\'][\'shed\'], \'positive_physical_deposit_gain\': deposited_gain, \'markets_712_717_unchanged\': all((final[\'actions\'][i].get(\'market\', []) == baseline_remaining[i].get(\'market\', []) for i in range(FINAL - START)))}}\n    except (Unsupported, KeyError, TypeError, ValueError, IndexError) as exc:\n        plan = {**fallback, \'reason\': str(exc)}\n    plan[\'planning_ms\'] = (perf_counter() - begun) * 1000\n    return plan\n\ndef _effective_action(action, n):\n    return (_commands(action, n), action.get(\'market\', []))\n\ndef _recover_observed(obs, config, parent_action, plan):\n    """Bounded cargo salvage after deviation; never resume old positional commands."""\n    farm, private = physical_state(obs)\n    positions = [farm[\'farmer\'], *farm[\'hands\']]\n    remaining = FINAL - int(_get(obs, \'step\')) + 1\n    room = max(0, int(_get(config, \'shedCapacity\', 100)) - sum(private[\'shed\'].values()))\n    commands = []\n    problems = []\n    prices = _get(obs, \'market\', {}).get(\'prices\', {})\n    for actor, (pos, inv) in enumerate(zip(positions, private[\'inventories\'])):\n        command = [\'PASS\']\n        if any((v > 0 for v in inv.values())):\n            route = _return(pos)\n            if len(route) > remaining:\n                problems.append({\'actor\': actor, \'reason\': \'unreachable cargo\'})\n            elif len(route) > 1:\n                command = route[0]\n            elif sum((max(0, q) for q in inv.values())) <= room:\n                command = [\'DROP\']\n                room -= sum((max(0, q) for q in inv.values()))\n            else:\n                items = [item for item in PRODUCTS if inv.get(item, 0) > 0]\n                if room and items:\n                    item = max(items, key=lambda i: (prices.get(i, 1) * min(inv[i], room), -PRODUCTS.index(i)))\n                    quantity = min(inv[item], room)\n                    command = [\'PLACE\', item, quantity]\n                    room -= quantity\n                else:\n                    problems.append({\'actor\': actor, \'reason\': \'no shed capacity\'})\n        commands.append(command)\n    action = {\'farmer\': commands[0], \'hands\': commands[1:], \'market\': deepcopy(parent_action.get(\'market\', []))}\n    if int(_get(obs, \'step\')) == FINAL:\n        action[\'market\'] = []\n        action = simulate(obs, config, [action], final_liquidate=True, preserve_final_commands=True)[\'actions\'][0]\n    plan[\'recovery_steps\'] = plan.get(\'recovery_steps\', 0) + 1\n    if problems:\n        plan.setdefault(\'recovery_failures\', []).append({\'step\': int(_get(obs, \'step\')), \'problems\': problems})\n    return action\n\ndef terminal_action(obs, config, parent_action, plan):\n    """Canonical guard, pre-deviation abstention, observed recovery after deviation."""\n    step = int(_get(obs, \'step\', -1))\n    if not plan or not plan.get(\'accepted\') or (not START <= step <= FINAL):\n        return parent_action\n    if plan.get(\'abandoned\'):\n        return _recover_observed(obs, config, parent_action, plan) if plan.get(\'deviated\') else parent_action\n    index = step - START\n    n = 1 + len(physical_state(obs)[0][\'hands\'])\n    mismatch = physical_state(obs) != plan[\'expected_states\'][index] or _effective_action(parent_action, n) != _effective_action(plan[\'baseline\'][index], n)\n    if mismatch:\n        plan[\'abandoned\'] = True\n        plan[\'abandon_step\'] = step\n        plan[\'reason\'] = \'physical observation or effective baseline action diverged\'\n        plan[\'safety_failure\'] = True\n        return _recover_observed(obs, config, parent_action, plan) if plan.get(\'deviated\') else parent_action\n    result = deepcopy(plan[\'actions\'][index])\n    if step == FINAL:\n        farm, private = physical_state(obs)\n        result = shop_liquidation(farm, private, _get(obs, \'market\')[\'prices\'])\n    if _commands(result, n) != _commands(parent_action, n):\n        plan[\'deviated\'] = True\n    return result',_PLANNER_NS)
+# EXP-154 integration by Ahmed Berat Ozer, derived from Dmitrii Gluzdov E182.
+# The preserved v27 parent is simulated on a private shadow only at step 712.
 _PRE_TERMINAL_AGENT=agent
 del agent
 _TERMINAL_PLANS={}
 _TERMINAL_PREVIOUS={}
 _UPGRADE_STATS={'planning_calls':0,'accepted':0,'changed_steps':0,'aborted':0,'shadow_declines':0,'errors':0,'max_planning_ms':0.0}
+
 def _parent_liquidate(farm, private, prices):
+    # Exactly v27's final projected DROP ordering, in the planner's private state.
     view=_View({'player':0,'farms':[farm],'private':private,'market':{'prices':prices}},0,_IMPL.chassis.cfg)
     commands=[['DROP'] if _shed_adjacent(pos,view.board) and view.inv(i) else ['PASS'] for i,pos in enumerate(view.positions)]
     action={'farmer':commands[0],'hands':commands[1:],'market':[]}
@@ -635,12 +1013,15 @@ def _parent_liquidate(farm, private, prices):
     action['market']=[['SELL',item,stock.get(item,0)] for item in PRODUCTS if stock.get(item,0)>0]
     action['market'].sort(key=lambda o:-view.prices.get(o[1],0)*o[2])
     return action
+
 _PLANNER_NS['shop_liquidation']=_parent_liquidate
+
 def _shadow_terminal(obs,config):
     seat=int(obs['player']);chassis=_IMPL.chassis
     state=chassis.players.get(seat)
     if not state or state.get('last_step')!=711 or state.get('route')!=2:
         return None
+    # No delayed weed/structure intervention may depend on an unmodeled future.
     if state.get('pending'):
         return None
     shadow=copy.copy(chassis);shadow.players=copy.deepcopy(chassis.players)
@@ -663,6 +1044,7 @@ def _shadow_terminal(obs,config):
         run['farm']['money']=projected['farms'][seat]['money']
         projected['farms'][seat]=run['farm'];projected['private']=run['private']
     return baseline,states
+
 def agent(observation,configuration=None):
     try:
         step=int(observation['step']);seat=int(observation['player'])
@@ -702,7 +1084,7 @@ def agent(observation,configuration=None):
     if actual!=baseline[0]:
         _UPGRADE_STATS['shadow_declines']+=1;return actual
     try:
-        plan=_PLANNER_NS['plan_terminal'](observation,configuration,baseline,max_simulations=256,passes=2,proposals_per_actor=16)
+        plan=_PLANNER_NS['plan_terminal'](observation,configuration,baseline,max_simulations=64,passes=1,proposals_per_actor=4)
         _UPGRADE_STATS['max_planning_ms']=max(_UPGRADE_STATS['max_planning_ms'],plan.get('planning_ms',0.0))
         if not plan.get('accepted'):return actual
         plan['parent_states_before']=states;_TERMINAL_PLANS[seat]=plan
@@ -712,7 +1094,10 @@ def agent(observation,configuration=None):
         return result
     except Exception:
         _UPGRADE_STATS['errors']+=1;return actual
+
 agent.telemetry=_UPGRADE_STATS
+
+# EXP-154: aurax7 Reactive v2 day-end storage guard, adapted to our v27 view.
 _PRE_ROOM_AGENT=agent
 del agent
 _ROOM_STATS={'changed_turns':0,'added_units':0,'errors':0}
@@ -739,7 +1124,76 @@ def agent(observation,configuration=None):
         return result
     except Exception:
         _ROOM_STATS['errors']+=1;return action
+
 agent.telemetry=_ROOM_STATS
+
+# Incorporated upstream attribution and change notice:
+# E182 Shop0909 + terminal physical closure (modified 2026-09-09)
+# 
+# The active public parent is Yusuke Hayashi's yhay81/shop-router-0909 v3.
+# router_parent.py and actions.json are exact original bytes, not newly authored
+# routes. The parent credits aurax7's Reactive Router for sale timing and shed
+# projection; that attribution remains in router_parent.py. Original payload
+# LICENSE.txt is preserved unchanged (Apache License 2.0 text); it contains no
+# named copyright grantor and no separate NOTICE was supplied. No additional
+# ownership, endorsement, or upstream replay-data rights claim is made.
+# 
+# Local changes: separate main.py/policy.py adapter; bounded start712 planner
+# copied from frozen E180/S78 and modified for seven callbacks, exact Shop final
+# liquidation, strict positive physical delivery/sale gain, and observation guards.
+# unit_model.py is an unchanged frozen E180 copy of Kaggle's extracted semantics.
+# The following original E180 notice is retained verbatim for attribution history.
+# Its references to Thomas files describe E180, not files supplied in this Shop
+# package: no Thomas tapes, trees or policy are included here.
+# 
+# ----- Original E180 notice -----
+# Kaggriculture: Last-Mile Harvest Planner
+# Attribution and change notice
+# 
+# Thomas Tschinkel is the author of the parent public state-router policy and its
+# published decision trees and action-route data. Source: Kaggriculture: 93.8% Win
+# Rate Public State Router, notebook version 3, scriptVersionId 347936183:
+# https://www.kaggle.com/code/thomastschinkel/kaggriculture-93-8-win-rate-public-state-router?scriptVersionId=347936183
+# The public notebook identifies its license as Apache License, Version 2.0.
+# Original published main.py SHA-256:
+# b87a27ed614a33329be85f1b662e51cf4078a019fee937afcebbbbf2f51f8522
+# 
+# Changes to that source for this distribution: compressed route/tree literals
+# were decoded into readable tapes.json and trees.json; a read-only planned_action
+# helper was added; descriptive headers and local data loading were adapted.
+# The original parent feature extraction, tree traversal and agent behavior are
+# retained. These public routes are not claimed as newly authored or trained by
+# the notebook distributor.
+# 
+# unit_model.py contains deterministic unit-action and crop-decay definitions
+# extracted from Kaggle's kaggle-environments 1.32.7 Kaggriculture engine, licensed
+# under Apache License, Version 2.0. Credit: Kaggle and the kaggle-environments
+# contributors. Project: https://github.com/Kaggle/kaggle-environments
+# Source file: kaggle_environments/envs/kaggriculture/kaggriculture.py
+# Source SHA-256:
+# bc8a54879ef02c7ea64b8b333d6a976f0ea65c4949149d01f463f23bccee653e
+# The extracted unit/decay definitions are not a newly authored game engine;
+# market price dynamics and the full interpreter are not part of this module.
+# 
+# Additional work in this distribution: a bounded last-nine-action collection
+# and delivery planner, observation guards and recovery, a settings-consuming
+# factory and entry point, standalone examples, and deterministic packaging.
+# The full Apache License, Version 2.0 is included as LICENSE.txt.
+# No endorsement by Thomas Tschinkel or Kaggle is implied.
+# 
+# Data provenance limitation: Thomas's source refers to public replay data and
+# an upstream provenance.json. That original episode-level manifest, replay IDs
+# and individual replay-author identities were not supplied with the public
+# notebook/output used here. No names or episode lineage have been invented.
+# Notebook-level licensing does not independently establish the missing underlying
+# replay-data rights chain. The package supplies usable readable routes, not a
+# reproducible reconstruction of their original collection or training process.
+# 
+# Packaging note: source inputs described as byte-exact above are
+# normalized to UTF-8/LF text with a final newline in this standalone
+# notebook package. Route JSON values and parent policy behavior are unchanged.
+
+# Final public-entry guard; measured separately and compared on captured observations.
 _V28_CORE=agent
 del agent
 _IMPL.chassis.diagnostics['v28_entry_errors']=0
@@ -750,28 +1204,40 @@ def agent(observation,configuration=None):
         _IMPL.chassis.diagnostics['v28_entry_errors']+=1
         return {'farmer':['PASS'],'hands':[],'market':[]}
 agent.telemetry=_ROOM_STATS
+
+# EXP-155: prvsiyan V221B finite tomato investment, adapted by Ahmed Berat Ozer.
+# Original public source is retained under research24/public; Apache-2.0.
 MAX_ORDERS=10
 class FarmView(_View):
     def __init__(self,obs):super().__init__(obs,int(obs['player']),_IMPL.chassis.cfg)
     def inventory(self,actor):return self.inv(actor)
 def projected_shed(action,view):return _IMPL.chassis._projected_shed(action,view)
+
 CROP_MIN_PRICE=70
+
+# V219: a finite late tomato investment with dedicated, observed workers.
 _V219_PARENT = agent
 del agent
-_V219_FERTILIZE = True
+_V219_FERTILIZE = True  # Builder changes only this flag for the ablation.
 _V219_STATES = {}
 _V219_REPORT = {'commitments': 0, 'hire_requests': 0, 'confirmed_workers': 0,
                 'hire_shortfalls': 0, 'plant_requests': 0, 'confirmed_plants': 0,
                 'water_requests': 0, 'fertilize_requests': 0, 'harvest_requests': 0,
                 'confirmed_harvest_units': 0, 'drop_requests': 0,
                 'tomato_sale_requests': 0, 'budget_declines': 0, 'lost_plants': 0}
+
+
 def _v219_fib(n):
     a, b = 1, 1
     for _ in range(n): a, b = b, a+b
     return a
+
+
 def _v219_native_day(native, day):
     tape = _IMPL.chassis.routes[native['route']]
     return tape[day*24:min((day+1)*24,719)]
+
+
 def _v219_qualifies(obs, native):
     farm=obs['farms'][obs['player']]
     if len(farm['tiles']) != 10 or set(farm['unlocked_quadrants']) != {'NW','NE','SW'}:
@@ -786,21 +1252,31 @@ def _v219_qualifies(obs, native):
         return False
     if any(isinstance(t,dict) and t.get('crop')=='TOMATO' for row in farm['tiles'] for t in row):
         return False
+    # The investment uses spare land and new worker indices. Avoid taking over
+    # any native tomato or land purchase obligation on the known own schedule.
     for tape in _IMPL.chassis.routes.values():
         for a in tape[432:719]:
             if any(o and o[0]=='BUY_LAND' for o in a.get('market',[])):return False
             if any(c==['PLANT','TOMATO'] for c in [a.get('farmer')]+a.get('hands',[])):return False
     return True
+
+
 def _v219_walk(pos, target):
     x,y=pos;tx,ty=target
     if x != tx:return ['EAST' if x < tx else 'WEST']
     if y != ty:return ['SOUTH' if y < ty else 'NORTH']
     return None
+
+
 def _v219_home(pos):
     return min(((4,4),(5,4),(4,5),(5,5)),key=lambda p:abs(pos[0]-p[0])+abs(pos[1]-p[1]))
+
+
 def _v219_request(obs, action, state, native):
     step=int(obs['step']);day=step//24;offset=step%24
     farm=obs['farms'][obs['player']];private=obs['private']
+    # If the planting-day transaction could not complete, abandon investment.
+    # Later purchases would miss the finite day26..29 production window.
     if not state.get('committed') and day!=18:return action
     if state.get('requested_day')==day or offset>3:return action
     planned=_v219_native_day(native,day)
@@ -811,6 +1287,8 @@ def _v219_request(obs, action, state, native):
     expected=max(len(a.get('hands',[])) for a in planned)
     if len(farm['hands'])+parent_hires != expected:return action
     fertilizer=bool(_V219_FERTILIZE and day in (24,27) and obs['market']['prices']['FERTILIZER']<=30)
+    # One watering tour: at most 2 entry moves + 9 between tiles + 10 waters.
+    # A hire request by hour2 leaves at least21 callbacks after confirmation.
     crop_workers=1 if day in (19,20,21,22,23,25) and offset<=2 else (3 if 26<=day<=28 else 2)
     labor=_r53_labor_assignment(obs,action,fertilizer)
     if labor is not None:crop_workers=labor['workers']
@@ -821,6 +1299,8 @@ def _v219_request(obs, action, state, native):
     if fertilizer:extra.append(['BUY_PRODUCT','FERTILIZER',10])
     extra += [['HIRE'] for _ in range(count)]
     if len(action['market'])+len(extra)>MAX_ORDERS:return action
+    # No assumed sale proceeds. Reserve 3,000 for parent obligations and price
+    # movement; the qualification separately requires 12,000 initial liquidity.
     budget=sum(_v219_fib(n) for n in range(farm['hires_today'],farm['hires_today']+parent_hires+count))
     if not state.get('committed'):budget+=4500
     if fertilizer:budget+=10*(obs['market']['prices']['FERTILIZER']+5)
@@ -840,10 +1320,13 @@ def _v219_request(obs, action, state, native):
         state['committed']=True;_V219_REPORT['commitments']+=1
     changed=copy.deepcopy(action);changed['market']+=extra
     return changed
+
+
 def _v219_worker(obs, state, actor, role):
     day=int(obs['step'])//24;step=int(obs['step']);view=FarmView(obs)
     pos=tuple(view.positions[actor]);inv=view.inventory(actor)
     targets=role['targets']
+    # Actual cargo differences, observed on the next callback, verify harvests.
     previous=state['last_work'].get(actor)
     if previous and previous['step']==step-1 and previous['command']==['HARVEST']:
         _V219_REPORT['confirmed_harvest_units']+=max(0,int(inv.get('TOMATO',0))-previous['tomatoes'])
@@ -854,6 +1337,7 @@ def _v219_worker(obs, state, actor, role):
         desired=role.get('fertilizer_quantity',10 if role['kind']=='fertilizer' else 5)
         if inv.get('FERTILIZER',0)>=desired:role['loaded']=True
         elif role.get('pickup_requested'):
+            # Never spend repeated turns waiting for stock that was not bought.
             role['loaded']=True;role['fertilizer_available']=int(inv.get('FERTILIZER',0))
         elif view.shed.get('FERTILIZER',0)>=desired:
             role['pickup_requested']=True;return ['PICKUP','FERTILIZER',desired]
@@ -874,11 +1358,14 @@ def _v219_worker(obs, state, actor, role):
             if tile is None and obs['private']['seeds'].get('TOMATO',0)>0:command=['PLANT','TOMATO']
             elif isinstance(tile,dict) and tile.get('kind')=='WEED':command=['DIG']
         elif tomato:
+            # No later production follows the final day, so watering then would
+            # consume time needed to harvest and deliver the final cargo.
             if day<29 and not tile.get('watered_today'):command=['WATER']
             elif role.get('needs_fertilizer') and tile.get('fertilized_until_day',-1)<day+2 and inv.get('FERTILIZER',0)>0:
                 command=['FERTILIZE']
             elif tile.get('yield_units',0)>0:command=['HARVEST']
         if command:todo.append((target,command))
+    # Final return has priority once only the exact distance plus DROP remains.
     home=_v219_home(pos);distance=abs(pos[0]-home[0])+abs(pos[1]-home[1])
     if step>=718-distance and inv.get('TOMATO',0):
         return _v219_walk(pos,home) or ['PLACE','TOMATO',int(inv.get('TOMATO',0))]
@@ -888,6 +1375,8 @@ def _v219_worker(obs, state, actor, role):
     if inv.get('TOMATO',0):return _v219_walk(pos,home) or ['PLACE','TOMATO',int(inv['TOMATO'])]
     if any(inv.values()):return _v219_walk(pos,home) or ['DROP']
     return ['PASS']
+
+
 def agent(observation, configuration=None):
     action=_V219_PARENT(observation,configuration)
     step=int(observation['step']);player=int(observation['player']);day=step//24
@@ -941,12 +1430,22 @@ def agent(observation, configuration=None):
             action=copy.deepcopy(action);action['market'].append(['SELL','TOMATO',quantity])
             _V219_REPORT['tomato_sale_requests']+=quantity
     return action
+
+
 agent.telemetry=_V219_REPORT
+
+# V221B: labor-only ablation of frozen V219G; not yet publicly scored.
+
+
+# Crop workers own their final routes after commitment. A private parent shadow
+# does not contain these obligations, so terminal rescue must abstain there.
 _ORIGINAL_SHADOW_TERMINAL=_shadow_terminal
 def _shadow_terminal(obs,config):
     if _V219_STATES.get(int(obs['player']),{}).get('committed'):return None
     return _ORIGINAL_SHADOW_TERMINAL(obs,config)
+
 APPLY_TIMING=False
+
 _EXPERIMENT_PARENT=agent
 del agent
 _V219_REPORT['extra_fertilizer_days']=0
@@ -961,6 +1460,7 @@ def agent(observation,configuration=None):
         _V219_REPORT['errors']+=1
         return {'farmer':['PASS'],'hands':[],'market':[]}
 agent.telemetry=_V219_REPORT
+
 def _v224_sales_first(action):
     original=action.get('market',[])[:MAX_ORDERS]
     orders=[list(o) for o in original if o and (o[0] in ('HIRE','BUY_LAND') or (len(o)>=3 and int(o[2])>0))]
@@ -980,6 +1480,7 @@ def _v224_sales_first(action):
     return changed
 _ORDER_PARENT=agent
 del agent
+
 def agent(observation,configuration=None):
     try:
         action=_ORDER_PARENT(observation,configuration)
@@ -989,6 +1490,7 @@ def agent(observation,configuration=None):
         _V219_REPORT["errors"]+=1
         return {"farmer":["PASS"],"hands":[],"market":[]}
 agent.telemetry=_V219_REPORT
+
 _V31_CORE=agent
 del agent
 _IMPL.chassis.diagnostics['production_errors']=0
@@ -1003,15 +1505,20 @@ def agent(observation,configuration=None):
         _IMPL.chassis.diagnostics['v31_entry_errors']+=1
         return {'farmer':['PASS'],'hands':[],'market':[]}
 agent.telemetry=_V219_REPORT
+
+# Apache-2.0; later cattle transfer from prvsiyan, Moon (2026-09-10).
+# Bounded livestock substitution; confirm owned animals before redirecting workers.
 _V231_PARENT=agent
 _V231_CAP=4
 _V231_STATES={}
 _V231_REPORT={}
+
 def _v231_new_state():
     return {'last':-1,'confirmed':0,'reserved':0,'pending_buy':None,
             'carrying':{},'pending_places':[],'sites':{},'milk_credit':0,
             'requested':0,'failed_purchase_units':0,'picked':0,'placed':0,
             'failed_placements':0,'extra_milk_harvested':0,'extra_milk_sale_requests':0}
+
 def _v231_controller(obs,action,state,cap):
     step=int(obs['step']);seat=int(obs['player']);farm=obs['farms'][seat]
     private=obs['private'];shed=private['shed'];inventories=private['inventories']
@@ -1075,13 +1582,14 @@ def _v231_controller(obs,action,state,cap):
     if (216<=step<=227 and len(shops)>=3 and state['confirmed']<cap and not state['reserved']
             and not any(state['carrying'].values()) and not state['pending_places']
             and not cargo and not stock_animals and len(animal_orders)==1
-            and animal_orders[0][1]=='SHEEP' and milk_shops>=3 and 'YARN_STORE' not in shops
-            and int(prices.get('MILK',0))>=int(prices.get('WOOL',0))
+            and animal_orders[0][1]=='SHEEP' and milk_shops>=2 and 'YARN_STORE' not in shops
+            and int(prices.get('MILK',0))>=int(prices.get('WOOL',0))+99999
             and counts['COW']>=4 and counts['SHEEP']>=2):
         order=animal_orders[0];quantity=int(order[2])
         if 1<=quantity<=2 and quantity<=cap-state['confirmed']:
             order[1]='COW';state['requested']+=quantity
             state['pending_buy']={'before':int(shed.get('COW',0)),'quantity':quantity}
+    # Sell only additional physically harvested production at an existing sale slot.
     if state['milk_credit']>0:
         stock=projected_shed(result,FarmView(obs))
         total_planned=sum(max(0,int(o[2])) for o in market if len(o)>=3 and o[:2]==['SELL','MILK'])
@@ -1094,6 +1602,7 @@ def _v231_controller(obs,action,state,cap):
                     break
     result['market']=market
     return result
+
 def agent(observation,configuration=None):
     step=int(observation['step']);seat=int(observation['player'])
     state=_V231_STATES.get(seat)
@@ -1107,14 +1616,21 @@ def agent(observation,configuration=None):
         _V231_REPORT['cattle_'+name]=state[name]
     _V231_REPORT['cattle_carried_pending']=sum(state['carrying'].values())
     return action
+
 agent.telemetry=_V231_REPORT
+
+
+# EXP-167, adapted from Dmitrii Gluzdov's Two Coins, One Sheep (Apache-2.0).
+# Reserve only physically available stock after the final parent worker actions.
 _R36_SALE_PARENT=agent
 _R36_NATIVE_LEAD=Chassis._sell_lead
 _R36_NATIVE_SUPPRESS=Chassis._apply_suppression
 _R36_SALE_REPORT={}
+
 def _r36_native_lead(self,action,view,projected,route,step,next_sup):
     if step<288 or step>=696:
         return _R36_NATIVE_LEAD(self,action,view,projected,route,step,next_sup)
+
 def _r36_suppress(action,state,step):
     _R36_NATIVE_SUPPRESS(action,state,step)
     due=state.get('r36_debts',{}).pop(step,{})
@@ -1123,17 +1639,21 @@ def _r36_suppress(action,state,step):
             removed=min(max(0,int(order[2])),due.get(order[1],0))
             order[2]-=removed
             due[order[1]]=due.get(order[1],0)-removed
+
 Chassis._sell_lead=_r36_native_lead
 Chassis._apply_suppression=staticmethod(_r36_suppress)
+
 def _r36_reserve(obs,action):
     step=int(obs['step'])
-    if not _V12_R36_LO<=step<_V12_R36_HI:return action
+    # The final planner forecasts its own parent, so keep its full window native.
+    if not 288<=step<696:return action
     native=_IMPL.chassis.players[int(obs['player'])]
     tape=_IMPL.chassis.routes[native['route']]
-    end=min(_V12_R36_HI-1,step+_R37_HORIZONS.get(int(obs['player']),2))
+    end=min(695,step+_R37_HORIZONS.get(int(obs['player']),2),(step//72+1)*72-1)
     if end<=step:return action
     commands=[action.get('farmer') or ['PASS'],*(action.get('hands') or [])]
     view=FarmView(obs)
+    # This projection intentionally abstains on ambiguous animal depot returns.
     if any(len(c)>1 and c[0]=='PLACE' and c[1] in ANIMAL_STRUCTURE
            and view.inv(i).get(c[1],0)>0 for i,c in enumerate(commands[:len(view.positions)])):
         return action
@@ -1145,7 +1665,7 @@ def _r36_reserve(obs,action):
                    if len(c)>1 and c[0]=='PICKUP')
     debts=native['sell_state'].setdefault('r36_debts',{})
     for item in PRODUCTS:
-        if item in blocked or view.prices.get(item,0)<2:continue
+        if item in ('WHEAT','FERTILIZER') or item in blocked or view.prices.get(item,0)<2:continue
         available=max(0,int(stock.get(item,0)))
         if not available or len(market)>=10:continue
         reservations=[]
@@ -1168,6 +1688,7 @@ def _r36_reserve(obs,action):
             _R36_SALE_REPORT['sale_reserved_units']+=qty
             _R36_SALE_REPORT['sale_reservations']+=1
     return action
+
 def agent(observation,configuration=None):
     if int(observation.get('step',0))==0:
         _R36_SALE_REPORT.update(sale_reserved_units=0,sale_reservations=0,sale_errors=0)
@@ -1181,8 +1702,16 @@ def agent(observation,configuration=None):
         _R36_SALE_REPORT['sale_errors']=_R36_SALE_REPORT.get('sale_errors',0)+1
     _R36_SALE_REPORT.update(_R36_SALE_PARENT.telemetry)
     return action
+
 agent.telemetry=_R36_SALE_REPORT
+
+# Ensure the Kaggle-selected final callable is the exported policy.
 agent = globals().pop("agent")
+
+
+# Public capability transfer: lucifer19; Flexon is the same Two Coins asset set.
+# Apache-2.0; exact functions from Kaggle kaggle-environments 1.32.7.
+# https://github.com/Kaggle/kaggle-environments/tree/master/kaggle_environments/envs/kaggriculture
 import math
 _R37_MARKET_PARAMS = {'WHEAT': {'base': 25, 'I0': 10000, 'T': 400, 'below_func': 'sqrt', 'below_target': 0.8, 'above_func': 'log', 'above_target': 0.2}, 'CARROT': {'base': 35, 'I0': 10000, 'T': 450, 'below_func': 'hinge', 'below_target': 1.0, 'above_func': 'sqrt', 'above_target': 0.7}, 'TOMATO': {'base': 60, 'I0': 10000, 'T': 200, 'below_func': 'hinge', 'below_target': 0.4, 'above_func': 'sqrt', 'above_target': 0.6}, 'STRAWBERRY': {'base': 120, 'I0': 10000, 'T': 100, 'below_func': 'sqrt', 'below_target': 0.7, 'above_func': 'linear', 'above_target': 1.6}, 'MELON': {'base': 250, 'I0': 10000, 'T': 300, 'below_func': 'log', 'below_target': 0.2, 'above_func': 'sq', 'above_target': 3.6}, 'EGG': {'base': 50, 'I0': 10000, 'T': 332, 'below_func': 'hinge', 'below_target': 0.4, 'above_func': 'log', 'above_target': 0.2}, 'MILK': {'base': 160, 'I0': 10000, 'T': 122, 'below_func': 'sqrt', 'below_target': 0.6, 'above_func': 'linear', 'above_target': 1.6}, 'WOOL': {'base': 200, 'I0': 10000, 'T': 105, 'below_func': 'log', 'below_target': 0.2, 'above_func': 'sq', 'above_target': 3.2}, 'FERTILIZER': {'base': 100, 'I0': 10000, 'T': 200, 'below_func': 'linear', 'below_target': 0.4, 'above_func': 'linear', 'above_target': 0.4}}
 _R37_PRICE_FLOOR = 1
@@ -1195,12 +1724,15 @@ def _r37_shape(func, x, T=None):
     if func == "log":    return math.log(1.0 + x)
     if func == "log10":  return math.log10(1.0 + x)
     if func == "hinge":
+        # Degenerates to linear if T is missing or non-positive.
         if not T or T <= 0:
             return x
         u = x / T
         return u + _R37_HINGE_GAIN * max(0.0, u - 1.0) ** 2
     return x
+
 def _r37_market_price(item, inventory, params=None):
+    """Floor at _R37_PRICE_FLOOR."""
     p = (params or _R37_MARKET_PARAMS)[item]
     base = p["base"]
     I0 = p["I0"]
@@ -1214,7 +1746,9 @@ def _r37_market_price(item, inventory, params=None):
         amp = p["above_target"] * base / _r37_shape(f, T, T)
         price = base - amp * _r37_shape(f, inventory - I0, T)
     return max(_R37_PRICE_FLOOR, int(round(price)))
+
 def _r37_similarity(observation):
+    """Empty tiles cannot make two unrelated production layouts look alike."""
     farms = observation['farms']
     own, rival = farms[observation['player']], farms[1-observation['player']]
     if own['unlocked_quadrants'] != rival['unlocked_quadrants']:
@@ -1228,7 +1762,10 @@ def _r37_similarity(observation):
             total += 1
             matches += sa == sb
     return matches / total if total >= 8 else 0.0
+
+
 def _r37_quote_priority(observation, order, stock):
+    """Revenue exposed to a small rival batch, not nominal headline revenue."""
     item = order[1]
     quantity = min(max(0, int(order[2])), stock.get(item, 0))
     if not quantity or item not in _R37_MARKET_PARAMS:
@@ -1245,11 +1782,16 @@ def _r37_quote_priority(observation, order, stock):
                    if isinstance(t, dict) and
                    ((crop_item is not None and t.get('crop') == crop_item) or
                     (animal is not None and t.get('animal') == animal)))
+    # Public fields do not reveal the rival shed. Eight units are a scenario,
+    # not a recovered hidden quantity; visible ripe yield increases the stress.
     batch = min(24, max(8, standing))
     now = sum(_r37_market_price(item, inventory+j, params) for j in range(quantity))
     later = sum(_r37_market_price(item, inventory+batch+j, params) for j in range(quantity))
     return now-later
+
+
 def _r37_reorder_sales(observation, action):
+    """Keep quantities and purchase barriers; rank distinct contiguous sales."""
     stock = projected_shed(action, FarmView(observation))
     orders = [list(o) for o in action['market']]
     start = 0
@@ -1268,8 +1810,14 @@ def _r37_reorder_sales(observation, action):
         _R37_STATS['quote_reordered_turns'] += 1
         action = dict(action, market=orders)
     return action
+
+
+
+# EXP175: bounded public cash-response probe inspired by leoprovorov,
+# Two Coins Mirror Counter v1 (Apache-2.0). No hidden rival inventory.
 _R44_PROBES={}
 _R44_REPORT=dict(probe_matches=0,probe_four_turn_calls=0,probe_errors=0)
+
 def _r44_before(obs):
     player=int(obs['player']);step=int(obs['step'])
     st=_R44_PROBES.get(player)
@@ -1284,21 +1832,27 @@ def _r44_before(obs):
             st['matched']=True
     st.update(step=step,money=money,probe=0)
     return st
+
 def _r44_after(obs,action,st):
     step=int(obs['step']);player=int(obs['player'])
     if not 336<=step<648 or st['matched']:return
+    # Positive all-sale probes avoid mistaking equal spending for preemption.
     if not action['market'] or any(o and o[0]!='SELL' for o in action['market']):return
     debts=_IMPL.chassis.players[player]['sell_state'].get('r36_debts',{})
     own=debts.get(step+3,{})
     if own:st['probe']=sum(max(0,int(n))*int(obs['market']['prices'].get(item,0)) for item,n in own.items())
+
 _R37_ADAPTIVE = True
 _R37_QUOTE = True
+# EXP-168: adapted from lucifer19 / Harvest Nocturne, Apache-2.0.
+# All rivalry features use public occupied tiles; no private rival inventory.
 _R37_PARENT = agent
 _R37_PLAYERS = {}
 _R37_HORIZONS = {}
 _R37_REPORT = {}
 _R37_STATS = dict(quote_reordered_turns=0, three_turn_calls=0, nocturne_errors=0)
 del agent
+
 def agent(observation, configuration=None):
     player, step = int(observation['player']), int(observation['step'])
     state = _R37_PLAYERS.get(player)
@@ -1307,7 +1861,7 @@ def agent(observation, configuration=None):
     if step == 0:
         _R37_STATS.update(quote_reordered_turns=0, three_turn_calls=0, nocturne_errors=0)
     state['step'] = step
-    _R37_HORIZONS[player] = _V12_HORIZON if (_V12_R36_LO <= step < _V12_R36_HI) else 2
+    _R37_HORIZONS[player] = 2
     probe_state=_r44_before(observation)
     try:
         if _R37_ADAPTIVE and step < 648:
@@ -1320,7 +1874,8 @@ def agent(observation, configuration=None):
     if _R37_HORIZONS[player]==3 and probe_state['matched']:
         _R37_HORIZONS[player]=4
         _R44_REPORT['probe_four_turn_calls']+=1
-    if _V12_R36_LO <= step < _V12_R36_HI:_R37_HORIZONS[player] = _V12_HORIZON
+    # EXP179: four-turn reservation; retain stock, debt and purchase barriers.
+    if 288 <= step < 696:_R37_HORIZONS[player] = 4
     action = _R37_PARENT(observation, configuration)
     _r44_after(observation,action,probe_state)
     if _R37_QUOTE and step >= 288:
@@ -1332,11 +1887,15 @@ def agent(observation, configuration=None):
     _R37_REPORT.update(_R37_STATS)
     _R37_REPORT.update(_R44_REPORT)
     return action
+
 agent.telemetry = _R37_REPORT
+
+# Export guard: normal decisions stay identical to the frozen screened policy.
 _RELEASE_PARENT=agent
 _RELEASE_REPORT={}
 _RELEASE_ERRORS=0
 del agent
+
 def agent(observation,configuration=None):
     global _RELEASE_ERRORS
     try:
@@ -1352,8 +1911,12 @@ def agent(observation,configuration=None):
     _RELEASE_REPORT.update(getattr(_RELEASE_PARENT,'telemetry',{}))
     _RELEASE_REPORT['release_errors']=_RELEASE_ERRORS
     return result
+
 agent.telemetry=_RELEASE_REPORT
 agent=globals().pop('agent')
+
+# Adapted from prvsiyan / The Soil Remembers Rain, Apache-2.0.
+# V233: bounded, financed six-sheep SE discovery investment.
 _V233_PARENT=agent
 del agent
 _V233_STATES={}
@@ -1362,6 +1925,7 @@ _V233_REPORT=dict(sheep_commit_requests=0,sheep_committed=0,sheep_hire_requests=
     sheep_capacity_declines=0,sheep_purchase_shortfalls=0,sheep_feed_buy_requests=0,
     sheep_wool_harvested=0,sheep_fert_collected=0,sheep_extra_wool_sales=0,
     sheep_extra_fert_sales=0,sheep_rescue_feed_requests=0)
+
 def _v233_eligible(obs,native):
     farm=obs['farms'][obs['player']];prices=obs['market']['prices']
     if len(farm['tiles'])!=10 or set(farm['unlocked_quadrants'])!={'NW','NE','SW'}:return False
@@ -1373,6 +1937,7 @@ def _v233_eligible(obs,native):
             if any(o and (o[0]=='BUY_LAND' or o[:2]==['BUY_ANIMAL','SHEEP']) for o in a.get('market',[])):return False
             if any(c and c[0] in ('PICKUP','PLACE') and len(c)>1 and c[1]=='SHEEP' for c in [a.get('farmer')]+a.get('hands',[])):return False
     return True
+
 def _v233_request(obs,action,state,native):
     step=int(obs['step']);day=step//24;hour=step%24
     if hour>(2 if state.get('committed') else 1) or state.get('requested_day')==day:return action
@@ -1408,6 +1973,7 @@ def _v233_request(obs,action,state,native):
     if initial:_V233_REPORT['sheep_commit_requests']+=1
     result=copy.deepcopy(action);result['market']=market+extra
     return result
+
 def _v233_worker(obs,actor,targets):
     farm=obs['farms'][obs['player']];private=obs['private'];step=int(obs['step'])
     pos=tuple(farm['hands'][actor-1]);inv=private['inventories'][actor]
@@ -1440,6 +2006,7 @@ def _v233_worker(obs,actor,targets):
         _,_,target,command=min(tasks);return _v219_walk(pos,target) or command
     if cargo:return _v219_walk(pos,home) or ['PLACE',cargo[0],inv[cargo[0]]]
     return ['PASS']
+
 def _v234_rescue(obs,action,state):
     if not state['workers'] or int(obs['step'])%24>14:return action
     orders=action.get('market',[])
@@ -1461,6 +2028,7 @@ def _v234_rescue(obs,action,state):
     state['rescue_today']=state.get('rescue_today',0)+shortage
     _V233_REPORT['sheep_rescue_feed_requests']+=shortage
     return result
+
 def agent(observation,configuration=None):
     action=_V233_PARENT(observation,configuration)
     step=int(observation['step']);player=int(observation['player']);day=step//24
@@ -1509,6 +2077,7 @@ def agent(observation,configuration=None):
             result['market'].append(['SELL',item,count]);state['credit'][item]-=count
             _V233_REPORT['sheep_extra_wool_sales' if item=='WOOL' else 'sheep_extra_fert_sales']+=count
     return result
+
 _R46_SHEEP_AGENT=agent
 _R46_SHADOW_PARENT=_shadow_terminal
 _R46_REPORT={}
@@ -1529,11 +2098,14 @@ def agent(observation,configuration=None):
     return result
 agent.telemetry=_R46_REPORT
 agent=globals().pop('agent')
+
+# EXP182: finite-harvest wheat/carrot input planner; original adaptation.
 _R51_INPUT_PARENT=agent
 _R51_INPUT_STATES={}
 _R51_INPUT_REPORT={}
 _R51_INPUT_MAX_WORKERS=2
 _R51_INPUT_CROPS={'WHEAT':(2,4,6),'CARROT':(2,3,4)}
+
 def _r51_input_forecast(obs,route,expected):
     step=int(obs['step']);day=step//24;farm=obs['farms'][obs['player']]
     pos=[list(farm['farmer'])]+[list(p) for p in farm['hands'][:expected]];targets={}
@@ -1545,6 +2117,7 @@ def _r51_input_forecast(obs,route,expected):
                 targets[(x,y)]={'crop':item,'birth':tile['planted_day'],'yield':tile['yield_units'],
                     'until':tile.get('fertilized_until_day',-1),'watered':tile.get('watered_today',False),'water':[],'harvest':None,'first':first,'last':last,'cap':cap}
     access=((4,4),(5,4),(4,5),(5,5));seen=set()
+    # Native continuation ends before the reactive terminal closure planner.
     for t in range(step,min(712,(day+4)*24)):
         tape=_IMPL.chassis.routes[2 if t>=648 else route];a=tape[t]
         for actor,c in enumerate([a.get('farmer') or ['PASS'],*(a.get('hands') or [])][:len(pos)]):
@@ -1563,11 +2136,13 @@ def _r51_input_forecast(obs,route,expected):
                 pos.append(list(min(access,key=lambda p:(counts[p],access.index(p)))))
         if (t+1)%24==0:pos=[[4,4]]
     return targets
+
 def _r51_input_gain(target,arrival,day):
     if target['harvest'] is None or target['harvest']<=arrival:return 0
     extra=sum(arrival<t<=target['harvest'] and day<=t//24<=day+2 and t//24>target['until'] for t in target['water'])
     baseline=target['yield']+sum(2 if t//24<=target['until'] else 1 for t in target['water'])
     return max(0,min(extra,target['cap']-baseline))
+
 def _r51_input_path(obs,targets):
     step=int(obs['step']);day=step//24;now=step+4;pos=(4,4);remaining=dict(targets);path=[];quantities={'WHEAT':0,'CARROT':0}
     while remaining and len(path)<8:
@@ -1580,6 +2155,7 @@ def _r51_input_path(obs,targets):
         _,_,_,xy,arrival,gain=max(options);target=remaining.pop(xy)
         path.append((xy[0],xy[1],target['crop'],target['birth']));quantities[target['crop']]+=gain;now=arrival+1;pos=xy
     return path,quantities
+
 def _r51_input_control(obs,action,state):
     step=int(obs['step']);day=step//24;hour=step%24;player=int(obs['player']);farm=obs['farms'][player];private=obs['private']
     native=_IMPL.chassis.players[player]
@@ -1617,6 +2193,7 @@ def _r51_input_control(obs,action,state):
     planned=_v219_native_day(native,day);expected=max(len(a.get('hands',[])) for a in planned)
     if any(o and o[0]=='HIRE' for a in planned[hour:] for o in a.get('market',[])) or native['pending']:return action
     parents=[_V219_STATES.get(player,{}),_V233_STATES.get(player,{})]
+    # A parent may retry after a full market queue; its headcount must remain native.
     if day in (12,18) or any(p.get('committed') and p.get('requested_day')!=day for p in parents):return action
     if any(p.get('pending') for p in parents) or any(o and o[0]=='HIRE' for o in action.get('market',[])):return action
     owned=set(range(1,expected+1))
@@ -1627,6 +2204,8 @@ def _r51_input_control(obs,action,state):
     if owned!=set(range(1,len(farm['hands'])+1)):return action
     targets=_r51_input_forecast(obs,native['route'],expected);plans=[];total_q=0;total_cost=0;all_units={'WHEAT':0,'CARROT':0}
     stock=projected_shed(action,FarmView(obs));purchases=sum(max(0,int(o[2])) for o in action.get('market',[]) if len(o)>2 and o[0] in ('BUY_PRODUCT','BUY_ANIMAL'))
+    # Units act before market orders. Preserve the native next-turn pickup,
+    # after the current parent's actual sales/purchases, before buying tour inputs.
     available=max(0,stock.get('FERTILIZER',0))
     for o in action.get('market',[]):
         if len(o)>=3 and o[:2]==['SELL','FERTILIZER']:available=max(0,available-max(0,int(o[2])))
@@ -1648,6 +2227,7 @@ def _r51_input_control(obs,action,state):
     _R51_INPUT_REPORT['input_hire_requests']+=len(plans);_R51_INPUT_REPORT['input_purchase_requests']+=total_q+topup
     _R51_INPUT_REPORT['input_forecast_wheat']+=all_units['WHEAT'];_R51_INPUT_REPORT['input_forecast_carrot']+=all_units['CARROT']
     changed=copy.deepcopy(action);changed['market'] += [['BUY_PRODUCT','FERTILIZER',total_q+topup]]+[['HIRE'] for _ in plans];return changed
+
 def agent(observation,configuration=None):
     try:
         step=int(observation['step']);player=int(observation['player']);state=_R51_INPUT_STATES.get(player)
@@ -1665,11 +2245,15 @@ def agent(observation,configuration=None):
         return {'farmer':['PASS'],'hands':[],'market':[]}
 agent.telemetry=_R51_INPUT_REPORT
 agent=globals().pop('agent')
+
+# EXP182: project the final hour's actual worker actions before automatic deposit.
 _R51_WAREHOUSE_PARENT=agent
 _R51_WAREHOUSE_REPORT={}
+
 def _r51_close_warehouse(obs,action):
     step=int(obs['step']);day=step//24
     if step%24!=23 or not 12<=day<=28:return action
+    # No speculative product purchase/worker count model: these hours abstain.
     if any(o and o[0] not in ('SELL',) for o in action.get('market',[])):return action
     farm,private=_PLANNER_NS['_clone_state'](obs['farms'][obs['player']],obs['private'])
     commands=[action.get('farmer') or ['PASS'],*(action.get('hands') or [])]
@@ -1686,6 +2270,8 @@ def _r51_close_warehouse(obs,action):
     needed=sum(post.values())+sum(max(0,q) for inv in private['inventories'] for q in inv.values())-100
     if needed<=0:return action
     result=copy.deepcopy(action);orders=result['market']
+    # Grain and fertilizer have native input obligations; other products do not.
+    # Additional commodity sales are bounded by actual post-action physical stock.
     for item in sorted((p for p in PRODUCTS if p not in ('WHEAT','FERTILIZER')),key=lambda p:-obs['market']['prices'].get(p,0)):
         qty=min(needed,post.get(item,0))
         if not qty:continue
@@ -1704,6 +2290,7 @@ def _r51_close_warehouse(obs,action):
             if any(len(o)>1 and o[:2]==['BUY_PRODUCT','WHEAT'] for o in future.get('market',[])):break
         incoming=sum(max(0,inv.get('WHEAT',0)) for inv in private['inventories'])
         others=sum(q for p,q in post.items() if p!='WHEAT')+sum(max(0,q) for inv in private['inventories'] for p,q in inv.items() if p!='WHEAT')
+        # Even if every other carried item deposits first, this grain reserve fits.
         qty=min(needed,post.get('WHEAT',0),max(0,post.get('WHEAT',0)+incoming-reserve)) if 100-others>=reserve else 0
         existing=next((o for o in orders if len(o)>=3 and o[:2]==['SELL','WHEAT']),None)
         if qty and (existing is not None or len(orders)<10):
@@ -1713,6 +2300,7 @@ def _r51_close_warehouse(obs,action):
     _R51_WAREHOUSE_REPORT['warehouse_projected_unresolved']+=max(0,needed)
     if result!=action:_R51_WAREHOUSE_REPORT['warehouse_changed_turns']+=1
     return result
+
 def agent(observation,configuration=None):
     result=_R51_WAREHOUSE_PARENT(observation,configuration)
     try:
@@ -1722,11 +2310,14 @@ def agent(observation,configuration=None):
     _R51_WAREHOUSE_REPORT.update(getattr(_R51_WAREHOUSE_PARENT,'telemetry',{}));return result
 agent.telemetry=_R51_WAREHOUSE_REPORT
 agent=globals().pop('agent')
+
 from itertools import permutations as _r53_permutations
 _R53_LABOR_REPORT=dict(labor_requests=0,labor_hires_avoided=0,labor_spawn_errors=0,labor_confirmed=0,labor_day26=0,labor_day27=0,labor_day28=0)
+
 def _r53_labor_assignment(obs,action,fertilizer):
     step=int(obs['step']);day=step//24;farm=obs['farms'][obs['player']]
     if day not in (26,27,28) or step%24>2:return None
+    # Do not preempt a later price-gated fertilizer request with a smaller unfertilized team.
     if day==27 and not fertilizer:return None
     count=3 if fertilizer else 2
     positions=[list(farm['farmer'])]+[list(p) for p in farm['hands']]
@@ -1751,6 +2342,7 @@ def _r53_labor_assignment(obs,action,fertilizer):
     if not choices:return None
     _,_,assignment=min(choices)
     return dict(paths=assignment,spawns=spawns,remaining=remaining,workers=count,fertilizer=fertilizer)
+
 _R53_LABOR_PARENT=agent
 def agent(observation,configuration=None):
     if isinstance(observation,dict) and observation.get('step')==0:
@@ -1760,83 +2352,4 @@ def agent(observation,configuration=None):
     return result
 _R53_LABOR_COMBINED={}
 agent.telemetry=_R53_LABOR_COMBINED
-agent=globals().pop('agent')
-_V12_FINAL_PARENT=agent
-def agent(observation,configuration=None):
-    result=_V12_FINAL_PARENT(observation,configuration)
-    try:
-        if _V12_PREDUMP_STEP>=0 and _step_of(observation)==_V12_PREDUMP_STEP:
-            view=_View(observation,_int(_get(observation,'player',0)),_IMPL.chassis.cfg)
-            projected=_IMPL.chassis._projected_shed(result,view)
-            sells=[['SELL',item,int(qty)] for item,qty in sorted(projected.items(),
-                    key=lambda kv:-kv[1]*int(view.prices.get(kv[0],0))) if qty>0]
-            if sells:
-                result=copy.deepcopy(result)
-                result['market']=sells[:_IMPL.chassis.cfg['max_orders']]
-    except Exception:
-        pass
-    return result
-agent=globals().pop('agent')
-
-_V12AA_REPORT=dict(prefire_turns=0,prefire_units=0,melon_turns=0,melon_units=0,layer_errors=0)
-def _v12aa_prefire(obs,action):
-    step=int(obs['step'])
-    if step%24!=22 or not 12<=step//24<=28:return action
-    if any(o and o[0] not in ('SELL',) for o in action.get('market',[])):return action
-    native=_IMPL.chassis.players[int(obs['player'])]
-    route=2 if step+1>=648 else native['route']
-    tape=_IMPL.chassis.routes[route]
-    future=tape[step+1] if step+1<len(tape) and isinstance(tape[step+1],dict) else {}
-    farm,private=_PLANNER_NS['_clone_state'](obs['farms'][obs['player']],obs['private'])
-    day=step//24
-    for act in (action,future):
-        commands=[act.get('farmer') or ['PASS'],*(act.get('hands') or [])]
-        demand={}
-        for c in commands:
-            if len(c)>1 and c[0]=='PLANT':demand[c[1]]=demand.get(c[1],0)+1
-        blocked={k for k,q in demand.items() if q>private['seeds'].get(k,0)}
-        for actor,c in enumerate(commands[:len(private['inventories'])]):
-            if len(c)>1 and c[0]=='PLANT' and c[1] in blocked:c=['PASS']
-            _PLANNER_NS['_apply_unit_action'](farm,private,actor,c,10,day,24,100)
-    post=dict(private['shed'])
-    for src_act in (action,future):
-        for o in src_act.get('market',[]):
-            if len(o)>=3 and o[0]=='SELL':post[o[1]]=max(0,post.get(o[1],0)-max(0,int(o[2])))
-    needed=sum(post.values())+sum(max(0,q) for inv in private['inventories'] for q in inv.values())-100
-    if needed<=0:return action
-    result=copy.deepcopy(action);orders=result['market']
-    for item in sorted((p for p in PRODUCTS if p not in ('WHEAT','FERTILIZER')),key=lambda p:-obs['market']['prices'].get(p,0)):
-        qty=min(needed,post.get(item,0))
-        if not qty:continue
-        existing=next((o for o in orders if len(o)>=3 and o[:2]==['SELL',item]),None)
-        if existing is not None:existing[2]=max(0,int(existing[2]))+qty
-        elif len(orders)<10:orders.append(['SELL',item,qty])
-        else:continue
-        needed-=qty;post[item]-=qty;_V12AA_REPORT['prefire_units']+=qty
-        if needed<=0:break
-    if result!=action:_V12AA_REPORT['prefire_turns']+=1
-    return result
-def _v12aa_melon(obs,action):
-    step=int(obs['step'])
-    if step%24<14 or step>=712:return action
-    if not isinstance(action,dict):return action
-    if any(len(o)>=3 and o[:2]==['SELL','MELON'] for o in action.get('market',[])):return action
-    view=_View(obs,int(obs.get('player',0)),_IMPL.chassis.cfg)
-    stock=int(view.shed.get('MELON',0) or 0)
-    if stock<=0 or view.prices.get('MELON',0)<2:return action
-    result=copy.deepcopy(action)
-    result.setdefault('market',[]).append(['SELL','MELON',stock])
-    _V12AA_REPORT['melon_turns']+=1;_V12AA_REPORT['melon_units']+=stock
-    return result
-_V12AA_PARENT=agent
-def agent(observation,configuration=None):
-    result=_V12AA_PARENT(observation,configuration)
-    try:
-        if isinstance(observation,dict) and int(observation.get('step',0))==0:
-            _V12AA_REPORT.update(prefire_turns=0,prefire_units=0,melon_turns=0,melon_units=0,layer_errors=0)
-        result=_v12aa_prefire(observation,result)
-        result=_v12aa_melon(observation,result)
-    except Exception:
-        _V12AA_REPORT['layer_errors']+=1
-    return result
 agent=globals().pop('agent')

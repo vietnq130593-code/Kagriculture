@@ -1075,7 +1075,7 @@ def _v231_controller(obs,action,state,cap):
     if (216<=step<=227 and len(shops)>=3 and state['confirmed']<cap and not state['reserved']
             and not any(state['carrying'].values()) and not state['pending_places']
             and not cargo and not stock_animals and len(animal_orders)==1
-            and animal_orders[0][1]=='SHEEP' and milk_shops>=3 and 'YARN_STORE' not in shops
+            and animal_orders[0][1]=='SHEEP' and milk_shops>=2 and 'YARN_STORE' not in shops
             and int(prices.get('MILK',0))>=int(prices.get('WOOL',0))
             and counts['COW']>=4 and counts['SHEEP']>=2):
         order=animal_orders[0];quantity=int(order[2])
@@ -1775,68 +1775,5 @@ def agent(observation,configuration=None):
                 result['market']=sells[:_IMPL.chassis.cfg['max_orders']]
     except Exception:
         pass
-    return result
-agent=globals().pop('agent')
-
-_V12AA_REPORT=dict(prefire_turns=0,prefire_units=0,melon_turns=0,melon_units=0,layer_errors=0)
-def _v12aa_prefire(obs,action):
-    step=int(obs['step'])
-    if step%24!=22 or not 12<=step//24<=28:return action
-    if any(o and o[0] not in ('SELL',) for o in action.get('market',[])):return action
-    native=_IMPL.chassis.players[int(obs['player'])]
-    route=2 if step+1>=648 else native['route']
-    tape=_IMPL.chassis.routes[route]
-    future=tape[step+1] if step+1<len(tape) and isinstance(tape[step+1],dict) else {}
-    farm,private=_PLANNER_NS['_clone_state'](obs['farms'][obs['player']],obs['private'])
-    day=step//24
-    for act in (action,future):
-        commands=[act.get('farmer') or ['PASS'],*(act.get('hands') or [])]
-        demand={}
-        for c in commands:
-            if len(c)>1 and c[0]=='PLANT':demand[c[1]]=demand.get(c[1],0)+1
-        blocked={k for k,q in demand.items() if q>private['seeds'].get(k,0)}
-        for actor,c in enumerate(commands[:len(private['inventories'])]):
-            if len(c)>1 and c[0]=='PLANT' and c[1] in blocked:c=['PASS']
-            _PLANNER_NS['_apply_unit_action'](farm,private,actor,c,10,day,24,100)
-    post=dict(private['shed'])
-    for src_act in (action,future):
-        for o in src_act.get('market',[]):
-            if len(o)>=3 and o[0]=='SELL':post[o[1]]=max(0,post.get(o[1],0)-max(0,int(o[2])))
-    needed=sum(post.values())+sum(max(0,q) for inv in private['inventories'] for q in inv.values())-100
-    if needed<=0:return action
-    result=copy.deepcopy(action);orders=result['market']
-    for item in sorted((p for p in PRODUCTS if p not in ('WHEAT','FERTILIZER')),key=lambda p:-obs['market']['prices'].get(p,0)):
-        qty=min(needed,post.get(item,0))
-        if not qty:continue
-        existing=next((o for o in orders if len(o)>=3 and o[:2]==['SELL',item]),None)
-        if existing is not None:existing[2]=max(0,int(existing[2]))+qty
-        elif len(orders)<10:orders.append(['SELL',item,qty])
-        else:continue
-        needed-=qty;post[item]-=qty;_V12AA_REPORT['prefire_units']+=qty
-        if needed<=0:break
-    if result!=action:_V12AA_REPORT['prefire_turns']+=1
-    return result
-def _v12aa_melon(obs,action):
-    step=int(obs['step'])
-    if step%24<14 or step>=712:return action
-    if not isinstance(action,dict):return action
-    if any(len(o)>=3 and o[:2]==['SELL','MELON'] for o in action.get('market',[])):return action
-    view=_View(obs,int(obs.get('player',0)),_IMPL.chassis.cfg)
-    stock=int(view.shed.get('MELON',0) or 0)
-    if stock<=0 or view.prices.get('MELON',0)<2:return action
-    result=copy.deepcopy(action)
-    result.setdefault('market',[]).append(['SELL','MELON',stock])
-    _V12AA_REPORT['melon_turns']+=1;_V12AA_REPORT['melon_units']+=stock
-    return result
-_V12AA_PARENT=agent
-def agent(observation,configuration=None):
-    result=_V12AA_PARENT(observation,configuration)
-    try:
-        if isinstance(observation,dict) and int(observation.get('step',0))==0:
-            _V12AA_REPORT.update(prefire_turns=0,prefire_units=0,melon_turns=0,melon_units=0,layer_errors=0)
-        result=_v12aa_prefire(observation,result)
-        result=_v12aa_melon(observation,result)
-    except Exception:
-        _V12AA_REPORT['layer_errors']+=1
     return result
 agent=globals().pop('agent')

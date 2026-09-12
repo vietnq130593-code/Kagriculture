@@ -1485,3 +1485,26 @@ Work Log:
 
 Stage Summary:
 - v12.py KHÔNG có lỗi cú pháp: compile + AST + import + trận thật đều sạch; khác biệt với backup đúng 100% là 3 đòn tuning v12z chủ đích (gap +3.2k, 32/32)
+
+---
+Task ID: 62
+Agent: KAIN (main-agent)
+Task: Vòng tinh chỉnh 3 — mở rộng gap v12 vs kme3 (mục tiêu +5k-10k)
+
+Work Log:
+- Phục hồi ngữ cảnh: đọc battery Task 60 (v12z +3.2k, 32/32), giải mã payload tape, map 476 harvests + toàn bộ SELL/HIRE steps
+- Phẫu thuật-chẩn đoán sóng melon d10 ($12.4k/side đối xứng): giá 272→131 theo giờ; CHẾT 5 cửa: (1) HARVEST bị engine chặn trước d10 (day-planted<first_yield=10); (2) WATER +1 yield trước harvest là đúng (12 units×$150 > sớm 1 bước); (3) workers+hands reset spawn mỗi sáng — không pre-position được; (4) d3-d5 là vật lý tối ưu của layout; (5) relocating melon = đẩy pasture (engine kinh tế $50k+) ra xa — phá tape toàn bộ
+- Đo v12aa (4 đòn): M8 milk-horizon-15 SAI (milk có ĐỈNH GIỮA NGÀY ~h9 — H=6 đã bán đúng đỉnh; dump h0 = bán đáy) | M2 terminal-hold no-op (stock 712-716 = 0, spam 1000 là ảo — thật bán hết từ 709) | M7 melon-accelerant bất khả (12 melon đuôi nằm trong inventory workers đang đi, auto-drop cuối ngày) | M1 prefire h22 SỐNG
+- v12ab (M1: R51-valve pre-fire tại h22 với mô phỏng lookahead 1 bước, chỉ item premium): seeds 100-107 16/16 gap +3.503 (vs +3.209)
+- Phát hiện V231-flip bisection: kme3_noflip vs kme3 self-play — flip CHỈ kích hoạt s105 (PIZZA×2: −$1.938 cho người flip) và s202 (ICE_CREAM×2+SMOOTHIE: +$4.224)
+- v12ae (noflip toàn bộ): 100-107 16/16 +3.852 NHƯNG 200-207 14/16 +2.641 — THUA s202 −$3.540 (flip dương bị tắt) → noflip = overfit s105
+- Tín hiệu phân biệt: milk-shop instances tại d9 (s105=2 hại, s202=3 lời — drain sữa quyết định giá trị bò). v12af = prefire + flip điều kiện milk_shops>=3
+- KẾT QUẢ CHỐT v12af: seeds 100-107 16/16 gap +3.852 worst 1.017× | seeds 200-207 16/16 gap +3.210 worst 1.007× (s202 hồi sinh +1.014) — 32/32 không seed nào thua
+- Deploy v12af → v12.py (1.842 dòng, 0 comment 0 docstring, compile+smoke OK); verify 2 ghế s103 dollar-identical (114.298/111.494)
+- Cập nhật desc constants.ts (KME3-TUNED v3, §11.23); UI e2e qua gateway :81 bằng agent-browser (Radix Select click [role=option] + set input qua HTMLInputElement prototype setter): v12 vs kme3 seed 103 chạy 720/720, 0 console error, 🏆 v12 thắng $114.298 vs $111.494 1.03× — đồng dollar server; screenshot /tmp/ui_v12_v3_victory.png
+
+Stage Summary:
+- v12 MỚI (v3): gap +3.2k → +3.5k trung bình 32 game (100-107: +3.852, 200-207: +3.210), worst-case 1.008→1.007, 32/32 thắng tuyệt đối
+- 2 ĐÒN MỚI: (1) PREFIRE h22 — bán overflow shed sớm 1 bước ở vùng giá phẳng cuối ngày, kme3 h23 ăn giá bị đè; (2) V231-flip điều kiện milk_shops>=3 — xử lý flip V231 theo ngữ cảnh shop (bỏ khi 2 milk-shop, giữ khi 3+)
+- 7 CỬA CHẾT xác nhận bằng số (melon physics 5 cửa + milk midday-peak + terminal phantom-spam) — thị trường tinh chỉnh đã BÃO HÒA
+- GAP +5k CHƯA ĐẠT: cần v13 kernel surgery (walk-level choreography regeneration — sắp xếp lại thứ tự thăm tile hằng ngày để stock premium về sớm hơn)

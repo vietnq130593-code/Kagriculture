@@ -1075,8 +1075,8 @@ def _v231_controller(obs,action,state,cap):
     if (216<=step<=227 and len(shops)>=3 and state['confirmed']<cap and not state['reserved']
             and not any(state['carrying'].values()) and not state['pending_places']
             and not cargo and not stock_animals and len(animal_orders)==1
-            and animal_orders[0][1]=='SHEEP' and milk_shops>=3 and 'YARN_STORE' not in shops
-            and int(prices.get('MILK',0))>=int(prices.get('WOOL',0))
+            and animal_orders[0][1]=='SHEEP' and milk_shops>=2 and 'YARN_STORE' not in shops
+            and int(prices.get('MILK',0))>=int(prices.get('WOOL',0))+99999
             and counts['COW']>=4 and counts['SHEEP']>=2):
         order=animal_orders[0];quantity=int(order[2])
         if 1<=quantity<=2 and quantity<=cap-state['confirmed']:

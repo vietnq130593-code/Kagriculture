@@ -1075,7 +1075,7 @@ def _v231_controller(obs,action,state,cap):
     if (216<=step<=227 and len(shops)>=3 and state['confirmed']<cap and not state['reserved']
             and not any(state['carrying'].values()) and not state['pending_places']
             and not cargo and not stock_animals and len(animal_orders)==1
-            and animal_orders[0][1]=='SHEEP' and milk_shops>=3 and 'YARN_STORE' not in shops
+            and animal_orders[0][1]=='SHEEP' and milk_shops>=2 and 'YARN_STORE' not in shops
             and int(prices.get('MILK',0))>=int(prices.get('WOOL',0))
             and counts['COW']>=4 and counts['SHEEP']>=2):
         order=animal_orders[0];quantity=int(order[2])
@@ -1778,7 +1778,7 @@ def agent(observation,configuration=None):
     return result
 agent=globals().pop('agent')
 
-_V12AA_REPORT=dict(prefire_turns=0,prefire_units=0,melon_turns=0,melon_units=0,layer_errors=0)
+_V12AA_REPORT=dict(prefire_turns=0,prefire_units=0,melon_turns=0,melon_units=0,held_turns=0,held_units=0,layer_errors=0)
 def _v12aa_prefire(obs,action):
     step=int(obs['step'])
     if step%24!=22 or not 12<=step//24<=28:return action
@@ -1816,6 +1816,30 @@ def _v12aa_prefire(obs,action):
         if needed<=0:break
     if result!=action:_V12AA_REPORT['prefire_turns']+=1
     return result
+
+_V12AA_PRICE_HIST={}
+def _v12aa_terminal_hold(obs,action):
+    step=int(obs['step'])
+    if not 700<=step<=716:return action
+    player=int(obs['player'])
+    prices=(obs.get('market') or {}).get('prices') or {}
+    hist=_V12AA_PRICE_HIST.setdefault(player,{})
+    hist[step]={k:int(v) for k,v in prices.items()}
+    if not 712<=step<=716:return action
+    prior=hist.get(step-4)
+    if not prior or not isinstance(action,dict):return action
+    market=action.get('market')
+    if not market or not any(len(o)>=3 and o[0]=='SELL' for o in market):return action
+    keep=[];held=0
+    for o in market:
+        if len(o)>=3 and o[0]=='SELL' and prior.get(o[1],0)>0 and int(prices.get(o[1],0))>prior[o[1]]:
+            held+=max(0,int(o[2]));continue
+        keep.append(o)
+    if held:
+        action=copy.deepcopy(action);action['market']=keep
+        _V12AA_REPORT['held_turns']=_V12AA_REPORT.get('held_turns',0)+1
+        _V12AA_REPORT['held_units']=_V12AA_REPORT.get('held_units',0)+held
+    return action
 def _v12aa_melon(obs,action):
     step=int(obs['step'])
     if step%24<14 or step>=712:return action
@@ -1833,10 +1857,24 @@ def agent(observation,configuration=None):
     result=_V12AA_PARENT(observation,configuration)
     try:
         if isinstance(observation,dict) and int(observation.get('step',0))==0:
-            _V12AA_REPORT.update(prefire_turns=0,prefire_units=0,melon_turns=0,melon_units=0,layer_errors=0)
+            _V12AA_REPORT.update(prefire_turns=0,prefire_units=0,melon_turns=0,melon_units=0,held_turns=0,held_units=0,layer_errors=0)
+            _V12AA_PRICE_HIST.clear()
         result=_v12aa_prefire(observation,result)
+        result=_v12aa_terminal_hold(observation,result)
         result=_v12aa_melon(observation,result)
     except Exception:
         _V12AA_REPORT['layer_errors']+=1
     return result
 agent=globals().pop('agent')
+
+def _arena_diag(obs):
+    d = dict(_V12AA_REPORT)
+    try:
+        step = int(obs.get('step', -1))
+        if 240 <= step <= 270:
+            d['melon_shed'] = int((obs.get('private') or {}).get('shed', {}).get('MELON', 0))
+            d['melon_price'] = int((obs.get('market') or {}).get('prices', {}).get('MELON', 0))
+        d['step'] = step
+    except Exception:
+        pass
+    return d
