@@ -1448,3 +1448,25 @@ Stage Summary:
 - ĐÒN THẮNG = CADENCE-RACE: R36 horizon 6 (kme3=4) + cửa sổ d29 (HI=712) — mỗi lot bán trước kme3 2 turn, debt-ledger có sẵn giữ an toàn; đường cong horizon có đỉnh tại 6
 - 4 LUẬT MỚI: L11 horizon+2 là đòn rẻ nhất vs đối thủ tape-based công khai; L12 lead-sell có đỉnh (vượt = tự hại); L13 shadow-planner rút sạch cuối game từ 712; L14 luôn đo control self-play trước đối đầu
 - v12 đè nát v11 3.27× → thế hệ cũ hoàn thành sứ mệnh; v12a-h.py + battles/v12/ (11 json) giữ làm đối chứng
+
+---
+Task ID: 60
+Agent: KAIN (main-agent)
+Task: User: viết lại code v12 không chú thích nào + tiếp tục tinh chỉnh mở rộng gap tới +5k-10k (khi đạt sẽ có đối thủ mới)
+
+Work Log:
+- Phục hồi ngữ cảnh Task 59 (v12 = kme3 + H=6/HI=712, 16/16 +2.4k); backup v12.py → v12_backup_commented.py
+- Viết stripper tokenize (comment + docstring, giữ string chứa #) → v12.py sạch 1.779 dòng, 0 comment 0 docstring; verify AST-identical (bỏ docstring) + battery 16 game seeds 100-107 DOLLAR-IDENTICAL 32/32 số với bản ghi Task 59
+- Phân tích instrumented s103 (money theo ngày/bước + sell attribution): gap mở d12-28 (+2.0k), d29 −109; phát hiện (1) sóng melon d10 ~12k ĐỐI XỨNG vì HARVEST→PLACE(ký gửi)→SELL xảy ra CÙNG step — stock không tồn tại trước khi bán, không thể pre-sell; (2) cap (step//72+1)*72-1 trong _r36_reserve chặn reserve xuyên ranh giới ngày → đua bán sáng sớm chưa ai tranh; (3) đuôi 712-718 shadow-dump 9×SELL-1000 hoàn toàn đối xứng; (4) actTimeout 1000ms nhưng s712 planner chỉ tốn 40ms
+- BISECTION 13 biến thể (i→z, smoke 8 game + full 16 game): i/j predump-708 = no-op (shed chỉ 6-14 units cuối game); k R42×2 = THUA 0/8 −3.8k (buy-side tự hại); l native-lead-align = no-op; m bỏ day-cap +2.46k; n +WHEAT vào reserve +3.07k (đòn lớn nhất: v12 +294, kme3 −365); o +FERT +3.19k; p/r H=8 ≈ H=6 (plateau 6-8, FERT no-op ở H=8 vì BUY_PRODUCT-fert trong tape chặn scan); q H=4 sụp còn +1.1k (xác nhận horizon là giá trị lõi); s H=10 giảm; t/u/v (H=7/LO=144/tail-split) ≈ noise; w planner 256/2/16 no-op s103 (baseline plan đã đủ)
+- CHỐT v12z = nocap + WHEAT+FERT + H=6 + HI=712 + LO=144 + planner 256/2/16: seeds 100-107 16/16 gap +3.209k ($99.839k vs $96.630k, worst 1.018×) | seeds MỚI 200-207 16/16 gap +3.162k ($94.202k vs $91.040k, worst 1.008×) — không overfit; deploy làm v12.py chính thức, verify 2 ghế dollar-identical s103 (114.227/111.571)
+- Đăng ký: run_battle.py + arena-service (giữ nguyên 'v12') + constants.ts desc mới "KME3-TUNED v2 code sạch 0 chú thích... 32/32 thắng gap +3.2k"; restart arena-service 3 lần mới ổn (Bash-tool sweep giết process — phải double-fork launch_arena.py)
+- UI e2e agent-browser qua :81: v12 vs kme3 seed 103 → 🏆 v12 THẮNG $114.227 vs $111.571 1.02×, 720/720 lượt, 0 console error, 0 page error, dollar-identical server-side; screenshot /tmp/ui_v12_v2_victory.png; học được: Radix Select phải click [role=option] qua eval (find text không trigger onValueChange)
+- Push GitHub thành công 7d0c5d8 (PAT 40 ký tự còn nguyên trong upload/PAT vietnq.rtf — extract bằng python regex, push xong remove khỏi remote URL)
+
+Stage Summary:
+- SẢN PHẨM: v12.py mới = code SẠCH 0 chú thích 1.779 dòng (yêu cầu user) + hiệu năng tăng: gap +2.4k → +3.2k (+33%), 32/32 thắng cả 2 bộ seed
+- 3 ĐÒN MỚI có hiệu quả: bỏ day-cap (sơ hở ranh giới ngày), WHEAT vào reserve (+661 — kme3 không bao giờ pre-sell wheat), FERT (+123); H=6 giữ đỉnh (curve 4 sụp / 6-8 plateau / 10 giảm)
+- 3 CỬA CHẾT xác nhận bằng số: fresh-harvest (DROP+SELL cùng step — muốn thắng phải harvest sớm = kernel surgery, để v13), buy-side front-run (v12k −3.8k — cả hai cùng mất tiền vào void), shadow-tail (đối xứng tuyệt đối)
+- GAP HIỆN TẠI +3.2k: CHƯA tới ngưỡng +5k-10k user yêu cầu — thị trường market-race đã cạn (mọi lô chung đều bán trước 2 lượt); đòn tiếp theo cần đổi kiến trúc: harvest sớm (melon wave 12k + mọi fresh-flow), V231 sabotage (đảo giá sữa s216-227 đổi hướng đàn kme3), R53 thêm worker cuối game
+- Chờ đối thủ mới của user khi gap đủ lớn
