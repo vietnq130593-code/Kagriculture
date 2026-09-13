@@ -1902,3 +1902,21 @@ Stage Summary:
 - 5 PHÁT HIỆN LỚN: (1) meta collapse quanh 1C4S-HIRE4, edge = continuation+market — đúng hướng ta đi; (2) 3 bolt-on rẻ nhất cho v15: town-demand gate + debt-ledger + mega-SELL/dead_stock; (3) Kaito Conditional Memory 177/180 = upgrade trực tiếp tầng front_run; (4) guruprasaathas V39 mới hơn kme3v10 — PHẢI build kme3v39 + kawashigi + indark_e776 vào battery; (5) router steering = lớp tấn công mới (thao túng public state mà router đối thủ đọc)
 - KẾ HOẠCH 12 HƯỚNG 3 TIER trong 03_BREAKTHROUGH_PLAN.md: Tier1 (H1-H4 bolt-on ~50 dòng) → Tier2 (H5 memory, H6 steering, H7 impact model, H8 tie-break, H9 contested ranking) → Tier3 (H10 đối thủ mới, H11 daily-replay refresh pipeline, H12 hour-0 audit); mỗi hướng có gate battery cụ thể
 - SẴN SÀNG TRIỂN KHAI: unpacked/ có sẵn main.py của mọi đối thủ mới (kme3v39, kawashigi, indark_e776) — Task sau chỉ cần đăng ký 3 tầng + battery
+
+---
+Task ID: 74-R (review)
+Agent: Ari (main-agent)
+Task: User yêu cầu review lại toàn bộ bộ tài liệu nghiên cứu Kaggle đã triển khai (Task 74) và báo cáo
+
+Work Log:
+- Đọc toàn bộ 9 file trong kaggriculture/research/ (4 master: 00_README/01_LANDSCAPE/02_TECHNIQUES/03_PLAN + 5 ANALYSIS deep-dive, tổng 1.761 dòng)
+- Kiểm chứng artifact: kaggle_dl 29MB (34 notebook extract .py + _md.txt + 13 list JSON votes/recent + unpacked 13 agent .py + indarkarhana 13-file tree + kaito_extracted v20/v21.1/v43/v48)
+- Kiểm chứng định lượng chéo: v15 battery t73_*.json (40/40 + 10/10 hòa exact-tie từng dollar, gap +$3.211-4.063) — khớp claim trong 00_README/01; _sell_lead của v15 đúng như tài liệu mô tả (chỉ gate step%4==0, chưa có town-demand gate); _V14_SHOP_ROUTE 15 cặp shop ≡ SHOP_PLANS yhay (xác nhận lineage); 493 unique notebook qua 10 trang list_votes
+- Kiểm chứng git: remote GitHub main = e456a34 (Task 74 đã push, verify bằng ls-remote; local origin/main ref stale ở Task 16 chỉ vì push bằng URL trực tiếp)
+- PHÁT HIỆN: thư mục upload/ bị sandbox reset — 5 file replay gốc (3 trận thua + 107559251/107573831) đã mất khỏi đĩa; toàn bộ phân tích phái sinh còn nguyên (TOP3_REPLAY_ANALYSIS.md 145KB + t71_autopsy/godsync JSON)
+- Ghi chú nhỏ: commit message ghi "8 file" nhưng thực tế 9 file docs (lỗi đếm vô hại); 02 A2 câu "_SHOP_PRODUCTS = R41 ta đã có" chỉ đúng ở mức tri thức RULES.md, v15.py chưa có code mapping này (0 occurrences)
+
+Stage Summary:
+- Bộ tài liệu HOÀN CHỈNH và NHẤT QUÁN: mọi claim định lượng quan trọng đều verify PASS so với dữ liệu thực (battery, code, API list, git)
+- 1 rủi ro dữ liệu: replay gốc mất khỏi đĩa → H5 (conditional memory) nếu cần raw data phải kéo lại qua KGAT token (plan đã có fallback này); phân tích phái sinh an toàn
+- Sẵn sàng bước tiếp theo: H10 build 3 đối thủ mới (kme3v39/kawashigi/indark_e776 — source đã giải nén sẵn trong unpacked/) rồi mới tới Tier-1 bolt-on (H1→H2→H3)
