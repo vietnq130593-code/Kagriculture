@@ -31,8 +31,8 @@ const RUNNER = '/home/z/my-project/kaggriculture/arena/run_battle.py'
 const BATTLE_DIR = '/home/z/my-project/kaggriculture/battles'
 const PYTHON = 'python3'
 
-// Task 69: v14 (ARI CLASS) registered as new champion; v13 kept as previous champion
-const AGENTS = ['v14', 'v13', 'kme3', 'kme3v10', 'aurax']
+// Task 69: v14 (ARI CLASS) registered; Task 73: v15 (ARI CLASS Mk-II — R90 watchdog) new champion
+const AGENTS = ['v15', 'v14', 'v13', 'kme3', 'kme3v10', 'aurax']
 
 mkdirSync(BATTLE_DIR, { recursive: true })
 

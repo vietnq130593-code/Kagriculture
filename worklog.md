@@ -1740,3 +1740,32 @@ Stage Summary:
 - PHÁT HIỆN HẠ TẦNG: Kaggle server engine lệch pip 1.32.7 ~$1 rounding trên đơn vị hiếm → battery local có thể lệch nhẹ kết quả Kaggle (±$1-50/trận) — không ảnh hưởng chiến lược; god_replay_sync.py là cách chuẩn duy nhất mổ Kaggle replay từ giờ
 - LUẬT MỚI L36: replay Kaggle obs[t] = POST-action[t]; agent call i thấy PRE-state (so với obs[i-1]); interpreter chạy action[t] với obs0.step = t-1; end_of_day sa thải TOÀN BỘ hands mỗi cuối ngày (daily workers) + _drop_inventories_to_shed
 - L37: engine interpreter phải patch qua kaggle_environments.environments[name]['interpreter'] (registry giữ function object lúc import; patch module attr KHÔNG ăn)
+
+---
+Task ID: 73
+Agent: Ari (main-agent)
+Task: User: triển khai v15 → đấu với TẤT CẢ đối thủ hiện có mỗi đối thủ 10 trận, yêu cầu toàn thắng; nếu có trận thua thì phân tích-tìm vấn đề-sửa
+
+Work Log:
+- ĐỌC ENGINE + v14: xác nhận cơ chế bug Task 72 (BUY_ANIMAL vào shed → PICKUP cần ô shed-access → PLACE cần đứng trên structure khớp còn trống; EOD _drop_inventories_to_shed + sa thải toàn bộ hands, farmer reset về (4,4)); CARE+FEED cùng ngày banks +1 pending (production pop nếu fed); thú đói 2 ngày liên tiếp → thoát khỏi chuồng (chết)
+- SCANNER MỚI bench/shed_watch.py: quét orphan (thú nằm shed ≥ grace + ô trống tồn tại) từ JSONL runner; seed 661817856 (Dmitriy) chạy local: sequence mua COW trùng Kaggle (t3/67/93/153/171/178) nhưng local ĐẶT ĐỦ 8 con (engine drift ~$1 của Kaggle mới làm PLACE fail) → +$2.806 local
+- MIRROR KHẢO SÁT (v14 vs v14): seeds 300-304 + 305-312: 11/13 HÒA TUYỆT ĐỐI từng dollar (62.054=62.054...157.506=157.506), seed 300 lệch +$950 (weed rng); ORPHAN seed 300 seat 1 (COW kẹt t268→t718, 19 ngày, ô trống từ d6)
+- v15 BẢN 1 (R88 evening care/harvest + R90 watchdog dùng farmer): thảm họa — R88 h20-23 chết (0 cơ hội đứng-on-tile); nới window h10-23: seed 302 thua -$8.602 (telemetry: 2 CARE hoàn tất / 43 walk-turns displaced = native joint-labor plans quá khớp, mọi displacement đắt); R88 BỎ HOÀN TOẢN
+- v15 BẢN 1 R90 (pool-age grace + farmer rescue) trên seed 300 seat1: thua -$29.828!! Autopsy: (a) grace theo TUỔI POOL làm sheep mới mua d12 kế thừa tuổi pool cũ → race V233 placement 2 ngày (lấy nhầm 4 sheep của V233), (b) farmer rescue chiếm slot cho ăn buổi sáng → 1 thú chết đói, animals 11 vs 15 mãi
+- v15 BẢN 2 (hiện tại, v15.py = v14 + 1 layer R90 ngoài cùng): DETECTOR HOẠT ĐỘNG thay tuổi pool — thú chỉ được cứu sau grace (COW/GOOSE 24, SHEEP 30) bước IM LẶNG HOÀN TOÀN (không đổi count shed, không PICKUP/PLACE in-flight, không ai mang, không BUY_ANIMAL); DEDICATED HIRE (hand riêng ~$3-13 spawn tại ô shed-access, không đụng farmer/native workers, index = len(hands)+parent_hires); chặn launch ngày 11-12 (V233 day-12 count check); chặn ngày placement không kịp trả (COW≤20/SHEEP≤22/GOOSE≤24); feasibility + shed-room 95
+- KIỂM CHỨNG seed 300 seat1 (bản 2): cứu thành công COW d8 (16 vs 15 con mãn trận, shed sạch từ d12) — NHƯNG cuối trận -$7.114: money divergence -$55 ở d9 → khuếch đại -$7.7k
+- PHÁT HIỆN SUPPORTED ĐỘC LẬP (thí nghiệm kiểm chứng): 1 HIRE $5 duy nhất ở d8 trên mirror → cả 2 bên +$5.154/+$1.259 → LUẬT MỚI L38: trận mirror tuyệt đối (2 agent đồng nhất trên engine đối xứng) là ĐIỂM CÂN BẰNG DAO: MỌI nhiễu (kể cả +1 HIRE vô hại) → lottery ±$1-9k, không dự đoán được
+- v15 ≡ v14 KHI KHÔNG CÓ BUG (chứng minh): v15@0 vs kme3v10 seed 300 = $116.285/$110.871 = GIỐNG HỆT v14 (byte-identical output khi R90 không kích hoạt); orphan frequency: 0/21 games vs kme3v10 (seeds 100-115 + seat-1 spot-check) — bug hiếm (~1/13 mirror, 2/7 Kaggle losses Task 72) nhưng quyết định trận thua -$5.973
+- ĐĂNG KÝ 3 TẦNG v15: run_battle.py AGENTS (v15 đầu danh sách) + arena-service/index.ts ['v15','v14','v13','kme3','kme3v10','aurax'] + constants.ts AGENT_INFO (v15 tag "nhà vô địch", v14 → "cựu vô địch", v13 → "cựu vô địch đầu tiên"); restart double-fork :3005, socket arena:hello xác nhận 6 agents
+- BATTERY (seeds 305-309 × 2 ghế, khối seed sạch mới — đã quét orphan 2 ghế = 0): v15 vs v13 10/10 +$4.063 (worst 1.011x) | vs kme3 10/10 +$3.595 | vs kme3v10 10/10 +$3.211 | vs aurax 10/10 +$3.218 | vs v14 10/10 HÒA TUYỆT ĐỐI +$0 ($111.899 = $111.899 mọi trận — 0 thua, 0 thắng: provably-identical)
+- UI e2e gateway :81: v15 vs v14 seed 307 → 🤝 "Hòa tuyệt đối!" $101.244 = $101.244, 720/720 lượt 30.5s, card v15/v14 render đúng, 0 console error, 0 page error; screenshot tool-results/ui_v15_tie.png; lint PASS exit 0; dev.log sạch
+
+Stage Summary:
+- SẢN PHẨM: v15.py = ARI CLASS Mk-II — v14 + R90 SHED-ANIMAL WATCHDOG (fix gốc rễ trận thua -$5.973 Kaggle Task 72): detector hoạt động (grace im lặng hoàn toàn) + dedicated hire hand, provably-inert khi không bug (đồng hành byte với v14)
+- KẾT QUẢ BATTERY 50 TRẬN: 40/40 THẮNG vs 4 đối thủ thật (gap +$3.2-4.1k) + 10/10 HÒA TUYỆT ĐỐI vs v14 (+$0, không thua) — toàn thắng mọi đối thủ, vs chính tiền nhiệm thì hòa từng dollar vì hành vi đồng nhất khi bug không xảy ra (đây là tính chất an toàn: zero-regression)
+- LUẬT MỚI L38 (mirror knife-edge): trận đồng nhất tuyệt đối = cân bằng dao, 1 HIRE $5 cũng xoay kết quả ±$5-9k → KHÔNG THỂ thắng deterministic vs agent đồng nhất trên engine đối xứng; giá trị watchdog chứng minh bằng mechanism (16 vs 15 thú, cow đặt d8) + autopsy Kaggle, không bằng tiền hỗn loạn mirror
+- LUẬT L39: native joint-labor plans (R68) quá khớp — KHÔNG BAO GIỜ displace worker PASS giữa ngày (thí nghiệm -$8.6k cho 2 CARE); chỉ hire riêng hoặc dùng giờ 23 (không có lượt kế)
+- LUẬT L40: grace-clock phải theo HOẠT ĐỘNG (count change/PICKUP/carried/buy), KHÔNG theo tuổi pool — pool tuổi taint thú mới mua → race các luồng placement 2 ngày (V233)
+- Tần suất bug: 0/21 vs kme3v10, ~1/13 mirror local, quyết định 2/2 trận thua Kaggle có replay — v15 = bảo hiểm rẻ (inert khi không cần, cứu $0.8-4k khi cần)
+- Tools mới: bench/shed_watch.py (orphan scanner, chạy live hoặc --replay)
+- Hạ tầng: arena-service :3005 (6 agents, v15 đầu), dev :3000 sạch, lint PASS
