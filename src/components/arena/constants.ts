@@ -103,6 +103,7 @@ export const AGENT_INFO: AgentDesc[] = [
   { name: 'kme3', desc: 'MASTER ENGINE V3 (guruprasaathas111, Kaggle public, Apache 2.0) — route-tape 719-turn + 20 lớp overlay, Public Score 600 · tự đấu hòa tuyệt đối · bị v12/v13 vượt 16/16 (chi tiết §11.21-23)', tag: 'đối thủ chuẩn' },
   { name: 'dra', desc: 'DYNAMIC ROUTE AGENT (Reyhan Ksatria, Kaggle public) — đã kiểm tra MD5: GIỐNG HỆT kme3 từng byte (fork không đổi code; self-play hòa tuyệt đối từng đồng). Đối thủ thứ hai user chỉ định — v13 thắng 32/32 (chi tiết §11.24)', tag: 'đối thủ mới' },
   { name: 'kme3v10', desc: 'MASTER ENGINE V3 — PHIÊN BẢN 10 (guruprasaathas111, Kaggle public, cập nhật 2026-09-13) — code KHÁC kme3 (v9) lẫn dra: MD5 4593a884…, 2.626 dòng (+270): R51 beam-search input-path (width 8), R68 joint multi-worker plans, R62 deterministic HIRE spawn, R70/R79 fertilizer adaptive (bỏ qty cố định 10 / giá ≤30), EXP193 · chi tiết §11.25', tag: 'đối thủ mới v10' },
+  { name: 'aurax', desc: 'SHOP-ROUTER REACTIVE V4 (aurax7, Kaggle public, version 3, pull 2026-09-13) — code KHÁC kme3/dra lẫn kme3v10: MD5 8230b5a9…, 2.766 dòng (+140): R36 sale-lead window mở sớm hơn (day 9 thay vì day 12), R60 SURVIVAL — lớp cứu hộ giờ 22 FEED động vật sắp chết đói 2 ngày liền (tránh mất $300-500/con), R60 opening liquidity guard (giữ $4 thuê lao động ngày 1) · chi tiết §11.26', tag: 'đối thủ mới aurax' },
 ]
 
 export const SPEED_OPTIONS: { value: number; label: string }[] = [

@@ -43,6 +43,7 @@ AGENTS = {
     "dra": (os.path.join(ROOT, "dra.py"), "agent"),
     "v13": (os.path.join(ROOT, "v13.py"), "agent"),
     "kme3v10": (os.path.join(ROOT, "kme3v10.py"), "agent"),
+    "aurax": (os.path.join(ROOT, "aurax.py"), "agent"),
 }
 
 
