@@ -32,7 +32,9 @@ const BATTLE_DIR = '/home/z/my-project/kaggriculture/battles'
 const PYTHON = 'python3'
 
 // Task 69: v14 (ARI CLASS) registered; Task 73: v15 (ARI CLASS Mk-II — R90 watchdog) new champion
-const AGENTS = ['v15', 'v14', 'v13', 'kme3', 'kme3v10', 'aurax']
+// Task 75 / H10: 3 doi thu moi tu Kaggle research — kme3v39 (V39 = kme3v10+R88/R95/R97),
+// kawashigi (tetsutani BL-Kawashigi-V19Core), indark_e776 (Kenjo medoid + guard chain E749-E776)
+const AGENTS = ['v16', 'v15', 'v14', 'v13', 'kme3', 'kme3v10', 'aurax', 'kme3v39', 'kawashigi', 'indark_e776']
 
 mkdirSync(BATTLE_DIR, { recursive: true })
 

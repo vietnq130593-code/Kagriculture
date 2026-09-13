@@ -41,12 +41,18 @@ sys.path.insert(0, BENCH)
 # Task 69: v14 = ARI CLASS (kme3v10 + 6 tầng tuning v13 + front_run/H8/room_guard/clamp_sells)
 # Task 73: v15 = ARI CLASS Mk-II (v14 + R90 shed-animal watchdog — fix bug mất thú trong shed)
 AGENTS = {
+    "v16": (os.path.join(ROOT, "v16.py"), "agent"),
     "v15": (os.path.join(ROOT, "v15.py"), "agent"),
     "v14": (os.path.join(ROOT, "v14.py"), "agent"),
     "v13": (os.path.join(ROOT, "v13.py"), "agent"),
     "kme3": (os.path.join(ROOT, "kme3.py"), "agent"),
     "kme3v10": (os.path.join(ROOT, "kme3v10.py"), "agent"),
     "aurax": (os.path.join(ROOT, "aurax.py"), "agent"),
+    # Task 75: v16 (ARI CLASS Mk-III) = v15 + H1 town-demand gate + H2 dead_stock/terminal + H3 R88 horizon-feed
+# Task 75 / H10: 3 doi thu moi tu Kaggle research (Task 74)
+    "kme3v39": (os.path.join(ROOT, "kme3v39.py"), "agent"),
+    "kawashigi": (os.path.join(ROOT, "kawashigi.py"), "agent"),
+    "indark_e776": (os.path.join(ROOT, "indark_e776.py"), "agent"),
 }
 
 

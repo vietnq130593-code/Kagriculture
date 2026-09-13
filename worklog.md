@@ -1920,3 +1920,29 @@ Stage Summary:
 - Bộ tài liệu HOÀN CHỈNH và NHẤT QUÁN: mọi claim định lượng quan trọng đều verify PASS so với dữ liệu thực (battery, code, API list, git)
 - 1 rủi ro dữ liệu: replay gốc mất khỏi đĩa → H5 (conditional memory) nếu cần raw data phải kéo lại qua KGAT token (plan đã có fallback này); phân tích phái sinh an toàn
 - Sẵn sàng bước tiếp theo: H10 build 3 đối thủ mới (kme3v39/kawashigi/indark_e776 — source đã giải nén sẵn trong unpacked/) rồi mới tới Tier-1 bolt-on (H1→H2→H3)
+
+---
+Task ID: 75
+Agent: Ari (main-agent)
+Task: User yêu cầu build 3 đối thủ mới (H10), xây dựng v16 từ nguồn mạnh nhất + tri thức mới (Task 74 research), chạy thử nghiệm cần thiết để đánh bại toàn bộ đối thủ mới lẫn cũ
+
+Work Log:
+- H10a kme3v39: extract main.py từ notebook guruprasaathas 317KB (cell %%writefile ranh giới L15→L2865, LF-normalize) — SHA-256 MATCH 708c7485… (notebook tự xác minh) = V39 nguyên vẹn = kme3v10 + R88/R95/R97
+- H10b kawashigi: copy tetsutani_adaptive__main.py (148KB, BL-Kawashigi-V19Core, 5 tape YARN + 10 guard layer, entry "agent" L984 + _kaggle_submission_entrypoint cuối file)
+- H10c indark_e776: copy 13-file tree (agents E749→E776 + artifacts Kenjo tape + e776_pkg) vào kaggressurE/indark_e776_tree/ + loader indark_e776.py
+- BUG CRITICAL + FIX: kaggle_environments get_last_callable exec agent file KHÔNG định nghĩa __file__ → loader NameError → agent chết $3,000 cả 10 trận (chữ ký PASS-only kiểu Kaito v47). Fix: _tree_root() try __file__ except NameError → hardcoded absolute path. Sau fix: 719 bước DONE, v15 thắng +$12.3k seed 310
+- Đăng ký 3 tầng: run_battle.py AGENTS + arena-service index.ts (bun --hot tự reload) + constants.ts AGENT_INFO
+- Baseline battery seeds 310-314 × 2 ghế: v15 vs kme3v39 10/10 +$2,738 | kawashigi 10/10 +$37,677 | indark_e776 10/10 +$10,150 (fixed)
+- v16a = v15 + H1 (town-demand gate: _SHOP_PRODUCTS 8 shop + _town_demand_now; thay gate step%4==0 thô bằng gate per-item trong _sell_lead + thêm vào _front_run; _View.shops mới) — A/B vs v15 seeds 320-324: 0/10 gap −$25 = hòa từng dollar (PASS gate "bằng-dollar")
+- v16b = v16a + H2 (dead_stock:True + terminal_liquidation:True trong _SETTINGS L968) — A/B vs v16a: 4/10 gap −$16, worst 0.999 = trung tính (schedule v15 đã sạch → layer inert như plan dự đoán "no-op khi schedule đã clean")
+- PHÁT HIỆN Thị trường: battery self-play gated-vs-gated rơi $112k→$73.8k — welfare effect của sell-into-tick (town drain hấp thụ dump giữ giá cao cho cả 2); KHÔNG áp dụng cho vs-đối-thủ (kết luận: H1 trung tính vs đối thủ thật, chỉ thay đổi self-play)
+- v16c = v16b + H3 (R88 horizon-feed port verbatim từ kme3v39.py: _R88_ANIMAL_DAYS + _r88_feed_bonus_cost thay bonus=1+pending trong _r85_feed) — vs kme3v39: 10/10 +$2,926 (best series: v15 +2,738 → v16a +2,790 → v16b +2,737 → v16c +2,926)
+- FINAL BATTERY: v16c vs cả 9 đối thủ, seeds 330-334 × 2 ghế = 90 trận: **86W-0L-4T** — v15 8/10 +$331 · v14 8/10 +$331 · v13 10/10 +$5,274 · kme3 10/10 +$5,290 · kme3v10 10/10 +$4,965 · aurax 10/10 +$4,972 · kme3v39 10/10 +$4,510 · kawashigi 10/10 +$28,070 · indark_e776 10/10 +$14,299 (4T = 2 seeds vs v15 + 2 vs v14 khi layer inert; KHÔNG thua trận nào)
+- v16.py chính thức (319.6KB, header đầy đủ nguồn gốc + battery), xóa v16a/b/c intermediates (recipe tái tạo trong worklog này); đăng ký "v16" 3 tầng; smoke v16 vs indark qua tên đăng ký PASS; lint PASS; dev.log sạch
+
+Stage Summary:
+- H10 HOÀN TẤT: 3 đối thủ Kaggle hiện đại vào registry (kme3v39 SHA-verified, kawashigi, indark_e776) — battery không còn lạc hậu meta
+- v16 = ARI CLASS Mk-III = v15 + H1 town-demand gate + H2 dead_stock/terminal + H3 R88 horizon-feed — 86/90 (0 loss), thắng cả parent v15 8/10 +$331 (bẻ tie thành công)
+- Tier-1 metrics trung thực: H1/H2 trung tính vs đối thủ (chỉ H3 đóng +$188-290 vs kme3v39); giá trị thật của Tier-1 = tie-break vs mirror + bảo hiểm endgame + không còn nhánh feed vô ích
+- Lesson kỹ thuật: kaggle_environments raw exec không có __file__ — mọi agent đọc file ngoài PHẢI try/except; bash `cd && (A) & (B) &` precedence bug (cd chỉ áp dụng subshell đầu)
+- Sẵn sàng Tier-2 (H5 conditional memory, H7 impact model, H6 steering) cho task sau theo 03_BREAKTHROUGH_PLAN.md
