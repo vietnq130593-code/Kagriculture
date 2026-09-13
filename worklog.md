@@ -1698,3 +1698,21 @@ Stage Summary:
 - 3 đòn rẻ đã đóng cửa trên dữ liệu mới: H=9 (tệ hơn), ops (15.6 PASS/ngày — gần tối ưu), timing ±1 bước (v14 = kme3v10 đều sát biên giới, residual ~$2.7k upper bound)
 - Định lượng đường tới 10k: KHÔNG thể vs mirror-class (ceiling ~6.5k); 10k nằm ở class-asymmetry ($6.4-17k đã đo) + dữ liệu trận v14 thua trên Kaggle — /upload sẵn sàng (UPLOAD_GUIDE.md), user từng upload replay ở đây thành công
 - Luật mới L35: oracle ±1 bước tính từ tx per-unit (mỗi dòng tx = 1 unit) — request-qty trong acts KHÔNG phải qty thực thi (seat đối thủ request 99999)
+
+---
+Task ID: 71
+Agent: Ari (main-agent)
+Task: User upload 6 file JSON (1-6) các trận v14 thua trên Kaggle — quan sát bằng tools, xác định chuyện gì xảy ra, cách v14 thua, phân tích + báo cáo; user lưu ý file không thấy trong /upload
+
+Work Log:
+- 6 file ĐÃ vào /upload (1.json-6.json, ~39KB mỗi file, 15:59) — upload/ là mount ẩn trong cây thư mục user (gitignored, giống lần 2 replay 32MB ngày 10/9)
+- FORENSIC CẤU TRÚC: 6 file = Kaggle episode LOGS (không phải replay): top-level list 719 step × 1 side, mỗi side chỉ {duration, stdout, stderr}. Replay thật = top-level dict (configuration/steps 720 × 2 sides có observation/reward/info seed + TeamNames) như 2 file 32MB cũ — đối chiếu trực tiếp để xác nhận
+- FORENSIC NỘI DUNG (toàn 6 file): stdout/stderr TRỐNG 100% (0/719); duration: max 0.31-0.41s (bước đầu = import payload), median 0.55-0.83ms, p99 ~3ms, tổng 0.92-1.22s/trận, 0 bước >1s → v14 KHÔNG crash, KHÔNG timeout, KHÔNG lỗi trong cả 6 trận thua
+- 6 file khác nhau (duration profile khác biệt từng file) = 6 episode khác nhau
+- KẾT LUẬN: 6 thất bại là THUA CHIẾN THUẬT (đối thủ out-play v14 trên nền v14 chạy sạch về mặt kỹ thuật); KHÔNG thể phân tích "cách thua" từ logs (không có seed/rewards/nước đi/tên đối thủ)
+- Chờ user tải REPLAY cùng 6 episode đó (nút Download replay trên trang episode, ~32MB/file, format như 2 file cũ) hoặc gửi link/ID episode — pipeline god-replay autopsy sẵn sàng (TOP3_REPLAY_ANALYSIS)
+- Lưu ý quota 10 file platform (thư mục hiện 11 file) — nếu upload bị chặn, 1-6.json đã khai thác hết có thể xóa
+
+Stage Summary:
+- 6 file = LOGS không phải REPLAY — chỉ chứa duration/stdout/stderr; toàn bộ thông tin có thể rút ra: v14 chạy sạch 6/6 (không lỗi/timeout, ~1s tổng/trận) → thua về chiến thuật, không phải technical
+- Cần replay thật để autopsy; hướng dẫn user nút tải đúng + phương án link episode
