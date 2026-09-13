@@ -42,6 +42,9 @@ sys.path.insert(0, BENCH)
 # Task 73: v15 = ARI CLASS Mk-II (v14 + R90 shed-animal watchdog — fix bug mất thú trong shed)
 AGENTS = {
     "v16": (os.path.join(ROOT, "v16.py"), "agent"),
+    "v16h5": (os.path.join(ROOT, "v16h5.py"), "agent"),
+    "v16h7": (os.path.join(ROOT, "v16h7.py"), "agent"),
+    "v16h57": (os.path.join(ROOT, "v16h57.py"), "agent"),
     "v15": (os.path.join(ROOT, "v15.py"), "agent"),
     "v14": (os.path.join(ROOT, "v14.py"), "agent"),
     "v13": (os.path.join(ROOT, "v13.py"), "agent"),

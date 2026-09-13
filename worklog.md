@@ -1963,3 +1963,29 @@ Work Log:
 Stage Summary:
 - Hạ tầng arena phục hồi hoàn chỉnh + quy trình restart bền vững (restart.sh)
 - e2e UI xác nhận toàn chuỗi: Caddy(81) → Next(3000) → socket XTransformPort → arena-service(3005) → run_battle.py → v16 thắng trận demo
+
+---
+Task ID: 76
+Agent: Ari (main-agent)
+Task: User yeu cau: trien khai rieng de xuat H5 va H7 roi them ban ket hop ca 2 cho v16 (3 phien ban), danh gia 3 phien ban qua thuc chien voi cac doi thu hien tai, va strip toan bo comment trong code v16 (vi da co tai lieu + v16 da la cua minh)
+
+Work Log:
+- KHAO SAT nguon: Kaito v211_main.py (_PROTOTYPES blob 30 prototype top-30, _signature_distance weight 12x workers/7x quadrant/3x counts/0.15 yields, gate 48, _conditional_reorder chi doi thu tu SELL) + v43_mods/scripts_v22_market_impact.py (MARKET_PARAMS + impact_score = qty x (quote_now - quote_after_q)) + v23_policy_library (impact_slots mode, alpha=0 trong legacy regime - v43 ship pure impact) + engine kaggressurE 1.32.7 xac minh: MARKET_PARAMS == _R37_MARKET_PARAMS co san trong v16 (giong het), town consume = shop %4 x1/x2 (dup instance) + center %24 flat 1 unit, market processing = per-unit lockstep theo slot list order
+- STRIP COMMENT: bench/strip_comments.py (tokenize an toan #-trong-string, docstring via AST + pass-chen khi body rong, protect multi-line string, verify AST-bang-minus-docstring) — v16.py 319.6KB -> 282.4KB (461 comments + 25 docstrings); verify hanh vi: v16-stripped vs v16-goc 4 game seeds 336-337 = 0/4 gap +0 ratio 1.000 (dong-dollar tung cent)
+- H5: blob 30 Kaito proto re-encode compact (flat int sig 47 values + sparse sales pairs) + LZMA+b85 = 52KB (vs 371KB zlib cua Kaito); layer outermost _h5_signature/_h5_distance/_h5_reorder (reorder-only, try/except, lzma import guard chong chet agent kieu v47)
+- H5 HIT-RATE GATE voi bank Kaito thuần: THAT BAI vs doi thu local — turn-hit 2.4-4.2% (±3 turn: 6-12%) vi schedule ban cua top-30 Kaggle khac cohort local -> theo dung tam tu Kaito (fit cohort se gap), them LOCAL BANK: t76_fit_protos.py ghi hinh 21 tran v16-vs-doi-thu (seeds 90-95, tach battery seeds 340-344) = 21 proto local; bank tong 51 proto, blob 78.6KB
+- H5 HIT-RATE LAI (seed 339 moi): kawashigi 100%/100%/100%, indark 95.1%, kme3v39 94.9%, kme3 96%, aurax 93.8%, v15/v14 74.3%, v13 73.7% (turn/item precision/item recall) — VUOT gate >=60%
+- H7: thay _r37_quote_priority (rival-batch heuristic) bang impact qty x (quote_hien - quote_sau_tu_do) dung bang gia engine + _r37_reorder_sales sang impact_slots mode (xep hang toan bo SELL vao slot SELL, giu nguyen vi tri non-SELL, tie-break index on)
+- BUILD: bench/t76_build.py tao v16h5/v16h7/v16h57 tu base stripped + patch H7 (anchor robust) + block H5; ca 4 file compile OK; dang ky 3 tang registry (run_battle AGENTS + arena-service index.ts + constants.ts AGENT_INFO 13 agents)
+- BATTERY MATRIX 330 tran (t76_matrix.py chay double-fork daemon, seeds 340-344 x 2 ghe, 33 pairing): MOI bien the 10/10 vs toan bo 9 doi thu (v15 +219/+352/+273, v14 tuong tu, v13 +3.86k, kme3 +3.83-3.88k, kme3v10 +2.9k, aurax +2.9k, kme3v39 +2.66-2.73k, kawashigi +27.7k, indark +22.4k — gap gan nhu trung nhau trong nhieu)
+- vs PARENT v16: v16h5 0/10 -$62 | v16h7 8/10 +$138 (worst 1.000, khong thua) | v16h57 4/10 +$55
+- DOI DAU TRUC TIEP: v16h57 vs v16h5 8/10 +$126 | v16h57 vs v16h7 0/10 -$91 | v16h5 vs v16h7 0/10 -$215 -> XEP HANG: v16h7 > v16h57 > v16h5
+- DIAGNOSTIC H5 mirror: reorder chi xay ra 22/719 va 4/719 turn, dong tien -$20/-$4 — nguyen nhan: meta local = tape-driven sells dau market list, collision cung slot index -> engine per-unit lockstep cho fair-share, reorder ~no-op; H5 chi co gia tri khi schedule doi thu khac slot (Kaggle that)
+- PROMOTE: v16h7 -> v16.py (ARI CLASS Mk-IV, 281,823 bytes); verify v16 vs v16h7 4 game = 0/4 gap +0 ratio 1.000 (dong-dollar tung cent); arena-service restart (pid cu 13848 giu port — kill + restart lai lan 2, hello 13 agents dung); lint PASS; dev.log sach (GET / 200)
+
+Stage Summary:
+- V16 = ARI CLASS Mk-IV = Mk-III + H7 IMPACT MODEL — duy nhat bien the thang parent 8/10 +$138 khong thua tran nao, dong thoi thang truc tiep ca v16h5 lan v16h57; 10/10 truoc toan bo 9 doi thu cu+moi
+- H5 (conditional memory): co che hoat dong dung (hit-rate 74-100% seed moi voi local bank 21 proto) nhung gia tri thuc chien local ~0 (engine fair-share khi cung slot; mat -$62 vs parent) — gia tri thuc la Kaggle meta (30 proto Kaito giu nguyen trong bank; neu submit Kaggle, v16h57 la ung cuen "bao hiem meta" chi ton -$91 so voi v16h7)
+- H7 (impact model): THANG THUC SU — 2 cai thien cong don: key chinh xac (bang gia engine thay vi heuristic batch 8-24) + impact_slots (xep hang toan cuc thay vi block contiguous)
+- Toan bo code v16 family DA STRIP comment/docstring (AST-verified + dong-dollar 4/4); attribution nguon goc van day du trong research/ docs (ANALYSIS_KAITO.md v.v.) — khuyen nghi re-add license text neu public release
+- Artifacts: bench/t76_*.json (33 ket qua battery + summary + stripcheck + promocheck), t76_local_bank.json, tools strip_comments/t76_build/t76_fit_protos/t76_h5_hitrate/t76_matrix; registry 13 agents ca 3 tang
