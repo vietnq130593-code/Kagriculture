@@ -38,7 +38,9 @@ sys.path.insert(0, BENCH)
 
 # name -> (file, entry function)
 # Task 68: v12 (bị v13 thay thế) và dra (bản sao MD5 của kme3 — redundant) đã bị xóa theo yêu cầu user
+# Task 69: v14 = ARI CLASS (kme3v10 + 6 tầng tuning v13 + front_run/H8/room_guard/clamp_sells)
 AGENTS = {
+    "v14": (os.path.join(ROOT, "v14.py"), "agent"),
     "v13": (os.path.join(ROOT, "v13.py"), "agent"),
     "kme3": (os.path.join(ROOT, "kme3.py"), "agent"),
     "kme3v10": (os.path.join(ROOT, "kme3v10.py"), "agent"),

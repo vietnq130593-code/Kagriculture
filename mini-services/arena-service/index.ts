@@ -31,8 +31,8 @@ const RUNNER = '/home/z/my-project/kaggriculture/arena/run_battle.py'
 const BATTLE_DIR = '/home/z/my-project/kaggriculture/battles'
 const PYTHON = 'python3'
 
-// Task 68: v12 (superseded by v13) and dra (byte-identical MD5 copy of kme3) removed per user request
-const AGENTS = ['v13', 'kme3', 'kme3v10', 'aurax']
+// Task 69: v14 (ARI CLASS) registered as new champion; v13 kept as previous champion
+const AGENTS = ['v14', 'v13', 'kme3', 'kme3v10', 'aurax']
 
 mkdirSync(BATTLE_DIR, { recursive: true })
 

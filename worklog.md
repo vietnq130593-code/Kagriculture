@@ -1648,3 +1648,29 @@ Stage Summary:
 - kme3v10 = v9 + 5 module (beam/joint/spawn/adaptive-fert/economic-overlay) — chính là 5 mảnh v13 đang thiếu → H1 merge ước +$1.3-1.8k
 - Đề xuất chiến lược v14 trong ARI_RESEARCH_PLAN.md — chờ user duyệt M1 (H1 merge)
 - Luật mới L31 (đề xuất): valve kinh tế phải surgical theo mẫu R85 (đã được đối thủ chứng minh), không tái cấu trúc ồ ạt như v11.5-11.8
+
+---
+Task ID: 69
+Agent: Ari (main-agent)
+Task: User: vượt v13 + mọi đối thủ cần gap $5-10k — triển khai ARI_RESEARCH_PLAN lần lượt, xây tools đo lường/tính toán/so sánh, thử nghiệm, báo cáo
+
+Work Log:
+- TOOLS (3 cái mới, theo yêu cầu user): bench/battery.py (battery 2 ghế song song 2 job, JSON + bảng tóm tắt, resolve registry/file, calibration PASS: v13 vs kme3 100-101 = 4/4 +$4.126 khớp dữ liệu cũ); bench/gap_waterfall.py (instrumented _process_market log 4.8k transaction/trận → waterfall gap theo item + theo ngày, kèm HIRE/BUY_LAND money); bench/force_route.py (sinh biến thể force-route K + probe route mặc định theo seed)
+- M1/H1 MERGE: v14m.py = copy kme3v10.py + 9 inline edit (hằng số _V12_*, planner 256/2/16, V231-flip >=3, R36 window 144-712 + bỏ day-cap, mở khóa WHEAT/FERT trong reserve scan, V224@144, horizon 2 chỗ, R37-quote@144) + append tail v13 (PREDUMP tắt + prefire h21/22 + melon-seller); 2.711 dòng syntax OK
+- G1: v14m vs v13 seeds 100-115 ×2 ghế = 32/32 THẮNG, TB +$1.283, worst 1.001x, 0/16 seed âm; G2: kme3 16/16 +$4.828 | kme3v10 16/16 +$3.674 | aurax 16/16 +$3.684 — v14-M vô địch mới trên mọi mặt trận (merge đúng dự đoán +$1-1.8k)
+- H3-SCREEN (force-route): decode payload patches — 3 lớp production (full 1,3-8,10-11 / endgame 2 / nhỏ 9,12); probe 16 seed: route 0 = 14/16 (mirror class); screen 12 route × 8 trận: TẤT CẢ THUA (r1 -$8.0k, r12 -$16.9k catastrophically, r2 +$196 noise) → LUẬT MỚI L32: route 0 = cân bằng Cournot, đổi route đơn phương tự hại $6.4-17k, cửa class-change-via-route ĐÓNG
+- WATERFALL: v14m vs v13 s103: WHEAT +$2.669 (R85 feed-skip tiết kiệm lúa bán, +66 units cùng giá $42-43) vs EGG -365/MILK -216 (đổi hợp lý); s102: WOOL -24 units -$409 (rò rỉ: worker plans v10 làm mất CARE banking — chưa fix, ghi nhận) + d19 -$402
+- H5 FRONT-RUN: chassis có sẵn layer front_run (bán trước dump MILK/WOOL/STRAW/MELON của opponent_plan) nhưng TẮT + không wired opponent_plan. Kích hoạt: settings front_run=True + make_agent(opponent_plan=_ROUTES[0]) + tail layer _v14_front_run_sync (đối thủ mirror = cùng lineage → route tính lại từ shop public: 0 trước s144, map s144-647, route 2 từ s648) → A/B 8/8 +$1.332 (+$49 so v14m)
+- A/B SWEEP (tất cả vs v13 seeds 100-103, baseline v14f +$1.332): dead_stock ON +10 (noise) | room_guard ON +$2.370 (+$1.038!) | H=7 +$3.646 | H=8 +$3.899 (+$2.567!!) | H=9 +$3.486 | H=10 +$3.469 | H=12 +$3.127 (đỉnh cong H=8) | fert-window mở rộng = no-op | R85 1.5× -$36 → STACK: room_guard+H=8 = +$4.937 (cộng dồn gần tuyệt đối); +clamp_sells = +$5.417; budget_guard = THẢM HỌA 0/8 -$17.834 (tác giả tắt đúng)
+- v14.py = v14rgh8cs + header tài liệu (2.755 dòng): kme3v10 + 6 tầng v13 + front_run-sync + H=8 + room_guard + clamp_sells
+- VALIDATION CHỐT (80 trận): v14 vs v13 seeds 100-115 ×2 = 32/32 TB +$4.952 worst 1.014x | vs kme3 16/16 +$5.647 | vs kme3v10 16/16 +$4.524 | vs aurax 16/16 +$4.534 — 80/80 TUYỆT ĐỐI
+- Đăng ký 3 tầng: run_battle AGENTS [v14,v13,kme3,kme3v10,aurax] + arena-service + constants.ts (v14 tag "nhà vô địch", v13 "cựu vô địch"); restart arena-service double-fork; socket.io arena:hello xác nhận 5 agents
+- UI e2e gateway :81: v14 vs v13 seed 103 → 🏆 v14 THẮNG tỷ lệ 1.04×, server-side $115.773 vs $111.294 (+$4.479) ĐỒNG DOLLAR, 720/720 lượt, 0 console error, 0 page error; screenshot tool-results/ui_v14_victory.png; lint PASS exit 0; dev.log sạch
+- Lint PASS; commit + push GitHub Train1
+
+Stage Summary:
+- SẢN PHẨM: v14.py = ARI CLASS — 80/80 thắng tuyệt đối (v13 32/32 +$4.95k; kme3 16/16 +$5.65k; kme3v10 16/16 +$4.52k; aurax 16/16 +$4.53k) — gap 4.5-5.6k trên MỌI đối thủ, đúng biên dưới mục tiêu user 5-10k
+- 3 nguồn gap mới đo được: horizon-race H=8 (+$2.6k — đường cong đổi khi đối thủ có H=6), room_guard+clamp_sells bật lại (+$1.5k), front_run pre-emption (+$0.5k), nền merge v10 (+$1.3k)
+- TOOLS: battery.py / gap_waterfall.py / force_route.py — bộ đo lường chuẩn hóa cho các vòng sau
+- LUẬT MỚI: L32 route-0 Cournot (đổi route tự hại 6.4-17k) | L33 layer tắt của tác giả phải A/B từng cái (budget_guard thảm họa nhưng room_guard/clamp_sells vàng) | L34 horizon-race là đòn rẻ nhất vs đối thủ cùng lineage có H thấp hơn
+- Chưa khai thác còn lại: WOOL care-banking leak (-$100-400/seed), R60 survival của aurax, H=8 đối đầu kme3v10 có thể chưa tối ưu (đường cong chưa sweep riêng)
