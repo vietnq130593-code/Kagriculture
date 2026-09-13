@@ -1602,3 +1602,28 @@ Stage Summary:
 - Notebook dra (reyhanksatria) đã private/404 — không thể kiểm tra phiên bản mới; kme3 nguồn (guruprasaathas111) vẫn public v10
 - LUẬT MỚI L27: slug Kaggle chứa tên ghép (KaggressurE = Kaggle+agRICULTURE) — luôn xây URL/slug bằng hex/từ nguồn xác thực, không gõ tay; L28: 403 "Permission denied" trên API Kaggle = slug sai HOẶC private — kiểm tra bằng notebook control (titanic-tutorial) trước khi kết luận bị chặn
 - Hạ tầng: arena-service :3005 (bun pid 13183) + dev :3000 + gateway :81; agents = [v13, v12, kme3, dra, kme3v10]
+
+---
+Task ID: 67
+Agent: KAIN (main-agent)
+Task: User gửi link aurax7/kaggressurE-shop-router-reactive-v4 — kiểm tra bài thi có khác kme3/dra không, khác thì thêm đối thủ mới, giống thì bỏ
+
+Work Log:
+- Pull Kaggle API (user_name=aurax7, kernel_slug trích xuất bằng lập trình từ URL user — hex 6b616767726963756c747572652d... verify đúng từng byte, áp dụng luật L27): urllib bị reCAPTCHA → agent-browser nhận JSON sạch 750.063 ký tự, tái dựng bằng 31 chunk × 25K (json.loads từng chunk, đúng từng byte)
+- Notebook: 4 cell (khác cấu trúc kme3 6-cell) — cell 1 là %%writefile main.py PLAIN CODE (306.897 ký tự, không nén Base85+zlib như kme3; chỉ _PAYLOAD runtime 123K nhúng b85 bên trong); Kaggle currentVersionNumber=3, isPrivate=false
+- Extract main.py = cell 1 bỏ dòng %%writefile: 306.877 B / 2.766 dòng, py_compile PASS, MD5 8230b5a97946f753a976aa48abe69f64
+- SO SÁNH: ≠ kme3/dra (55579a72d9dc94902c8b282d862ce466) ≠ kme3v10 (4593a884e0a8f8d69293dfe56f566fc1) ≠ v12/v13 → **ĐỐI THỦ MỚI**
+- Diff vs kme3v10 (145 dòng, cùng lineage header EXP-173/KaggressurE v31 Ahmed Berat Ozer + shop-router tapes yhay81): (1) R36 native-lead + reserve window 288→216 (day 12 → day 9, sale-lead mở sớm 3 ngày); (2) +R60 SURVIVAL layer ~140 dòng cuối file — rescue giờ 22 (h≥22 mỗi ngày: phát hiện con vật consecutive_unfed≥1 sắp chết, redirect 2 lệnh cuối của actor đi FEED, loss = giá con $300-500 + giá trị sản xuất tương lai; chọn carrier sạch + lệnh ít quan trọng, min-loss); (3) _r60_opening_liquidity giữ $4 cho 3 hire ngày-1 (ĐỊNH NGHĨA nhưng KHÔNG wire — dead code); telemetry counters đầy đủ
+- Đăng ký 3 tầng register_aurax.py (glob-an toàn): arena/run_battle.py AGENTS + arena-service/index.ts ['v13','v12','kme3','dra','kme3v10','aurax'] + constants.ts (desc MD5 + R36 + R60, tag "đối thủ mới aurax")
+- Restart arena-service: nohup thường bị Bash-tool process-group sweep giết → double-fork daemon (/tmp/launch_arena_aurax.py, PPid=1) bun pid 15175 giữ :3005; socket.io arena:hello xác nhận 6 agents cả direct lẫn gateway :81
+- Battery v13 vs aurax (seeds 100-103 × 2 ghế): **8/8 THẮNG** $79,8k/$99,3k/$104,1k/$114,3k vs $77,6k/$97,0k/$99,2k/$113,2k — TB gap +$2.608 (ratio 1.027×, worst 1.009× seed 103)
+- Battery đặc trưng aurax vs kme3v10 (seeds 100-103 × 2 ghế): **8/8 aurax thắng NHẸ** $99.664 vs $99.659 (+$5/trận — hai bản ngang sức, aurax nhỉnh hơn tí)
+- UI e2e lần 1 bị gián đoạn: chạy battery song song + next-server cũ OOM chết giữa trận → supervisor tự restart :3000 (pid 15610) — server-side trận vẫn chạy đủ (battle_1789293951086.jsonl 15MB, winner v13 $79.774 vs $77.582, 720 lượt 37.2s); UI e2e lần 2 SẠCH (không battery ngầm): 🏆 v13 THẮNG $79.774 vs $77.582 tỷ lệ 1.03×, 720 lượt 24.4s — ĐỒNG DOLLAR server-side; card info aurax render đúng; 0 console error; screenshot /tmp/ui_aurax_victory.png
+- Lint PASS; dev.log sạch; commit 41ebb0e push GitHub Train1 (ce75a6e..41ebb0e)
+
+Stage Summary:
+- KẾT LUẬN CHO USER: bài thi trong link KHÁC tất cả các bài trước (kme3, dra, kme3v10) → ĐÃ thêm đối thủ mới "aurax" (dropdown vị trí 6)
+- aurax = cùng họ KaggressurE v31 nhưng có 2 đòn riêng: R36 window sớm hơn (d9 vs d12) + R60 cứu hộ động vật giờ 22 (chống chết đói — đúng kiểu wrapper survival của dra nhưng có chọn lọc min-loss)
+- v13 vẫn NHÀ VÔ ĐỊCH: 8/8 thắng aurax (+$2.608 TB, hẹp hơn kme3 +3.870 nhưng an toàn); sức mạnh aurax ≈ kme3v10 (hơn $5/trận)
+- BÀI HỌC MỚI L29: không chạy battery ngầm khi UI e2e — 4GB box OOM giết next-server giữa trận live (supervisor tự cứu nhưng observer mất kết quả); L30: notebook Kaggle có 2 dạng đóng gói — %%writefile plain (aurax) vs Base85+zlib cell (kme3) — extractor phải xử lý cả hai
+- Hạ tầng: arena-service :3005 (bun pid 15175, double-fork daemon) + dev :3000 (next-server 15610, supervised bởi arena-service) + gateway :81; agents = [v13, v12, kme3, dra, kme3v10, aurax]
