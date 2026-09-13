@@ -102,6 +102,7 @@ export const AGENT_INFO: AgentDesc[] = [
   { name: 'v12', desc: 'KME3-TUNED v3 (code sạch 0 chú thích) — vòng 3: valve PREFIRE h22 + V231 flip điều kiện milk-shops>=3 · 32/32 thắng kme3 (gap +3.9k/+3.2k, worst 1.007x) · bị v13 thay thế (chi tiết §11.23)', tag: 'cựu vô địch' },
   { name: 'kme3', desc: 'MASTER ENGINE V3 (guruprasaathas111, Kaggle public, Apache 2.0) — route-tape 719-turn + 20 lớp overlay, Public Score 600 · tự đấu hòa tuyệt đối · bị v12/v13 vượt 16/16 (chi tiết §11.21-23)', tag: 'đối thủ chuẩn' },
   { name: 'dra', desc: 'DYNAMIC ROUTE AGENT (Reyhan Ksatria, Kaggle public) — đã kiểm tra MD5: GIỐNG HỆT kme3 từng byte (fork không đổi code; self-play hòa tuyệt đối từng đồng). Đối thủ thứ hai user chỉ định — v13 thắng 32/32 (chi tiết §11.24)', tag: 'đối thủ mới' },
+  { name: 'kme3v10', desc: 'MASTER ENGINE V3 — PHIÊN BẢN 10 (guruprasaathas111, Kaggle public, cập nhật 2026-09-13) — code KHÁC kme3 (v9) lẫn dra: MD5 4593a884…, 2.626 dòng (+270): R51 beam-search input-path (width 8), R68 joint multi-worker plans, R62 deterministic HIRE spawn, R70/R79 fertilizer adaptive (bỏ qty cố định 10 / giá ≤30), EXP193 · chi tiết §11.25', tag: 'đối thủ mới v10' },
 ]
 
 export const SPEED_OPTIONS: { value: number; label: string }[] = [

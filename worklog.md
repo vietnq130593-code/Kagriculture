@@ -1559,3 +1559,46 @@ Work Log:
 Stage Summary:
 - SẢN PHẨM: v13.py = KME3-TUNED v4 DUAL-OPPONENT — 48/48 thắng cả kme3 lẫn dra trên 2 bộ seed (gap +3.9k/+3.2k), đầu-trực thắng v12 8/8; dra.py đối thủ thứ hai (bản sao MD5 kme3)
 - GAP +5k-10k KHÔNG đạt được bằng timing (bão hòa chứng minh bằng oracle): mức cân bằng mirror-tape = +3.5-3.9k; đường vượt = cần đối thủ khác lớp (khác tape/production) — đã ghi L26 bàn giao
+
+---
+Task ID: 66 (IN PROGRESS)
+Agent: KAIN (main-agent)
+Task: User cung cấp PAT mới + yêu cầu kiểm tra phiên bản notebook trong link có khác kme3/dra không — khác thì thêm đối thủ mới, giống thì thôi
+
+Work Log:
+- PAT mới (user gửi trực tiếp trong chat, 40 ký tự ghp_) hợp lệ cho user vietnq130593-code; PUSH 5 commit pending (Tasks 61-65: 0f35262, 9b3a36c, c5da43b + 2 cũ) lên Train1 thành công: 65b56b7..c5da43b
+- GHỐI SỨC NGỮ CẢNH: link = notebook Kaggle `guruprasaathas111/kaggressurE-master-engine-v3` (nguồn kme3, kéo lần đầu Task 56 khi notebook đứng v9). Sáng nay pull đầu tiên THÀNH CÔNG: metadata `currentVersionNumberNullable: 10` + `isPrivateNullable: false` → **NOTEBOOK ĐÃ CẬP NHẬT v9 → v10** — nhưng response đầy đủ (~201KB) bị mất vì pipe qua head -c 300
+- Sau pull thành công duy nhất đó: MỌI request Kaggle API bị 403 "Permission 'kernels.get' was denied" (curl) + reCAPTCHA challenge page; browser (agent-browser) pass reCAPTCHA nhưng vẫn nhận 403 sạch
+- Notebook dra (reyhanksatria/kaggressurE-dynamic-route-agent): 403 API + 404 page → private/deleted; page notebook kme3 cũng 404; Kaggle search "kaggressurE" = 0 kết quả (kể cả competition) — sandbox search không index
+- Giả thuyết: (a) anonymous kernels.get quota ~4 request/giờ đã cạn (3 dra + 1 kme3 success) — sẽ reset; (b) notebook flipped private ngay sau pull 08:08 — retry vô ích. Ưu tiên chờ (a)
+- Đã kill retry-loop dày (2.5 phút/lần — nguy cơ sliding-window không bao giờ reset); chuyển sang sparse: attempt đơn tại 09:12, 09:45, 10:20
+- Hạ tầng verify: arena-service :3005 SỐNG (bun pid 9001; pgrep phải match "bun" không phải "arena-service"), socket.io arena:hello → agents [v13,v12,kme3,dra]; dev :3000 + gateway :81 OK
+- Tools đã chuẩn bị: /home/z/nbcheck/try_once.py (single attempt, 2 slug casing), extract_from_pull.py (b85+zlib → main.py → md5 vs kme3/dra), launch_retry.py (double-fork daemon pattern)
+
+Stage Summary:
+- (đang tiến hành) v10 tồn tại (metadata xác nhận); chờ quota reset để pull nội dung; nếu pull được → extract main.py → md5 so 55579a72d9dc94902c8b282d862ce466 (kme3=dra) → khác thì đăng ký đối thủ mới 3 tầng + battery + UI e2e, giống thì báo user không đổi
+- GitHub Train1 đã đồng bộ đầy đủ tới c5da43b
+
+---
+Task ID: 66 (HOÀN TẤT)
+Agent: KAIN (main-agent)
+Task: User cung cấp PAT mới + yêu cầu kiểm tra phiên bản notebook (link guruprasaathas111) có khác kme3/dra không — khác thì thêm đối thủ mới, giống thì thôi
+
+Work Log:
+- PHÁT HIỆN GỐC RỄ SỰ CỐ 403 suốt sáng: TÊI ĐẠNH VĂN slug! Mình dùng base hex 6b61676772657373757245 ("kaggressurE", 11 ký tự — thiếu "icult") thay vì base đúng hex 6b616767726963756c74757265 (13 ký tự, Kaggle+Ag-riculture). Pull 08:08 thành công vì lần đó gõ đúng theo worklog; mọi retry sau đều sai slug → 403 "Permission denied" (notebook không tồn tại). CÀI BẪY NHẬN DIỆN: các chuỗi "kaggressurE"/"kaggressurE" hiển thị gần giống nhau — PHẢI dùng hex/glob, không gõ tay
+- Bài học routing: curl bị reCAPTCHA (bot wall) nhưng agent-browser thì nhận JSON sạch → dùng browser eval substring 25K/chunk × 20 + json.loads từng chunk để tái dựng response 484.388 ký tự ĐÚNG TỪNG BYTE
+- PULL THÀNH CÔNG notebook guruprasaathas111 (slug hex-đúng, version 10, isPrivate false): 6 cells, cell 3 = Base85+zlib 185.982 ký tự → main.py 299.348 B / 2.626 dòng (v9 = 285.100 B / 2.356 dòng)
+- SO SÁNH: MD5 kme3v10 = 4593a884e0a8f8d69293dfe56f566fc1 ≠ 55579a72d9dc94902c8b282d862ce466 (kme3 = dra) → **KHÁC → đăng ký đối thủ mới** theo yêu cầu user
+- Diff v9→v10 (+295/−25 dòng): (1) R51 input-path GREEDY → BEAM SEARCH width 8 depth 8, phạt 1.5×giá FERT mỗi bước đường; (2) R68 joint multi-worker plans — liệt kê 3 mode (None/WHEAT-first/CARROT-first) thay vì mỗi worker greedy riêng; (3) R62 deterministic HIRE spawn (mô phỏng vị trí spawn access-tile sau native actions); (4) R79 tomato-fert worthwhile thay giá ≤30 + R70 fert qty thích ứng thay cố định 10; (5) EXP193
+- Đăng ký 3 tầng qua script glob-an toàn (register.py): run_battle.py AGENTS + arena-service/index.ts (['v13','v12','kme3','dra','kme3v10']) + constants.ts (tag "đối thủ mới v10"); restart arena-service sạch (kill zombies 9000/9001/11633, bun pid 13183 giữ :3005, socket.io arena:hello xác nhận 5 agents)
+- Battery v13 vs kme3v10 (seeds 100-103 × 2 ghế): **8/8 THẮNG** $79,8k/$99,3k/$104,1k/$114,3k vs $77,6k/$97,0k/$99,2k/$113,2k — TB gap +$2.597 (hẹp hơn gap vs kme3 +3.87k → v10 mạnh lên thật)
+- Đặc trưng kme3v10 vs kme3 (seeds 100-101 × 2 ghế): **4/4 v10 THẮNG v9** +$1.773 TB — bản nâng cấp có hiệu quả thật
+- UI e2e gateway :81: chọn v13 vs kme3v10 seed 100 (Radix [role=option] + HTMLInputElement prototype setter) → 719/719 lượt 31.6s, 🏆 v13 THẮNG $79.774 vs $77.588 1.03× — ĐỒNG DOLLAR server-side; card info kme3v10 render đúng (desc + tag "đối thủ mới v10"); 0 console error; screenshot /tmp/ui_kme3v10_victory.png
+- Lint PASS (exit 0); dev.log sạch; push GitHub: các commit Task 61-65 (5 commit, tới c5da43b) + commit Task 66
+
+Stage Summary:
+- KẾT LUẬN CHO USER: phiên bản trong link KHÁC kme3 và dra (MD5 4593a884 ≠ 55579a72; +270 dòng, 5 thay đổi kiến trúc) → ĐÃ thêm đối thủ mới kme3v10 vào arena (dropdown vị trí 5)
+- v13 vẫn là NHÀ VÔ ĐỊCH: 8/8 thắng kme3v10 (TB +$2.597; worst seed 103 +$1.039) — đối thủ mới mạnh hơn kme3 gốc (+1.773 vs v9) nhưng chưa đủ lật v13
+- Notebook dra (reyhanksatria) đã private/404 — không thể kiểm tra phiên bản mới; kme3 nguồn (guruprasaathas111) vẫn public v10
+- LUẬT MỚI L27: slug Kaggle chứa tên ghép (KaggressurE = Kaggle+agRICULTURE) — luôn xây URL/slug bằng hex/từ nguồn xác thực, không gõ tay; L28: 403 "Permission denied" trên API Kaggle = slug sai HOẶC private — kiểm tra bằng notebook control (titanic-tutorial) trước khi kết luận bị chặn
+- Hạ tầng: arena-service :3005 (bun pid 13183) + dev :3000 + gateway :81; agents = [v13, v12, kme3, dra, kme3v10]

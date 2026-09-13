@@ -31,7 +31,7 @@ const RUNNER = '/home/z/my-project/kaggriculture/arena/run_battle.py'
 const BATTLE_DIR = '/home/z/my-project/kaggriculture/battles'
 const PYTHON = 'python3'
 
-const AGENTS = ['v13', 'v12', 'kme3', 'dra']
+const AGENTS = ['v13', 'v12', 'kme3', 'dra', 'kme3v10']
 
 mkdirSync(BATTLE_DIR, { recursive: true })
 
