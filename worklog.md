@@ -1627,3 +1627,24 @@ Stage Summary:
 - v13 vẫn NHÀ VÔ ĐỊCH: 8/8 thắng aurax (+$2.608 TB, hẹp hơn kme3 +3.870 nhưng an toàn); sức mạnh aurax ≈ kme3v10 (hơn $5/trận)
 - BÀI HỌC MỚI L29: không chạy battery ngầm khi UI e2e — 4GB box OOM giết next-server giữa trận live (supervisor tự cứu nhưng observer mất kết quả); L30: notebook Kaggle có 2 dạng đóng gói — %%writefile plain (aurax) vs Base85+zlib cell (kme3) — extractor phải xử lý cả hai
 - Hạ tầng: arena-service :3005 (bun pid 15175, double-fork daemon) + dev :3000 (next-server 15610, supervised bởi arena-service) + gateway :81; agents = [v13, v12, kme3, dra, kme3v10, aurax]
+
+---
+Task ID: 68
+Agent: KAIN (main-agent, ký danh Ari từ task này)
+Task: User: v13 đánh bại cả dra/kme3/aurax → xóa v12 + dra (dra≡kme3); báo cáo khác biệt kme3 vs kme3v10; từ giờ làm Ari (kỹ sư AI/kiến trúc sư/chuyên gia thuật toán); nghiên cứu & đề xuất hướng mới để tạo phiên bản vượt v13 + mọi đối thủ
+
+Work Log:
+- Xóa v12 + dra 3 tầng: run_battle.py AGENTS (chỉ còn v13/kme3/kme3v10/aurax) + arena-service/index.ts + constants.ts AGENT_INFO (desc v13 cập nhật ghi nhận nghỉ hưu v12/dra; tag kme3v10 = "đối thủ mạnh nhất"); xóa file kaggriculture/v12.py + dra.py; smoke runner v13 vs kme3 seed 103 48 lượt PASS
+- Restart arena-service bằng double-fork daemon (/home/z/launch_arena_t68.py): bun giữ :3005, socket.io arena:hello xác nhận agents ["v13","kme3","kme3v10","aurax"]
+- Diff thật kme3 vs kme3v10 (+295/−25): (1) R51 greedy→beam search w8×d8 phạt 1.5×giáFERT×path; (2) R62 deterministic HIRE spawn (mô phỏng ô access ít người, path bắt đầu spawn thật step+2); (3) R68 joint 3-mode (None/WHEAT-first/CARROT-first) thay vòng lặp greedy từng worker; (4) R70 fert qty thích ứng max(10,10+native_need−stock) + R79 worthwhile (mua >$30 nếu bonus tomato×giá ≥ 2×cost+$100); (5) R85+R86 economic overlay (feed-skip điều kiện consecutive_unfed==0 + FERT-sale phần thừa, credit Steven Lee Hans)
+- Trích xuất tuning v13 vs kme3 (609 dòng xoá = strip comment + 96 thêm = 6 tầng: H=6/LO=144/HI=712, V224 sales-first, V231-flip 3-shop, v12aa prefire h21+h22, melon-seller, PREDUMP tắt) → merge plan v14-M khả thi trên nền kme3v10
+- MARKET_PARAMS gốc đọc từ engine: EGG above log 0.20 (glut-káng nhất: +332 units chỉ −$7) — cơ sở ứng viên H3 egg-heavy; milk/straw linear-1.6 (crash nhanh)
+- Phân tích per-seed: v13 vs aurax gap 100:+$2.19k / 101:+$2.32k / 102:+$4.87k / 103:+$1.05k (seed giàu nén timing — cần sản lượng)
+- Viết kaggriculture/ARI_RESEARCH_PLAN.md: 6 hướng H1-MERGE (v14-M = kme3v10 + 6 tầng tuning v13, checklist xung đột R85-vs-V231/R62-vs-prefire) · H2-CAPITAL ENGINE (3 valve surgical theo mẫu R85) · H3-CLASS CHANGE (egg-heavy/straw-early-milk-late/fert-industrial + quy trình tape-gen) · H4-KERNEL-OPS (đổi objective generator sang op/ngày) · H5-PRE-EMPTION deterministic (mô phỏng tape đối thủ) · H6-SURVIVAL+monitoring; lộ trình M1-M5 với cổng đo G1-G4 định lượng
+- Lint PASS; commit + push GitHub Train1
+
+Stage Summary:
+- Registry sạch 4 agent: [v13, kme3, kme3v10, aurax]; v12/dra đã xóa hoàn toàn (file + 3 tầng đăng ký)
+- kme3v10 = v9 + 5 module (beam/joint/spawn/adaptive-fert/economic-overlay) — chính là 5 mảnh v13 đang thiếu → H1 merge ước +$1.3-1.8k
+- Đề xuất chiến lược v14 trong ARI_RESEARCH_PLAN.md — chờ user duyệt M1 (H1 merge)
+- Luật mới L31 (đề xuất): valve kinh tế phải surgical theo mẫu R85 (đã được đối thủ chứng minh), không tái cấu trúc ồ ạt như v11.5-11.8

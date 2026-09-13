@@ -37,11 +37,10 @@ sys.path.insert(0, ROOT)
 sys.path.insert(0, BENCH)
 
 # name -> (file, entry function)
+# Task 68: v12 (bị v13 thay thế) và dra (bản sao MD5 của kme3 — redundant) đã bị xóa theo yêu cầu user
 AGENTS = {
-    "v12": (os.path.join(ROOT, "v12.py"), "agent"),
-    "kme3": (os.path.join(ROOT, "kme3.py"), "agent"),
-    "dra": (os.path.join(ROOT, "dra.py"), "agent"),
     "v13": (os.path.join(ROOT, "v13.py"), "agent"),
+    "kme3": (os.path.join(ROOT, "kme3.py"), "agent"),
     "kme3v10": (os.path.join(ROOT, "kme3v10.py"), "agent"),
     "aurax": (os.path.join(ROOT, "aurax.py"), "agent"),
 }

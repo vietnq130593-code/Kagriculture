@@ -31,7 +31,8 @@ const RUNNER = '/home/z/my-project/kaggriculture/arena/run_battle.py'
 const BATTLE_DIR = '/home/z/my-project/kaggriculture/battles'
 const PYTHON = 'python3'
 
-const AGENTS = ['v13', 'v12', 'kme3', 'dra', 'kme3v10', 'aurax']
+// Task 68: v12 (superseded by v13) and dra (byte-identical MD5 copy of kme3) removed per user request
+const AGENTS = ['v13', 'kme3', 'kme3v10', 'aurax']
 
 mkdirSync(BATTLE_DIR, { recursive: true })
 
