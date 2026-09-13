@@ -1674,3 +1674,27 @@ Stage Summary:
 - TOOLS: battery.py / gap_waterfall.py / force_route.py — bộ đo lường chuẩn hóa cho các vòng sau
 - LUẬT MỚI: L32 route-0 Cournot (đổi route tự hại 6.4-17k) | L33 layer tắt của tác giả phải A/B từng cái (budget_guard thảm họa nhưng room_guard/clamp_sells vàng) | L34 horizon-race là đòn rẻ nhất vs đối thủ cùng lineage có H thấp hơn
 - Chưa khai thác còn lại: WOOL care-banking leak (-$100-400/seed), R60 survival của aurax, H=8 đối đầu kme3v10 có thể chưa tối ưu (đường cong chưa sweep riêng)
+
+---
+Task ID: 70
+Agent: Ari (main-agent)
+Task: User: v14 giữ biên ~5k là thành công; 10k cần nghiên cứu thêm. (1) v14 đấu lại MỖI đối thủ 10 trận rồi báo kết quả; (2) nghiên cứu dữ liệu tìm bước đột phá mới; (3) user định upload dữ liệu trận Kaggle (top-ranking + các trận v14 thua) — thư mục /upload không thấy trong cây
+
+Work Log:
+- Phát hiện /upload ĐÃ TỒN TẠI từ trước (2 replay Kaggle 32-33MB ngày 10/9 đã phân tích + file PAT); lần đầu Write đè README.md gốc (tài liệu game 372 dòng) → git checkout khôi phục, hướng dẫn nạp đặt riêng vào upload/UPLOAD_GUIDE.md
+- RE-VALIDATION (seeds 200-204 HOÀN TOÀN MỚI, 5 seed × 2 ghế = 10 trận/đối thủ): v14 vs v13 10/10 +$4.797 | vs kme3 10/10 +$4.827 | vs kme3v10 10/10 +$3.744 | vs aurax 10/10 +$3.749 — 40/40, worst cell 1.020x; smoke seed 200 trước đó khớp (+$4.278)
+- Per-seed: seed 202 (giàu nhất, $144k) nén gap mọi matchup xuống +$2.8-3.0k (lặp lại luật L26); seed nghèo 203 ($67k) gap +$3.8-5.4k; aurax ≡ kme3v10 hành vi (gap chênh <$15, tiền v14 trùng dolla ở seed 200/203/204)
+- WATERFALL 2 cell yếu nhất (v14 vs kme3v10 seed 200/202): gap = THUẦN TIMING GIÁ trên thể tích ngang nhau — seed200 WOOL +$1.792 (262u vs 262u, chỉ giá cao hơn); seed202 MILK +$1.255 (+3u và giá cao); sản lượng 2 bên gần trùng (MELON 72u=72u, EGG 74/73u) = cân bằng Cournot route-0 (L32)
+- H=9 SCREEN vs kme3v10 (variants/v14h9t.py, diff đúng 1 dòng _V12_HORIZON): +$3.276 < baseline H=8 +$3.744 → H=8 là đỉnh cong TRÊN CẢ 2 đối thủ mạnh (v13 đã đo ở Task 69) — đóng hướng horizon-race
+- OPS AUDIT (kops11.py trên replay mới t70_replay_v14_kme3v10_202.jsonl, 721 turn, chạy run_battle.py stdout): v14 chỉ còn 469 PASS/720 turn ≈ 15.6 op/ngày (chassis cũ 101/ngày) — PASS dồn giờ 21-23 (hết việc cuối ngày); WATER 1110/HARVEST 476/CARE 417; nợ nước STRAWBERRY giữa game (d17 11/33) tự chữa các ngày sau → headroom ops (H4) chỉ còn ~$100-300/trận
+- ORACLE ±1 BƯỚC (tính từ tx per-unit của waterfall): residual v14 +$2.673/+$2.746 vs kme3v10 +$2.858/+$2.490 (seed 202/200) — HAI BÊN CÁCH ĐỀU BIÊN GIỚI TIMING; v14 không bỏ lại tiền nhiều hơn đối thủ; toàn bộ headroom 1-bước của lớp này ~$2.5-2.9k (upper bound, chưa trừ market impact)
+- KẾT LUẬN ĐỘT PHÁ: (a) vs roster mirror-class địa phương, gap ceiling thực nghiệm ~5-6.5k (giới hạn thông tin), 10k KHÔNG thể đạt bằng timing; (b) 10k chỉ tồn tại ở BẤT ĐỐI XỨNG LỚP — đo ở Task 69: khi đối thủ chơi sai route, agent route-0 thắng $6.4-17k → trên Kaggle trường heterogen, biên v14 có thể tự động 5-10k+; (c) nguồn dữ liệu quyết định tiếp theo = các trận v14 THUA trên Kaggle (đối thủ mạnh hơn / seed đặc thù / lớp lạ) — đúng kế hoạch user upload
+- Toàn bộ artifact: bench/t70_v14_vs_{v13,kme3,kme3v10,aurax}.json, t70_h9t_vs_kme3v10.json, t70_wf_v14_kme3v10_{200,202}.json, t70_replay (15MB — không commit), upload/UPLOAD_GUIDE.md
+- Hạ tầng: dev :3000 200 OK, arena-service :3005 sống, dev.log sạch; không đổi code frontend/registry nên không cần e2e mới
+- Commit + push GitHub Train1
+
+Stage Summary:
+- v14 KHẲNG ĐỊNH lại vô địch trên seed hoàn toàn mới: 40/40 (gap +3.74k đến +4.83k), không overfit seed 100-115
+- 3 đòn rẻ đã đóng cửa trên dữ liệu mới: H=9 (tệ hơn), ops (15.6 PASS/ngày — gần tối ưu), timing ±1 bước (v14 = kme3v10 đều sát biên giới, residual ~$2.7k upper bound)
+- Định lượng đường tới 10k: KHÔNG thể vs mirror-class (ceiling ~6.5k); 10k nằm ở class-asymmetry ($6.4-17k đã đo) + dữ liệu trận v14 thua trên Kaggle — /upload sẵn sàng (UPLOAD_GUIDE.md), user từng upload replay ở đây thành công
+- Luật mới L35: oracle ±1 bước tính từ tx per-unit (mỗi dòng tx = 1 unit) — request-qty trong acts KHÔNG phải qty thực thi (seat đối thủ request 99999)
