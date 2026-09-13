@@ -1,0 +1,107 @@
+# Kaggriculture: Market Relay — A High-Score Near-Mirror Upgrade
+
+**Boatlee V16-RC2-MarketRelay** keeps a high-output, `YARN_STORE`-selective
+production program and adds one narrow market controller for the matchup
+that has become hardest to separate: two farms following nearly the same
+production route.
+
+On a frozen 12-seed, two-seat panel against the public V27 artifact, the
+paired result changes from **1 positive / 11 zero / 0 negative** for the
+previous Boatlee version to **12 / 0 / 0** for Market Relay. Other strong
+reference panels are unchanged or slightly improved.
+
+These are local paired simulations, not a Public Leaderboard score.
+
+---
+
+## 1. Why a market relay matters
+
+Kaggriculture uses a shared market. A `SELL` increases
+`market.inventory`, and subsequent units can receive a lower price. Once
+two strong agents converge on similar crops, animals, land purchases and
+labor, production is no longer the only differentiator: **which turn
+reaches the shared market first** matters too.
+
+The recurring near-mirror pattern was unusually clean:
+
+- final farm structure and total `SELL` quantities could be identical;
+- one side issued the same `SELL FERTILIZER` batch three steps earlier;
+- the money gap accumulated gradually while the production route stayed aligned.
+
+That suggests a small timing correction, not a new farm plan.
+
+---
+
+## 2. The controller
+
+The relay uses only the public observation. At steps 216, 240 and 264 it
+compares aggregate farm structure: unlocked quadrants, hands, crops,
+animals, structures and weeds. The controller locks only when all three
+checkpoints remain close.
+
+For the recurring late-day `FERTILIZER` sale:
+
+1. inspect the scheduled batch at step `t + 3`;
+2. at step `t`, sell up to that quantity from the player's own `shed`;
+3. record the executed quantity as debt;
+4. remove exactly that quantity from the original step `t + 3` order.
+
+The two-step quantity is conserved. If the farms do not look like a
+near-mirror, the controller leaves the base action unchanged.
+
+---
+
+## 3. Evaluation protocol
+
+Each matchup uses **12 frozen seeds × both seat orders = 24 games**.
+A paired result sums the two seat margins for the same seed, so first-player
+effects cannot masquerade as a strategy improvement. Every reported game
+reached 720 frames with both agents in `DONE` status.
+
+The panel contains exact public artifacts for Kaito V25/V27 and Rayk
+C68/C71, plus a replay-derived HealthStone route proxy. The proxy is labeled
+separately because it is not the exact online submission artifact.
+
+---
+
+## 4. Protect the close wins, not only the losses
+
+Losses are useful for finding a defect, but high-score small-margin wins are
+equally valuable as regression guards. The five samples below came from
+that fragile region. Replaying their seeds against the public C71 artifact
+shows that Market Relay improves every paired mean by roughly 26–28 coins
+and preserves all five outcome classes: four stay positive and the one
+locally negative sample is not presented as a forced pass.
+
+---
+
+## 5. What stayed out
+
+A separate route-recovery branch could repair one observed animal-placement
+drift, but it regressed the untouched default panel badly (including an
+8,308-coin single-game loss versus Boatlee V16-RC1). It is deliberately not
+part of this release. The final strategy contains the audited production
+core plus the guarded Market Relay only.
+
+## 6. Public references and Boatlee contribution
+
+Public notebooks helped make the current top-meta production route and its
+market behavior reproducible as benchmarks:
+
+- [Kaito Fukami — 25→27 Strict Future V27 Midgame Meta Reset](https://www.kaggle.com/code/kaitofukami/25-27-strict-future-v27-midgame-meta-reset)
+- [Rayk Kretzschmar — Findings from Zero to Top Meta](https://www.kaggle.com/code/raykkretzschmar/kaggriculture-findings-from-zero-to-top-meta)
+
+Boatlee V16 adds the `YARN_STORE`-selective livestock mix, a staged `WOOL`
+controller, same-turn market-order ranking, and the cross-turn
+`FERTILIZER` Market Relay described here. The exact submitted implementation
+follows below.
+
+---
+
+## Takeaway
+
+The strongest modification here is deliberately small: detect a stable
+near-mirror from public farm state, move a recurring `FERTILIZER` sale three
+steps earlier, and repay the exact quantity later. The result is a measurable
+paired edge without replacing the production engine that already performs
+well across established public strategy families.

@@ -1,0 +1,20 @@
+# Kaggriculture research candidate B
+
+B keeps the same complete V36 parent program and no-op-slot adapter as A. An additional admission model can decline the initial day-12 six-sheep capital project under explicit feed-cost and competing-supply stress scenarios. The parent continues to govern its already-started feeding, care, harvesting and delivery.
+
+Both alternatives use the same cached information cutoff, **2026-09-12T09:00:00Z**. A is not claimed to be today's strongest policy. B is an unverified hypothesis about adoption of a public sheep strategy, not an established improvement. The existing fixed0 policy remains a required reference for a later benchmark.
+
+The notebook builds exact submission bytes and makes one action call on a saved initial observation. It runs **zero games**. This establishes a small execution check; it does not establish project-branch coverage, counterfactual reachability, score, future advantage, or release eligibility. A paired current-population, response-scenario and genuinely later-generation comparison remains pending.
+
+Market no-ops preserve the original interleaved order positions. The narrowly scoped slot profile accepts only exact `['SELL', 'WHEAT', 0]` placeholders; every other order and all field commands use the repository's canonical strict validator. The receipt reports canonical strict and scoped-profile results separately. A future benchmark must explicitly declare this profile.
+
+
+---
+
+## Source and assumptions
+
+Upstream: **Ahmed Berat Özer**, [Kaggriculture V36 Guarded Four Turn Sales](https://www.kaggle.com/code/ahmedberatozer/kaggriculture-v36-guarded-four-turn-sales), observed public notebook version 1, acquired 2026-09-12. The packaged unmodified `upstream.py` SHA-256 is `7eb5ab6c48581c82906ab6fa6b2cc5c9607513249ef59b2c45fcd6176e8653dd`. The archive preserves the source license and attribution notices. Inherited replay-level route lineage is incomplete; this notebook does not claim to have reconstructed every original route author or seam.
+
+B's gate uses observable herd, inventory, shop and parent-program information. Its forward prices and competing-adoption cases are stress assumptions, not observed future weights or guaranteed profit bounds. Future shops, hidden storage, realised execution and opportunity costs remain uncertain. Consult the packaged configuration and module for the exact model. The notebook's initial observation does not exercise B's day-12 gate.
+
+The engine, schema and official Python loader are pinned to Kaggle Environments 1.32.7 and checked by content hash. Both notebook directories are alternatives for the same configured public destination; creating them does not push either version or submit to the competition.

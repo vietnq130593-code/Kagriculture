@@ -1,0 +1,139 @@
+# Kaggriculture Frontier | The Soil Remembers Rain
+
+## Adaptive livestock, with the failures left in
+
+**Version 34 · September 10, 2026.** This runnable lab combines Moon's later cattle switch with a financed sheep paddock. The default **V235Combined** includes the complete policy and 13 editable route plans. Both component sources, the failed first sheep controller, paired results and an editable cash-versus-production chart are included.
+
+Start with sections 1–5 to inspect, edit, run six full games and build `submission.tar.gz`. Section 7 explains the livestock experiments. The earlier carrot study remains in sections 2–3 and 6, with its own unchanged source and results. A fresh run records the source hash it actually tested.
+
+**Score provenance:** this combined source has no verified public competition rating at publication preparation. Historical badges belong to the versions that earned them. A selected local win record, especially against a frozen public-action control, is not an estimate of leaderboard strength. The next submission is a public experiment; its actual completed episodes determine its rating.
+
+[Moon's companion lab](https://www.kaggle.com/code/prvsiyan/kaggriculture-frontier-the-moon-counts-melons) explains the later cattle decision and why a huge margin against a rank-one-derived control did not establish a victory over the team's private agent.
+
+
+---
+
+## 1. Inspect the livestock decisions
+
+The cattle rule waits until steps 216–227 and at least three shops are visible. It requires two milk consumers, no Yarn Store, milk priced at least as high as wool, a compatible herd and no unresolved animal delivery. It replaces at most four scheduled sheep purchases, follows each cow through pickup and placement, and bounds additional milk sales by harvested stock.
+
+The sheep rule considers a different observed regime on day 12: two Yarn Stores, wool at least 220, wheat at most 45, compatible owned land and no scheduled use of the southeast quadrant. It finances that land, six sheep, feed and two workers while preserving cash reserves. Two workers feed, care for and harvest three sheep each. Later hiring can retry through hour 2 if native orders fill the ten-order limit. A bounded feed top-up uses observed shortages; it does not assume future prices or income.
+
+Buying southeast land also prevents a later tomato expansion. Added production changes the shared market, so neither a successfully maintained flock nor a higher wool total proves a profitable investment. Section 7 shows the cash cost explicitly.
+
+Only permitted observations and the agent's own state select these branches. Episode IDs, opponent names and hidden seeds appear only in offline experiments. Expand the readable policy, edit `PLANS`, `ROUTE_MAP` or `AGENT_SOURCE`, then rebuild and rerun the demonstrations. The competition's source-size check also applies to edits.
+
+
+---
+
+**Archived carrot study:** these V228/V229 measurements describe the earlier policies, not the new default livestock source.
+
+## 2. What the measurements support
+
+Discovery used 58 paired cells, including all previously measured activations, inactive controls and the entire newest selected public batch. Both V228 and V229 won 50 and lost eight. All 46 active cells preserved 50 plantings and 150 expansion harvest units; all 12 inactive cells matched both rewards and terminal-state hashes exactly.
+
+The frozen confirmation used three previously unused eligibility-selected seeds, both seats and three intact public implementations: 18 cells per agent. Both won all 18, with mean margin 1,465.44 → 2,174.11 and worst margin 608 → 1,315. **Those 18 cells share only three seeds and related Shop0909 plans.** They are a targeted mechanism check. A separate four-seed unconditional panel produced 24 wins per agent, but the branch never activated; every result was identical. It provides no new active-effect evidence.
+
+We audited all 719 callbacks, both cash ledgers, actual hiring, the crop actions and day-boundary inventory. The direct saving of 610 is distinct from the final reward change, because keeping workers and trading goods can affect later costs and shared prices. Every row below includes both rewards. The public raw-action controls reproduce observed rival actions but cannot replan in response to our changes. Historical ranked guards are not recovered private top-ten agents.
+
+
+---
+
+**Archived carrot examples.** Rerun them with the optional section 6 controls.
+
+## 3. More output can still reduce the margin
+
+The three replay controls below deliberately include a recovered win, a remaining loss, and a profitable game made worse by the investment. They are diagnostic cases, not a random leaderboard sample.
+
+| Observed public history | Feed baseline | Carrot parent | Final labor repair |
+|---|---:|---:|---:|
+| 107178239 | −3,545 | +2,571 | +3,299 |
+| 107239937 | −5,936 | −8,978 | −8,220 |
+| 107253119 | +3,725 | +803 | +1,454 |
+
+Both seats produced these margins. In the recovered-win case, the original carrot expansion reduced our reward by 3,311 but reduced the rival's by 9,427. In the last case, the expansion added 6,201 in carrot revenue while our wool revenue fell 13,810, with 4,000 land, 6,388 hiring and 1,000 seed costs. The physical crop plan worked; its broader market consequences were worse. Saving two hires improves the parent without erasing those earlier investment mistakes.
+
+The earlier four-seed carrot-versus-feed stress test also had worse seed-level margins on three of four seeds. Its positive average was driven by one seed where our reward fell 20,481 and the rival's fell 30,585. **Large margins and perfect win counts need causal and sample-size checks.** The next useful experiment is a prospectively frozen investment decision tested against different production families and newly arriving public losses, not repeated tuning on these three histories.
+
+
+---
+
+The archived result tables are separated from new runs. Editing an agent removes historical reward assertions for that source and records the newly tested source hash. Opponent bundles remain fixed and are checked before and after each experiment.
+
+---
+
+## 4. Reproduce six complete livestock games
+
+The default runs both seats of three selected diagnostics: the milk loss from public episode 107426389, the unresolved wool loss from 107442173, and the related Aurax implementation at seed 9413601 where the late cattle gate avoids the early-switch regression. These are mechanism examples, not a random population sample.
+
+Each game must finish 720 states and 719 decisions per player. Unedited sources must match both stored rewards; edits produce new measurements. Packaging checks the source hash against those new demonstrations. `late_cattle.py`, `feed_baseline.py`, `sheep_first.py` and `sheep_repaired.py` are independent comparison sources. The earlier carrot default is retained as `carrot_labor.py`.
+
+
+---
+
+## 5. Package the agent you just tested
+
+This creates a deterministic archive containing exactly one root `main.py`. It does not submit anything to Kaggle or spend submission quota. After editing, rerun the source rebuild and the demonstrations before packaging.
+
+
+---
+
+**Earlier carrot experiments:** the V229 jobs now explicitly use `carrot_labor.py`, preserving their original source and reward assertions.
+
+## 6. Run a paired experiment
+
+Enable one switch in the fixture cell, then run this cell. `RUN_HISTORY` compares V228 and V229 on all 58 discovery cells (116 games). `RUN_REACTING` reruns the separately labeled stress and unconditional panels (84 games); their shared production family remains a limitation. `RUN_ABLATIONS` compares the feed baseline, carrot parent and final labor repair on the three diagnostic histories (18 games). Rerunning these seeds after an edit is a regression test; use a newly frozen set for confirmation.
+
+Try one change at a time. Log its source hash, preserve both rewards, count gained and lost wins, and check whether the branch actually activated. Keep seed clusters and related opponent sources together when assessing uncertainty. A rule that wins only against one schedule needs new public-episode evidence before it is called broadly strong.
+
+
+---
+
+## Credits and useful extensions
+
+The original 13 plans are from [yhay81's Shop Router 0909](https://www.kaggle.com/code/yhay81/shop-router-0909). The inherited execution and selling work credits SevenTurn in the source. Reacting test bundles are [aurax7's Reactive Router v2](https://www.kaggle.com/code/aurax7/kaggriculture-shop-router-reactive-v2), [tetsutani's Market Smart Farming](https://www.kaggle.com/code/tetsutani/market-smart-farming-kaggriculture), and [Evgen Dvorkin's Kaggriculture notebook](https://www.kaggle.com/code/evgendvorkin/kaggriculture). Their complete bundled files and original notices are retained. All three use related Shop0909 plans; different notebook names are not proof of independent strategies. Game semantics come from [Kaggle's official environments](https://github.com/Kaggle/kaggle-environments).
+
+Public replay controls are research fixtures. Their episode IDs and seeds live in the experiment runner, never in the runtime policy's selection logic. Only current permitted observations and the agent's own state guide the submitted agent.
+
+Useful next contributions include a different crop or livestock opponent family, a public loss the policy does not explain, or a paired experiment where the lower labor cost fails. If this notebook helps your research, an upvote helps others find it. Please keep the failed comparisons when sharing an improvement.
+
+
+---
+
+## 7. More wool can still mean less cash
+
+The first financed paddock produced 81 wool units in the selected wool history. It missed hiring on two days because native orders filled the market queue, and on another day only three sheep were fed. Those missed requests did not appear as rejected purchases: the controller never sent them. Counting accepted orders alone would have missed the husbandry failure.
+
+The repaired controller produced 108 wool, with all six sheep fed and cared for on days 12–29 in both discovery seats. It hired 36 workers across those days and consumed 108 wheat. Yet its own cash fell by 15,818 and 17,616 relative to the feed baseline. The opponent's cash fell still more, so the loss margins improved to −8,507 and −11,132. **Both games still lost.** More output, better care and a better margin are three different measurements.
+
+The chart below is regenerated from the six paired records and exported as PNG, SVG and CSV. Use the same accounting when changing animal count, hiring or sales: inspect actual harvest, feed consumption, direct costs, both final cash totals and wins gained or lost.
+
+
+---
+
+### Keep discovery, transfer and fresh confirmation separate
+
+The sheep transfer reuses 204 frozen feed-baseline results and runs 204 new sheep games. Its six additional wins come from three selected public histories in both seats. The rule did not activate in any of the 72 ranked cells, so that subset checks preservation only. Related implementations and duplicated seeds are not independent trials.
+
+All 14 active transfer cells harvested 108 paddock wool and lost no paddock animal. Daily care was complete in 12 of them. In both seats of history 106929029, only five of six sheep were cared for on day 28, and the controller recorded two capacity declines. This remaining care miss is retained even though the final wool total was unaffected; technical accounting success does not mean every husbandry target was met.
+
+The combined source preserves the complete later cattle policy and appends the already frozen sheep repair without retuning either. Twenty new composition games check the two components together, including remaining losses. A separate prospective comparison runs both the later cattle parent and combined policy against 36 newly collected public-route slots in both seats, using one previously unused seed. Those slots contain 32 distinct public episodes and 29 distinct worker schedules. The ranks include 1–10 and eight lower ranks. Guarded public histories cannot reproduce private adaptive opponents.
+
+The tables below retain all losses, show both policies and identify inactive comparisons. These local checks justify an experiment; they cannot establish a Kaggle rating. New public episodes, including small losses caused by prices despite equal output, remain the strongest way to find missing failure families.
+
+Completed fresh result: parent 52 wins/20 losses and combined 52 wins/20 losses. Wins gained: 0; lost: 0. The sheep branch activated in 0 of 72 combined cases; 72 inactive cases matched both parent rewards and terminal-state hashes. This panel therefore supplies no fresh active sheep-effect evidence. The top-ten and lower-rank breakdowns remain in the table.
+
+
+---
+
+### A new public loss: milk volume, not a lower milk price
+
+Moon version 39's first completed public loss, episode 107488643, ended at −7,350. Its submitted source reproduced all 719 actions on the recorded observations, and both players' cash transitions reconciled. It sold 266 milk for 50,205; the rival sold 347 for 63,671. Our average milk sale price was higher, yet the 81-unit volume gap produced a 13,466 revenue deficit. Our egg sales and other savings offset part of that gap. No animal disappeared at dawn.
+
+One later cattle substitution completed and yielded 21 extra milk units. That confirms execution, not that the later switch caused or fixed the loss. The opponent bought 13 cows versus our nine and used 280 worker hires versus our 260. These observed differences motivate a new production experiment; changing the policy still requires a full counterfactual game. Neither the combined source nor its fresh-test selection was retuned after seeing this loss.
+
+### Try the production-versus-cash experiment
+
+Set `RUN_SHEEP_COMPARISON=True` below to rerun six complete games: feed baseline, first sheep controller and repaired controller, both seats. Edit one of those files to test a hypothesis; its old reward assertions are removed automatically and its new hash is recorded. The default remains disabled so a normal Run All executes only the six combined-policy demonstrations.
+
+If this lab helps you explain a loss or improve an agent, an upvote is appreciated. Reproducible failures are useful contributions too: keep them when sharing an improvement.

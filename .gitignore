@@ -11,3 +11,7 @@ tool-results/
 *.jsonl
 *.jsonl.gz
 *.pyc
+
+# Kaggle research raw payloads (duplicate of extracted .py)
+kaggriculture/research/kaggle_dl/raw_*.json
+kaggriculture/research/kaggle_dl/*.ipynb
