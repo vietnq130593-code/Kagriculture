@@ -1946,3 +1946,20 @@ Stage Summary:
 - Tier-1 metrics trung thực: H1/H2 trung tính vs đối thủ (chỉ H3 đóng +$188-290 vs kme3v39); giá trị thật của Tier-1 = tie-break vs mirror + bảo hiểm endgame + không còn nhánh feed vô ích
 - Lesson kỹ thuật: kaggle_environments raw exec không có __file__ — mọi agent đọc file ngoài PHẢI try/except; bash `cd && (A) & (B) &` precedence bug (cd chỉ áp dụng subshell đầu)
 - Sẵn sàng Tier-2 (H5 conditional memory, H7 impact model, H6 steering) cho task sau theo 03_BREAKTHROUGH_PLAN.md
+
+---
+Task ID: 75-ops (supplement)
+Agent: Ari (main-agent)
+Task: Sửa sự cố hạ tầng phát hiện trong lúc browser-verify UI arena (Task 75)
+
+Work Log:
+- Phát hiện 1: arena-service pid cũ (1149, sống 2h50m từ boot sandbox) chạy code CỔ (agents Task-25: v5/v4/kain...) — bun --hot không reload file bị git thay bằng rename (git checkout/reset làm gãy inotify watch)
+- Phát hiện 2: process khởi động trong tool-session bị kill khi call kết thúc — kể cả nohup/setsid single-fork; CHỈ python double-fork daemon (fork + setsid + fork + execvp) sống sót qua các tool call
+- Phát hiện 3: UI page phải mở qua Caddy gateway (port 81), không qua localhost:3000 trực tiếp — socket io('/?XTransformPort=3005') chỉ route đúng qua gateway (trực tiếp 3000 → handshake rỗng)
+- Fix: kill pid cũ → restart double-fork daemon (bun --hot index.ts, pid 13848) → gateway 200 + hello đúng 10 agents [v16,v15,v14,v13,kme3,kme3v10,aurax,kme3v39,kawashigi,indark_e776]
+- Viết mini-services/arena-service/restart.sh (kỹ thuật double-fork + 3 lesson trên) để task sau tái sử dụng
+- Browser-verify e2e PASS: page / load, dropdown đủ 10 agents (v16 default), trận v16 vs kme3v39 seed random chạy đủ 720/720 lượt 23.5s live, banner "🏆 v16 THẮNG!", 0 console errors, screenshot bench/t75_ui_v16_vs_kme3v39.png
+
+Stage Summary:
+- Hạ tầng arena phục hồi hoàn chỉnh + quy trình restart bền vững (restart.sh)
+- e2e UI xác nhận toàn chuỗi: Caddy(81) → Next(3000) → socket XTransformPort → arena-service(3005) → run_battle.py → v16 thắng trận demo
