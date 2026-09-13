@@ -1716,3 +1716,27 @@ Work Log:
 Stage Summary:
 - 6 file = LOGS không phải REPLAY — chỉ chứa duration/stdout/stderr; toàn bộ thông tin có thể rút ra: v14 chạy sạch 6/6 (không lỗi/timeout, ~1s tổng/trận) → thua về chiến thuật, không phải technical
 - Cần replay thật để autopsy; hướng dẫn user nút tải đúng + phương án link episode
+
+---
+Task ID: 72
+Agent: Ari (main-agent)
+Task: User tải lên 3 trận thua của v14 trên Kaggle (1.json/2.json/3.json ~30MB) — dùng tools đo lường xác định chuyện gì đã xảy ra, cách v14 thua, phân tích + báo cáo
+
+Work Log:
+- 3 file vào /upload lúc 16:14: 1.json (32.6MB) + 2.json + 3.json (32.3MB) — MD5: 2≡3 (trùng nhau) → thực chất 2 THUA duy nhất; v14 = "Mr. Architect": thua BorisV $100.603-$100.050 (-$553, seed 1412509500, ep 108583841) và Dmitriy Ulybin $73.176-$79.149 (-$5.973, seed 661817856, ep 108581173)
+- CẢ HAI đối thủ = cùng họ KaggressurE (bằng chứng hành vi: mở màn y hệt — đồn WHEAT step 1, mua 8 COW/6 SHEEP/3 GOOSE/12 MELON seed/33 STRAW seed/31 CARROT/2 BUY_LAND, tile timeline trùng từng ngày) → 2 trận đều MIRROR-CLASS
+- TOOL MỚI replay_autopsy.py: money curve theo ngày (exact từ replay), timeline tiles/animals, hire, ops mix, buy animal — chạy cả 2 trận
+- TOOL god_replay_tx.py (thử) + PHÁT HIỆN ENGINE: Kaggle server engine ≠ pip 1.32.7 ở rounding giá ~$1 trên đơn vị hiếm (bước 1: local seat0 -397 vs kaggle -398, seat1 -43 vs -44, inventory/price khớp 100%) → $1 này làm BUY bị từ chối lệch → cascade (tape replay thuần lệch tới $36k seat). Thử patch round-half-up KHÔNG đúng (không có giá .5 nào ở bước 1) — lỗi nằm sâu hơn trong engine server
+- TOOL god_replay_sync.py (chính): đồng bộ state từng bước từ replay (patch kaggle_environments.environments['kaggriculture']['interpreter'] — registry giữ function object từ lúc import, KHÔNG phải module attr) + structify recorded obs → drift chỉ 0.2-0.4% → TX ledger đáng tin
+- GOD-REPLAY-SYNC LEDGER trận Dmitriy: gap item net: MILK -$4.255 (v14 bán 212u vs 238u) | FERTILIZER -$1.463 | STRAWBERRY -$1.383 | WHEAT +$1.590 (v14 hơn) | tổng item gap -$5.436 ≈ final -$5.973
+- ROOT CAUSE LOSS 2 (Dmitriy): BUG CON BÒ KẸT SHED — v14 mua 8 COW (t2×2, t66, t89, t151×2, t170, t177) nhưng chỉ ĐẶT 7: d3 v14 có 5 ô pasture/coop FULL (3 COW+2 SHEEP), mua bò #4 t89 → worker PICKUP nhưng không có ô trống → PLACE t96 fail (worker đứng [2,4] ô trống thường, không phải pasture) → ranh giới ngày _drop_inventories_to_shed (engine SA THẢ toàn bộ hands MỖI cuối ngày + đổ inventory về shed — đọc _end_of_day L879-882) → con bò về shed và PLANNER KHÔNG BAO GIỜ RETRY (mission mồ côi) → ngồi shed 26 NGÀY (d3→d29) dù từ d6 có 7 ô pasture trống! Dmitriy xây 6 pasture từ d1 (v14 chỉ 5) nên bò #4 của hắn đặt được
+- Chi phí bug: ~30 milk units × $160 ≈ $4.3k + manure/fert ~$1.5k = ~$5.8k ≈ toàn bộ khoảng thua; yield/bò 2 bên như nhau (212/7 ≈ 238/8) → 100% gap MILK = con bò mất tích
+- ROOT CAUSE LOSS 1 (BorisV): KHÔNG bug (shed sạch: COW transient d0-d7 max 2, GOOSE d10-d11) — v14 DẪN TRƯỚC đến -$1.356 (d22) rồi thua ngược 6 ngày cuối: BorisV bán 460u WHEAT (+61u, net +$2.5k) bằng cách FEED ít hơn (milk 210u vs v14 245u nhưng giá $55/u vs $47.6/u — v14 d milk giá thấp hơn), endgame d23 BorisV +$781; match trong dải noise mirror (±$1-2k)
+- commit + push GitHub
+
+Stage Summary:
+- 2/2 trận thua đều mirror-class cùng họ KaggressurE; loss nặng -$5.973 = 95% do BUG SHED-COW (thú kẹt shed khi pasture full + day-boundary dump, planner không retry — hoặc có thể mở rộng: mọi loại tài sản mồ côi), loss nhẹ -$553 = noise phân bổ wheat feed-vs-sell
+- ĐỀ XUẤT v15 (surgical theo L31): (1) SHED-ANIMAL WATCHDOG — mỗi ngày scan shed, nếu có COW/SHEEP/GOOSE + ô trống phù hợp → gán worker PICKUP+PLACE ưu tiên cao; (2) PASTURE-CAPACITY GUARD — không mua thú vượt quá ô trống + build pasture trước khi mua; ước +$4-6k trên seed dính (kiểu 661817856), 0 rủi ro vs seed thường (watchdog no-op khi shed sạch)
+- PHÁT HIỆN HẠ TẦNG: Kaggle server engine lệch pip 1.32.7 ~$1 rounding trên đơn vị hiếm → battery local có thể lệch nhẹ kết quả Kaggle (±$1-50/trận) — không ảnh hưởng chiến lược; god_replay_sync.py là cách chuẩn duy nhất mổ Kaggle replay từ giờ
+- LUẬT MỚI L36: replay Kaggle obs[t] = POST-action[t]; agent call i thấy PRE-state (so với obs[i-1]); interpreter chạy action[t] với obs0.step = t-1; end_of_day sa thải TOÀN BỘ hands mỗi cuối ngày (daily workers) + _drop_inventories_to_shed
+- L37: engine interpreter phải patch qua kaggle_environments.environments[name]['interpreter'] (registry giữ function object lúc import; patch module attr KHÔNG ăn)
