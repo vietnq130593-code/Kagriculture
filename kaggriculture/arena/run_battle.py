@@ -56,6 +56,10 @@ AGENTS = {
     "kme3v39": (os.path.join(ROOT, "kme3v39.py"), "agent"),
     "kawashigi": (os.path.join(ROOT, "kawashigi.py"), "agent"),
     "indark_e776": (os.path.join(ROOT, "indark_e776.py"), "agent"),
+    "v16h8": (os.path.join(ROOT, "v16h8.py"), "agent"),
+    "thomast": (os.path.join(ROOT, "thomast.py"), "agent"),
+    "thomast_t0": (os.path.join(ROOT, "thomast_t0.py"), "agent"),
+    "thomast_t3": (os.path.join(ROOT, "thomast_t3.py"), "agent"),
 }
 
 

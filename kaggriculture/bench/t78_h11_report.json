@@ -1,0 +1,425 @@
+{
+ "latest_daily": {
+  "date": "2026-09-13",
+  "daily_dataset_slug": "kaggriculture-episodes-2026-09-13",
+  "daily_dataset_url": "https://www.kaggle.com/datasets/kaggle/kaggriculture-episodes-2026-09-13",
+  "episode_count": "654",
+  "total_bytes": "21470209057",
+  "top_avg_score": "3187.717047",
+  "median_avg_score": "3007.474791"
+ },
+ "elo_trend_7d": [
+  [
+   "2026-09-06",
+   3017.729278
+  ],
+  [
+   "2026-09-07",
+   3020.888017
+  ],
+  [
+   "2026-09-08",
+   2948.453701
+  ],
+  [
+   "2026-09-09",
+   3008.171959
+  ],
+  [
+   "2026-09-10",
+   3080.904291
+  ],
+  [
+   "2026-09-11",
+   3107.199452
+  ],
+  [
+   "2026-09-12",
+   3169.947465
+  ],
+  [
+   "2026-09-13",
+   3187.717047
+  ]
+ ],
+ "top20": [
+  {
+   "id": "108385318",
+   "elo": 3187.717047
+  },
+  {
+   "id": "108377042",
+   "elo": 3186.817385
+  },
+  {
+   "id": "108381189",
+   "elo": 3186.817385
+  },
+  {
+   "id": "108377045",
+   "elo": 3186.817385
+  },
+  {
+   "id": "108372810",
+   "elo": 3186.48337
+  },
+  {
+   "id": "108368104",
+   "elo": 3186.48337
+  },
+  {
+   "id": "108390115",
+   "elo": 3185.302098
+  },
+  {
+   "id": "108653397",
+   "elo": 3184.930453
+  },
+  {
+   "id": "108667748",
+   "elo": 3184.742287
+  },
+  {
+   "id": "108714609",
+   "elo": 3184.504516
+  },
+  {
+   "id": "108702330",
+   "elo": 3184.504516
+  },
+  {
+   "id": "108714608",
+   "elo": 3184.504516
+  },
+  {
+   "id": "108702328",
+   "elo": 3184.504516
+  },
+  {
+   "id": "108706449",
+   "elo": 3184.504516
+  },
+  {
+   "id": "108698225",
+   "elo": 3184.504516
+  },
+  {
+   "id": "108710580",
+   "elo": 3184.504516
+  },
+  {
+   "id": "108706451",
+   "elo": 3184.504516
+  },
+  {
+   "id": "108710581",
+   "elo": 3184.504516
+  },
+  {
+   "id": "108663358",
+   "elo": 3183.610409
+  },
+  {
+   "id": "108694094",
+   "elo": 3182.875243
+  }
+ ],
+ "episodes": [
+  {
+   "episode_id": 108385318,
+   "teams": [
+    "Majkel1337",
+    "M & M & P & Q"
+   ],
+   "elo": 3187.717047,
+   "rewards": [
+    131651.0,
+    136241.0
+   ],
+   "seats": [
+    {
+     "money": 131651,
+     "units": 1509,
+     "hires": 290,
+     "quads": 3,
+     "h0_share": 0.0412,
+     "sells_by_product": {
+      "WHEAT": 562,
+      "FERTILIZER": 216,
+      "WOOL": 64,
+      "MILK": 298,
+      "MELON": 67,
+      "EGG": 78,
+      "STRAWBERRY": 204,
+      "TOMATO": 20
+     },
+     "nearest_route": 1,
+     "route_sim": 0.8314
+    },
+    {
+     "money": 136241,
+     "units": 1653,
+     "hires": 267,
+     "quads": 4,
+     "h0_share": 0.2603,
+     "sells_by_product": {
+      "FERTILIZER": 263,
+      "WHEAT": 280,
+      "CARROT": 98,
+      "WOOL": 43,
+      "EGG": 174,
+      "MILK": 303,
+      "STRAWBERRY": 206,
+      "MELON": 101,
+      "TOMATO": 185
+     },
+     "nearest_route": 11,
+     "route_sim": 0.8776
+    }
+   ]
+  },
+  {
+   "episode_id": 108377042,
+   "teams": [
+    "Majkel1337",
+    "M & M & P & Q"
+   ],
+   "elo": 3186.817385,
+   "rewards": [
+    147908.0,
+    134174.0
+   ],
+   "seats": [
+    {
+     "money": 147908,
+     "units": 1585,
+     "hires": 290,
+     "quads": 3,
+     "h0_share": 0.0807,
+     "sells_by_product": {
+      "WHEAT": 488,
+      "FERTILIZER": 270,
+      "WOOL": 381,
+      "MILK": 144,
+      "MELON": 72,
+      "STRAWBERRY": 201,
+      "TOMATO": 29
+     },
+     "nearest_route": 1,
+     "route_sim": 0.9522
+    },
+    {
+     "money": 134174,
+     "units": 1602,
+     "hires": 256,
+     "quads": 4,
+     "h0_share": 0.232,
+     "sells_by_product": {
+      "FERTILIZER": 240,
+      "WHEAT": 240,
+      "CARROT": 230,
+      "WOOL": 272,
+      "EGG": 20,
+      "MILK": 119,
+      "STRAWBERRY": 196,
+      "MELON": 102,
+      "TOMATO": 183
+     },
+     "nearest_route": 5,
+     "route_sim": 0.9429
+    }
+   ]
+  },
+  {
+   "episode_id": 108381189,
+   "teams": [
+    "Majkel1337",
+    "M & M & P & Q"
+   ],
+   "elo": 3186.817385,
+   "rewards": [
+    94216.0,
+    96673.0
+   ],
+   "seats": [
+    {
+     "money": 94216,
+     "units": 1474,
+     "hires": 290,
+     "quads": 3,
+     "h0_share": 0.0682,
+     "sells_by_product": {
+      "WHEAT": 456,
+      "FERTILIZER": 156,
+      "WOOL": 88,
+      "MILK": 160,
+      "MELON": 72,
+      "EGG": 82,
+      "STRAWBERRY": 193,
+      "TOMATO": 113,
+      "CARROT": 154
+     },
+     "nearest_route": 10,
+     "route_sim": 0.9394
+    },
+    {
+     "money": 96673,
+     "units": 1754,
+     "hires": 263,
+     "quads": 4,
+     "h0_share": 0.1709,
+     "sells_by_product": {
+      "FERTILIZER": 203,
+      "WHEAT": 418,
+      "CARROT": 216,
+      "WOOL": 36,
+      "EGG": 256,
+      "MILK": 113,
+      "STRAWBERRY": 134,
+      "MELON": 96,
+      "TOMATO": 282
+     },
+     "nearest_route": 2,
+     "route_sim": 0.9158
+    }
+   ]
+  },
+  {
+   "episode_id": 108377045,
+   "teams": [
+    "Majkel1337",
+    "M & M & P & Q"
+   ],
+   "elo": 3186.817385,
+   "rewards": [
+    105635.0,
+    119255.0
+   ],
+   "seats": [
+    {
+     "money": 105635,
+     "units": 1305,
+     "hires": 290,
+     "quads": 3,
+     "h0_share": 0.0789,
+     "sells_by_product": {
+      "WHEAT": 429,
+      "FERTILIZER": 150,
+      "WOOL": 71,
+      "MILK": 168,
+      "MELON": 72,
+      "EGG": 106,
+      "STRAWBERRY": 248,
+      "TOMATO": 8,
+      "CARROT": 53
+     },
+     "nearest_route": 1,
+     "route_sim": 0.8793
+    },
+    {
+     "money": 119255,
+     "units": 1713,
+     "hires": 263,
+     "quads": 4,
+     "h0_share": 0.2027,
+     "sells_by_product": {
+      "FERTILIZER": 236,
+      "WHEAT": 291,
+      "CARROT": 256,
+      "WOOL": 51,
+      "EGG": 290,
+      "MILK": 139,
+      "STRAWBERRY": 284,
+      "MELON": 102,
+      "TOMATO": 64
+     },
+     "nearest_route": 11,
+     "route_sim": 0.9273
+    }
+   ]
+  },
+  {
+   "episode_id": 108372810,
+   "teams": [
+    "Majkel1337",
+    "M & M & P & Q"
+   ],
+   "elo": 3186.48337,
+   "rewards": [
+    125465.0,
+    139521.0
+   ],
+   "seats": [
+    {
+     "money": 125465,
+     "units": 1559,
+     "hires": 290,
+     "quads": 3,
+     "h0_share": 0.0385,
+     "sells_by_product": {
+      "WHEAT": 588,
+      "FERTILIZER": 195,
+      "WOOL": 127,
+      "MILK": 280,
+      "MELON": 72,
+      "STRAWBERRY": 235,
+      "TOMATO": 45,
+      "CARROT": 17
+     },
+     "nearest_route": 1,
+     "route_sim": 0.8666
+    },
+    {
+     "money": 139521,
+     "units": 1611,
+     "hires": 270,
+     "quads": 4,
+     "h0_share": 0.191,
+     "sells_by_product": {
+      "FERTILIZER": 264,
+      "WHEAT": 137,
+      "CARROT": 234,
+      "WOOL": 308,
+      "EGG": 82,
+      "MILK": 160,
+      "STRAWBERRY": 126,
+      "MELON": 90,
+      "TOMATO": 210
+     },
+     "nearest_route": 5,
+     "route_sim": 0.8846
+    }
+   ]
+  }
+ ],
+ "v16": {
+  "routes": 13,
+  "hour_histogram": {
+   "0": 305,
+   "1": 588,
+   "6": 101,
+   "8": 91,
+   "2": 201,
+   "17": 322,
+   "16": 182,
+   "18": 331,
+   "21": 556,
+   "4": 98,
+   "15": 235,
+   "22": 438,
+   "23": 359,
+   "14": 195,
+   "5": 141,
+   "7": 79,
+   "9": 164,
+   "10": 103,
+   "20": 295,
+   "13": 170,
+   "11": 92,
+   "12": 78,
+   "3": 94,
+   "19": 265
+  },
+  "hour0_share": 0.0556
+ }
+}

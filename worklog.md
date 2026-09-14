@@ -2010,3 +2010,31 @@ Stage Summary:
 - Tổng trạng thái 12 hypothesis: 7 xong (H1,H2,H3,H4 gộp,H7,H10 + H5 built-not-promoted), 5 chưa (H6,H8,H9,H11,H12)
 - Mục tiêu tổng #1 #2 đạt; #3 (Kaggle >60% + H11 theo dõi) blocked: chưa submit + chưa có pipeline
 - Đề xuất thứ tự phần còn lại: H8 (rẻ, nhắm số hòa còn lại vs v15/v14, tái dùng infra R44) → H11 (bảo hiểm meta 0-risk, kéo lại replay) → H6 (cần thomast-proxy) → H12 (audit rẻ, half-covered bởi H1 gate) → H9 (cuối, rủi ro no-op như H5)
+
+---
+Task ID: 78
+Agent: Ari (main-agent)
+Task: User yeu cau trien khai va thu nghiem cac phuong an theo thu tu de xuat Task 77-R: H8 → H11 → H6 → H12 → H9
+
+Work Log:
+- H8 NGHIEN CUU: giai nen payload andrewsokolovsky Breaking-the-Tie (158KB) — co che goc: prev_opp_money−opp_money ≥ $100 tai step 217 → _MARKET_OVERLAY vinh vien → action + Δ(base→front-run variant) tren 4 mon WOOL/MILK/MELON/STRAW; probe v16-wrap vs v15/v14/kme3v39 seed 350: step 217 spend = −$108 (EARN) nhung step 218 = $581/$481 (mua pasture+cattle) → checkpoint cohort minh = 218, dat window (217,218,219)
+- H8 THIET KE v1 (uncap own_next) THAT BAI co dinh luong: trigger dung (1 lan/ghế) nhung extra_units=0 — trong mirror own_next == opp_qty (cung tape) → no-op; viet lai v2 = SECOND PASS horizon-2: khi flag bat, _front_run them quet plan[step+2] (item khac pass-1, cap = lich trinh step+2 cua minh, giu het gate H1, KHONG suppression — stock-clamp o step+2 thay the)
+- H8 BUILD: bench/t78_build.py tao v16h8 + v16h8i (window 9999 = inert control); INERTNESS: v16h8i vs v16 8 game = dong-dollar tung cent moi ghế (a0=b0, a1=b1); PHAT HIEN PHU: v16-self-play seed 352 seat-first-mover dang $132 (engine xu ly seat0 truoc) — bang chung them cho front-run
+- H8 VERIFY: extra_units 25-30/game, gap v16h8−v15 cai thien +$148/+$279 (seed 350/351), deterministic 2 ghe
+- H8 BATTERY (daemon t78_matrix seeds 350-354 x2): v16h8 vs v15/v14 = 10/10 +$444 worst 1.0007 (parent v16 9/10 +$275 worst 0.9989 — xoa sach seat-game thua, 0 hoa 0 thua); vs kme3v39 8/10 +$3,276 ≈ parent 8/10 +$3,302; vs parent v16 9/10 +$110 (mọi seed-avg duong +$91..139)
+- H8 FULL BATTERY (t78_full 8 pairings): v13 10/10 +$5,493 | kme3 8/10 +$4,648 | kme3v10 8/10 +$3,426 | aurax 8/10 +$3,428 | kawashigi 10/10 +$35,905 | indark 10/10 +$23,073 | v16h5 10/10 +$465 | v16h57 10/10 +$296; DOI CHUNG CUNG SEED parent (t78_parent_base): kme3 8/10 +$4,672 | kme3v10 8/10 +$3,452 | aurax 8/10 +$3,454 → 8/10 la seed-variance CHA TRUYEN (parent cung 8/10, lech chi $24-26) — H8 khong gay hai
+- H8 PROMOTE: v16.py = v16h8 (ARI CLASS Mk-V, 284,290 bytes, SHA 239cfa67ad9306ab); xoa v16h8i/v16h6/v16h6i
+- H11 PIPELINE (bench/t78_h11_refresh.py): index dataset kaggle/kaggressurE-episodes-index (tim qua API search + loc suffix — tranh loi chinh ta tay; KGAT token bi TU CHOI datasets.get 403 → dataset public, tai an danh); daily moi nhat 2026-09-13 (654 episodes); manifest → top-20 Elo 3183-3188; tai 5 episode (~167MB, .gitignore); bao cao diff tape: top Elo 7 ngay 3018→3188 (meta leo nhanh); tran dinh = Majkel1337 vs 'M & M & P & Q' (thang 4/5, h0-share 17-26%, 1600-1750 units, 4 quads, 256-270 hires); tape top chua phai near-mirror v16 (cosine 0.83-0.95) — GATE H11 PASS end-to-end
+- H6 THOMAST: extract agent tu notebook 93.8% (loai cell matplotlib/validation); decode 5 tree: block0 tape0, block1 doc f28(YARN)+f35(MILK demand), block2/3 tape0, block4 (step 576) = px_CARROT ≤ 54 → tape3; tape3 = late-liquidation (WHEAT 3M + CARROT 2M + MILK 2M dump 576-719); thomast tapes = CUNG HO yhay lineage (plants MELON12/WHEAT31/STRAW20 giong het routes minh, chi khac HIRE 62 vs 55-59 + WHEAT-sells 234 vs 67-77); dang ky thomast + thomast_t0 + thomast_t3 3 tang
+- H6 BATTERY: v16 vs thomast 10/10 +$9,752 | vs t0 10/10 +$9,903 (≈ natural → router tu chon tape0) | vs t3 10/10 +$14,088 → GIA TRI STEERING = +$4,185/game NHUNG
+- H6 BAT LOC (bench/t78_shed_probe): px_CARROT tu nhien 35 → 97@576 → 185@672 (thieu hut toan cuc); shed CARROT = 0 suot game (21u moi o t672) — ca meta KHONG san xuat carrot → dump bat kha thi (can +150-700u tai 576, minh co 0; buy-sell vong lap am tuyet doi) → H6 = NEGATIVE RESULT co dinh luong (+$4.2k neu co carrot — da checkpoint lai bang t3); xoa v16h6 files, giu thomast_t0/t3 lam chung
+- H12 AUDIT (tu data H11): v16 histogram — h0 5.6%, h1 10.7% (dinh), h21-23 24.6% (ban TRUOC tick demand); doi top thang — cum h23→h0→h1→h2 (h0 17-26%, ban SAU tick kep gia hoi phuc); v16 da co 1 phan pattern (h1 = gio dinh) nhung thieu h0; danh gia: loi ~1%/don vi, xung dot kien truc voi H8 (front-run keo nguoc chieu delay-to-h0) + rui ro L38 → DEFER, document day du
+- H9: bo theo ke hoach (dieu kien "chi lam neu H8 xong ma van con hoa" — H8 da xoa sach 0 hoa/0 thua voi v15/v14)
+- FINAL: registry 17 agents (v16 Mk-V + v16h8 + thomast trio) 3 tang; arena-service restart (kill 2 pid cu Sep13 + restart.sh, hello 17 agents dung); UI e2e qua gateway :81 — v16 vs indark_e776 seed 350 → "🏆 v16 THẮNG!", 0 console/page errors, screenshot bench/t78_ui_v16_vs_indark.png; mobile 390px responsive OK; lint PASS; dev.log sach (GET / 200)
+
+Stage Summary:
+- v16 = ARI CLASS Mk-V = Mk-IV + H8 spend-detector tie-break (horizon-2 front-run overlay): duy nhat bien the trong lich su xoa sach seat-game thua vs v15/v14 (9/10→10/10, worst 0.9989→1.0007) va thang parent moi seed — 13/13 pairing khong co tran nao thua seed-avg
+- H11 pipeline HOAT DONG end-to-end (index→manifest→top-5 episodes→signature diff): meta Kaggle dang leo (3018→3188/7 ngay), doi top thang (M&M&P&Q) co h0-clustering 17-26% + unit-sell cao hon
+- H6 = negative result dinh luong: steering dung co gia tri +$4.2k nhung bat kha thi voi thanh phan farm hien tai (0 carrot production); lai giu thomast + t0/t3 trong registry de do lai neu v17 doi tape
+- H12 audit xong: khoang cach h0-share 5.6% vs 17-26% la that nhung defer (xung dot H8 + rui ro L38)
+- Artifacts: bench/t78_*.{py,json,md,png} + t78_h11_tapes/ (gitignored); thomast{,_t0,_t3}.py; v16h8.py (doi chung = v16 Mk-V)
