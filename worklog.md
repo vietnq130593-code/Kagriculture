@@ -1989,3 +1989,24 @@ Stage Summary:
 - H7 (impact model): THANG THUC SU — 2 cai thien cong don: key chinh xac (bang gia engine thay vi heuristic batch 8-24) + impact_slots (xep hang toan cuc thay vi block contiguous)
 - Toan bo code v16 family DA STRIP comment/docstring (AST-verified + dong-dollar 4/4); attribution nguon goc van day du trong research/ docs (ANALYSIS_KAITO.md v.v.) — khuyen nghi re-add license text neu public release
 - Artifacts: bench/t76_*.json (33 ket qua battery + summary + stripcheck + promocheck), t76_local_bank.json, tools strip_comments/t76_build/t76_fit_protos/t76_h5_hitrate/t76_matrix; registry 13 agents ca 3 tang
+
+---
+Task ID: 77-R
+Agent: Ari (main-agent)
+Task: User hỏi xác nhận H6 + Tier 3 còn tồn tại; rà soát research docs + code, báo cáo đầy đủ những hypothesis chưa triển khai/cần kiểm thử
+
+Work Log:
+- Đọc lại research/03_BREAKTHROUGH_PLAN.md toàn văn (127 dòng, H1-H12 chia 3 tier + lộ trình 3 đợt + 3 mục tiêu đo lường)
+- Verify code-level trên v16.py (Mk-IV, 281,823 bytes): H1 (_town_demand_now L30 + gate L385/L410 + r36_debts L1242-1272) ✓, H2 (_SETTINGS L650 dead_stock/terminal_liquidation:True) ✓, H3 (_R88_ANIMAL_DAYS L2072) ✓, H7 (_r37_quote_priority L1365 impact qty×max(0,now−later) + _r37_reorder_sales L1380 impact_slots) ✓; cmp v16.py == v16h7.py IDENTICAL
+- Grep H6/H8/H9 trong v16.py: 0 match (opponent_money/px_CARROT/clone_distance/steering) → 3 mục Tier-2 còn lại CHƯA triển khai; H5 không promote (giữ v16h57)
+- Đối chiếu registry run_battle.py AGENTS (13 agents): KHÔNG có thomast-proxy → điều kiện tiên quyết H6 chưa có
+- Kiểm tra H11: không có script nào pull episodes-index/manifest (chỉ nhắc trong docs); upload/ gốc mất → pipeline cũng là đường kéo lại data
+- Kiểm tra H12: không có audit giờ-bán nào cho v15/v16; hourly_autopsy.py là tool v5-era lỗi; PHÁT HIỆN MỚI: _town_demand_now L33 đã tính center tick giờ 0 (step%24==0 → d=1) từ Task 75 → một nửa premise H12 (gate giờ 0) đã được H1 exploit sẵn
+- Đọc t76_summary.json 33 rows: Mk-IV (v16h7) 10/10 vs 9 đối thủ, vs parent 8/10 +$138 worst 1.0000 (2 hòa dollar); v16h5 0/10 −$62, v16h57 4/10 +$55 → xếp hạng v16h7 > v16h57 > v16h5 đúng như Task 76
+- Scan 02_TOP_TECHNIQUES.md headers: các mục ngoài H-list (A5/A7/A8/B3/D1-D3) đã được triage hợp lý ở Task 74
+
+Stage Summary:
+- Xác nhận user đúng cả 2: H6 (Tier 2) chưa làm; Tier 3 có 3 mục — H10 xong, H11/H12 chưa
+- Tổng trạng thái 12 hypothesis: 7 xong (H1,H2,H3,H4 gộp,H7,H10 + H5 built-not-promoted), 5 chưa (H6,H8,H9,H11,H12)
+- Mục tiêu tổng #1 #2 đạt; #3 (Kaggle >60% + H11 theo dõi) blocked: chưa submit + chưa có pipeline
+- Đề xuất thứ tự phần còn lại: H8 (rẻ, nhắm số hòa còn lại vs v15/v14, tái dùng infra R44) → H11 (bảo hiểm meta 0-risk, kéo lại replay) → H6 (cần thomast-proxy) → H12 (audit rẻ, half-covered bởi H1 gate) → H9 (cuối, rủi ro no-op như H5)
