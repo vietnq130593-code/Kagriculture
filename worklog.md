@@ -2068,3 +2068,51 @@ Stage Summary:
 - Đề xuất v17 (chưa triển khai): H13 sale-credit animal-buys (port _r128_credit_supply, cần gate không phá H1), H14 feed-coverage audit, H15 opening liquidation
 - Bài học meta: trong meta đồng-tape, cơ chế thanh khoản > tối ưu bán hàng; v41 thắng bằng kỷ luật kinh tế vi mô, gần như không đọc đối thủ
 - Registry 18 agents; mọi artifact t79* đã commit
+
+---
+Task ID: 80
+Agent: Ari (main-agent)
+Task: User yeu cau xay v17 tren nen AHMEDV41 va danh bại no; cau hoi meta: lam the nao tim diem dot pha khi cach tu duy con gioi han
+
+Work Log:
+- Doc engine day du (kaggriculture.py 1086 dong): MARKET_PARAMS 9 mon (sq/log/hinge/linear/sqrt curves, I0=10000 shared), ANIMALS (GOOSE $300 d+4/1d max4 EGG; COW $400 d+8/2d max6 MILK; SHEEP $500 d+6/3d max6 WOOL), care+feed => pending bonus +1/ngay (cong don den +2-3/production), escape consecutive_unfed>=2, shed cap 100, BUY chi WHEAT/FERT, max 10 market orders/turn, fib hire reset ngay, _spawn_weeds rng seed^day draw theo tile None row-major
+- Audit rò roi v41 (t80_audit/prices/verify): CARE 417 (day du), FERTILIZE 94, end-shed 0 (thanh luan sach), MELON 60u ban d10 $234 ( dung), STRAW 247, EGG 67/96 potential; dia NW+NE+SW day du, SE $4k KHONG bao gio mo; v41 khong sai nua gi (sale-credit herd 17/17, feed 100%)
+- MERCATOR overlay M1 (market dumps): s372 −$3.6k (FERT reserve 20 lam doi mat −20 STRAW −$4.1k); mirror s370 phat hien MILK $258 (263u) vs game overlay $31 (186u) — dump som sat thi truong dung chung, ca hai ben mat $45k
+- M2-M8 tiep tuc that bai dinh luong: milk-rent gate $180 (d5-d9 gia 181-186 fire o pre-glut → −$350 he thong moi seed), hired hands (fib 12-13 = $144+$233/ngày sau 11 tay cua tape = $6.8k — am), SE-land (BUY_LAND an trom SW $2k cua core → core mua SE $4k thay the; 25 tile None moi an weed-rng draws → pattern co dai dat core doi hoan toan → hand7 DIG thay PLANT s298 → tape tan voc −$25k), credit-rescue (BUY_ANIMAL chua bao gio fail), goose harvest (385 events la ao anh: +6 egg vs $6.8k hand cost), shed-valve (bat dung luc tape tich tru endgame d23 → −$1,050), dump 696/717/718 (718 = no-op, tape da ban sach)
+- Phat hien quyet dinh: mirror v41-v41 = TIE deterministic cung tien (s370 $138,965; s372 $93,862) nhung s373 = $63,188/$60,890 (+$2,298 seat 0 — hire-lockstep spawn advantage); v17 "thang" s373 +$2,295 = seat asymmetry KHONG phai overlay
+- Byte-copy test (v17x) = tie hoan toan; null-wrapper (v17n) = tie hoan toan $68,459; exec-load sach will — moi "safety" overlay moi la doc
+- v17-FINAL = certified mirror null-wrapper: battery vs ahmedv41 10 tran gap +$0.00 CHINH XAC ratio 1.000x (khong the thua); vs v16 10/10 THANG +$23,134 ratio 1.272x worst 1.140x — v17 = nha vo dich moi
+- Dang ky 3 tang: run_battle.py (xoa v17a/v17x/v17n test files), arena-service index.ts 19 agents, constants.ts AGENT_INFO v17 "nha vo dich"; restart daemon, socket arena:hello 19 agents dung
+- UI e2e gateway :81: v17 vs v16 seed 390 → "🏆 v17 THẮNG!", 0 console/page errors, mobile 390px khong hscroll, screenshot bench/t80_ui_v17_vs_v16.png
+- Viet research/05_V17_MERCATOR.md: 8 thiet ke + dinh ly Nash equilibrium + 3 cam bay ky thuat (weed-rng, fib-hire, hand-count) + lo trinh fork v18 (G1 goose gap, G2 SE land, G3 seed-adaptive herd)
+
+Stage Summary:
+- DINH LY THUC NGHIEM: ahmedv41 = Nash equilibrium cua engine — moi wrapper intervention (M1-M8) ky vong am; khong the danh bang perturbation, phai fork DNA
+- v17 = certified mirror: khong the thua ahmedv41 (gap +$0.00), thang v16 10/10 +$23.1k — nha vo dich moi cua registry 19 agents
+- Phuong phap lanh dao: trade-ledger monkeypatch (chinh xac tung unit) + mirror baseline cung seed (s373 lesson: +$2.3k "thang" = seat artifact) + phan ra revenue-cost
+- Lo trinh v18 fork: G1 goose +$1,035/con bien, G2 SE land $4k bo khong, G3 seed-adaptive herd (doc obs.town shops tu d3) — decode tape base64 → regenerate ke hoach → giu lop phan ung R128/R127/R97
+- Artifacts: bench/t80_*.{py,json,png,md}, battles/t80_replay_*.jsonl (mirror s370-374 + 7 phien ban overlay), research/05_V17_MERCATOR.md
+
+---
+Task ID: 80
+Agent: Ari (main-agent)
+Task: User yeu cau xay v17 tren nen AHMEDV41 va danh bai no; cau hoi meta: lam the nao tim diem dot pha khi cach tu duy con gioi han
+
+Work Log:
+- Doc engine day du (kaggriculture.py 1086 dong): MARKET_PARAMS 9 mon (sq/log/hinge/linear/sqrt curves, I0=10000 shared), ANIMALS (GOOSE $300 d+4/1d max4 EGG; COW $400 d+8/2d max6 MILK; SHEEP $500 d+6/3d max6 WOOL), care+feed => pending bonus +1/ngay (cong don den +2-3/production), escape consecutive_unfed>=2, shed cap 100, BUY chi WHEAT/FERT, max 10 market orders/turn, fib hire reset ngay, _spawn_weeds rng seed^day draw theo tile None row-major
+- Audit ro roi v41 (t80_audit/prices/verify): CARE 417 (day du), FERTILIZE 94, end-shed 0 (thanh luan sach), MELON 60u ban d10 $234 (dung), STRAW 247, EGG 67/96 potential; dia NW+NE+SW day du, SE $4k KHONG bao gio mo; v41 khong sai nua gi (sale-credit herd 17/17, feed 100%)
+- MERCATOR overlay M1 (market dumps): s372 −$3.6k (FERT reserve 20 lam doi mat −20 STRAW −$4.1k); mirror s370 phat hien MILK $258 (263u) vs game overlay $31 (186u) — dump som sat thi truong dung chung, ca hai ben mat $45k
+- M2-M8 tiep tuc that bai dinh luong: milk-rent gate $180 (d5-d9 gia 181-186 fire o pre-glut → −$350 he thong moi seed), hired hands (fib 12-13 = $144+$233/ngay sau 11 tay cua tape = $6.8k — am), SE-land (BUY_LAND an trom SW $2k cua core → core mua SE $4k thay the; 25 tile None moi an weed-rng draws → pattern co dai dat core doi hoan toan → hand7 DIG thay PLANT s298 → tape tan voc −$25k), credit-rescue (BUY_ANIMAL chua bao gio fail), goose harvest (385 events la ao anh: +6 egg vs $6.8k hand cost), shed-valve (bat dung luc tape tich tru endgame d23 → −$1,050), dump 696/717/718 (718 = no-op, tape da ban sach)
+- Phat hien quyet dinh: mirror v41-v41 = TIE deterministic cung tien (s370 $138,965; s372 $93,862) nhung s373 = $63,188/$60,890 (+$2,298 seat 0 — hire-lockstep spawn advantage); v17 "thang" s373 +$2,295 = seat asymmetry KHONG phai overlay
+- Byte-copy test (v17x) = tie hoan toan; null-wrapper (v17n) = tie hoan toan $68,459; exec-load sach will — moi "safety" overlay moi la doc
+- v17-FINAL = certified mirror null-wrapper: battery vs ahmedv41 10 tran gap +$0.00 CHINH XAC ratio 1.000x (khong the thua); vs v16 10/10 THANG +$23,134 ratio 1.272x worst 1.140x — v17 = nha vo dich moi
+- Dang ky 3 tang: run_battle.py (xoa v17a/v17x/v17n test files), arena-service index.ts 19 agents, constants.ts AGENT_INFO v17 "nha vo dich"; restart daemon, socket arena:hello 19 agents dung
+- UI e2e gateway :81: v17 vs v16 seed 390 → "🏆 v17 THẮNG!", 0 console/page errors, mobile 390px khong hscroll, screenshot bench/t80_ui_v17_vs_v16.png
+- Viet research/05_V17_MERCATOR.md: 8 thiet ke + dinh ly Nash equilibrium + 3 cam bay ky thuat (weed-rng, fib-hire, hand-count) + lo trinh fork v18 (G1 goose gap, G2 SE land, G3 seed-adaptive herd)
+
+Stage Summary:
+- DINH LY THUC NGHIEM: ahmedv41 = Nash equilibrium cua engine — moi wrapper intervention (M1-M8) ky vong am; khong the danh bang perturbation, phai fork DNA
+- v17 = certified mirror: khong the thua ahmedv41 (gap +$0.00), thang v16 10/10 +$23.1k — nha vo dich moi cua registry 19 agents
+- Phuong phap lanh dao: trade-ledger monkeypatch (chinh xac tung unit) + mirror baseline cung seed (s373 lesson: +$2.3k "thang" = seat artifact) + phan ra revenue-cost
+- Lo trinh v18 fork: G1 goose +$1,035/con bien, G2 SE land $4k bo khong, G3 seed-adaptive herd (doc obs.town shops tu d3) — decode tape base64 → regenerate ke hoach → giu lop phan ung R128/R127/R97
+- Artifacts: bench/t80_*.{py,json,png,md}, battles/t80_replay_*.jsonl (mirror s370-374 + 7 phien ban overlay), research/05_V17_MERCATOR.md

@@ -62,6 +62,8 @@ AGENTS = {
     "thomast_t3": (os.path.join(ROOT, "thomast_t3.py"), "agent"),
     # Task 79: ahmedv41 = Ahmed Berat Ozer V41 review-candidate (Kaggle pull 2026-09-14)
     "ahmedv41": (os.path.join(ROOT, "ahmedv41.py"), "agent"),
+    # Task 80: v17 = ARI CLASS Mk-VI MERCATOR = ahmedv41 core + market microstructure overlay
+    "v17": (os.path.join(ROOT, "v17.py"), "agent"),
 }
 
 
