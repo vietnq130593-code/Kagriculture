@@ -2038,3 +2038,33 @@ Stage Summary:
 - H6 = negative result dinh luong: steering dung co gia tri +$4.2k nhung bat kha thi voi thanh phan farm hien tai (0 carrot production); lai giu thomast + t0/t3 trong registry de do lai neu v17 doi tape
 - H12 audit xong: khoang cach h0-share 5.6% vs 17-26% la that nhung defer (xung dot H8 + rui ro L38)
 - Artifacts: bench/t78_*.{py,json,md,png} + t78_h11_tapes/ (gitignored); thomast{,_t0,_t3}.py; v16h8.py (doi chung = v16 Mk-V)
+
+---
+Task ID: 79
+Agent: Ari (main-agent)
+Task: User yêu cầu nghiên cứu link https://www.kaggle.com/code/ahmedberatozer/kaggriculture-v41-review-candidate — build đối thủ (nếu chưa có), v16 đấu 10 trận, so sánh/phân tích/nghiên cứu, báo cáo
+
+Work Log:
+- PULL notebook qua API kernels/pull (366KB, 13 cells) → extract: cell 4 = main.py 331,608B / 3175 dòng, 25 lần def agent chồng lớp, lớp cuối L3157 = R128(R127(R97(...))); self-contained chỉ stdlib; tapes nhúng base64+zlib
+- PHÁT HIỆN LINEAGE: kme3v39.py trong registry CHÍNH LÀ V39 của cùng tác giả Ahmed Berat Özer (55% code chung, cùng EXP markers + attribution) → v41 = v39 + funded atomic opening + R127 + R128
+- BUILD: copy nguyên văn → kaggressurE/ahmedv41.py; smoke entry OK (opening BUY WHEAT 5+10/SELL 60); đăng ký 3 tầng registry (run_battle.py / arena-service index.ts AGENTS 18 agents / constants.ts AGENT_INFO)
+- BATTERY 10 trận seeds 360-364 × 2 ghế (bench/t79_v16_vs_ahmedv41.json): **v16 thua 0/10**, avg $92,019 vs $121,132, gap −$29,113, worst ratio 0.695 — ĐỐI THỦ MẠNH NHẤT TỪNG GẶP (trước đó tệ nhất là 8/10 THẮNG); engine deterministic: cùng seed cùng kết quả cả 2 ghế
+- VALIDATE claim của họ: kme3v39 vs ahmedv41 s362 → $77,843 vs $101,321 (khớp chiều "thắng V39 128/128")
+- AUTOPSY 4 replay đầy đủ (s360/361/364/365, tools bench/t79_{analyze,executed,herd,deaths}.py):
+  * Hai bên chạy GẦN NHƯ CÙNG tape — orders BUY_ANIMAL giống hệt từng bước (s1 COW2+SHEEP2, s65/88/150×2/169/176 COW, s196 SHEEP×2, s217/226 SHEEP, s241 GOOSE×2, s265 GOOSE), plants MELON12/WHEAT162-163/STRAW33/CARROT31, hires ~253-254, mua feed 102u day0-9 như nhau
+  * CƠ CHẾ QUYẾT ĐỊNH #1 — SALE-CREDIT: v41 tại s65 chỉ có $249 nhưng order `SELL FERTILIZER 4 → BUY_ANIMAL COW` (engine tuần tự trong-lượt → đủ tiền); s196: `SELL MILK 12 → BUY_ANIMAL SHEEP 2` ($668+$552≥$1,000). v16 cùng lúc $84/$73 KHÔNG có SELL dẫn trước → order chết im, tape không retry
+  * CƠ CHẾ #2 — ĐÀN ĐẦY ĐỦ: v41 đặt đủ 17/17 con mọi game; v16 chỉ 12-13/17 (trượt 1 COW s169 + 2 SHEEP s196 + 1 SHEEP s217...) do nghèo tiền tại thời điểm mua; hệ quả v41 bán nhiều hơn WOOL 106u vs 66u, MILK 132u vs 77u, FERT 316u vs 239u
+  * CƠ CHẾ #3 — BỎ ĐÓI: v16 để 1 COW (4,4) đói 2 ngày liên tiếp d0-2 → BỎ TRỐN (engine consecutive_unfed≥2), lặp lại mọi replay; v41 feed 100%
+  * CƠ CHẾ #4 — OPENING THANH KHOẢN: v41 bán sạch starting wheat step 0 (net +$34, giữ $3,034 lỏng); v16 găm 13 WHEAT làm feed (còn $2,609) → cascade gap $275→$1,475 ngày 4-8 → +$20-40k cuối game
+  * Orders SELL "khổng lồ" của v41 (2,000u/lần) vô hại — engine per-unit lockstep clamp theo shed
+- Ghi chú engine: vật không feed vẫn đẻ; feed chỉ cần cho tồn tại (2 ngày) + care bonus; giá thú GOOSE $300/COW $400/SHEEP $500; market zero-spread (buy-sell round-trip net 0)
+- UI E2E qua gateway :81 (arena-service restart setsid, socket 18 agents): v16 vs ahmedv41 seed 366 → "🏆 ahmedv41 THẮNG!" $66,485 vs $77,138, 0 console/page errors; mobile 390px không hscroll, footer ok; screenshots bench/t79_ui_{v16_vs_ahmedv41,mobile}.png
+- Viết research/04_AHMEDV41_AUTOPSY.md (8 mục: nguồn gốc, self-claims, kết quả 10 trận, giải phẫu 4 lớp khác biệt, 3 lỗi gốc rễ v16, gợi ý v17 H13/H14/H15, nghịch lý chiến lược, artifacts)
+- Lint PASS; dev.log sạch
+
+Stage Summary:
+- ahmedv41 = đối thủ mạnh nhất lịch sử registry: v16 0/10 −$29,113; cũng thắng kme3v39 +$23.5k — đúng như self-claim 128/0 của họ
+- GỐC RỄ thất bại của v16 KHÔNG PHẢI chiến thuật đối kháng mà là 3 lỗi vi mô: (1) không có sale-credit tại 12 thời điểm mua thú của tape → trượt 4-5 con → mất WOOL/MILK/FERT suốt 20 ngày; (2) feed-coverage d0-2 bỏ đói 1 COW; (3) opening găm wheat thay vì tiền lỏng
+- Đề xuất v17 (chưa triển khai): H13 sale-credit animal-buys (port _r128_credit_supply, cần gate không phá H1), H14 feed-coverage audit, H15 opening liquidation
+- Bài học meta: trong meta đồng-tape, cơ chế thanh khoản > tối ưu bán hàng; v41 thắng bằng kỷ luật kinh tế vi mô, gần như không đọc đối thủ
+- Registry 18 agents; mọi artifact t79* đã commit

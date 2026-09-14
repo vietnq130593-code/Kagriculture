@@ -115,6 +115,7 @@ export const AGENT_INFO: AgentDesc[] = [
   { name: 'thomast', desc: 'THOMASTSCHINKEL V5 PUBLIC-STATE ROUTER 93.8% WR (Kaggle pull 2026-09-13, Task 78 extract) — 5 tape + decision tree chốt tape tại step 0/144/288/432/576; block 4 (day 24) đọc px_CARROT ≤ 54 → tape3 late-liquidation — mục tiêu steering H6 (dump CARROT đẩy router vào tape yếu)', tag: 'đối thủ router' },
   { name: 'thomast_t0', desc: 'thomast ép tape0 tại checkpoint step 576 (hành vi tự nhiên khi px_CARROT > 54)', tag: 'đối thủ router' },
   { name: 'thomast_t3', desc: 'thomast ép tape3 tại checkpoint step 576 (kịch bản BỊ STEER: px_CARROT ≤ 54) — đo giá trị steering', tag: 'đối thủ router' },
+  { name: 'ahmedv41', desc: 'AHMED BERAT OZER V41 REVIEW-CANDIDATE (Kaggle pull 2026-09-14, Task 79 extract, 317KB) — V39 base (kme3v39 cùng lineage, 55% code chung) + funded atomic opening kiểu Rayk Kretzschmar (BUY WHEAT 5+10/SELL 60 ngay step 0) + R127 field-projection safety + R128 service layer (feed-service swaps step 144-647: đổi lệnh FEED hết thức ăn thành PICKUP+1, prefetch kẻ rảnh; sale-credit step 144-695: bán WHEAT trong lượt để đủ tiền mua tiếp) · Self-claim: thắng V39/V40 128/128 trận trực tiếp, +110 win/3200 game vs public policies — đối thủ nặng ký nhất họ ahmedberatozer', tag: 'đối thủ V41 mới' },
 ]
 
 export const SPEED_OPTIONS: { value: number; label: string }[] = [

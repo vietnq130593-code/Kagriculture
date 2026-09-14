@@ -60,6 +60,8 @@ AGENTS = {
     "thomast": (os.path.join(ROOT, "thomast.py"), "agent"),
     "thomast_t0": (os.path.join(ROOT, "thomast_t0.py"), "agent"),
     "thomast_t3": (os.path.join(ROOT, "thomast_t3.py"), "agent"),
+    # Task 79: ahmedv41 = Ahmed Berat Ozer V41 review-candidate (Kaggle pull 2026-09-14)
+    "ahmedv41": (os.path.join(ROOT, "ahmedv41.py"), "agent"),
 }
 
 
