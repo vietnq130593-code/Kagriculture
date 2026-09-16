@@ -23,6 +23,9 @@ so với replay gốc (verification money match từng bước từng player).
   shed_total, seeds, unit_verbs (đếm PLANT/WATER/HARVEST/DROP/PICKUP/PLACE/moves...).
 - `daily.json` — tổng hợp theo ngày mỗi player: money_start/end, profit_day,
   buys/sells theo item (units+cash), hire_spend, land_spend, verbs, plants, animals, shed cuối ngày.
+  (`money_start`/`profit_day` = số dư cuối ngày trước / chênh lệch money chuẩn; bản trước tối 16-09
+  có bug off-by-one bỏ sót giao dịch step đầu ngày — đã sửa + regenerate, cột Δ trong 04A/04B
+  được viết lại theo dữ liệu chuẩn.)
 - `market.json` — giá + inventory thị trường từng step (shared).
 - `town.json` — shop unlock từng step.
 - `timeline.csv` — bản CSV gọn của timeline.

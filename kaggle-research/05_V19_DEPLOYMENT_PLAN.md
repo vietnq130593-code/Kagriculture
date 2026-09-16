@@ -22,7 +22,7 @@ là **3 tầng quyết định kết quả ở 4 ngày cuối**:
 2. **TROUGH THROTTLE** — cắt bán khi giá đáy, tích shed 65 units, chờ giá hồi +100% rồi mới bán:
    +$4,757 cho người làm, −$4,474 cho người không làm.
 3. **PORTFOLIO BREADTH** — match1 Majkel (top-1!) thua vì portfolio hẹp: không GOOSE/EGG
-   (−$10,926 ΔEGG cho ymg_aq), 9 dòng revenue của ymg_aq áp 5 dòng của Majkel. Người bán giá
+   (−$10,926 ΔEGG cho ymg_aq), 9 dòng revenue của ymg_aq so 8 dòng của Majkel (Majkel chỉ thiếu đúng EGG). Người bán giá
    TỆ hơn (STRA @96 vs @137) vẫn thắng nếu có thêm 2-3 dòng "không đối thủ".
 
 v18 hiện tại (4 edges: HORIZON-24 / OPEN-50 / FRONT-LOAD / ADVANCE-2) là **market micro-layer**,
@@ -46,9 +46,10 @@ hoàn toàn KHÔNG có 3 tầng trên. Đó là khoảng trống $8,000-15,000/g
   - **match1** = 109776263 (16-09 19:27): ymg_aq (hạng 4) vs Majkel1337 → 86,713 vs 86,262. **Majkel thua 451.**
   - **match2** = 109770002 (16-09 19:03): Majkel1337 vs DSM (hạng 3) → 91,845 vs 84,129. **Majkel thắng 7,716.**
 - Parser `top1/parse_replay.py` re-simulate lockstep engine từng bước (kể cả shed-impact của
-  DROP/PICKUP/PLACE trước market) → **0 sai lệch tiền trên 720×2 bước của cả 2 trận**. Mọi con số
+  DROP/PICKUP/PLACE trước market) → **0 sai lệch tiền trên 720×2 bước của cả 2 trận** (bug off-by-one của `profit_day` trong daily.json
+  đã được phát hiện và sửa trong review ngày 16-09 — cột Δ trong 04A/04B giờ là money-delta chuẩn). Mọi con số
   trong tài liệu này đều truy vết được về orders/timeline/daily/market/town JSON.
-- Engine facts đã verify từ source 1.32.7 (định vị dòng): `_end_of_day` auto-drop L860-882,
+- Engine facts đã verify từ source 1.32.7 (định vị dòng): `_end_of_day` auto-drop L860-893 (call L878),
   animal escape khi `consecutive_unfed ≥ 2` L817-819, care-bonus L829-830, town consume L728-749,
   lockstep market L544-628, hire fib L696-703, land NE/SW/SE = 1000/2000/4000 L95-97.
 
@@ -60,19 +61,19 @@ hoàn toàn KHÔNG có 3 tầng trên. Đó là khoảng trống $8,000-15,000/g
 
 | Pha | Ngày | Hành vi |
 |---|---|---|
-| Spend-down | d0-2 | Chi $3,000 xuống ~$5-180: seeds + 5-6 động vật đầu + feed + hire |
+| Spend-down | d0-2 | Chi $3,000 xuống ~$3-180: seeds + 5-6 động vật đầu + feed + hire |
 | Re-invest | d3-9 | Mua NE ($1,000) ngay revenue-event đầu (d5-6), SW ($2,000) d8-9; tiền rơi về $11-148 |
 | Compound | d10-24 | Bán liên tục nhưng giữ ≤ ~$3,000 idle; tiền quay ngay thành seed/animal |
-| Harvest | d25-28 | Dừng mua (buys → $0 từ d28), dừng feed (d28), cắt hiring d27 |
+| Harvest | d25-28 | Dừng mua (buys → $0 từ d28), dừng feed (d28), cắt bớt hiring từ d28 (11→10 hands) |
 | **Liquidate** | **d29** | **Xả toàn bộ tồn kho; đặc biệt giữ item đắt nhất cho step 719** |
 
 ### 2.2 Bảng chứng cứ gốc (trích 04A/04B)
 
 | Chỉ số | Majkel (2 trận) | Đối thủ | Δ ý nghĩa |
 |---|---|---|---|
-| Revenue ngày 29 (match2) | **$13,575** | DSM $6,943 | endgame dump = 96% margin trận |
+| Revenue ngày 29 (match2) | **$13,575** | DSM $6,943 | dump s719 = 96% revenue bước cuối của Majkel; step 719 mang 81% margin trận |
 | Cú dump step 719 (match2) | 42 STRA @173 avg = **+$7,258** | DSM +$1,260 | giữ hàng chờ giá cuối |
-| Trough throttle (match2) | +$4,757 (giữ 65u chờ 84→186) | DSM −$4,474 (bán đáy @102) | price-gated sell rate |
+| Trough throttle (match2) | +$4,757 (tích shed 65-68u chờ 84→186, giữ 42u cho s719) | DSM −$4,474 (bán đáy @102) | price-gated sell rate |
 | ΔEGG (match1) | $0 (không có GOOSE) | ymg_aq **+$10,926** (6 GOOSE $1,800 → 208 EGG) | breadth monopoly |
 | Avg sell STRA | match2 152.3 / match1 137.3 | DSM 139.3 / ymg 96.3 | timing nhạy giá |
 | Carrot factory | 125 gói seed từ d11 (match2) | DSM 76 gói từ d17 | +$7,200 carrot rev |
@@ -93,7 +94,7 @@ hoàn toàn KHÔNG có 3 tầng trên. Đó là khoảng trống $8,000-15,000/g
    trên base (premium); sau khi vượt, WOOL/MILK/MELON rơi kiểu sq/linear rất đau (match2: MILK
    −74% base). Bán vào strength TRƯỚC ngưỡng, giữ qua ngưỡng chỉ dành cho item town hút mạnh.
 5. **Động vật = máy 2 tầng**: sản phẩm (EGG/MILK/WOOL) + FERTILIZER byproduct ($11,514 match2
-   từ 179 units bán + 162 bón ×2-yield cho STRA). CARE từ ngày 0 để tích care-bonus (+1 yield
+   từ 179 units bán + 152 bón ×2-yield cho STRA). CARE từ ngày 0 để tích care-bonus (+1 yield
    mỗi ngày fed+cared).
 
 ---
@@ -119,9 +120,9 @@ biến/hàm trong `_PARENT_NS` theo pattern HORIZON-24 đã chứng minh, (3) **
 
 #### A1 · ENDGAME LIQUIDATION SCHEDULER ★ impact lớn nhất (+$5,000-8,000/game kỳ vọng)
 - **Cơ chế**:
-  - Từ step 712 (h 20 d29): tắt mọi BUY (kể cả feed/seed), chỉ còn SELL.
+  - Từ step 712 (h 16 d29): tắt mọi BUY (kể cả feed/seed), chỉ còn SELL.
   - Steps 712-718: xả TỪNG PHẦN các item theo thứ tự **recovery-score tăng dần**
-    (recovery = town_đơn_vị/ngày × giá hiện tại; WHEAT/FERT/MILK/WOOL/TOMATO/CARROT trước),
+    (recovery = town_đơn_vị/ngày × giá hiện tại — bán tăng dần recovery: FERT/MILK/WOOL trước, rồi WHEAT/CARROT/TOMATO),
     giữ lại **đúng 1 anchor item** = argmax(recovery) (gần như luôn là STRAWBERRY).
   - Step 719: **1 order duy nhất** `["SELL", anchor, all_remaining]` + các order lẻ của item
     khác còn kẹt. Chunking: max 10 order/turn, mỗi order 1 item.
@@ -138,7 +139,7 @@ biến/hàm trong `_PARENT_NS` theo pattern HORIZON-24 đã chứng minh, (3) **
   base` → giới hạn SELL item đó còn 2-4 units/step (chỉ đủ giữ shed ≤ 100 và không để yields
   tràn); chờ giá hồi ≥ 0.85×peak → mở full. Shed là bể chứa, không phải kho vĩnh viễn.
 - **Evidence**: Majkel match2 +$4,757 (giữ 65 STRA qua đáy 84 → bán 104-186); ymg match1 thua
-  $6-7K vì dump 120u STRA @44.8 trung bình.
+  $6-7K vì dump 120u STRA @45 trung bình.
 - **Tương tác**: active cùng A1 — trong d29 throttle TẮT (cái chuông đã đánh thì xả hết).
 
 #### A3 · IMPACT-AWARE ORDERING (nâng cấp frontload — merge MD1)
@@ -165,7 +166,7 @@ biến/hàm trong `_PARENT_NS` theo pattern HORIZON-24 đã chứng minh, (3) **
 
 ### 3.2 Lớp B — Breadth Layer (5 module — can thiệp có kiểm soát)
 
-#### B1 · GOOSE/EGG MONOPOLY DETECTOR ★ breadh lớn nhất (Δ +$10,926 trong 1 trận)
+#### B1 · GOOSE/EGG MONOPOLY DETECTOR ★ breadth lớn nhất (Δ +$10,926 trong 1 trận)
 - **Detector** (rẻ, market-only): EGG price flat trong [base × 1.0, base × 1.08] liên tục ≥ 5
   ngày + không thấy SELL EGG của đối thủ (inventory EGG không tăng khi mình theo dõi) + ≥ 1 shop
   EGG (BAKERY/BRUNCH) đã mở hoặc sắp mở → **mua 4-6 GOOSE trải d0-9**.
@@ -179,7 +180,7 @@ biến/hàm trong `_PARENT_NS` theo pattern HORIZON-24 đã chứng minh, (3) **
 #### B2 · SHOP-DRIVEN ANIMAL MIX + FEED INVARIANT
 - Công thức mix: `n_target[animal] ∝ (shop_instances[product] − opponent_supply_estimate) ×
   price_margin`. Match1: EGG 3 shop 0 đối thủ → GOOSE; MILK 3 shop nhưng đối thủ 10 COW → không
-  thêm COW (Majkel vẫn mua = sai lệnh −$2K).
+  thêm COW (Majkel vẫn thêm 5 COW ở d6 — MILK bão hòa từ d16, thiếu dòng EGG).
 - **FEED INVARIANT**: mọi con phải được feed mỗi ngày đến d27 (`consecutive_unfed ≥ 2` = escape;
   match1 Majkel mất 7 con = −$1-1.5K). **FEED-CUTOFF d28**: dừng feed, bán nốt WHEAT @35 thay vì
   đổi thành milk $1-3, chấp nhận escape (động vật không thể hiện tiền ở d29).
@@ -187,14 +188,14 @@ biến/hàm trong `_PARENT_NS` theo pattern HORIZON-24 đã chứng minh, (3) **
 #### B3 · CROP-MIX: STRA-ANCHOR + SHOP-COUNT FILLER
 - Anchor: STRAWBERRY max cây sống (~25 gói, mỗi gói ~$1,500 revenue với fertilizer, ROI 11.9x).
 - Filler theo công thức: `argmax(shops × price_margin / (seed_cost × cycle_days))` — match2 có
-  PET_CAFE d21 + base 35 + cycle 2 ngày → CARROT factory (125 gói từ d11 → $16,068, ROI 6.4x);
+  PET_CAFE d9 + base 35 + cycle 2 ngày → CARROT factory (125 gói từ d11 → $16,068, ROI 6.4x);
   match1 có 7 WHEAT-shops → WHEAT-filler đúng.
 - Giữ-alive: tưới tuyệt đối để ongoing cây sống hết vòng đời (~d26); 8 weeds d28 của DSM =
   mất production cuối. Kỷ luật: WATER count ≥ plants count mỗi ngày.
 
 #### B4 · CROP-MATURITY SCHEDULING d26-27
 - Plant WHEAT/CARROT (first-yield 2 ngày) vào d26-27 để max-yield chín đúng d28-29 — inventory
-  "trên cây" là kho thứ hai, 23h auto-drop vào shed rồi d29 bán. TOMATO ongoing + fertilizer
+  "trên cây" là kho thứ hai — auto-drop 23h chỉ gom hàng TRÊN TAY units; yields trên cây phải HARVEST trong ngày cuối. TOMATO ongoing + fertilizer
   tiếp tục đẻ trong d29 (ymg bán 18 TOMA ngày cuối match1).
 
 #### B5 · FERTILIZER ALLOCATION + ANIMALS-AS-FERT-MACHINES
@@ -207,10 +208,10 @@ biến/hàm trong `_PARENT_NS` theo pattern HORIZON-24 đã chứng minh, (3) **
 - **C1**: reset TELEMETRY mỗi game (hiện cộng dồn cross-episode — bug của v18 wrapper); thêm
   counter per-module (a1_dump_value, a2_throttle_saved, b1_egg_rev...).
 - **C2**: endgame stranding audit — shed + yields-trên-cây còn kẹt tại step 719 phải < $300
-  (match2 Majkel = 0 stranded; destbreso benchmark cho thấy agent xấu kẹt $442).
+  (shed match2 Majkel = 0 stranded; destbreso benchmark cho thấy agent xấu kẹt $442).
 - **C3**: hands endgame — **không cắt hire d27-29** (cuộc chiến d29 là cuộc chiến đơn vị hành
   động: ymg 39 vs 33 HARVEST). Land threshold-trigger: mua khi `cash ≥ price + $150` buffer,
-  không spam dead-order; **SE KHÔNG BAO GIỜ** (âm EV: +25 ô cần +$377-665/ngày fib-hands).
+  không spam dead-order; **SE KHÔNG BAO GIỜ** (âm EV: +25 ô cần +$377-1,364/ngày fib-hands).
 
 ---
 
@@ -232,8 +233,8 @@ biến/hàm trong `_PARENT_NS` theo pattern HORIZON-24 đã chứng minh, (3) **
 ### Phase 3 — "v19-rc" (+ B1, B2, B4, B5 khi route-bias không đủ)
 8. Nếu B1 cần vượt ra ngoài route sẵn có: fork có kiểm soát kế hoạch động vật (đo riêng từng
    module bằng ablation: base / +B1 / +B1+B2...).
-9. Cổng G2 (sparring) + G4 (official runner, **single-file packaged — KHÔNG wrapper**; audit
-   bằng packaged main.py, giải phóng sys.modules giữa games).
+9. Cổng G2 (sparring) + G4 (official runner, **single-file packaged — inline toàn bộ source vào 1 file**;
+   audit bằng packaged main.py chứ KHÔNG qua wrapper-file, giải phóng sys.modules giữa games).
 
 ### Bảng module — impact × rủi ro
 | Module | Kỳ vọng $/game | Rủi ro | Nơi can thiệp |
@@ -270,11 +271,12 @@ biến/hàm trong `_PARENT_NS` theo pattern HORIZON-24 đã chứng minh, (3) **
 
 ```
 kaggle-research/top1/           ← toàn bộ intel trận đấu (README + 04A + 04B + match1/ match2/)
-kagriculture/agents/v19.py     ← (tương lai) wrapper REAPER trên v18
-kagriculture/agents/v18.py     ← nền byte-exact, KHÔNG đụng
+kagriculture/v19.py            ← (tương lai) wrapper REAPER trên v18
+kagriculture/v18.py            ← nền byte-exact, KHÔNG đụng
 kagriculture/arena/run_battle.py  ← T1 battery (CLI --a v19 --b v18 --seed N)
 mini-services/arena-service/   ← UI arena (đã chạy, giữ nguyên)
-bench/                         ← 64-worlds + bootstrap CI (tái dụng hạ tầng task 80)
+kagriculture/battles/          ← JSONL battle log (run_battle tự ghi)
+bench/64worlds/                ← (tái tạo khi triển khai) bootstrap CI — bench/ cũ đã dọn trong cleanup
 ```
 
 Quy trình đo: T1 battery (24 seed) → stress-clone → 64 worlds bootstrap paired → official runner

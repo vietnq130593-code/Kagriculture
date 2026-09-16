@@ -4,7 +4,7 @@
 Majkel1337 = top-1 LB (3191.7); DSM = top-3 LB. Shops match2: d3 FARMERS_MARKET, d6 YARN_STORE,
 d9 PET_CAFE, d12 BAKERY, d15 FARMERS_MARKET(2), d18 FARMERS_MARKET(3), d21 BAKERY(2), d24 ICE_CREAM_SHOP.
 
-> **Tóm tắt 1 đoạn:** Hai agent gần như đồngPhương (cùng opening từng dollar đến d2, cùng mua land
+> **Tóm tắt 1 đoạn:** Hai agent gần như đồng nhất (cùng opening từng dollar đến d2, cùng mua land
 > NE d6 / SW d9, cùng 5 COW + 10 SHEEP, cùng 11 hands $232/ngày). Majkel thắng bằng 3 quyết định:
 > **(1)** crop-mix thiên về STRAWBERRY (25 vs 23 cây) + CARROT (125 vs 76 gói seed),
 > **(2)** **throttle** bán strawberry trong vùng giá đáy d19-24 (bán 40 units thay vì 117, tích trữ
@@ -45,25 +45,25 @@ d9 PET_CAFE, d12 BAKERY, d15 FARMERS_MARKET(2), d18 FARMERS_MARKET(3), d21 BAKER
 | 8 | 700 | +689 | 1,139 | +1,067 | −439 |
 | 9 | 341 | −359 | 635 | −504 | −294 |
 | 10 | **6,950** | **+6,609** | 5,305 | +4,670 | **+1,645** |
-| 11 | 12,026 | +5,076 | 11,626 | +5,607 | +400 |
+| 11 | 12,026 | +5,076 | 11,626 | +6,321 | +400 |
 | 12 | 20,619 | +8,593 | 20,766 | +9,140 | −147 |
 | 13 | 23,139 | +2,520 | 23,553 | +2,787 | −414 |
 | 14 | 28,070 | +4,931 | 29,945 | +6,392 | **−1,875** (đáy gap) |
 | 15 | 32,969 | +4,899 | 34,097 | +4,152 | −1,128 |
 | 16 | 36,180 | +3,211 | 37,738 | +3,641 | −1,558 |
-| 17 | 40,655 | +3,315 | 41,053 | +3,315 | −398 |
-| 18 | 46,070 | +4,753 | 45,223 | +4,170 | +847 |
+| 17 | 40,655 | +4,475 | 41,053 | +3,315 | −398 |
+| 18 | 46,070 | +5,415 | 45,223 | +4,170 | +847 |
 | 19 | 47,841 | +1,771 | 47,254 | +2,031 | +587 |
-| 20 | 49,564 | +1,723 | 50,528 | +3,167 | −964 |
-| 21 | 51,151 | +1,585 | 52,335 | +1,807 | −1,184 |
-| 22 | 54,155 | +2,711 | 54,234 | +1,899 | −79 |
-| 23 | 56,612 | +2,457 | 56,927 | +2,639 | −315 |
-| 24 | 59,164 | +2,200 | 59,692 | +2,765 | −528 |
-| 25 | 62,928 | +3,116 | 62,679 | +2,933 | +249 |
-| 26 | 67,572 | +3,598 | 66,327 | +3,648 | **+1,245** |
-| 27 | 71,227 | +3,030 | 71,417 | +5,090 | −190 |
-| 28 | 78,413 | +5,788 | 77,329 | +5,907 | **+1,084** |
-| 29 | **91,845** | **+13,431** | **84,129** | **+6,325** | **+7,716** |
+| 20 | 49,564 | +1,723 | 50,528 | +3,274 | −964 |
+| 21 | 51,151 | +1,587 | 52,335 | +1,807 | −1,184 |
+| 22 | 54,155 | +3,004 | 54,234 | +1,899 | −79 |
+| 23 | 56,612 | +2,457 | 56,927 | +2,693 | −315 |
+| 24 | 59,164 | +2,552 | 59,692 | +2,765 | −528 |
+| 25 | 62,928 | +3,764 | 62,679 | +2,987 | +249 |
+| 26 | 67,572 | +4,644 | 66,327 | +3,648 | **+1,245** |
+| 27 | 71,227 | +3,655 | 71,417 | +5,090 | −190 |
+| 28 | 78,413 | +7,186 | 77,329 | +5,912 | **+1,084** |
+| 29 | **91,845** | **+13,432** | **84,129** | **+6,800** | **+7,716** |
 
 ### 1.2 Tóm tắt dòng tiền theo pha (revenue / spend)
 
@@ -81,7 +81,7 @@ d9 PET_CAFE, d12 BAKERY, d15 FARMERS_MARKET(2), d18 FARMERS_MARKET(3), d21 BAKER
   Cả hai đốt sạch $3,000 → $5.
 - **Build-up (d3-9):** sống bằng tiền bán FERTILIZER (5/ngày @ ~95-97) + bán lại WHEAT wash.
   Cả hai mua NE (d6, s150) ngay sau đợt bán WOOL đầu tiên, SW (d9, s222/224) sau đợt WOOL lần 2.
-- **Mid (d10-20):** MELON dump d10 (30 units @246 = $7,380) + STRAWBERRY đỉnh giá d13-17 (@160-192).
+- **Mid (d10-20):** MELON dump d10 (30 units @245.6 = $7,367) + STRAWBERRY đỉnh giá d13-17 (@160-192).
   **DSM dẫn tới −1,875 ở d14** vì bán WHEAT dồn dập (32-37 units/ngày) còn Majkel âm thầm chuyển
   tile sang CARROT/STRAWBERRY và **bắt đầu tích trữ** (bán ít đi).
 - **Endgame (d21-28):** giá STRAWBERRY hồi (104 → 174) do town hút 25 units/ngày trong khi cây đã chết
@@ -107,8 +107,8 @@ d9 PET_CAFE, d12 BAKERY, d15 FARMERS_MARKET(2), d18 FARMERS_MARKET(3), d21 BAKER
 | s15-s22 | xen kẽ SELL WHEAT ×1 @28 và BUY_SEED WHEAT ×1 @10 → **đủ 10 WHEAT seeds** | 5 |
 | **Cuối d0** | **$5** — đã có: 2 COW, 3 SHEEP, 6 MELON plants, 10 WHEAT plants, 4 hands | |
 
-- Trên board: **17 plants trên 25 ô NW** (6 MELON + 10 WHEAT + 2 ô trống), 5 ô PASTURE cho 5 con vật
-  (verbs: 5 BUILD_PASTURE + 5 PLACE). WATER 17 lần ngay d0 (tưới đủ 16 cây + 1 thừa).
+- Trên board: **16 plants trên 25 ô NW** (6 MELON + 10 WHEAT), 5 ô PASTURE cho 5 con vật
+  (verbs: 5 BUILD_PASTURE + 5 PLACE), 4 ô trống. PLANT/WATER 17 lần ngay d0 (tưới đủ 16 cây + 1 thừa).
 - **Trình tự PLANT:** MELON trước (s4-s12 trồng đủ 6), WHEAT sau (s13-s22 đủ 10). Ngày d1-d2 bổ sung
   4 MELON nữa (10) + 2 STRAWBERRY (d2) — đều tự tài trợ bằng tiền bán FERTILIZER.
 - **Wash trade WHEAT:** mua feed 5 @26-27 đẩy giá 25→28, rồi bán lại 1-4 units @28. Cả 2 bên làm;
@@ -118,13 +118,13 @@ d9 PET_CAFE, d12 BAKERY, d15 FARMERS_MARKET(2), d18 FARMERS_MARKET(3), d21 BAKER
 
 ### 2.2 Số dư từng ngày đầu: d0 $5 → d1 $59 → d2 $16 → d3 $180 (M) / $102 (D).
 Nguồn sống d1-d5: **FERTILIZER ×5/ngày @ 99→91** (thu từ COLLECT_FERTILIZER của 5 con vật, miễn phí)
-+ bán WHEAT @30-32. Cả hai thuê thêm hands: d1 +3 ($4), d2 +6 ($20) → 6 hands.
++ bán WHEAT @30-32. Cả hai thuê thêm hands: d1 giữ 4 ($7), d2 +6 ($20) → 6 hands.
 
 ---
 
 ## 3. Quá trình dùng tiền (money flow)
 
-### 3.1 Tổng chi theo loại (begge 30 ngày)
+### 3.1 Tổng chi theo loại (cả hai, 30 ngày)
 
 | Loại | Majkel | DSM | Chênh |
 |---|---:|---:|---:|
@@ -148,11 +148,11 @@ Nguồn sống d1-d5: **FERTILIZER ×5/ngày @ 99→91** (thu từ COLLECT_FERTI
   NE/SW/animals/seeds. Sau d12 thì "reinvest" = seeds lai rai + feed.
 
 ### 3.3 Hire strategy
-- **Hands là thuê THEO NGÀY** (fib reset mỗi ngày): d0-1: 4 hands ($7) → d2-5: 6 ($20) → d6-8: 8-9
+- **Hands là thuê THEO NGÀY** (fib reset mỗi ngày): d0-1: 4 hands ($7) → d2-5: 5-6 ($12-20) → d6-8: 8-9
   ($54-88) → d9: 10 ($143) → **d10-27: 11 hands = $232/ngày** (fib 1..89) → d28-29: 10 ($143).
 - Pattern hire: hires đặt **đầu giờ** (s = day×24+1) trước khi làm gì khác; hires ngày mới luôn nổ
   đúng 1-2 step sau nửa đêm. Tổng 285 lượt/$4,921 — chi phí "nhân sự" chỉ 4.2% revenue.
-- 2 lượt hire FAIL của Majkel (s25 d1) vì tiền < giá fib — vô hại.
+- 3 lượt hire FAIL của Majkel (s25×2 d1, s73 d3) vì tiền < giá fib — vô hại.
 
 ---
 
@@ -163,7 +163,7 @@ Nguồn sống d1-d5: **FERTILIZER ×5/ngày @ 99→91** (thu từ COLLECT_FERTI
 | Bước | Bên | Kết quả | Tiền lúc order |
 |---:|---|---|---:|
 | s126 (d5) | M | **NE FAIL** (còn $460 < $1,000) | 460 |
-| **s150 (d6)** | M | **NE OK** (−1,000, sau khi bán WOOL 12 units) | 2,017 → 1,017 |
+| **s150 (d6)** | M | **NE OK** (−1,000, sau đợt WOOL đầu 6 units ở s149) | 2,017 → 1,017 |
 | **s150 (d6)** | D | **NE OK** | 2,046 → 1,446 |
 | s220 (d9) | M+D | SW FAIL (M $250, D $413) | — |
 | s222 (d9) | M | SW FAIL ($1,115) — D **SW OK** ($2,148 → $148) | — |
@@ -176,7 +176,7 @@ cần kịp trồng trước d10-11).
 ### 4.2 Tại sao KHÔNG ai mua SE ($4,000)? — Phân tích opportunity cost
 - 3 quadrant = 75 ô; trừ ~15 ô PASTURE/COOP + shed-path → **~57-61 ô trồng là capacity thực tế**
   (cả trận 2 bên giữ đúng 57-61 plants). Thêm SE = +25 ô nhưng:
-  - Cần thêm ~4 hands/ngày: fib(12..15) = 144+233+377+610 ≈ **+$665/ngày** (hoặc tối thiểu +$377 nếu
+  - Cần thêm ~4 hands/ngày: fib(12..15) = 144+233+377+610 ≈ **+$1,364/ngày** (hoặc tối thiểu +$377 nếu
     chỉ +2 hands) vs doanh thu carrot/tomato của 25 ô ≈ 25 × $21/ngày = **+$525/ngày** → **EV âm**.
   - Ô SE xa shed nhất (board 10×10, shed ở giữa) → unit tốn thêm bước di chuyển/harvest.
   - $4,000 ở d10-12 = 11-19% money — rủi ro cash-flow khi đang cần mua seeds/animals.
@@ -205,7 +205,7 @@ xuống 11-13 (d16-17); DSM giữ 33 cây WHEAT đến d16 rồi chuyển sang T
 - WATER ~54-71 lần/ngày trên 57-61 cây — phủ gần đủ. FERTILIZE 8-14 lần/ngày từ d15.
 - **Weeds: Majkel 1 (d21), 0-2 rải rác; DSM 8 ở d28** — DSM rút bớt unit đi bán hàng → bỏ tưới 2 ngày
   liên tiếp → 8 ô thành weed đúng lúc cuối. d29: M 7, D 9 (hỗn loạn ngày cuối, ít ý nghĩa).
-- Bảng专项 strawberry: Majkel giữ cây STRA sống tới d26 (25→10→5→3→0), DSM chết sạch từ d24
+- Bảng chuyên sâu strawberry: Majkel giữ cây STRA sống tới d26 (25→10→5→3→0), DSM chết sạch từ d24
   (23→8→2→1) → Majkel thu thêm ~2 ngày production (~+10-15 units).
 
 ---
@@ -240,12 +240,14 @@ xuống 11-13 (d16-17); DSM giữ 33 cây WHEAT đến d16 rồi chuyển sang T
 
 **ROI động vật (Majkel):**
 - SHEEP $5,000 → 196 WOOL @94.3 = $18,481 (**3.7x**). Chi tiết: 3 con đầu được CARE từ d0 → lượt
-  cắt lông đầu d6 cho **6 WOOL/con** (care-bonus tích lũy 6) = 18 units @194-199 = $3,492 ngay d6.
+  cắt lông đầu d6 cho **6 WOOL/con** (care-bonus tích lũy 6) = 18 units @167-218 = $3,483 ngay d6.
 - COW $2,000 → 107 MILK @41.5 = $4,440 (**2.2x**) — milk chết giá từ d16 (xem 6.3).
-- **FERTILIZER (byproduct miễn phí): 179 units bán $11,514 + ~162 units tự bón** → đám vật nuôi
-  "trả tiền" chủ yếu qua phân: $11.5K tiền + giá trị bón (~162 × ~$40 hiệu ứng ×2 yield) ≈ $18K.
+- **FERTILIZER (byproduct miễn phí): 179 units bán $11,514 + ~152 units tự bón** → đám vật nuôi
+  "trả tiền" chủ yếu qua phân: $11.5K tiền + giá trị bón (~152 × ~$40 hiệu ứng ×2 yield) ≈ $18K.
 - Feed: 178 units WHEAT mua ($6,507) + phần wheat tự trồng; FEED 4-16 lần/ngày ≈ đủ 15 con.
-  **d28-29 FEED=0** — chủ động bỏ đói (1 COW + 4 SHEEP escape, vô hại ngày cuối) để bán sạch wheat.
+  **d28-29 FEED=0** — bỏ đói cuối game (3 SHEEP escape d28, 1 COW + 1 SHEEP d29 — vô hại ngày cuối)
+  để bán sạch wheat; trước đó đã mất lẻ 1 SHEEP (~d20) + 1 COW + 1 SHEEP (~d22) vì feed không đều
+  (đàn 15 → 12 → 9 → 7 từ d19 tới d29).
 
 ### 5.3 Mua WHEAT làm feed
 - Majkel: 178 units $6,507 (avg 36.6) — tập trung d0-9 (26-37/unit) rồi giảm dần khi wheat tự trồng
@@ -256,7 +258,7 @@ xuống 11-13 (d16-17); DSM giữ 33 cây WHEAT đến d16 rồi chuyển sang T
 
 ### 5.4 Mua FERTILIZER
 - **KHÔNG ai mua fertilizer** (0 đơn). Nguồn duy nhất: COLLECT_FERTILIZER 1/con vật/ngày → bán 179
-  units @64.3 = $11,514 + bón cây. Fertilizer bán giá giảm dần 99 → 29 (linear 0.40 hai chiều, T=200).
+  units @64.3 = $11,514 + bón cây. Fertilizer bán giá giảm dần 100 → 29 (linear 0.40 hai chiều, T=200).
 
 ---
 
@@ -300,7 +302,7 @@ Giá thị trường STRAWBERRY + sản lượng bán 2 bên theo ngày:
 
 **Cơ chế:** d18 cả 2 dump 23-25 units → inventory vượt I0=10,000 → giá rơi 158→105. Từ d19:
 - **Majkel THROTTLE**: chỉ bán 2-4 units/step (40 units trong 6 ngày @102.6 avg) trong khi cây vẫn
-  ra ~10-12 units/ngày → **shed STRA tích lũy 0 → 20 → 30 → 46 → 54 → 65 units (d19-24)**.
+  ra ~10-12 units/ngày → **shed STRA tích lũy 0 → 20 → 33 → 51 → 57 → 68 → 65 units (d19-24, đỉnh 68 ở d23)**.
 - **DSM tiếp tục dump**: 72 units @102.3 trong cùng kỳ (có cú 13@93 ngày d19, 10@95 ngày d20 —
   bán thẳng vào dao rơi), shed không bao giờ quá 7.
 - Town (FM×3 + ICE_CREAM + center) hút **~25 units/ngày**; cây strawberry chết dần từ d22-26 →
@@ -317,14 +319,14 @@ Giá thị trường STRAWBERRY + sản lượng bán 2 bên theo ngày:
 
 ### 6.3 Timing các item khác
 - **MELON d10:** cả 2 thu 12 cây × 6 units (bón đủ phân) rồi dump 30 units trong 4 order liên tiếp
-  (s251-254) — giá 270 → 226 cùng ngày; Majkel vẫn đạt avg 246 cho 24 units đầu, cú 12 units cuối
-  @235. Avg 199.7 (−20% base) vì nốt 12 units d11-12 bán @136-208. *Bài học: melon không có shop
+  (s251-254) — giá 272 → 226 cùng ngày; Majkel đạt avg ~252 cho 18 units đầu (s251-253), cú 12 units cuối
+  @235 (s254). Avg 199.7 (−20% base) vì nốt 12 units d11-12 bán @136-208. *Bài học: melon không có shop
   hút, dump sớm khi giá còn >240 thì tốt hơn giữ.*
-- **WOOL d12:** cả 2 bán 10@216 + 6@226/227 ở s292-294 khi giá còn 226-228 (inv 9,976 < I0) —
+- **WOOL d12:** Majkel 6@226 (s292) + 10@216 (s294), DSM 5@227 + 10@216, giá còn 226-228 (inv 9,976 < I0) —
   **đúng trước ngưỡng sụp**; d14-16 giá rơi 185 → 24 (hàm sq trên I0). Sau đó wool = rác $1-35,
   cả 2 vẫn bán từng unit (đúng — tiền nào cũng là tiền).
 - **MILK:** không shop hút tới ICE_CREAM d24 → giá chết dần 185 (d8) → 110 (d12) → 19 (d16) → 1 (d18+).
-  Majkel dump 12@153 (d8), 12@138 (d10), 17@59 (d14) rồi bán rác. Avg 41.5 — **thấp hơn DSM 47.8**
+  Majkel dump 12@153 (d8), 6@119 (d10), 3@108 (d12), 3@99 (d13), 17@59 (d14) rồi bán rác. Avg 41.5 — **thấp hơn DSM 47.8**
   vì Majkel chunk 12 units/lần (walk-down dốc) trong khi DSM chunk 3 units (@185/177/152/143).
   Bài học nhỏ: trên book dốc (linear 1.6), chunk nhỏ giá hơn.
 - **CARROT:** giá rất ổn 41→55 (PET_CAFE d9 hút 12/ngày + FM×3 18/ngày) — Majkel bán 20-32 units/ngày
@@ -361,22 +363,22 @@ DSM bán rải đều mọi thứ (1-19 units/step, nhiều nhất 20), strawber
 vào vùng giá đáy.
 
 ### 6.5 Inventory accumulation (shed_total theo thời gian)
-Majkel: ~0 (d0-15) → 15-50 (d16-21) → **57-100 (d22-27, chạm cap 100 ở d22/d28/d29)** → 0.
-DSM: tối đa 79-92 (d21-27), thường 17-35. → Majkel vận hành gần shed-cap 100 suốt cuối game,
+Majkel: ~0-20 (d0-15) → 50-95 (d16-21) → **94-100 (d22-29, chạm cap 100 ở d22/d28/d29)** → 0.
+DSM: max 60-92 (d21-29), thường 17-35. → Majkel vận hành gần shed-cap 100 suốt cuối game,
 vẫn không văng hàng (overflow discard = 0 mất mát quan sát được nhờ pipeline bán-hàng-ngày-cuối).
 
 ### 6.6 Dead orders ("rác")
 | | Majkel | DSM |
 |---|---|---|
 | Tổng orders | 987 (968 exec) | 3,772 (1,043 exec) |
-| Dead | **19** | **2,729** (2,709 là SELL vô hàng: TOMATO 594, EGG 492, MELON 400, CARROT 389, STRA 311, WOOL 270, MILK 252) |
+| Dead | **19** | **2,729** (2,709 là SELL vô hàng: TOMATO 594, EGG 492, MELON 400, CARROT 389, STRA 311, WOOL 270, MILK 252, WHEAT 1) |
 | Lý do | hết tiền (BUY_SEED/land/hire fail) | standing-order spam — chiếm slot (cap 10 orders/turn) |
 
 ---
 
 ## 7. Tương tác thị trường & shops
 
-### 7.1 Town consumption (engine: shop 每4 step, single-product ×2; center 每24 step mỗi product)
+### 7.1 Town consumption (engine: mỗi shop 4 step một lần, shop 1 sản phẩm ×2; center mỗi 24 step mỗi product)
 Lượng town hút/ngày ở cuối game (sau d24): **CARROT ~31** (FM×3=18 + PET_CAFE×2=12 + center 1),
 **STRAWBERRY ~25** (FM 18 + ICE 6 + 1), WHEAT ~37 (FM 18 + BAKERY×2 12 + ICE 6 + 1), TOMATO ~19,
 WOOL 12 (YARN), EGG 12, MILK 6. → Giải thích: giá CARROT/STRA/WHEAT giữ trên base (+27..+49%)
@@ -384,7 +386,7 @@ còn WOOL/MILK/MELON chết giá.
 
 ### 7.2 Có pivot theo shop không?
 - **YARN_STORE d6:** cả 2 đã có 3 SHEEP từ d0 (first yield đúng d6) và **+4 SHEEP ngay d6** —
-  timing hoàn hảo với shop; đợt WOOL đầu 18 units @194-199.
+  timing hoàn hảo với shop; đợt WOOL đầu 18 units @167-218.
 - **PET_CAFE d9 (CARROT):** Majkel bắt đầu mua CARROT seed **d11** (6 gói) — phản ứng trong 2 ngày;
   DSM chậm tới **d17**. Đây là pivot tạo ra cả mảng $16K carrot revenue của Majkel.
 - **FARMERS_MARKET d3/15/18:** hút 4 loại crop — đúng lúc Majkel mở rộng STRA+WHEAT (d9-10) và
@@ -402,13 +404,13 @@ còn WOOL/MILK/MELON chết giá.
 | # | Step | Sự kiện | Ý nghĩa |
 |---|---|---|---|
 | 1 | s1-s2 (d0) | 2 COW + 3 SHEEP + wash WHEAT + 4 hires, còn $585 | opening chuẩn của cả family; CARE ngay từ d0 |
-| 2 | **s149-152 (d6)** | WOOL 18 units @194-208 (6/con nhờ care-bonus) rồi mua NE + 4 SHEEP + 2 COW | cú tái đầu tư đầu tiên, ep về $69-130 |
-| 3 | s251-254 (d10) | MELON dump 30 units @235-262 (+$7,380 trong 4 step) | ngày +6,609, nguồn tiền mở rộng |
+| 2 | **s149-152 (d6)** | WOOL 18 units @167-218 (6/con nhờ care-bonus) rồi mua NE + 4 SHEEP + 2 COW | cú tái đầu tư đầu tiên, money về đáy $49 |
+| 3 | s251-254 (d10) | MELON dump 30 units @243-270 (+$7,367 trong 4 step) | ngày +6,609, nguồn tiền mở rộng |
 | 4 | **s224 (d9)** | Mua SW muộn hơn DSM 2 step, còn $88 | mở 25 ô → STRA 25 + WHEAT 25 + CARR |
 | 5 | d11 (s265-290) | Majkel bắt đầu CARROT (6 gói) — DSM không | +6 ngày carrot factory sớm hơn |
 | 6 | **d18-19 (s448-474)** | STRA crash 158→105; Majkel cắt bán 25→2 units/ngày | điểm rẽ throttle — nơi trận đấu được thắng thầm lặng |
-| 7 | d22-24 | shed STRA 54→65; giá hồi 114→132 | tích trữ đúng hướng town-drain |
-| 8 | s292-294 (d12) | WOOL 10@216 bán đúng trước ngưỡng I0 | (cả 2) — kiểu "sell into strength" |
+| 7 | d22-24 | shed STRA 57→68→65; giá hồi 114→132 | tích trữ đúng hướng town-drain |
+| 8 | s292-294 (d12) | WOOL 15-16 units mỗi bên @216-227 bán đúng trước ngưỡng I0 | (cả 2) — kiểu "sell into strength" |
 | 9 | d26-28 | Majkel bán STRA 4-13 units/ngày @145-177 + CARROT 25-32/ngày | gỡ gap −1,184 → +1,084 |
 | 10 | **s719 (d29)** | **SELL STRAWBERRY ×42 @173 = $7,258** (96% revenue step cuối) | cú đánh quyết định, duy nhất 1 order |
 
@@ -426,33 +428,33 @@ Match2 gợi ý **các feature v18 CHƯA có**:
    giá tăng 175→186 trong ngày chờ; +$6,283 của margin sinh ở step cuối. v18 hiện bỏ qua step≥718
    trong advance_sales — thay bằng module mới: nếu step == 719 → sell-all inventory theo thứ tự
    recovery giảm dần.
-2. **TROUGH THROTTLE (price-gated sell rate):** khi giá < ~85% đỉnh rolling-14d HOặc < base, giới
+2. **TROUGH THROTTLE (price-gated sell rate):** khi giá < ~85% đỉnh rolling-14d hoặc < base, giới
    hạn bán 2-4 units/step (min impact), để shed hấp thụ (đến cap 100). Evidence: throttle gain
    +$4,757; DSM bỏ lỡ $4,474. Lưu ý mức giá hoạt động: d19-24 STRA ~84-114 vs đỉnh 193.
 3. **CROP-MIX endgame: STRAWBERRY anchor + CARROT filler.** Evidence: 125 gói CARR ($2,500) →
    310 units $16,068 (ROI 6.4x); STRA 25 gói → 196 units $29,844 (ROI 11.9x). DSM dùng tile cho
-   WHEAT (ROI ~11x nhưng giá thấp, bị両 bên bão hòa) + TOMATO. Tape-route của V43 nên có route
+   WHEAT (ROI ~11x nhưng giá thấp, bị cả hai bên bão hòa) + TOMATO. Tape-route của V43 nên có route
    STRA-heavy + CARR-filler khi shop có PET_CAFE/FM nhiều.
 4. **STRAWBERRY PLANT-COUNT + keep-alive:** mỗi gói seed STRA dư = ~$1,500 revenue (8 units × ~150
    với fertilizer). Majkel 25 vs DSM 23 gói = +21 units = +$3,045. Tưới tuyệt đối để cây sống hết
    vòng đời (~d26); weeds = mất production (DSM 8 weeds d28).
 5. **FERTILIZER ALLOCATION:** bón STRA/TOMA (ongoing, ×2 yield) ưu tiên — STRA 7.84 units/cây (≈8
    = max có phân), TOMA 7.7; CARROT 2.48 (thường không bón — đúng, seed rẻ). Động vật là "máy tạo
-   phân": 179 bán + ~162 bón = ~$18K giá trị từ 15 con.
+   phân": 179 bán + ~152 bón = ~$18K giá trị từ 15 con.
 6. **SHED-CAP PIPELINE ngày cuối:** shed 100 là cap; phải xen kẽ sell→harvest→drop. Majkel đứng ở
    cap 3 lần mà vẫn xả sạch 190 units d29 (0 stranded). Thêm check "expected final-day throughput"
    vào terminal planner của V43.
 7. **FEED-CUTOFF d28-29:** dừng FEED (FEED=0 từ d28) — bán nốt wheat @35 thay vì đổi thành milk
    $1-3; để động vật escape. Majkel bán 44 WHEAT d29 = $1,530.
 8. **CHUNKING theo độ dốc book:** WOOL/MILK/MELON (sq/linear above-func) — chunk lớn khi giá còn
-   TRÊN I0-threshold rồi dừng hẳn; MILK nên bán sạch trước ~d14 ( Majkel còn giữ tới 17@59 d14,
+   TRÊN I0-threshold rồi dừng hẳn; MILK nên bán sạch trước ~d14 (Majkel còn giữ tới 17@59 d14,
    avg 41.5 < DSM 47.8 vì chunk 12). STRA/CARROT (sqrt/log, town hút) — chunk lớn an toàn.
 9. **ORDER HYGIENE:** 0 dead-sell standing orders (DSM lãng phí 2,709 slot, từng bước chạm cap 10).
    v18 đã sạch (19 dead) — giữ nguyên; đảm bảo frontload không tạo rác.
 10. **FEED-BUY sớm để nâng giá WHEAT cho crop mình:** 178 units mua d0-9 đẩy giá 25→37+; 390 units
     wheat self-crop bán @37.3 (+49% base). (Khớp ý tưởng #3 feed-buy index-0 trong roadmap MD3.)
 11. **LAND: NE ngay sau revenue-event đầu (d6), SW sau đợt 2 (d9), SE KHÔNG BAO GIỜ** (toán:
-    +25 ô cần +2-4 hands = +$377-665/ngày > $525/ngày carrot revenue; cộng khoảng cách xa shed).
+    +25 ô cần +2-4 hands = +$377-1,364/ngày > $525/ngày carrot revenue; cộng khoảng cách xa shed).
     Agent nên retry-buy land mỗi step khi tiền thiếu (Majkel FAIL s126/s220/s222 rồi OK) — mô hình
     "order-đặt-hàng" này miễn phí.
 12. **SELL-INTO-STRENGTH trước ngưỡng I0:** WOOL d12: inventory 9,976 (dưới I0 24 units) — cả 2
@@ -470,7 +472,7 @@ spam dead-sells.
 | Step | Majkel (money sau) | DSM (money sau) |
 |---:|---|---|
 | 696 | SELL WOOL 1@1 — shed 100/100: CARR30, MILK6, **STRA42**, TOMA11, WHEA6, WOOL5 (78,414) | SELL CARR 6@50, WHEA 5@35 (77,804) |
-| 697 | **SELL CARR 30@48 (+1,428)** + hire 9 (79,788) | SELL CARR 19@48, WHEA 8@35 + hire 9 (78,948) |
+| 697 | **SELL CARR 30@48 (+1,428)** + hire 8 (79,788) | SELL CARR 19@48, WHEA 8@35 + hire 8 (78,948) |
 | 698-708 | WOOL/MILK lẻ @1-11; FERT 1@31; TOMA 11@77 (s709, 80,628); WHEA 6@36 (s710) | STRA 2@180 (s702), 2@182 (s706), 1@183 (s710); TOMA lẻ |
 | 711-718 | WHEA 8+8+15, CARR 8+5+4+17, TOMA 2+3+2, FERT 4@30 — về $84,303; **shed còn STRA42 + lẻ** | STRA 1@182×3 (s711-712); TOMA/WHEA/CARR/FERT rải; về $82,869 |
 | **719** | **SELL STRA 42@173 = +7,258** (prices 186→158) + WHEA 5@33 + CARR 2@45 + FERT 1@29 → **$91,845** | TOMA 11@74 + FERT 2@29 + CARR 2@45 + WHEA 9@33 → **$84,129** (+4 dead-sell STRA/MELON/MILK/WOOL/EGG) |

@@ -15,41 +15,41 @@ cuối d29. ymg_aq hiện hạng 4 LB. Dữ liệu parse + verify 0-mismatch (`m
 | 3 | 1,150 (+340) | 73 (+30) | ymg | +1,077 |
 | 4 | 82 (−1,068) | 149 (+76) | **MAJ** | −67 |
 | 5 | 732 (+650) | 505 (+356) | ymg | +227 |
-| 6 | 2,222 (+1,401) | 20 (−485) | ymg | +2,202 |
+| 6 | 2,222 (+1,490) | 20 (−485) | ymg | +2,202 |
 | 7 | 1,951 (−271) | 19 (−1) | ymg | +1,932 |
-| 8 | 2,560 (+441) | 2,275 (+2,256) | ymg | +285 |
-| 9 | 3,388 (+793) | 374 (−1,901) | ymg | +3,014 |
-| 10 | 5,748 (+2,066) | 6,487 (+6,113) | **MAJ** | −739 |
+| 8 | 2,560 (+609) | 2,275 (+2,256) | ymg | +285 |
+| 9 | 3,388 (+828) | 374 (−1,901) | ymg | +3,014 |
+| 10 | 5,748 (+2,360) | 6,487 (+6,113) | **MAJ** | −739 |
 | 11 | 5,635 (−113) | 11,876 (+5,389) | MAJ | −6,241 |
-| 12 | 5,841 (−140) | 13,532 (+1,656) | MAJ | −7,691 |
-| 13 | 9,250 (+3,279) | 13,837 (+305) | MAJ | −4,587 |
-| 14 | 13,739 (+4,365) | 25,612 (+7,167) | MAJ | **−11,873 (đỉnh)** |
+| 12 | 5,841 (+206) | 13,532 (+1,656) | MAJ | −7,691 |
+| 13 | 9,250 (+3,409) | 13,837 (+305) | MAJ | −4,587 |
+| 14 | 13,739 (+4,489) | 25,612 (+11,775) | MAJ | **−11,873 (đỉnh)** |
 | 15 | 21,785 (+8,046) | 29,796 (+4,184) | MAJ | −8,011 |
 | 16 | 29,660 (+7,875) | 36,684 (+6,888) | MAJ | −7,024 |
 | 17 | 36,122 (+6,462) | 41,153 (+4,469) | MAJ | −5,031 |
 | 18 | 45,446 (+9,324) | 48,207 (+7,054) | MAJ | −2,761 |
 | 19 | 49,819 (+4,373) | 51,248 (+3,041) | MAJ | −1,429 |
-| 20 | 51,374 (+1,461) | 54,367 (+3,119) | MAJ | −2,993 |
+| 20 | 51,374 (+1,555) | 54,367 (+3,119) | MAJ | −2,993 |
 | 21 | 54,347 (+2,973) | 56,847 (+2,480) | MAJ | −2,500 |
 | 22 | 58,029 (+3,682) | 58,598 (+1,751) | MAJ | −569 |
-| 23 | 58,931 (+902) | 59,918 (+1,318) | MAJ | −987 |
-| 24 | 61,268 (+2,337) | 62,786 (+2,326) | MAJ | −1,518 |
-| 25 | 65,174 (+3,856) | 65,998 (+3,210) | MAJ | −824 |
-| 26 | 68,110 (+2,936) | 69,047 (+3,035) | MAJ | −937 |
-| 27 | 71,469 (+3,323) | 73,091 (+4,044) | MAJ | −1,622 |
-| 28 | 76,145 (+4,676) | 79,264 (+6,162) | MAJ | −3,119 |
+| 23 | 58,931 (+902) | 59,918 (+1,320) | MAJ | −987 |
+| 24 | 61,268 (+2,337) | 62,786 (+2,868) | MAJ | −1,518 |
+| 25 | 65,174 (+3,906) | 65,998 (+3,212) | MAJ | −824 |
+| 26 | 68,110 (+2,936) | 69,047 (+3,049) | MAJ | −937 |
+| 27 | 71,469 (+3,359) | 73,091 (+4,044) | MAJ | −1,622 |
+| 28 | 76,145 (+4,676) | 79,264 (+6,173) | MAJ | −3,119 |
 | **29** | **86,713 (+10,568)** | **86,262 (+6,998)** | **YMG** | **+451** |
 
 **Diễn biến chính:**
 - **d0-9:** ymg_aq dẫn nhỏ — cả 2 mở màn HEAVY (chi gần hết $3,000). Majkel giữ tiền hơn (d1-3
   profit ~0, còn $3/node), ymg_aq bán WHEAT sớm để có cash-flow (60 WHEAT d0 +$1,844).
-- **d10-14 — "Majkel blitz":** Majkel bùng nổ (+6,113 ngày 10, +5,389 ngày 11, +7,167 ngày 14),
+- **d10-14 — "Majkel blitz":** Majkel bùng nổ (+6,113 ngày 10, +5,389 ngày 11, +11,775 ngày 14),
   mở gap tới **−11,873 (d14)**. Đây là phase Majkel dồn toàn lực (mua animals + STRA) trong khi
   ymg_aq lãi đều.
-- **d15-25 — ymg_aq grind-back:** 11 ngày liên tiếp ymg_aq out-earn Majkel (trừ d20/d23 nhỏ),
+- **d15-25 — ymg_aq grind-back:** ymg_aq out-earn Majkel 8/11 ngày (trừ d20/d23/d24),
   gap co từ −11,873 → −824. Không phải một cú strike mà là compound: +8,046 (d15), +7,875 (d16),
   +9,324 (d18).
-- **d26-28:** Majkel lại tăng speed (+3,035/+4,044/+6,162) → gap nới lại −3,119. Majkel dường như
+- **d26-28:** Majkel lại tăng speed (+3,049/+4,044/+6,173) → gap nới lại −3,119. Majkel dường như
   vẫn tin mình đang kiểm soát endgame như match2.
 - **d29 — THE FLIP:** ymg_aq profit **+10,568** vs Majkel +6,998 = chênh **+3,570 trong 1 ngày**,
   đủ lật từ −3,119 thành **+451**. Toàn bộ kết quả nằm ở ngày cuối → xem kỹ Mục 6.
@@ -68,7 +68,7 @@ cuối d29. ymg_aq hiện hạng 4 LB. Dữ liệu parse + verify 0-mismatch (`m
 | s2 | BUY_SEED 18 WHEAT (−180) + 1 MELON (−80) → plant 18 WHEAT + 1 MELON |
 | d1-3 | FEED/CARE 6 animals/ngày → **bán 6 FERTILIZER/ngày @94-100 (~$570-590/ngày)** — máy in tiền đầu game; mua thêm 6 WHEAT/ngày làm feed |
 | d3 | s73: hire ×6 (−20) + BUY_SEED 1 CARROT |
-| d4-5 | Pivot: mua STRA (11 plants), +MELON (8), +1 COW; d4 HARVEST 18 WHEAT → d5 bán 68u/$2,614 |
+| d4-5 | Pivot: mua STRA (11 plants), +MELON (8), +1 COW; d4 HARVEST 18 WHEAT → d5 bán 68u/$2,614 (58 WHEAT + 10 FERT) |
 
 → Kết thúc d0 với **$12** (all-in). Cash-flow d1-5 từ FERT (~$580/ngày) + WHEAT harvest d4-5 (~$2,600).
 
@@ -76,12 +76,12 @@ cuối d29. ymg_aq hiện hạng 4 LB. Dữ liệu parse + verify 0-mismatch (`m
 | Step | Hành động |
 |---:|---|
 | s1 | BUY_ANIMAL 1 COW (−400) + BUY_PRODUCT 5 WHEAT @33 (feed) |
-| s2 | HIRE ×4 (−7); **2 COW (−800) + 3 SHEEP (−1,500)** = 5 animals |
+| s2 | HIRE ×4 (−7); **1 COW (−400) + 3 SHEEP (−1,500)** → cộng COW s1 = 5 animals (2 COW + 3 SHEEP) |
 | s2-12 | BUY_SEED MELON ×2 ba lần = **6 MELON seeds (−480)**; WHEAT seeds 1+3 |
-| s16-19 | 4 lệnh BUY_SEED **exec=0 (hết tiền)** — spam order khi broke |
+| s16-19 | 5 lệnh BUY_SEED **exec=0 (hết tiền)** — spam order khi broke |
 | d1 | +4 MELON seeds (−320), tiếp tục dead-orders MELON khi hết tiền (s36-42) |
 | d2-3 | **STRA seeds bắt đầu d2** (1), d3 mua 4 (−400, 1 dead) → 4 STRA plants d3 |
-| d1-3 | Bán FERT 4-5/ngày (~$475-495/ngày), mua 2-6 WHEAT product/ngày làm feed |
+| d1-3 | Bán FERT 5/ngày (~$476-496/ngày), mua 2-6 WHEAT product/ngày làm feed |
 
 → Kết thúc d0 với **$7**. d1-4 money đáy **$3-73** (không hề có cash dự trữ) — nhưng plants d3 đã là
 **MELON 12 + STRA 4 + WHEAT 3** (đầu tư thu hoạch d10+).
@@ -128,9 +128,9 @@ ymg_aq **đầu tư manpower nhiều hơn hẳn** (hire +$1,657 ≈ +1-2 hands t
 | d29 | 76,145→86,713 | 79,264→86,262 | ymg_aq bán khỏe hơn ở ngày cuối |
 
 **Hands (lao động):**
-- ymg_aq: 7 (d0) → 8 (d7) → **11-12 (d9-28)** → 11 (d29). Avg 10.4-11.3.
-- Majkel: 4 (d0) → 8 (d6) → 10-11 (d9-26) → **chỉ 9-10 (d27-29)**.
-- ymg_aq giữ 11-12 hands suốt 20 ngày cuối; Majkel giảm về 9-10 ở đúng 3 ngày cuối → ít unit
+- ymg_aq: 7 (d0) → 8 (d7) → **10-12 (d9-28)** → 11 (d29). Avg 10.4-11.3.
+- Majkel: 4 (d0) → 8 (d6) → 10-11 (d9-26) → **chỉ 10 (d27-29)**.
+- ymg_aq giữ 11-12 hands suốt 20 ngày cuối; Majkel giảm về 10 ở đúng 3 ngày cuối → ít unit
   harvest/drop hơn trong endgame (thấy rõ ở Mục 6).
 
 **Shed trung bình/ngày (inventory nằm trong kho):**
@@ -149,7 +149,7 @@ ymg_aq **đầu tư manpower nhiều hơn hẳn** (hire +$1,657 ≈ +1-2 hands t
 | Player | NE ($1,000) | SW ($2,000) | SE | Ghi chú |
 |---|---|---|---|---|
 | ymg_aq | **s121/d5** | **s204/d8** | — | Mua ngay khi đủ tiền, 0 lần fail |
-| Majkel | s150/d6 | s220 FAIL → **s222/d9** | — | Spam retry khi broke: s101/d4, s122-129/d5 (6 lệnh cash=0), s220/d9 |
+| Majkel | s150/d6 | s220 FAIL → **s222/d9** | — | Spam retry khi broke: s101/d4, s122-129/d5 (5 lệnh cash=0), s220/d9 |
 
 → ymg_aq có đất sớm hơn đúng **1 ngày mỗi lần** (NE d5 vs d6, SW d8 vs d9) — 25 ô mới sớm 1 ngày
 = 1 ngày production sớm hơn ở đúng giai đoạn giá còn cao (trước khi market bị bơm hàng).
@@ -176,9 +176,9 @@ ymg_aq **đầu tư manpower nhiều hơn hẳn** (hire +$1,657 ≈ +1-2 hands t
   từ d13 (replant bằng WHEAT).
 
 ### Weeds & nước tưới
-- Tổng weeds: ymg_aq 16 (chủ yếu d28-29: 3+8 khi rút unit đi harvest/bán), Majkel 26 (1 weed
-  suốt d5-13, d25-29 tăng 2→7).
-- WATER verbs: Majkel nhiều hơn tổng thể (1,181 vs 942) — chăm tưới hơn nhưng vẫn để weeds d28-29
+- Weeds trên board (cuối ngày): ymg_aq gần sạch suốt game (0-2 tới d27) rồi 3 (d28) → 8 (d29)
+  khi rút unit đi harvest/bán; Majkel giữ 1 weed dai dẳng d5-13, d25-29 tăng dần 2→7. Final 8 vs 7.
+- WATER verbs: Majkel nhiều hơn tổng thể (1,397 vs 1,028) — chăm tưới hơn nhưng vẫn để weeds d28-29
   như ymg_aq; khác biệt không quyết định.
 - Điểm chung: **cả 2 đều chấp nhận để cây thành weed ở 2 ngày cuối** để tối ưu hands cho
   harvest/drop/sell — đúng chân dung endgame.
@@ -210,13 +210,13 @@ ymg_aq **đầu tư manpower nhiều hơn hẳn** (hire +$1,657 ≈ +1-2 hands t
 ### Feed & fertilizer
 | | ymg_aq | Majkel |
 |---|---|---|
-| FEED verbs tổng | 354 (đỉnh 18/ngày) | 244 (đỉnh 14/ngày) |
+| FEED verbs tổng | 353 (đỉnh 18/ngày) | 267 (đỉnh 14/ngày) |
 | BUY WHEAT (feed) | 193u | 169u |
 | BUY FERTILIZER từ market | **66u** (bón thêm cho cây) | 0u |
-| FERTILIZE verbs tổng (bón cây) | **208** (d28 vẫn bón 24) | 100 |
+| FERTILIZE verbs tổng (bón cây) | **216** (d28 vẫn bón 24) | 134 |
 | SELL FERTILIZER | 251u / $14,707 @58.6 | 157u / $10,535 @67.1 |
 
-→ ymg_aq vận hành "FERT twin-engine": động vật nhả FERT, 1 phần bón lại cây (**208 lượt bón vs 100**,
+→ ymg_aq vận hành "FERT twin-engine": động vật nhả FERT, 1 phần bón lại cây (**216 lượt bón vs 134**,
 chưa kể 66u mua thêm) để nhân ×2 yield cho STRA/TOMA/MELON, phần dư bán ra ($14.7K). Majkel bán FERT
 đắt hơn từng unit (67.1 vs 58.6 — bớt bón cây hơn) nhưng tổng FERT-revenue thấp hơn $4,172.
 
@@ -255,7 +255,7 @@ bù cho MELON −4,199, TOMA −3,613 (Majkel bán đắt/nhiều hơn ở 2 ite
 ---
 ## 6. BÁN — nơi trận đấu được quyết định
 
-### 6.1 Sells tổng hợp theo item (beguồn Mục 5) — ai tối ưu hơn?
+### 6.1 Sells tổng hợp theo item (từ Mục 5) — ai tối ưu hơn?
 | Item | ymg_aq | Majkel | Tối ưu hơn |
 |---|---|---|---|
 | STRAWBERRY | 211u $20,326 @96.3 | 150u $20,598 **@137.3** | **Majkel** (đơn giá +42%, revenue ngang) |
@@ -267,15 +267,15 @@ bù cho MELON −4,199, TOMA −3,613 (Majkel bán đắt/nhiều hơn ở 2 ite
 | CARROT | 137u $6,118 | 109u $5,102 | ymg_aq |
 
 → Majkel thắng thế "đơn giá" ở đúng 3 item mình tập trung (STRA/MELON/TOMA, cộng +$8K), nhưng
-**thua thế "portfolio"**: ymg_aq có 2 nguồn revenue Majkel không hề có (EGG +$10.9K, FERT +$4.2K)
-và nhiều unit hơn ở CARROT. Tổng: ymg +$6,471 revenue.
+**thua thế "portfolio"**: ymg_aq có 1 nguồn revenue Majkel hoàn toàn không có (EGG +$10.9K)
+và 1 nguồn áp đảo (FERT +$4.2K — đàn 18 con vs 14 con), cộng nhiều unit hơn ở CARROT. Tổng: ymg +$6,471 revenue.
 
 ### 6.2 Timing bán vs giá thị trường
 | Item | Đỉnh giá | Majkel bán | ymg_aq bán |
 |---|---|---|---|
 | WOOL | 218 @d6 | d6 18u@184, d9 12u@119 rồi ngừng | d6 16u@202, d9 12u@130 — cả 2 sát đỉnh ✓ |
 | MILK | 201 @d8 | d8 12@196, d12 4@193, d14 30@167 | d8 12@184, d13 15@186 — cả 2 tốt; cả 2 tiếp tục bán @58-88 d17-22 (crash) |
-| MELON | 272 @d10 | **d10-11: 48u @248-264, d14: 24u @230 → hết hàng d14** ✓ chuẩn | d10 6@250, rồi **dump d15-18: 60u @190→95** ✘, giữ 6u bán d29 @100 |
+| MELON | 272 @d10 | **d10-11: 48u @248-264, d14: 24u @223 → hết hàng d14** ✓ chuẩn | d10 6@250, rồi **dump d15-18: 66u @~181→102** ✘, giữ 6u bán d29 @100 |
 | STRAWBERRY | 206 @d14-15 | d15 12@204 ✓; d19-21 bán 34u @132→45 rồi **THROTTLE d22-25**; d26-29 bán 39u @86-104 (đón sóng hồi) | d15-16 30u @198-203 ✓; **d19-24 dump 120u @111→6** ✘✘ (26u @6 ngày 23!); d26-29 chỉ còn 18u @88-102 |
 | CARROT | 51 @d25 | d25-29: 109u @43-50 | d27-29: 137u @42-48 (nhiều cây hơn) |
 | WHEAT | 44 @d24 | đều 39-43 | d0 60@31 (arb), d5 58@29 ✘, còn lại 40-44 |
@@ -298,7 +298,7 @@ và nhiều unit hơn ở CARROT. Tổng: ymg +$6,471 revenue.
 | Shed (94u) | WHEA 43, CARR 16, TOMA 10, STRA 6, EGG 7, MILK 8, FERT 4 | WHEA 14, CARR 21, STRA 11, TOMA 6, MILK 8, FERT 1, WOOL 1 (62u) |
 | Yields trên cây | CARR 32, TOMA 8, WHEA 11, STRA 2, MELON 5 (58u) | WHEA 37, CARR 13, TOMA 9, STRA 2 (61u) |
 | Đàn vật | 9 COW + 6 GOOSE (sẽ nhả EGG/MILK/FERT trong ngày) | 6 COW + 1 SHEEP |
-| Hands ngày | 11 | 9-10 |
+| Hands ngày | 11 | 10 |
 
 → ymg_aq bắt đầu ngày cuối với **~152 units bán được + động vật daily-yield**; Majkel ~123 units,
 không có EGG, không có MELON.
@@ -314,14 +314,15 @@ không có EGG, không có MELON.
 | FERTILIZER | **18u $623** | 8u $269 |
 | MELON | **6u $600** @100 | — |
 | MILK | 16u $294 @18 | 13u $295 @23 |
+| WOOL | — | 1u $5 @5 |
 | **Tổng d29** | **$10,900** | **$7,141** |
 
 **Cơ chế "giữ hàng chờ cuối" của ymg_aq (tái hiện):**
 1. **Không phải giữ trong shed** (shed luôn rỗng cuối ngày d25-28) — hàng nằm ở 3 chỗ: (a) yields
    chín trên cây (CARROT 31-34, WHEAT 11→47, MELON 2→5 mỗi tối d26-28), (b) trứng/phân tích lũy trên
    pasture chờ PICKUP, (c) 1 cây MELON "gác" với 5-6 yield chín đúng d29.
-2. Engine **tự harvest yields đã chín vào shed lúc 0h d29** (shed 0→94 units chỉ sau 1 step) → không
-   tốn hands cho việc đưa hàng vào kho sáng cuối.
+2. Hàng nằm **trên tay units lúc 23h** được `_end_of_day` auto-drop vào shed (ymg 0→94 units ngay
+   đầu d29) — KHÔNG phải engine tự harvest cây (yields chín vẫn nằm trên cây chờ HARVEST tay).
 3. Ngày 29: **bán ngay từ s697** (43 WHEAT + 10 TOMA — 2 order đầu ngày), song song 39 HARVEST +
    13 DROP + 24 WATER (tưới ongoing TOMA/CARR để chúng đẻ thêm yield trong ngày), nhặt EGG/FERT
    (COLLECT_FERTILIZER ×14), bán liên tục 4-6 order/step.
@@ -334,7 +335,7 @@ không có EGG, không có MELON.
 | Step | ymg | Majkel | Lead |
 |---:|---:|---:|---|
 | 696 | 76,145 | 79,264 | MAJ (−3,119) |
-| 697-714 | +6,306 | +5,391 | MAJ (gap cực đại +1,574 @s710) |
+| 697-714 | +6,306 | +3,378 | MAJ (gap cực đại +1,574 @s710) |
 | 715 | 83,114 | 82,742 | **YMG dẫn lần đầu trong ngày** |
 | 718 | 85,308 | 86,002 | MAJ giành lại (dump 13 WHEAT) |
 | **719** | **86,713** | **86,262** | **YMG +451 — trận kết thúc** |
@@ -375,7 +376,7 @@ endgame; WOOL chết sau d12, MELON không có hồi sức (chỉ dump đỉnh l
 | Sự kiện | ymg_aq | Majkel |
 |---|---|---|
 | d6 PIZZA (MILK) | mua GOOSE đầu tiên (thăm dò) | **+5 COW ngay d6** (2→7) phản ứng MILK |
-| d9 BAKERY (EGG) | **+3 GOOSE d9, +2 GOOSE d10** → độc quyền EGG | không反应 (0 GOOSE cả match) |
+| d9 BAKERY (EGG) | **+3 GOOSE d9, +2 GOOSE d10** → độc quyền EGG | không phản ứng (0 GOOSE cả match) |
 | d9-13 (WHEAT shops chồng) | WHEAT đều đặn 3-8 pkt/ngày | **WHEAT-monoculture**: 16,10,10,10,12,10 pkt d9-14 |
 | d21 PET_CAFE (CARROT) | CARROT wave d23-28: 36 pkt → 22 cây d27 | CARROT wave d21-26: 32 pkt → 27 cây d26 |
 | d24 BRUNCH (EGG+STRA) | EGG giá lên 54 (max); STRA hồi 22→101 | bán STRA hồi @104 d27-28 |
@@ -393,7 +394,7 @@ trường trống (không ai cạnh tranh + 3 shop hút) còn MILK/WHEAT bị c�
 | WHEAT | 11 | giữ 39-44 nhờ 7 shop hút |
 | TOMATO 7, CARROT 3, WOOL 4, MELON 1 | | |
 
-→ Hai agent bán cùng lúc加速 sập giá ở MILK/STRA/FERT; không có cơ chế nhường lượt — đây là
+→ Hai agent bán cùng lúc thúc đẩy sập giá ở MILK/STRA/FERT; không có cơ chế nhường lượt — đây là
 "prisoner's dilemma" bán hàng: ai dump trước giữ đơn giá tốt hơn, ai giữ thì nhận giá hồi.
 
 *(town.json, orders.json, engine SHOPS mapping.)*
@@ -409,16 +410,16 @@ trường trống (không ai cạnh tranh + 3 shop hút) còn MILK/WHEAT bị c�
 | 3 | **s121 d5 / s204 d8** | ymg mua NE (d5), SW (d8) — mỗi lần sớm hơn Majkel đúng 1 ngày (Majkel cần 6 retry hụt d4-5) | +25 ô × 1 ngày production ở giai đoạn giá cao |
 | 4 | d6 | PIZZA unlock → Majkel +5 COW; ymg +1 GOOSE | Majkel all-in MILK (sẽ bão hòa d16+); ymg thăm dò EGG |
 | 5 | **d9-10** | BAKERY (EGG) unlock → ymg **+5 GOOSE (tổng 6)** | **Nguồn lợi thế lớn nhất trận**: 208 EGG @52.5 = $10,926, giá không bao giờ xuống dưới base 50 |
-| 6 | d10-14 | Majkel blitz: MELON 72u @240 (đỉnh 272), MILK @167-196, +6,113/+5,389/+7,167 profit 3 ngày | Gap lên **−11,873 (d14)** — Majkel tưởng đã thắng thế |
-| 7 | d15-24 | STRA crash 206→1: ymg **dump 156u (120u @44.8 ở đáy)**; Majkel throttle từ d22, giữ 29 STRA trong shed @d25 | ymg đốt ~$6K so với kịch bản giữ; Majkel bán lại @100-104 d27-29 — Majkel thắng thế sell-timing |
+| 6 | d10-14 | Majkel blitz: MELON 72u @240 (đỉnh 272), MILK @167-196, +6,113/+5,389/+11,775 profit 3 ngày | Gap lên **−11,873 (d14)** — Majkel tưởng đã thắng thế |
+| 7 | d15-24 | STRA crash 206→1: ymg **dump 120u @45 ở đáy d19-24 (13u @$1 ngày d23)**; Majkel throttle từ d22, giữ 29 STRA trong shed @d25 | ymg đốt ~$6K so với kịch bản giữ; Majkel bán lại @100-104 d27-29 — Majkel thắng thế sell-timing |
 | 8 | **d18-22** | Majkel under-feed (8-12 FEED cho 14 con) → **d22: 5 con escape (2 COW + 3 SHEEP)**, thêm 2 COW d27-28 | Mất ~30% sản lượng MILK/FERT 8 ngày cuối; đàn cuối: 15 vs 7 con |
-| 9 | d21-28 | PET_CAFE → cả 2 plant CARROT wave; ymg nhiều hơn (36 pkt, 22 cây d27) + giữ 4 STRA + 1 MELON + 9 TOMA | Tồn kho cuối trận đa dạng: ymg 9 loại hàng vs Majkel 5 loại |
+| 9 | d21-28 | PET_CAFE → cả 2 plant CARROT wave; ymg nhiều hơn (36 pkt, 22 cây d27) + giữ 4 STRA + 1 MELON + 9 TOMA | Tồn kho cuối trận đa dạng: d29 ymg bán 8 loại hàng (Majkel 7), tới s719 vẫn còn 6 loại đạn (CARR/WHEA/STRA/TOMA/EGG/FERT) vs 2 của Majkel (WHEA/FERT) |
 | 10 | **d28 23h → d29 0h** | Engine `_end_of_day`: auto-drop toàn bộ hàng trên tay vào shed (ymg shed 0→**94 units**, Majkel 12→62); hands bị giải tán, thuê lại theo ngày | ymg mở ngày cuối với 94u sẵn sàng bán + 58u yield trên cây + EGG/FERT theo đàn |
 | 11 | **d29 s697→719** | ymg bán 229u/$10,900 (chunk 2-8u, liên tục tới s719 +$1,405); Majkel cạn hàng ở s718, s719 chỉ +$260 | Trận lật ở **đúng step cuối 719**: 86,713 vs 86,262 |
 
 **Công thức thắng của ymg_aq:** không phải bán giỏi hơn (đơn giá STRA/MELON/TOMA đều thua
 Majkel), mà là **"đủ hàng để bán"** — 9 dòng revenue, đàn vật 18 con (có EGG monopoly), 248 seed
-packets, 208 lượt bón phân, 11-12 hands mỗi ngày, tồn kho trên cây chín đúng d29.
+packets, 216 lượt bón phân, 11-12 hands mỗi ngày, tồn kho trên cây chín đúng d29.
 
 ---
 
@@ -445,7 +446,7 @@ feed-buy sớm, land timing, sell-into-strength. Match1 bổ sung:
    WATER/FERTILIZE/HARVEST, gánh hàng về 23h; sang 0h d29 shed đã đầy (ymg 0→94u) → SELL ngay s697
    trước khi di chuyển (ymg +$2,615 ở s697). v18 nên bỏ DROP khỏi plan 3 step cuối mỗi ngày.
 5. **HANDS LÀ CHI PHÍ HẰNG NGÀY (dismissed 23h, thuê lại 0h):** ymg duy trì 11-12 hands × 20 ngày
-   ($6,481 tổng) vs Majkel cắt về 9-10 ở d27-29 → throughput d29: 39 vs 33 HARVEST. Cuộc chiến
+   ($6,481 tổng) vs Majkel cắt về 10 ở d27-29 → throughput d29: 39 vs 33 HARVEST. Cuộc chiến
    endgame là cuộc chiến đơn vị hành động/ ngày — **đừng tiết kiệm hire ở 3 ngày cuối**.
 6. **CROP-MATURITY SCHEDULING cho d29:** plant WHEAT/CARROT (first-yield 2 ngày) vào d26-27 để
    max-yield chín đúng d28-29; TOMATO ongoing + fertilizer tiếp tục đẻ NGAY trong d29 (ymg bán 18
@@ -461,20 +462,20 @@ feed-buy sớm, land timing, sell-into-strength. Match1 bổ sung:
 9. **MONOPOLY MICRO-CHUNKING:** item mình là người bán duy nhất (EGG) → chunk 2-8u/order, giá
    không suy chuyển (54 suốt); item hai bên cùng bán (STRA d15-21) → chunk lớn = tự sát chung.
    v19: chunk-size ∝ (I0 − inventory − town-drain-rate×steps) của riêng item đó.
-10. **TROUGH-THROTTLE xác nhận từ phía thua:** ymg dump 120u STRA @44.8 trung bình ở đáy (26u @6
+10. **TROUGH-THROTTLE xác nhận từ phía thua:** ymg dump 120u STRA @45 trung bình ở đáy (26u @6
     ngày d23!) trong khi Majkel giữ 29u bán lại @104 — chênh ~$6-7K. ymg vẫn thắng nhờ portfolio,
     nhưng v19 (đấu với Majkel-style throttle) KHÔNG được áp đặt crash-dumping; giữ nguyên
     04A #2 và cộng thêm nguồn thu breadth.
 11. **BREADTH vs EFFICIENCY:** Majkel hiệu quả hơn từng dollar (revenue/spend 4.07x vs 3.53x) nhưng
     thua tổng tuyệt đối. Khi margin mỏng (±0.5%), người có thêm 2-3 dòng revenue "không đối thủ"
-    (EGG, FERT, MELON-endgame) thắng. v19: giữ core hiệu suất của v18 + bổ sung động物 mix + shop
+    (EGG, FERT, MELON-endgame) thắng. v19: giữ core hiệu suất của v18 + bổ sung động vật mix + shop
     counter (bài 1-2).
 12. **LAND THRESHOLD-TRIGGER:** mua đất đúng lúc cash vượt giá (ymg d5/d8, 0 retry) thay vì spam
     order khi broke (Majkel 9 dead-orders đất). Land sớm 1 ngày = 1 ngày giá cao hơn của quadrant
     mới. Kiểm "cash ≥ price + buffer hire" mỗi step.
 
-*(Phân tích: match1/{orders,timeline,daily,market,town}.json; engine kaggressurE.py `_end_of_day`
-L~740: `_drop_inventories_to_shed`, `farm["hands"]=[]`, `hires_today=0`; `_daily_refresh_animals`:
+*(Phân tích: match1/{orders,timeline,daily,market,town}.json; engine kaggriculture.py `_end_of_day`
+L860-893: `_drop_inventories_to_shed` L878, `farm["hands"]=[]`, `hires_today=0`; `_daily_refresh_animals`:
 escape khi consecutive_unfed≥2, care-bonus +1 yield khi fed+cared.)*
 
 ---

@@ -313,6 +313,13 @@ orders_by_day = defaultdict(list)
 for e in orders_all:
     orders_by_day[(e["day"], e["player"])].append(e)
 
+# Money at end of previous day (start of this day). Timeline snapshot at step t
+# is POST-action, so rows[0].money (step day*24) already includes the first
+# step's orders — using it as money_start silently dropped those transactions
+# from profit_day. Start-of-day money = money after the last step of the
+# previous day (end-of-day processing never touches money).
+money_by_sp = {(row["step"], row["player"]): row["money"] for row in timeline}
+
 for (day, p), rows in sorted(by_day.items()):
     ods = orders_by_day.get((day, p), [])
     buys = defaultdict(lambda: [0, 0.0])
@@ -333,9 +340,10 @@ for (day, p), rows in sorted(by_day.items()):
     for r in rows:
         for v, c in r["unit_verbs"].items():
             verbs[v] += c
+    money_start = 3000.0 if day == 0 else money_by_sp[(day * 24 - 1, p)]
     daily.append(dict(
-        day=day, player=p, money_start=rows[0]["money"], money_end=rows[-1]["money"],
-        profit_day=rows[-1]["money"] - rows[0]["money"],
+        day=day, player=p, money_start=money_start, money_end=rows[-1]["money"],
+        profit_day=rows[-1]["money"] - money_start,
         buys={k: dict(units=v[0], cash=round(v[1], 2)) for k, v in buys.items() if v[0] > 0},
         sells={k: dict(units=v[0], cash=round(v[1], 2)) for k, v in sells.items() if v[0] > 0},
         hire_spend=hire_spend, land_spend=land_spend,

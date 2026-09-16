@@ -1,0 +1,269 @@
+======================================================================
+MATCH2 — Majkel(p0) vs DSM(p1) — 04A claims
+======================================================================
+
+-- §1.1 money_end (doc vs data) --
+PASS | all 60 money_end match
+
+-- §1.1 delta column (doc Δ vs money_end diff) --
+DOC Δ ERRORS: d11D: docΔ=5607 correctΔ=6321; d17M: docΔ=3315 correctΔ=4475; d18M: docΔ=4753 correctΔ=5415; d20D: docΔ=3167 correctΔ=3274; d21M: docΔ=1585 correctΔ=1587; d22M: docΔ=2711 correctΔ=3004; d23D: docΔ=2639 correctΔ=2693; d24M: docΔ=2200 correctΔ=2552; d25M: docΔ=3116 correctΔ=3764; d25D: docΔ=2933 correctΔ=2987; d26M: docΔ=3598 correctΔ=4644; d27M: docΔ=3030 correctΔ=3655; d28M: docΔ=5788 correctΔ=7186; d28D: docΔ=5907 correctΔ=5912; d29M: docΔ=13431 correctΔ=13432; d29D: docΔ=6325 correctΔ=6800
+DAILY.JSON profit_day vs moneyΔ: d11D: profit_day=5607.0 moneyΔ=6321; d17M: profit_day=3315.0 moneyΔ=4475; d18M: profit_day=4753.0 moneyΔ=5415; d20D: profit_day=3167.0 moneyΔ=3274; d21M: profit_day=1585.0 moneyΔ=1587; d22M: profit_day=2711.0 moneyΔ=3004; d23D: profit_day=2639.0 moneyΔ=2693; d24M: profit_day=2200.0 moneyΔ=2552; d25M: profit_day=3116.0 moneyΔ=3764; d25D: profit_day=2933.0 moneyΔ=2987; d26M: profit_day=3598.0 moneyΔ=4644; d27M: profit_day=3030.0 moneyΔ=3655; d28M: profit_day=5788.0 moneyΔ=7186; d28D: profit_day=5907.0 moneyΔ=5912; d29M: profit_day=13431.0 moneyΔ=13432; d29D: profit_day=6325.0 moneyΔ=6800
+
+-- §1.2 phase table (rev/spend/net) --
+FAIL | phase d0-2 M: rev=1094 (doc 1094) spend=-4078 (doc 4078)
+FAIL | phase d0-2 D: rev=1122 (doc 1122) spend=-4106 (doc 4106)
+FAIL | phase d3-9 M: rev=12190 (doc 12190) spend=-11865 (doc 11865)
+FAIL | phase d3-9 D: rev=12474 (doc 12474) spend=-11855 (doc 11855)
+FAIL | phase d10-20 M: rev=57036 (doc 57036) spend=-7813 (doc 7813)
+FAIL | phase d10-20 D: rev=59193 (doc 59193) spend=-9300 (doc 9300)
+FAIL | phase d21-28 M: rev=34278 (doc 34278) spend=-5429 (doc 5429)
+FAIL | phase d21-28 D: rev=30305 (doc 30305) spend=-3504 (doc 3504)
+FAIL | phase d29 M: rev=13575 (doc 13575) spend=-143 (doc 143)
+FAIL | phase d29 D: rev=6943 (doc 6943) spend=-143 (doc 143)
+
+-- §3.1 spend categories --
+INFO | M seeds: WHEAT=124u/$1240, CARROT=125u/$2500, TOMATO=14u/$700, STRAWBERRY=25u/$2500, MELON=12u/$960
+PASS | M animal_spend: actual=7000.0 expect=7000
+PASS | M product(feed) spend: actual=6507.0 expect=6507
+PASS | M product(feed) units: actual=178 expect=178
+INFO | D seeds: WHEAT=180u/$1800, CARROT=76u/$1520, TOMATO=19u/$950, STRAWBERRY=23u/$2300, MELON=12u/$960
+PASS | D animal_spend: actual=7000.0 expect=7000
+PASS | D product(feed) spend: actual=6449.0 expect=6449
+PASS | D product(feed) units: actual=172 expect=172
+
+-- §6.1 per-item revenue --
+PASS | 6.1 M STRAWBERRY: units=196 (doc 196) avg=152.3 (doc 152.3)
+PASS | 6.1 M WOOL: units=196 (doc 196) avg=94.3 (doc 94.3)
+PASS | 6.1 M CARROT: units=310 (doc 310) avg=51.8 (doc 51.8)
+PASS | 6.1 M WHEAT: units=390 (doc 390) avg=37.3 (doc 37.3)
+PASS | 6.1 M MELON: units=72 (doc 72) avg=199.7 (doc 199.7)
+PASS | 6.1 M FERTILIZER: units=179 (doc 179) avg=64.3 (doc 64.3)
+PASS | 6.1 M TOMATO: units=108 (doc 108) avg=82.5 (doc 82.5)
+PASS | 6.1 M MILK: units=107 (doc 107) avg=41.5 (doc 41.5)
+PASS | 6.1 D STRAWBERRY: units=175 (doc 175) avg=139.3 (doc 139.3)
+PASS | 6.1 D WOOL: units=215 (doc 215) avg=85.3 (doc 85.3)
+PASS | 6.1 D CARROT: units=170 (doc 170) avg=52.2 (doc 52.2)
+PASS | 6.1 D WHEAT: units=455 (doc 455) avg=37.6 (doc 37.6)
+PASS | 6.1 D MELON: units=72 (doc 72) avg=201.4 (doc 201.4)
+PASS | 6.1 D FERTILIZER: units=177 (doc 177) avg=64.8 (doc 64.8)
+PASS | 6.1 D TOMATO: units=135 (doc 135) avg=81.1 (doc 81.1)
+PASS | 6.1 D MILK: units=93 (doc 93) avg=47.8 (doc 47.8)
+INFO | Δrevenue M-D = 8136 (doc +8,136)
+PASS | 6.1 Δ WHEAT: -2569 (doc -2569)
+PASS | 6.1 Δ FERTILIZER: 46 (doc 46)
+PASS | 6.1 Δ WOOL: 144 (doc 144)
+PASS | 6.1 Δ MILK: -3 (doc -3)
+PASS | 6.1 Δ MELON: -126 (doc -126)
+PASS | 6.1 Δ STRAWBERRY: 5475 (doc 5475)
+PASS | 6.1 Δ CARROT: 7200 (doc 7200)
+PASS | 6.1 Δ TOMATO: -2031 (doc -2031)
+
+-- §6.2 STRA throttle math --
+INFO | M STRA d19-24: 40u $4104 (doc 40 @102.6 → $4,104)
+INFO | M STRA d25-29: 77u $12657 avg 164.4 (doc 77 @164.4)
+PASS | throttle total units (117): actual=117 expect=117
+INFO | throttle gain = (4104.0+12657) - 117u*102.6 = 4757 (doc +4,757)
+
+-- §6.4 day29 --
+INFO | M shed s696: CARROT=30, MILK=6, STRAWBERRY=42, TOMATO=11, WHEAT=6, WOOL=5
+INFO | D shed s696: CARROT=20, MILK=8, STRAWBERRY=7, TOMATO=10, WHEAT=8, WOOL=7
+INFO | s697 SELL p0 CARROT 30u $1428 prices[:3]=[50, 50, 49]
+INFO | s697 SELL p1 CARROT 19u $918 prices[:3]=[50, 50, 49]
+INFO | s697 SELL p1 WHEAT 8u $280 prices[:3]=[35, 35, 35]
+INFO | s719 p0 SELL STRAWBERRY asked=42 units=42 cash=7258 prices[:3]=[186, 185, 185]
+INFO | s719 p0 SELL WHEAT asked=5 units=5 cash=165 prices[:3]=[33, 33, 33]
+INFO | s719 p0 SELL CARROT asked=2 units=2 cash=90 prices[:3]=[45, 45]
+INFO | s719 p0 SELL FERTILIZER asked=1 units=1 cash=29 prices[:3]=[29]
+INFO | s719 p1 SELL STRAWBERRY asked=1000 units=0 cash=0 prices[:3]=[]
+INFO | s719 p1 SELL MELON asked=1000 units=0 cash=0 prices[:3]=[]
+INFO | s719 p1 SELL MILK asked=1000 units=0 cash=0 prices[:3]=[]
+INFO | s719 p1 SELL WOOL asked=1000 units=0 cash=0 prices[:3]=[]
+INFO | s719 p1 SELL TOMATO asked=1000 units=11 cash=815 prices[:3]=[75, 75, 74]
+INFO | s719 p1 SELL FERTILIZER asked=1000 units=2 cash=58 prices[:3]=[29, 29]
+INFO | s719 p1 SELL EGG asked=1000 units=0 cash=0 prices[:3]=[]
+INFO | s719 p1 SELL CARROT asked=1000 units=2 cash=90 prices[:3]=[45, 45]
+INFO | s719 p1 SELL WHEAT asked=1000 units=9 cash=297 prices[:3]=[33, 33, 33]
+PASS | M s719 revenue: actual=7542.0 expect=7542
+PASS | D s719 revenue: actual=1260.0 expect=1260
+PASS | step719 margin: actual=6282.0 expect=6283
+PASS | M d29 sell units: actual=190 expect=190
+PASS | D d29 sell units: actual=136 expect=136
+PASS | M d29 revenue: actual=13575.0 expect=13575
+PASS | D d29 revenue: actual=6943.0 expect=6943
+
+-- §6.5 shed_total --
+INFO | M max shed_total per day: 16:72 18:81 20:77 21:95 22:100 24:99 26:96 27:94 28:100 29:100
+INFO | D max shed_total per day: 16:71 18:80 20:77 21:79 22:75 24:61 26:82 27:92 28:79 29:60
+
+-- §6.6 dead orders --
+PASS | M total orders: actual=987 expect=987
+PASS | M executed: actual=968 expect=968
+INFO | M dead-SELL by item: {}
+PASS | D total orders: actual=3772 expect=3772
+PASS | D executed: actual=1043 expect=1043
+INFO | D dead-SELL by item: {'TOMATO': 594, 'EGG': 492, 'MELON': 400, 'CARROT': 389, 'STRAWBERRY': 311, 'WOOL': 270, 'MILK': 252, 'WHEAT': 1}
+
+-- §8 key moments --
+INFO | d6 WOOL sells (both): p1 s148 2u @220-$219 $439; p0 s149 6u @218-$200 $1251; p1 s149 4u @218-$206 $851; p1 s150 2u @200-$200 $400; p0 s151 6u @199-$190 $1173; p1 s151 6u @199-$190 $1173; p0 s152 6u @187-$167 $1059; p1 s152 4u @187-$174 $723
+INFO | d10 MELON sells: p1 s250 2u @272 $543; p0 s251 6u @270 $1572; p1 s251 6u @270 $1572; p0 s252 6u @250 $1496; p1 s252 6u @250 $1496; p0 s253 6u @248 $1476; p1 s253 6u @248 $1476; p0 s254 12u @243 $2823; p1 s254 10u @243 $2368
+INFO | LAND p0 s126 d5 units=0 cash=0
+INFO | LAND p0 s150 d6 units=1 cash=-1000
+INFO | LAND p1 s150 d6 units=1 cash=-1000
+INFO | LAND p0 s220 d9 units=0 cash=0
+INFO | LAND p1 s220 d9 units=0 cash=0
+INFO | LAND p0 s222 d9 units=0 cash=0
+INFO | LAND p1 s222 d9 units=1 cash=-2000
+INFO | LAND p0 s224 d9 units=1 cash=-2000
+INFO | d12 WOOL sells: p1 s291 1u @229 $229; p0 s292 6u @228 $1358; p1 s292 5u @228 $1134; p0 s294 10u @225 $2164; p1 s294 10u @225 $2164; p0 s295 4u @199 $790; p1 s295 4u @199 $790; p0 s297 4u @193 $753; p1 s297 4u @193 $753; p0 s299 2u @183 $364; p1 s299 5u @179 $871; p0 s306 1u @177 $177; p0 s310 1u @179 $179; p1 s310 1u @179 $179
+INFO | M weeds by day (nonzero): d21:1, d25:1, d26:1, d27:2, d28:2, d29:7
+INFO | D weeds by day (nonzero): d25:1, d26:1, d27:1, d28:8, d29:9
+INFO | M animals d26-29: {26: {'COW': 4, 'SHEEP': 8}, 27: {'COW': 4, 'SHEEP': 8}, 28: {'COW': 4, 'SHEEP': 5}, 29: {'COW': 3, 'SHEEP': 4}}
+INFO | M FEED verbs d26-29: {26: 4, 27: 7, 28: 0, 29: 0}
+INFO | D animals d26-29: {26: {'COW': 4, 'SHEEP': 8}, 27: {'COW': 4, 'SHEEP': 8}, 28: {'COW': 4, 'SHEEP': 5}, 29: {'COW': 3, 'SHEEP': 4}}
+INFO | D FEED verbs d26-29: {26: 6, 27: 7, 28: 0, 29: 0}
+INFO | M first CARROT seed-buy day: 11
+INFO | D first CARROT seed-buy day: 17
+
+======================================================================
+MATCH1 — ymg_aq(p0) vs Majkel(p1) — 04B claims
+======================================================================
+
+-- §1 money_end + profit --
+PASS | all 60 money_end match
+DOC Δ ERRORS: d6ymg: docΔ=1401 correctΔ=1490; d8ymg: docΔ=441 correctΔ=609; d9ymg: docΔ=793 correctΔ=828; d10ymg: docΔ=2066 correctΔ=2360; d12ymg: docΔ=-140 correctΔ=206; d13ymg: docΔ=3279 correctΔ=3409; d14ymg: docΔ=4365 correctΔ=4489; d14maj: docΔ=7167 correctΔ=11775; d20ymg: docΔ=1461 correctΔ=1555; d23maj: docΔ=1318 correctΔ=1320; d24maj: docΔ=2326 correctΔ=2868; d25ymg: docΔ=3856 correctΔ=3906; d25maj: docΔ=3210 correctΔ=3212; d26maj: docΔ=3035 correctΔ=3049; d27ymg: docΔ=3323 correctΔ=3359; d28maj: docΔ=6162 correctΔ=6173
+
+-- §3 summary from summary.json --
+PASS | ymg revenue: actual=116858.0 expect=116858
+PASS | maj revenue: actual=110387.0 expect=110387
+PASS | ymg hire: actual=6481 expect=6481
+PASS | maj hire: actual=4824.0 expect=4824
+
+-- §5 revenue per item --
+PASS | 5 ymg STRAWBERRY: 211u $20326 @96.3 (doc 211u $20326 @96.3)
+PASS | 5 ymg MILK: 219u $19507 @89.1 (doc 219u $19507 @89.1)
+PASS | 5 ymg WHEAT: 482u $18464 @38.3 (doc 482u $18464 @38.3)
+PASS | 5 ymg FERTILIZER: 251u $14707 @58.6 (doc 251u $14707 @58.6)
+PASS | 5 ymg MELON: 84u $13099 @155.9 (doc 84u $13099 @155.9)
+PASS | 5 ymg EGG: 208u $10926 @52.5 (doc 208u $10926 @52.5)
+PASS | 5 ymg TOMATO: 91u $8359 @91.9 (doc 91u $8359 @91.9)
+PASS | 5 ymg CARROT: 137u $6118 @44.7 (doc 137u $6118 @44.7)
+PASS | 5 ymg WOOL: 70u $5352 @76.5 (doc 70u $5352 @76.5)
+PASS | 5 maj STRAWBERRY: 150u $20598 @137.3 (doc 150u $20598 @137.3)
+PASS | 5 maj MILK: 232u $20320 @87.6 (doc 232u $20320 @87.6)
+PASS | 5 maj WHEAT: 478u $19564 @40.9 (doc 478u $19564 @40.9)
+PASS | 5 maj FERTILIZER: 157u $10535 @67.1 (doc 157u $10535 @67.1)
+PASS | 5 maj MELON: 72u $17298 @240.2 (doc 72u $17298 @240.2)
+PASS | 5 maj EGG: 0u $0 @0.0 (doc 0u $0 @0)
+PASS | 5 maj TOMATO: 128u $11972 @93.5 (doc 128u $11972 @93.5)
+PASS | 5 maj CARROT: 109u $5102 @46.8 (doc 109u $5102 @46.8)
+PASS | 5 maj WOOL: 71u $4998 @70.4 (doc 71u $4998 @70.4)
+
+-- §6.3 endgame d29 --
+INFO | ymg s696 shed: CARROT=16, EGG=7, FERTILIZER=4, MILK=8, STRAWBERRY=6, TOMATO=10, WHEAT=43 | total=94
+INFO | ymg s696 yields on plants: {'CARROT': 32, 'TOMATO': 8, 'WHEAT': 11, 'STRAWBERRY': 2, 'MELON': 5} | animals: {'COW': 9, 'GOOSE': 6} | hands=0
+INFO | maj s696 shed: CARROT=21, FERTILIZER=1, MILK=8, STRAWBERRY=11, TOMATO=6, WHEAT=14, WOOL=1 | total=62
+INFO | maj s696 yields on plants: {'WHEAT': 37, 'CARROT': 13, 'TOMATO': 9, 'STRAWBERRY': 2} | animals: {'COW': 6, 'SHEEP': 1} | hands=0
+INFO | m1 s697 p0 SELL WHEAT 43u $1747
+INFO | m1 s697 p0 SELL TOMATO 10u $868
+INFO | m1 s697 p0 HIRE None 1u $-1
+INFO | m1 s697 p0 HIRE None 1u $-1
+INFO | m1 s697 p0 HIRE None 1u $-2
+INFO | m1 s697 p0 HIRE None 1u $-3
+INFO | m1 s697 p0 HIRE None 1u $-5
+INFO | m1 s697 p0 HIRE None 1u $-8
+INFO | m1 s697 p0 HIRE None 1u $-13
+INFO | m1 s697 p0 HIRE None 1u $-21
+INFO | m1 s697 p1 SELL CARROT 21u $935
+INFO | m1 s697 p1 SELL WHEAT 14u $560
+INFO | m1 s697 p1 HIRE None 1u $-1
+INFO | m1 s697 p1 HIRE None 1u $-1
+INFO | m1 s697 p1 HIRE None 1u $-2
+INFO | m1 s697 p1 HIRE None 1u $-3
+INFO | m1 s697 p1 HIRE None 1u $-5
+INFO | m1 s697 p1 HIRE None 1u $-8
+INFO | m1 s697 p1 HIRE None 1u $-13
+INFO | m1 s697 p1 HIRE None 1u $-21
+PASS | ymg s697 revenue: actual=2615.0 expect=2615
+
+-- d29 per-item sells --
+INFO | ymg d29: CARROT=64u/$2681, EGG=27u/$1453, FERTILIZER=18u/$623, MELON=6u/$600, MILK=16u/$294, STRAWBERRY=8u/$800, TOMATO=18u/$1560, WHEAT=72u/$2889 | TOTAL 229u $10900
+INFO | maj d29: CARROT=34u/$1476, FERTILIZER=8u/$269, MILK=13u/$295, STRAWBERRY=13u/$1296, TOMATO=13u/$1119, WHEAT=68u/$2681, WOOL=1u/$5 | TOTAL 150u $7141
+
+-- trace s714-719 --
+INFO | s713: ymg=81405 maj=82333
+INFO | s714: ymg=82451 maj=82642
+INFO | s715: ymg=83114 maj=82742
+INFO | s716: ymg=84302 maj=84178
+INFO | s717: ymg=85308 maj=84880
+INFO | s718: ymg=85308 maj=86002
+INFO | s719: ymg=86713 maj=86262
+INFO | m1 s719 p0 SELL CARROT 16u $637
+INFO | m1 s719 p0 SELL WHEAT 6u $228
+INFO | m1 s719 p0 SELL STRAWBERRY 2u $200
+INFO | m1 s719 p0 SELL TOMATO 2u $170
+INFO | m1 s719 p0 SELL EGG 2u $106
+INFO | m1 s719 p0 SELL FERTILIZER 2u $64
+INFO | m1 s719 p1 SELL WHEAT 6u $228
+INFO | m1 s719 p1 SELL FERTILIZER 1u $32
+PASS | ymg s719 revenue: actual=1405.0 expect=1405
+PASS | maj s719 revenue: actual=260.0 expect=260
+
+-- §6.4 dead orders --
+PASS | ymg total orders: actual=878 expect=878
+PASS | ymg dead: actual=2 expect=2
+PASS | maj total orders: actual=949 expect=949
+PASS | maj dead: actual=45 expect=45
+
+-- opening d0 --
+INFO | m1 d0 s1 p0 BUY_PRODUCT WHEAT 60u $-1812 prices[:2]=[26, 26]
+INFO | m1 d0 s1 p0 SELL WHEAT 60u $1844 prices[:2]=[33, 33]
+INFO | m1 d0 s1 p0 HIRE None 1u $-1 prices[:2]=[]
+INFO | m1 d0 s1 p0 HIRE None 1u $-1 prices[:2]=[]
+INFO | m1 d0 s1 p0 HIRE None 1u $-2 prices[:2]=[]
+INFO | m1 d0 s1 p0 HIRE None 1u $-3 prices[:2]=[]
+INFO | m1 d0 s1 p0 HIRE None 1u $-5 prices[:2]=[]
+INFO | m1 d0 s1 p0 HIRE None 1u $-8 prices[:2]=[]
+INFO | m1 d0 s1 p0 BUY_ANIMAL COW 3u $-1200 prices[:2]=[400, 400]
+INFO | m1 d0 s1 p0 BUY_ANIMAL SHEEP 3u $-1500 prices[:2]=[500, 500]
+INFO | m1 d0 s1 p1 BUY_ANIMAL COW 1u $-400 prices[:2]=[400]
+INFO | m1 d0 s1 p1 BUY_PRODUCT WHEAT 5u $-165 prices[:2]=[33, 33]
+INFO | m1 d0 s2 p0 BUY_SEED WHEAT 18u $-180 prices[:2]=[10, 10]
+INFO | m1 d0 s2 p0 HIRE None 1u $-13 prices[:2]=[]
+INFO | m1 d0 s2 p0 BUY_SEED MELON 1u $-80 prices[:2]=[80]
+INFO | m1 d0 s2 p1 SELL WHEAT 1u $27 prices[:2]=[27]
+INFO | m1 d0 s2 p1 HIRE None 1u $-1 prices[:2]=[]
+INFO | m1 d0 s2 p1 HIRE None 1u $-1 prices[:2]=[]
+INFO | m1 d0 s2 p1 HIRE None 1u $-2 prices[:2]=[]
+INFO | m1 d0 s2 p1 HIRE None 1u $-3 prices[:2]=[]
+INFO | m1 d0 s2 p1 BUY_ANIMAL COW 1u $-400 prices[:2]=[400]
+INFO | m1 d0 s2 p1 BUY_ANIMAL SHEEP 3u $-1500 prices[:2]=[500, 500]
+INFO | d0 animals: ymg={'COW': 3, 'SHEEP': 3} maj={'COW': 2, 'SHEEP': 3}
+
+-- animals by day (escapes) --
+INFO | ymg animals end d18: {'COW': 9, 'GOOSE': 6, 'SHEEP': 3}
+INFO | ymg animals end d23: {'COW': 9, 'GOOSE': 6, 'SHEEP': 1}
+INFO | ymg animals end d26: {'COW': 9, 'GOOSE': 6}
+INFO | maj animals end d18: {'COW': 10, 'SHEEP': 4}
+INFO | maj animals end d22: {'COW': 8, 'SHEEP': 1}
+INFO | maj animals end d27: {'COW': 7, 'SHEEP': 1}
+INFO | maj animals end d29: {'COW': 6, 'SHEEP': 1}
+
+-- hands --
+INFO | ymg hands_max: {8: 8, 9: 11, 20: 11, 26: 11, 27: 11, 28: 11, 29: 11}
+INFO | maj hands_max: {8: 9, 9: 10, 20: 11, 26: 11, 27: 10, 28: 10, 29: 10}
+
+-- totals verbs --
+INFO | ymg: WATER total=1028 (doc 942/1181) weeds_total=16 (doc 16/26) d29 HARVEST=39 DROP=13 WATER=24 COLLECT_FERT=14
+INFO | maj: WATER total=1397 (doc 942/1181) weeds_total=30 (doc 16/26) d29 HARVEST=33 DROP=12 WATER=31 COLLECT_FERT=8
+
+-- animal purchases by day --
+INFO | ymg: d0:{'COW': 3, 'SHEEP': 3}; d4:{'COW': 1}; d6:{'GOOSE': 1, 'COW': 1}; d7:{'COW': 1}; d9:{'GOOSE': 3, 'COW': 2}; d10:{'GOOSE': 2, 'COW': 1}
+INFO | maj: d0:{'COW': 2, 'SHEEP': 3}; d6:{'COW': 5}; d8:{'COW': 1}; d9:{'COW': 2}; d12:{'SHEEP': 1}
+
+-- STRA sells by day --
+INFO | ymg STRA: d15:6u@203 d16:24u@198 d17:14u@185 d18:28u@168 d19:28u@111 d20:16u@66 d21:20u@26 d22:18u@20 d23:26u@6 d24:12u@15 d25:3u@34 d26:2u@88 d27:4u@98 d28:2u@102 d29:8u@100
+INFO | maj STRA: d15:12u@204 d16:17u@198 d17:18u@185 d18:26u@167 d19:14u@132 d20:15u@68 d21:5u@45 d22:2u@19 d23:2u@8 d26:2u@86 d27:11u@104 d28:13u@104 d29:13u@100
+INFO | ymg STRA dump d19-24: 120u $5395 @45.0 (doc 120u @44.8)
+INFO | ymg STRA sub-$10 sells d19-24: d22 2u@8; d23 2u@4; d23 2u@4; d23 13u@1; d24 1u@9; d24 1u@9
+
+DONE. Full log saved.
