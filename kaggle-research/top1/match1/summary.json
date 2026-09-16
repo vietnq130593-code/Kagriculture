@@ -1,0 +1,47 @@
+{
+ "episode_id": "d6c22dbc-b204-11f1-9f1b-0242ac130204",
+ "teams": [
+  "ymg_aq",
+  "Majkel1337"
+ ],
+ "seed": 223111085,
+ "rewards": [
+  86713.0,
+  86262.0
+ ],
+ "statuses": [
+  "DONE",
+  "DONE"
+ ],
+ "final_money": [
+  86713.0,
+  86262.0
+ ],
+ "winner": 0,
+ "margin": 451.0,
+ "majkel_idx": 1,
+ "n_steps": 720,
+ "money_mismatch_player_steps": 0,
+ "p0": {
+  "revenue": 116858.0,
+  "sell_units": 1753,
+  "hire_spend": 6481,
+  "land_spend": 3000,
+  "seed_spend": 7430.0,
+  "animal_spend": 6900.0,
+  "product_spend": 9334.0,
+  "n_orders": 878,
+  "n_executed": 876
+ },
+ "p1": {
+  "revenue": 110387.0,
+  "sell_units": 1397,
+  "hire_spend": 4824.0,
+  "land_spend": 3000.0,
+  "seed_spend": 7140.0,
+  "animal_spend": 6000.0,
+  "product_spend": 6161.0,
+  "n_orders": 949,
+  "n_executed": 904
+ }
+}

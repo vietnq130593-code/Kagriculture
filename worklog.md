@@ -126,3 +126,72 @@ Stage Summary:
 - v18 = nền jaxa623 K0006 byte-exact đã live trong arena; 3 sparring lineage Ahmed V43/V44/V45
 - Nghiên cứu hoàn chỉnh 3 tầng: base analysis (code) + meta research (12 notebook) + roadmap (03_V18_ROADMAP.md)
 - Bước tiếp theo đề xuất: triển khai gói market-defence MD1-MD4 (~50 dòng trong frontload/advance_sales) qua 4-tier acceptance; re-sweep OPEN_UNITS với Two-Coins stress clone
+
+---
+Task ID: 9-a
+Agent: general-purpose (subagent)
+Task: Phân tích match2 Majkel1337 vs DSM (thắng +7,716)
+
+Work Log:
+- Đọc worklog.md (bối cảnh: v18 = jaxa623 K0006 đã live, 4 edges) + top1/README.md (định dạng 7 file data match2, engine facts) + scan heading 01_V18_BASE_ANALYSIS.md (biết v18 đã có gì)
+- Viết chuỗi script Python (json thuần) mổ xẻ match2: money curve 30 ngày 2 bên; log order từng step day 0-2 (opening) + days 3-10 + ngày 29 full; tổng chi/theo item; doanh thu/theo item với avg price vs base; dead orders; plants/animals/yields/shed/weeds theo ngày; hires theo ngày; land purchases (kèm các cú FAIL); seed/animal purchases theo ngày; verbs FERTILIZE/WATER/CARE/FEED; idle cash; shed-cap usage; sell-order size histogram; giá thị trường từng item vs timing bán (đặc biệt STRAWBERRY từng step); phân giải margin theo item + theo pha + theo step
+- Verify engine facts trực tiếp trong kaggle_environments 1.32.7 (kaggriculture.py): CROPS/ANIMALS/SHOPS/MARKET_PARAMS, WATER/HARVEST/FERTILIZE/FEED/COLLECT_FERTILIZER/CARE, _daily_refresh_plants/animals (care-bonus, fertilizer_available mỗi con mỗi ngày), _town_consume (shop mỗi 4 step ×2 nếu 1-product, center mỗi 24 step) — xác nhận cơ chế 8-units/plant STRA có phân, 6-wool/sheep lượt đầu nhờ CARE, walk-down giá từng unit trong 1 order (prices[42] = 186→158)
+- Tính định lượng throttle value (Majkel d19-24 bán 40@102.6 thay vì 117 → +$4,757; DSM bỏ lỡ $4,474), phân giải margin: STRA +5,475 + CARROT +7,200 − WHEAT 2,569 − TOMATO 2,031 + lẻ = +8,136 revenue − 420 spend = +7,716; riêng step 719 chênh +6,283
+- Viết báo cáo đầy đủ /home/z/my-project/kaggle-research/top1/04A_MATCH2_MAJKEL_WIN_ANALYSIS.md (10 mục, ~20 bảng số liệu, log d29 đầy đủ, 12 bài học v19 kèm evidence)
+
+Stage Summary:
+- MATCH2 = 2 agent cùng family (opening giống từng dollar tới d2, cùng NE d6/SW d9, cùng 5 COW + 10 SHEEP + 11 hands $232/ngày); Majkel thắng +7,716 hoàn toàn nhờ 3 quyết định: crop-mix (STRA 25 vs 23 cây, CARROT 125 vs 76 gói seed), throttle bán vùng đáy, mega-dump cuối
+- ENDGAME ĐỈNH CAO: Majkel giữ nguyên 42 STRAWBERRY suốt ngày 29 (giá đi 175→186) rồi dump 1 order duy nhất ở step 719 cuối cùng — avg 173, unit đầu 186, +$7,258; riêng step cuối M +$7,542 vs D +$1,260 → $6,283/7,716 margin sinh ở đúng step cuối; DSM chỉ còn 7 STRA vì đã bán sạch 72 units vào vùng đáy d19-24 @102
+- Throttle d19-24: khi giá STRA crash 158→84 (cả 2 dump 25 units d18 vượt I0), Majkel cắt bán 25→2-4 units/step, shed STRA tích 0→65 units, chờ town (FM×3 + ICE_CREAM hút 25/ngày) kéo giá hồi 104→186 ở d25-29; giá trị throttle ≈ +$4,757
+- Carrot factory: Majkel pivot CARROT từ d11 (2 ngày sau PET_CAFE d9 mở, hút 12/ngày), DSM chậm tới d17; 125 gói $2,500 → 310 units @51.8 = $16,068 (ROI 6.4x); STRA 25 gói $2,500 → 196 units @152.3 = $29,844 (ROI 11.9x, 7.84 units/cây nhờ fertilizer ×2)
+- Cơ chế miễn phí: động vật = máy tạo FERTILIZER (179 bán $11,514 + ~162 bón cây); CARE từ d0 → lượt nhổ lông đầu d6 = 6 WOOL/con (18 units @194+); feed-buy đầu game đẩy giá WHEAT 25→37+ để bán crop mình +49% base
+- Anti-patterns DSM: dump vào dao rơi (13@93 d19), giữ 33 WHEAT d12-16, 8 weeds d28 (rút unit đi bán), 2,709 dead-sell orders (vs 19 của Majkel) lãng phí slot cap-10
+- 12 bài học v19 (file báo cáo mục 9): #1 ENDGAME LIQUIDATION SCHEDULER giữ item town-recovery cao nhất cho step 719; #2 TROUGH THROTTLE price-gated 2-4 units/step; #3 crop-mix STRA+CARR; các bài nhỏ: shed-cap pipeline d29, feed-cutoff d28, chunking theo độ dốc book (MILK/WOOL), sell-into-strength trước I0, land retry mỗi step + SE never (toán fib-hands âm EV)
+- Báo cáo: /home/z/my-project/kaggle-research/top1/04A_MATCH2_MAJKEL_WIN_ANALYSIS.md (kèm phụ lục log d29 từng step + nguồn engine line numbers)
+
+---
+Task ID: 9-b
+Agent: general-purpose (subagent)
+Task: Phân tích match1 ymg_aq vs Majkel1337 (Majkel thua -451)
+
+Work Log:
+- Đọc README.md format dữ liệu match1/ (orders/timeline/daily/market/town, 0-mismatch) + lướt mục 9 của 04A để tránh trùng bài học.
+- Script 1: money curve 30 ngày 2 bên + mốc đổi leader (ymg dẫn d0-9, MAJ d10-28 đỉnh -11,873 @d14, YMG lật d29 +10,568 vs +6,998).
+- Script 2: opening d0-3 từng step (ymg: arb 60 WHEAT s1 + 7 hands + 6 animals + 18 WHEAT plants; Majkel: MELON-first 6 seeds + 5 animals, broke $3-73 suốt d1-4).
+- Script 3: idle cash/hands/shed theo ngày → phát hiện shed_avg Majkel 36-82 vs ymg 15-26, hands 11-12 vs 9-10 cuối trận.
+- Script 4: BUY_LAND (ymg NE d5/SW d8 sớm hơn 1 ngày, Majkel 9 dead land-orders), crop mix theo mốc, weeds (16 vs 26), WATER/HARVEST verbs.
+- Script 5: mua theo item (seeds 248 vs 286 pkt; animals 18 vs 14 con — ymg có 6 GOOSE, Majkel 0) + revenue 9 item từng bên + FEED/FERTILIZE/FERTILIZE verbs + ROI loài (GOOSE 6.1x).
+- Script 6: giá min/max từng item + sells theo ngày d25-29; truy endgame: snapshot s696 (sau daily-refresh) shed 94u vs 62u, yields trên cây 58u vs 61u; d29 step-by-step cả 2 bên với giá; trace money 696-719 (lật ở s715, MAJ giành lại s718, YMG thắng ở s719 +1,405 vs +260); dead orders (2 vs 45); MELON sells từng step (Majkel bán 72u @240 đúng đỉnh d10-14, ymg dump 60u @95-190 d15-18).
+- Script 7: seed mua theo ngày (pivot CARROT sau PET_CAFE d21 cả 2), animals theo ngày (Majkel mất 5 con escape d22 + 2 con d27-28 do under-feed; ymg giữ 18 con tới d26), va chạm same-step same-item (64 steps: FERT 24, MILK/STRA 13).
+- Verify engine: SHOPS mapping (match1 = 7 WHEAT-shops, 3 EGG-shops, 0 WOOL/MELON); _end_of_day có _drop_inventories_to_shed (auto-drop hàng vào shed lúc 23h) + farm["hands"]=[] (hands giải tán hàng ngày); _daily_refresh_animals escape khi consecutive_unfed>=2, care-bonus +1 yield.
+- Viết báo cáo 04B incremental 10 mục (488 dòng) + fix 1 đoạn lỗi typo.
+
+Stage Summary:
+- Match1 = hình ảnh phản chiếu match2: lần này MAJKEL hết đạn trước step cuối (d29 bán 150u/$7,141 vs 229u/$10,900 của ymg_aq; trận lật đúng s719: 86,713 vs 86,262).
+- Nguyên nhân gốc: Majkel price-sniping giỏi (STRA @137 vs 96, MELON @240 vs 156) nhưng portfolio hẹp — 0 GOOSE (ymg độc quyền EGG: 208u @52.5 = $10,926, giá không bao giờ xuống base vì sole-supplier + 3 shop EGG), đàn vật 14→7 con (escape d22 vì under-feed), ít CARROT/MELON cuối, cắt hands 11→9 ở 3 ngày cuối.
+- Phân rã margin +451 = Δrevenue +6,471 (EGG +10,926, FERT +4,172, CARR +1,016, WOOL +354 trừ MELON -4,199, TOMA -3,613, WHEAT -1,100, MILK -813, STRA -272) − Δchi +6,020 (hire +1,657, product +3,173, animal +900, seed +290).
+- Engine facts mới cho v19: _end_of_day auto-DROP toàn bộ inventory vào shed (bỏ action DROP cuối ngày, shed đầy sẵn 0h d29 — ymg 0→94u, bán $2,615 ngay s697); hands dismissed 23h (chi phí hằng ngày, đừng cắt d27-29); animal escape khi 2 ngày không feed.
+- 12 bài học v19 trong mục 9 (độc nhất match1): #1 GOOSE/EGG-monopoly play (detector EGG price flat ~base); #2 shop-driven animal mix (count shop-instance trừ supply đối thủ); #3 feed invariant; #4 end-of-day auto-drop; #5 hands daily; #6 crop-maturity scheduling d26-27 cho chín d29; #7 MELON peak-only (0 shop); #8 filler theo shop-count (match1 7 WHEAT-shops); #9 monopoly micro-chunking 2-8u; #10 xác nhận thêm trough-throttle từ phía thua; #11 breadth vs efficiency; #12 land threshold-trigger.
+- Báo cáo: /home/z/my-project/kaggle-research/top1/04B_MATCH1_MAJKEL_LOSS_ANALYSIS.md
+
+---
+Task ID: 9 (project Task 82) — Intel Top-1 & tài liệu v19
+Agent: Z.ai Code (main, vai trò Ari)
+Task: Tải 2 trận gần nhất của #1 Majkel1337 → ghi chép + phân tích diễn biến/dòng tiền/mua/bán/đất → viết tài liệu triển khai v19 (nền v18, mục tiêu thắng cách xa)
+
+Work Log:
+- Kaggle API (kaggle-cli 2.2.4 + KAGGLE_API_TOKEN): leaderboard → Majkel1337 = teamId 16718819 (hạng 1, 3191.7); team-submissions → submission đang chạy 56216119 (13-09, public 3179.0); episodes → 289 public episodes
+- Tải 2 replay mới nhất (16-09): 109776263 (ymg_aq vs Majkel, 86,713 vs 86,262 — Majkel thua 451) + 109770002 (Majkel vs DSM, 91,845 vs 84,129 — Majkel thắng 7,716), ~33MB/replay
+- Viết top1/parse_replay.py: re-simulate _process_market lockstep + shed-impact của DROP/PICKUP/PLACE pre-market; phát hiện alignment steps[t].action tạo ra state[t]; verify money 0-mismatch trên 720×2 bước × 2 trận → outputs orders/timeline/daily/market/town JSON + CSV
+- Khám phá chính: cả 2 trận quyết định ở step 715-719; match2 Majkel dump 42 STRA ở step 719 (+$7,258); match1 Majkel hết hàng step cuối; ymg_aq thắng nhờ breadth (ΔEGG +$10,926 từ 6 GOOSE)
+- 2 subagent song song: 9-a viết 04A_MATCH2_MAJKEL_WIN_ANALYSIS.md (482 dòng: mega-dump s719, trough throttle +$4,757, carrot factory, 12 bài học) — 9-b viết 04B_MATCH1_MAJKEL_LOSS_ANALYSIS.md (488 dòng: cú lật kèo s719, GOOSE/EGG monopoly, auto-drop 23h, feed invariant, 12 bài học bổ sung)
+- Verify 3 engine facts từ source trước khi viết spec: _end_of_day auto-drop L860-882, animal escape consecutive_unfed>=2 L817-819, care-bonus L829-830
+- Viết kaggle-research/05_V19_DEPLOYMENT_PLAN.md — tài liệu triển khai v19 "REAPER": luận đề "Timing của Majkel + Breadth của ymg_aq trên nền v18"; 3 lớp (A: Market Timing 6 module A1-A6 — Endgame Liquidation Scheduler, Trough Throttle, Impact-aware ordering, Debt invariant, Feed-buy index-0, I0 tracker; B: Breadth 5 module B1-B5 — EGG monopoly detector, shop-driven animal mix + feed invariant, STRA-anchor crop filler, maturity scheduling d26-27, fertilizer allocation; C: telemetry/audit/ops); bảng impact×rủi ro; 3 phase triển khai; cổng dominance G1-G5 (vs v18: mean ≥ +$2,500, CI95 > +$1,000, worst ≥ −$1,500); danh mục âm tính tuyệt đối tránh
+- Verify hệ thống: dev:3000 + gateway:81 HTTP 200, arena:hello agents [v18, ahmedv43, ahmedv44, ahmedv45], E2E browser: v18 vs ahmedv43 seed 777 → "🏆 v18 THẮNG!" $97,622 (1.01×), 0 console error, screenshot t82_arena_v18_win_777.png
+
+Stage Summary:
+- Toàn bộ intel Top-1 đã trích xuất với độ chính xác tuyệt đối (parser 0-mismatch): chiến thắng của top-1 nằm ở ENDGAME LIQUIDATION (giữ anchor item cho step 719) + TROUGH THROTTLE (giữ hàng chờ giá hồi) + PORTFOLIO BREADTH (đường doanh thu không đối thủ như EGG monopoly)
+- Khoảng trống của v18 xác định: 4 edges hiện tại chỉ là micro-timing, không có 3 tầng trên → v19 nhắm $8,000-15,000/game potential
+- Tài liệu chủ đạo: kaggle-research/05_V19_DEPLOYMENT_PLAN.md (11 module, 3 lớp, 3 phase, 5 cổng dominance định lượng)
+- Báo cáo trận: top1/04A (match2 win) + top1/04B (match1 loss) + top1/README.md (format dữ liệu + engine facts)
+- Sẵn sàng cho bước triển khai code v19 theo Phase 1 (A1+A2+A4 — Endgame Liquidation + Throttle + Debt invariant)
