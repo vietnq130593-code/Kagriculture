@@ -16,14 +16,14 @@
 | 1 | **MARKET_PARAMS sensitivity table** (above/below func từng item) | WOOL sq3.20, MELON sq3.60, MILK/STRA linear1.60, EGG log0.20, WHEAT log0.20, FERT linear0.40 | Chunk-policy CHÍNH XÁC theo engine, không phải heuristic |
 | 2 | **Mỗi con vật sống = 1 FERT miễn phí/ngày** (`fertilizer_available=True` L831, không cần feed) | Majkel bán 142-217 FERT/match = $9.4-12.2K, KHÔNG BAO GIỜ mua FERT | Động vật = "máy in FERT" — dòng thu #4 của top-1 |
 | 3 | **MELON opening là template cố định**: 12 cây (6 d0 + 6 d1-2), bón phân, tưới đủ cửa sổ d6-12 | 72.6u/match @ 218.7 = $15.9K; bán 24-30u d10 @ ~250, phần còn lại d11-12; KHÔNG bao giờ trồng lại | Module B6 mới — $15K/ trận gần như deterministic |
-| 4 | **STRA campaign 2 cohort**: trồng d2-6 + d6-12 (peak 24-39 cây); mỗi cây 4 lần đẻ (interval 2 ngày) rồi CHẾT ~d20/d26 | Cohort 1 chết d18-20 → giá crash d19-23 (m1: 204→7); cohort 2 chết ~d26 → giá hồi d24-29 | Chiến lược "tránh crash window + đón recovery" cho anchor |
-| 5 | **Anchor correlation 7/7**: 5 trận thắng đều có mega-dump s715-719 ($4.8-8.0K); 2 trận thua KHÔNG còn hàng | m2 s719 STR×42@173=$7,258; m6 s719 STR×46@174=$7,975; m4 s718 STR×30@161 + s715 WOO×13@171 | Xác nhận A1 là module #1; anchor nhiều tầng: WOOL s715-716 → STRA s718-719 |
+| 4 | **STRA campaign 2 cohort**: trồng d2-6 + d6-12 (peak 23-39 cây); mỗi cây 4 lần đẻ (interval 2 ngày) rồi CHẾT ~d20/d26 | Cohort 1 chết d18-20 → giá crash d19-23 (m1: 204→7); cohort 2 chết ~d26 → giá hồi d24-29 | Chiến lược "tránh crash window + đón recovery" cho anchor |
+| 5 | **Anchor correlation 7/7**: 5 trận thắng đều còn đạn anchor s715-719 — 3 lệnh mega-dump STRA $4.8-8.0K (m2/m4/m6) + WOO $2.6K (m7) + nhỏ (m5); 2 trận thua KHÔNG còn hàng | m2 s719 STR×42@173=$7,258; m6 s719 STR×46@174=$7,975; m4 s718 STR×30@161 + s715 WOO×13@171 | Xác nhận A1 là module #1; anchor nhiều tầng: WOOL s715-716 → STRA s718-719 |
 | 6 | **Trough discipline ở quy mô lớn**: sau dump ≥10u của đối thủ, Majkel chờ 4-23 bước (65%) rồi bán tại −2.9 dưới giá dump; đối thủ phản ứng ngược (41% bán lại trong 3 bước, −7.8) | 340 instances Majkel vs 244 đối thủ | Bằng chứng thống kê cho A2 (trước đây chỉ 2 trận) |
 | 7 | **Cửa sổ bán h22-23 + h0-1** = 39% doanh thu Majkel (đối thủ 61.7%) — auto-drop 23h + consumption-bump h0 (shops step%4==0 + center step%24==0) | h23: 250 lệnh/$118.8K; h1: 221/$98.1K | Module A7 mới: morning scheduler |
 | 8 | **Majkel phân tán hơn đối thủ**: top-5 lệnh chỉ 11-16% revenue (n=318-452 lệnh); M&M&P&Q top-5 = 15-20% (n=203-239) | 2,508 lệnh bán / 7 trận | Micro-chunking là edge thống kê, không phải style |
 | 9 | **WHEAT là item khối lượng**: 454.7u/match @ 36 (144% base) — log0.20 above-func cho phép dump thoải mái | chunk TB 6.2u, percentile bán 72.4 | Filler crop + feed tự sản |
 | 10 | **Idle cash d0-9 ≈ 0** (min $3-7, avg $244-616) — mọi đồng tái đầu tư tức thì; hire ladder cứng 3.7→10.4 units đến d10, giữ nguyên, $4.9K/match | 7/7 trận giống hệt | Money-lifecycle là invariant, không phải tình huống |
-| 11 | **Mua feed lúc rẻ**: WHEAT feed mua ở percentile giá 32-38 (avg $33-36.6) | 127-216u/match | A5 cập nhật: price-gated feed buying |
+| 11 | **Mua feed quanh mặt bằng, không đuổi đỉnh**: WHEAT feed mua đều d0-27, avg $33-36.6, ở percentile 32-58% phân phối giá trận (5/7 trận ≤ 38%) | 127-216u/match | A5 cập nhật: price-gated feed buying quanh-under mặt bằng |
 | 12 | **Đối thủ mới M&M&P&Q** (4/5 trận mới): 4-quadrant ($7K land), 10-12 GOOSE, 15 con vật, dump d29 khổng lồ — beaten 3/4 bởi Majkel nhưng +12.7K revenue trong trận thắng (m3) | Điểm 102-112K | Meta đã lên mức 100K+; v19 phải nhắm chuẩn này |
 
 ---
@@ -40,7 +40,7 @@
 | m6 | 109741171 | SpaTaro | 1330453307 | thắng | 108,597 | 96,273 | +12,324 |
 | m7 | 109732826 | M&M&P&Q | 1889174384 | thắng | 110,903 | 102,007 | +8,896 |
 
-**5W/2L.** Điểm trung bình Majkel 102,647 — meta mới đã lên mức **100K+** (2 trận cũ 84-92K).
+**5W/2L.** Điểm trung bình Majkel 102,747 — meta mới đã lên mức **100K+** (2 trận cũ 84-92K).
 5 trận mới: đối thủ "M & M & P & Q" chiếm 4 trận (102-112K — có lẽ đội top mới; đã từng
 thắng Majkel 8,968 ở m3). SpaTaro 96K.
 
@@ -109,7 +109,7 @@ bón cho cây. **Không bao giờ mua FERT (buy_n = 0 ở cả 7 trận).**
 
 ### 2.3 Cơ chế cây trồng (L215-227 _new_plant, L431-443 WATER, L755-768 decay)
 - Non-ongoing (WHEAT/CARROT/MELON): sinh ra `yield_units=1`; **WATER trong cửa sổ
-  `[ceil((max_yield_day+1)/2), max_yield_day]`** mỗi lần +1 (+2 nếu fertilized), cap max_yield.
+  `[(max_yield_day+1)//2, max_yield_day]`** mỗi lần +1 (+2 nếu fertilized), cap max_yield.
   - WHEAT: cửa sổ tuổi 2-4, cap 6 → 3 lần tưới = 4u (fert: 6u)
   - CARROT: cửa sổ 2-3, cap 4 → 2 tưới = 3u (fert: 4u)
   - MELON: cửa sổ 6-12, cap 6 → 6 tưới = 6u (fert: 3 tưới = 6u — tiết kiệm verb)
@@ -127,7 +127,7 @@ bón cho cây. **Không bao giờ mua FERT (buy_n = 0 ở cả 7 trận).**
 - Lockstep market: cùng order-index → quote cùng giá pre-commit, commit chẵn kịp p0-p1 mỗi
   unit (p0 không được giá tốt hơn). **Index thấp chạy HẾT trước index cao** (vòng lặp ngoài
   theo index). Majkel đặt index thấp hơn trong 154/586 collision, đối thủ 66, còn lại bằng nhau
-  (62% cả hai cùng index 0).
+  (54% cả hai cùng index 0; 62% cùng index).
 
 ### 2.5 Town consumption (L728-749)
 - Shops: **step % 4 == 0** (giờ 0, 4, 8, 12, 16, 20) — mỗi shop-instance mua: single-product
@@ -205,7 +205,7 @@ của above_func** (sq > linear > sqrt/hinge > log).
   $9,989). Cùng failure mode: **hết đạn trước chuông cuối**.
 - Mẫu hình stagger: **WOOL anchor bán trước (s715-716), STRA anchor giữ đến s718-719** — đúng
   lý thuyết recovery (WOOL log0.20 hồi chậm nên bán sớm vào đỉnh; STRA được town hút mạnh nên
-  giá cuối ngày d29 vẫn cao 142-207).
+  giá cuối ngày d29 vẫn cao 142-207). Ngoại lệ m6: WOO×6 xả cùng s719 (giá đã đủ cao).
 
 ---
 
@@ -221,7 +221,8 @@ của above_func** (sq > linear > sqrt/hinge > log).
 - **Seed WHEAT: liên tục d9-27** (40-109 gói/ngày) — filler + feed.
 - **Seed CARROT: d11-27** (bulk d16+: 33+18+30+30+54+43+37+55+60+24) — late filler theo shop.
 - **Seed TOMATO: d9-19** (nhỏ, 2-11 gói/ngày).
-- **Feed WHEAT mua ở percentile giá 32-38** (127-216u/match, avg $33-36.6) — mua lúc rẻ,
+- **Feed WHEAT mua đều tay d0-27** (127-216u/match, avg $33-36.6) — mức mua nằm ở percentile
+  32-58% phân phối giá trận (5/7 ≤ 38%): mua quanh-under mặt bằng, không đuổi đỉnh spike;
   phần còn lại tự trồng.
 
 ### 4.2 Crop mix template (7/7 trận gần giống hệt)
@@ -230,12 +231,12 @@ của above_func** (sq > linear > sqrt/hinge > log).
 |---|---|
 | d0 | WHEAT×10 + MELON×6 |
 | d2-5 | +MELON×12 (tổng) + STRA×2→8 |
-| d8 | **STRA×24-27 + MELON×12** (peak cohort 1) |
-| d10 | STRA×24-32 + MELON×6 (vừa xả) + WHEAT×17-27 |
+| d8 | **STRA×21-27 + MELON×12** (peak cohort 1) |
+| d10 | STRA×21-32 + MELON×6 (vừa xả) + WHEAT×17-27 |
 | d14 | **STRA×23-37** (peak cohort 2) + WHEAT×20-27 |
-| d18 | STRA giảm + TOMOTO×2-9 mọc + WHEAT |
+| d18 | STRA giảm + TOMATO×2-9 mọc + WHEAT |
 | d22-25 | CARROT×6-29 + WHEAT×15-41 + TOM×2-10 + STRA×2-22 (cohort chết dần) |
-| d29 | TOM×2-3 + STRA×1-6 (gần trống — đã thanh lý) |
+| d29 | TOM×2-5 + STRA×0-6 + WHEAT×0-6 (gần trống — đã thanh lý) |
 
 ### 4.3 Idle cash & hire ladder (invariant 7/7)
 - **d0-9: tiền mặt gần 0** (min $3-7; TB $244-616/ngày cuối ngày) — mua ngay khi có tiền.
@@ -247,8 +248,9 @@ của above_func** (sq > linear > sqrt/hinge > log).
 ### 4.4 MELON opening — mổ xẻ (5 mục)
 1. d0: 6 MELON + 10 WHEAT; d1-2: +6 MELON → **12 cây MELON** ($960 seed).
 2. Bón FERT (hiệu lực 3 ngày/lần) + tưới trong cửa sổ d6-12 → mỗi cây 6u (cap).
-3. d10: **bán 24-30u @ 240-255**; d11: 6-24u @ 177-244; d12-19: rải nốt @ 111-232.
-4. TB 72.6u @ 218.7 = **$15,874/match** — ROI ~15x trên seed, không tính verb.
+3. d10: **bán 24-30u @ 240-255**; d11: 6-24u @ 177-244; d12-19: rải nốt @ 106-244.
+4. TB 72.6u @ 218.7 = **$15,874/match** — ROI 14.6-18x trên seed $960-1,040 (TB 16.4x), không
+   tính verb.
 5. Không trồng lại (sq3.60 crash + log0.20 hồi chậm = giữ MELON là leak; m2 d12: 12u@136 sau
    khi xả 54u — đường sq rõ ràng).
 
@@ -269,7 +271,7 @@ throttle 5-14u@147-158 → d27-28 13-26u@167-168 (hồi) → **d29 30u@161 (anch
 
 ### 5.1 Va chạm cùng bước (586 lần / 7 trận)
 FERTILIZER 147 · MILK 110 · WOOL 94 · WHEAT 84 · STRA 63 · CARROT 33 · TOMATO 28 · MELON 22 ·
-EGG 5. 62% cả hai cùng đặt index 0 (giá quote như nhau). Không có evidence "đặt index thấp
+EGG 5. 54% cả hai cùng đặt index 0 (62% cùng index — giá quote như nhau). Không có evidence "đặt index thấp
 để ăn giá" mang lại chênh lệch đáng kể (48.2 vs 50.2 trung bình — lẫn item-mix). **Kết luận:
 order-index không phải vũ khí lớn; THỜI ĐIỂM BÁN (step) mới là vũ khí.**
 
@@ -295,9 +297,10 @@ Nguyên lý top-1: **để town-consumulation + cohort-death tạo đáy, mình 
 - EGG engine: 8.9-18.6K EGG + 12.6-14.8K FERT (nhiều con vật = nhiều FERT).
 - Dump d29 khổng lồ: m3 s718-719 bán $9,989 (EGG×19+28, STR×12+6, MEL×12, WHEAT×26+30, CAR×11+17);
   m5 $6,395; m4 $7,147; m7 $9,414 (WHEAT×67@31 một lệnh s718!).
-- Điểm yếu bị Majkel khai thác: bán QUÁ nhiều units ở giá thấp hơn (m7: 249u d29 vs Majkel
-  176u nhưng cùng tiền), top-heavy concentration (top-5 = 17-20% revenue), crash-dump WHEAT
-  @22-31 (m4/m7 — còn Majkel bán @33-40).
+- Điểm yếu bị Majkel khai thác: bán QUÁ nhiều units ở giá thấp hơn (TB 7 trận d29: 249u đối
+  thủ vs 176u Majkel — họ thu thêm ~$1.5K ở đúng ngày cuối nhưng trả giá bằng đơn giá thấp suốt
+  d10-26; riêng m7: 318u vs 157u), top-heavy concentration (top-5 = 17-20% revenue),
+  crash-dump WHEAT @22-31 (m4/m7 — còn Majkel bán @33-40).
 
 ---
 

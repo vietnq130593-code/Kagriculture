@@ -218,3 +218,63 @@ Stage Summary:
 - Audit trail: top1/verify_docs{,2,3}.py + verify_final.py + fix_04{a,b}.py + fix_05.py giữ lại làm bằng chứng review
 - Tài liệu giờ tự nhất quán 100% với dữ liệu parse 0-mismatch; sẵn sàng triển khai v19 Phase 1 (A1+A2+A4) trên nền các số liệu đã chuẩn
 - Bài học quy trình: mọi bảng số liệu sinh từ daily.json cũ (trước 16-09 tối) nếu có dùng profit_day/money_start đều phải sinh lại
+
+---
+Task ID: 11+12 (project Task 84) — Khai tác intel top-1 mở rộng: 5 trận mới + phân tích tổng hợp 7 trận
+Agent: Z.ai Code (main, vai trò Bio)
+
+Task:
+- Task 11: Đào sâu 2 replay đã tải (nguyên lý tấn công, thời điểm mua/bán)
+- Task 12: Tải thêm 5 trận của top 1 (Majkel1337), khai tác đa khía cạnh (mua/bán, ép giá,
+  tấn công, chọn cây/con theo lượt, dòng tiền ra/vào) → đóng góp vào tài liệu triển khai v19
+
+Work Log:
+- Kaggle API: lấy episodes list Majkel1337 → tải 5 replay mới nhất tiếp theo (16-09):
+  m3=109763505 (thua M&M&P&Q −8,968), m4=109756255 (thắng +7,328), m5=109748819 (thắng +1,557),
+  m6=109741171 (thắng SpaTaro +12,324), m7=109732826 (thắng +8,896) → top1/match3..7/
+- Parse 5 trận bằng parse_replay.py (lockstep re-simulate): 5/5 trận money_mismatch=0
+- Viết chuỗi 5 script phân tích tổng hợp 7 trận (an5_overview / an5_selltiming / an5_attack /
+  an5_buyportfolio / an5_stra) + 6 script match1 chi tiết (m1_part1-6) — outputs an5_*.json
+- Khai tác 6 khía cạnh theo yêu cầu: (1) nguyên lý bán — percentile giá, khung giờ, chunk,
+  impact/unit; (2) nguyên lý mua — animal/land/seed timing, idle cash, hire ladder;
+  (3) ép giá & tấn công — 586 same-step collision, order-index, 584 trough-response instance;
+  (4) cây/con theo lượt — crop mix template 7/7, STRA 2-cohort, MELON opening;
+  (5) dòng tiền ra — spend categories W vs L, FERT printer; (6) dòng tiền vào — revenue mix,
+  pha trận, concentration, anchor
+- Viết báo cáo /home/z/my-project/kaggle-research/06_TOP1_7MATCH_DEEP_ANALYSIS.md (334 dòng,
+  12 phát hiện mới + engine facts verify từ source L36-52/215-227/345-358/431-443/665-687/755-768)
+- Review + verify số liệu toàn báo cáo 06 bằng verify_06.py (8 nhóm kiểm chứng): phát hiện và
+  sửa 15 lỗi — điểm TB 102,647→102,747; crop-mix ranges d8/d10 (STRA 24-27→21-27, 24-32→21-32),
+  d29 (TOM 2-3→2-5, STRA 1-6→0-6); MELON ROI ~15x→14.6-18x (seed $960-1,040 thật), d12-19
+  @111-232→@106-244; feed percentile 32-38→32-58 (m2=50%, m6=58%); anchor "$4.8-8.0K mọi trận
+  thắng"→"3 mega-dump STRA $4.8-8.0K + WOO $2.6K (m7) + nhỏ (m5)"; collision index-0 62%→54%
+  (62% là cùng-index); "m7 249u vs 176u cùng tiền"→TB 7 trận 249u vs 176u, m7 thật 318u vs 157u;
+  công thức WATER window ceil→(max_yield_day+1)//2; thêm ngoại lệ stagger m6; sửa typo TOMOTO
+- Update 05_V19_DEPLOYMENT_PLAN.md (22 thay đổi): thêm nguồn 06; mở đầu 2→7 trận (5W/2L,
+  102,747 TB; meta 100K+); thêm khối "4 khám phá bổ sung"; thêm G6 (chuẩn meta mới $100K+);
+  thêm 5 episode m3-m7 vào mục 1; A1 + stagger 2 tầng WOOL s715-716 → STRA s718-719 + evidence
+  7/7; A2 nâng evidence 2 trận → thống kê 340 instance (−2.9 vs −7.8) + crash window d19-23;
+  A6 thay bằng CHUNK TABLE engine-exact theo MARKET_PARAMS (sq/linear/sqrt/log); THÊM MODULE A7
+  Morning scheduler (h22-23+h0-1 = 39% revenue, h0 consumption-bump); B1 + detector "net supply
+  flow vs band"; B2 + reframing FERT printer (1 FERT/con/ngày miễn phí, buy FERT 0/7 trận, net
+  GOOSE $74/COW $68/SHEEP $67/ngày); B3 + STRA 2-cohort model; B5 + MELON 3-tưới + STRA bón ×2;
+  THÊM MODULE B6 MELON opening lock (12 cây d0-2, $15,874/match ROI 14.6-18x, 7/7 trận);
+  bảng module +2 dòng (A7 +300-800, B6 +1,500-2,500); Phase 2 + A7/B6/mmpq-clone stress;
+  rủi ro +3 (shed-full phá hủy auto-drop 23h, non-ongoing chết d+5/d+13, không order-index
+  snipe/price-war slam); file map + 06 + match3-7 + an5; kết luận 11→13 module (A1-A7 + B1-B6)
+- Health check: dev:3000 = 200, gateway:81 = 200 (không đụng code app)
+
+Stage Summary:
+- MẪU 7 TRẬN HOÀN CHỈNH: 5W/2L, điểm TB 102,747 — top-1 thắng bằng 4 trụ: MELON opening
+  template ($15.9K gần deterministic) + STRA campaign 2-cohort (31.5% revenue) + FERT printer
+  ($9.4-12.2K miễn phí từ đàn vật) + endgame anchor s715-719 (correlation 7/7 với thắng/thua)
+- PHÁT HIỆN ĐỊNH LƯỢNG MỚI LỚN NHẤT: A7 morning window (39% revenue ở h22-23+h0-1) và B6 MELON
+  opening lock — 2 module mới đưa v19 từ 11 → 13 module; A6 chunk table giờ engine-exact
+- META ĐÃ ĐỔI: đối thủ mới M&M&P&Q (102-112K, 4-quadrant + EGG engine + d29 mega-dump) thắng
+  Majkel 1/4 trận — v19 cần gate G6 mới (TB ≥ $100K hoặc không thua mmpq-clone > $3K)
+- NGUYÊN LÝ TẤN CÔNG NGẮN GỌN: top-1 KHÔNG price-war chủ động — 65% chờ 4-23 bước sau khi bị
+  dump (−2.9) trong khi đối thủ tự dẫm lẫn nhau (−7.8); order-index không phải vũ khí (54%
+  cùng index 0); vũ khí thật là THỜI ĐIỂM BÁN
+- Tài liệu: 06_TOP1_7MATCH_DEEP_ANALYSIS.md (đã verify 15 lỗi sửa) + 05_V19_DEPLOYMENT_PLAN.md
+  (13 module, G1-G6, Phase 1-3) — sẵn sàng triển khai code v19 Phase 1 (A1+A2+A4)
+- Scripts/audit: top1/an5_*.py + verify_06.py + m1_part1-6.py (reproduce toàn bộ bảng số liệu)
