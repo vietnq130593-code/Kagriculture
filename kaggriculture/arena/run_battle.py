@@ -62,6 +62,9 @@ AGENTS = {
     "v194": (os.path.join(ROOT, "v194.py"), "agent"),
     # v20 = FLAT single-namespace build of the v19.4 chain (submission format, 410KB)
     "v20": (os.path.join(ROOT, "v20.py"), "agent"),
+    # Task 89: v21 = v19.4 chain + v21 trough-banker layer (WOOL/STRAWBERRY/MELON
+    # crash-window banking, recovery liquidation). Flat build, 419KB.
+    "v21": (os.path.join(ROOT, "v21.py"), "agent"),
     # Task 88: aurax7 "Farmers Is All You Need" (rank 299, 2723.3) — V45 chassis
     # + V44 race escalator + _r60 survival guard + 2842 overlay (frontload +
     # advance_sales LOOK=2 + HORIZON 24). Extracted byte-exact 17-09.

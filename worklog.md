@@ -549,3 +549,84 @@ Stage Summary:
   (v46, seyit4, aurax7, ahmedv43-46); 2 ứng viên port v20.1: _r60 animal rescue,
   HORIZON 24
 - Token Kaggle đã lộ trong public repo → cần rotate (đã redact phần hiện tại)
+
+---
+Task ID: 18 (phiên khẩn cấp) — Sandbox reboot 17:56: mất toàn bộ môi trường, khôi phục từ GitHub
+Agent: Z.ai Code (main, vai trò Bio)
+
+Task:
+- User giao triển khai H1 (Milk Printer) thành v21 + battery 48 trận vs ahmedv46,
+  không re-fetch data cũ. Sandbox reboot giữa chừng làm mất gần như tất cả.
+
+Work Log:
+- Reboot 17:56 (boot-timeline.log) xóa: my-project toàn bộ (trừ download/skills/
+  upload mount), /home/z/engine.py, staging/, ~/.kaggle token, Kagriculture/.
+  upload/ mount biến mất theo (RESEARCH_FOUNDATION.md + 123/234.json 35MB × 2).
+- Khôi phục: clone GitHub public vietnq130593-code/Kagriculture → /tmp/restore
+  (2.191 file, 516MB, đủ src/app + kaggle-research + kaggressurE + v20.py đầy đủ)
+  → cp -a vào my-project; cài lại kaggle_environments==1.32.7 (PyPI, env có sẵn)
+- Nội dung RESEARCH_FOUNDATION.md khôi phục nguyên văn từ context phiên trước →
+  kaggle-research/RESEARCH_FOUNDATION.md (kèm archival note + đánh giá Task 89)
+- Bài học vận hành: (1) bash tool không persistent giữa các lệnh (mỗi lệnh shell
+  mới); (2) process nền bị sandbox giết khi session bash kết thúc → battery phải
+  chạy foreground; (3) TÊN THƯ MỤC kaggressurE → đúng là "kaggressurE" với
+  double-g lowercase toàn bộ — 6 lần gõ sai gây loạt lỗi diagn sai "filesystem
+  bất ổn"; dùng glob kaggr* + od -c để byte-verify
+
+Stage Summary:
+- Môi trường sống lại 100%: engine verify (env kaggressurE 720 turn, $3000),
+  run_battle smoke v20 vs ahmedv46 seed 5 khớp battery cũ tới từng đồng
+  (93,409 vs 91,853, +$1,556)
+- KHÔNG push được GitHub (PAT mất theo reboot) — commit local thôi, chờ user cấp
+  lại PAT; Kaggle token cũng mất — submit về sau cần token mới (cũ đã từng lộ,
+  rotate là đúng anyway)
+
+---
+Task ID: 19 (project Task 89) — v21: 6 thực nghiệm H1/H2 trong mirror + battery 48 trận
+Agent: Z.ai Code (main, vai trò Bio)
+
+Task:
+- Triển khai hướng đề xuất (H1 Milk Printer → v21) + battery 48 trận vs ahmedv46
+  và báo cáo. Data đối chiếu: 8-seed probe giá full 9 item (không re-fetch 84 trận
+  cũ theo lệnh user)
+
+Work Log:
+- Probe 8 seed full game (v20 vs ahmedv46): MILK glut vĩnh viễn (giá $5-76, inv
+  cuối 10.070+; 6/8 seed chỉ 1 milk shop; seed 2-shop cũng crash rồi hồi một phần);
+  WOOL mạnh (YARN 8/8 seed, $100-242); EGG tăng đều $50→88; STRA/MELON crash
+  đồng bộ giữa game
+- Verify engine trực tiếp: _process_market/_commit_unit (SELL từ shed, walk-down
+  từng unit, bán $1 không tăng supply, BUY_PRODUCT CHỈ WHEAT/FERTILIZER — chặn
+  arb mua tận gốc), market_price/_shape (công thức giá xác định)
+- v21-v1 bank+liquidate (WOOL/STRA/MELON): mean +$537 (−$1,030 vs v20) —
+  liquidate-dump tự re-crash + free-rider
+- v21-v2 trim-only WOOL floor 120: +$1,259 (−$307) — giữ $50-98 rồi REAPER bán
+  cùng giá
+- v21-v3 COW→SHEEP swap (V231-inverted: rewrite BUY/PICKUP/PLACE): **−$17,995**
+  — hiệu ứng nhường thị trường: bỏ milk → v46 độc quyền sữa $250+ (+$14-20K cho
+  v46), V231 của v46 kích hoạt mở rộng đàn bò
+- v21-v4 floor-banker <$15: kết quả y hệt v20 từng đồng — trim dead orders
+  (engine no-op khi shed rỗng; tape over-ask 8-14u)
+- v21-v5 (final): v4 + fix (1) NameError _V21_STANDARD/_v21_standard nuốt kín
+  719/719 turn trong fail-open, (2) flag trimmed không set khi order bị xóa hết
+  → action gốc trả về, (3) shed guard đếm wheat buffer 100 che mù — đo áp lực
+  theo item thay vì tổng shed → probe +$213 (seed5), mean +$1,575
+- BATTERY 48 trận (24 seed × 2 ghế, official runner, foreground 542s): v21 vs
+  ahmedv46 **48W-0L, mean +$1,581.7, median +$1,565, worst +$568, best +$3,427,
+  paired +$3,163.4, CI95 [1,397.1-1,771.8], 0 errors** → bench/t89_v21_vs_v46.json
+- Viết kaggle-research/09_V21_MIRROR_FINDINGS.md (6 thực nghiệm + 3 bug kỹ thuật
+  + 4 hướng còn lại); khôi phục RESEARCH_FOUNDATION.md vào repo
+- arena-service thêm v21 (14 agents), mini-service port 3005 lên; dev server
+  port 3000 HTTP 200
+
+Stage Summary:
+- H1 Milk Printer BỊ BÁC BỎ trong mirror (glut + BUY-blocked + free-rider +
+  vacate-monopoly) — biên độ $40-80K chỉ tồn tại ở thế giới top-tier nơi đối thủ
+  không phản ứng; không chuyển vào mirror constant-seller được
+- v21-v5 = v20 + garbage-price wool banker: 48-0 giữ nguyên, mean +$1,582 ≈
+  +$11 so v20 (trong sai số) — KHÔNG nên thay submission v20.1 (#56308666);
+  lever thật tiếp theo cần kiến trúc production-planner riêng (goose ladder 5→20,
+  PET_CAFE carrot) — vượt khả năng layer-wrap
+- Bài học cấu trúc lớn nhất: thị trường 2 người dùng chung → rời item = nhường
+  monopoly cho đối thủ; dồn item = tự crash; chỉ "thêm tổng giá trị" mới tăng
+  margin bền
