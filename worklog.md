@@ -688,3 +688,18 @@ Stage Summary:
   log-gentle glut curve, BUILD_COOP free, wheat feed sẵn từ máy wheat) — cần
   kiến trúc production-planner (tile/labor/feed), mở v23
 - Quyết định submission: GIỮ v20.1 #56308666 đang climb
+
+---
+Task ID: 20b — Push GitHub THẤT BẠI: PAT mới invalid
+Agent: Z.ai Code (main)
+
+Work Log:
+- git push origin main → "could not read Username" (không credential)
+- Push bằng PAT user cấp mới qua URL + credential-helper: GitHub từ chối
+  "Invalid username or token"
+- Verify trực tiếp GitHub API /user: HTTP 401 "Bad credentials" → PAT
+  ghp_fQNS...LTQ không hợp lệ (revoked / mistyped / bị cắt)
+
+Stage Summary:
+- 2 commit Task 90 nằm local chờ push (code + worklog đầy đủ)
+- CẦN user cấp lại PAT hợp lệ (kiểm tra scope: repo + workflow) để push
