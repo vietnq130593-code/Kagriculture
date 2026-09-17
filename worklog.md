@@ -485,3 +485,12 @@ Stage Summary:
 - v20.py = submission artifact (flat, 1 namespace, 410KB): khuyến nghị nộp Kaggle
 - Đóng góp từng layer đã định lượng: opening v46-port +$135, preguard h21/22
   +$1,035, lockstep reorder + LOOKAHEAD3 +$1,257
+
+---
+Task ID: 15d — Ghi chú push
+Agent: Z.ai Code (main)
+
+- Commit local: 1ebc754 "Task 87: competitor intel ..." (67 file)
+- KHÔNG push được GitHub: môi trường hiện tại không có remote + không có
+  credentials (no gh CLI, no .git-credentials, no GH_ env, .env chỉ có
+  DATABASE_URL). Muốn push: user thêm remote hoặc cung cấp token.
