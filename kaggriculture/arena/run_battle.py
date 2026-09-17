@@ -37,33 +37,17 @@ sys.path.insert(0, ROOT)
 sys.path.insert(0, BENCH)
 
 # name -> (file, entry function)
-# Task 68: v12 (bị v13 thay thế) và dra (bản sao MD5 của kme3 — redundant) đã bị xóa theo yêu cầu user
-# Task 69: v14 = ARI CLASS (kme3v10 + 6 tầng tuning v13 + front_run/H8/room_guard/clamp_sells)
-# Task 73: v15 = ARI CLASS Mk-II (v14 + R90 shed-animal watchdog — fix bug mất thú trong shed)
+# Task 81 (2026-09-16): RESET TOÀN BỘ registry — user xóa sạch dòng dõi cũ (v13→v17, kme3 family,
+# aurax, kawashigi, indark, thomast, ahmedv41) để dựng v18 trên nền mới.
+# v18 = jaxa623/sdy623 "Beyond 48-0" K0006 (V43 + 4 market micro-edges) — Kaggle pull 2026-09-16,
+#        main.py sha256 4757f3f5b28db8a2f4614bb08993a8a567a7d49bae1ac324fbcfbcc1af60e95e (byte-exact).
+# Sparring: ahmedv43/v44/v45 = Ahmed Berat Özer lineage (nền của v18).
 AGENTS = {
-    "v16": (os.path.join(ROOT, "v16.py"), "agent"),
-    "v16h5": (os.path.join(ROOT, "v16h5.py"), "agent"),
-    "v16h7": (os.path.join(ROOT, "v16h7.py"), "agent"),
-    "v16h57": (os.path.join(ROOT, "v16h57.py"), "agent"),
-    "v15": (os.path.join(ROOT, "v15.py"), "agent"),
-    "v14": (os.path.join(ROOT, "v14.py"), "agent"),
-    "v13": (os.path.join(ROOT, "v13.py"), "agent"),
-    "kme3": (os.path.join(ROOT, "kme3.py"), "agent"),
-    "kme3v10": (os.path.join(ROOT, "kme3v10.py"), "agent"),
-    "aurax": (os.path.join(ROOT, "aurax.py"), "agent"),
-    # Task 75: v16 (ARI CLASS Mk-III) = v15 + H1 town-demand gate + H2 dead_stock/terminal + H3 R88 horizon-feed
-# Task 75 / H10: 3 doi thu moi tu Kaggle research (Task 74)
-    "kme3v39": (os.path.join(ROOT, "kme3v39.py"), "agent"),
-    "kawashigi": (os.path.join(ROOT, "kawashigi.py"), "agent"),
-    "indark_e776": (os.path.join(ROOT, "indark_e776.py"), "agent"),
-    "v16h8": (os.path.join(ROOT, "v16h8.py"), "agent"),
-    "thomast": (os.path.join(ROOT, "thomast.py"), "agent"),
-    "thomast_t0": (os.path.join(ROOT, "thomast_t0.py"), "agent"),
-    "thomast_t3": (os.path.join(ROOT, "thomast_t3.py"), "agent"),
-    # Task 79: ahmedv41 = Ahmed Berat Ozer V41 review-candidate (Kaggle pull 2026-09-14)
-    "ahmedv41": (os.path.join(ROOT, "ahmedv41.py"), "agent"),
-    # Task 80: v17 = ARI CLASS Mk-VI MERCATOR = ahmedv41 core + market microstructure overlay
-    "v17": (os.path.join(ROOT, "v17.py"), "agent"),
+    "v18": (os.path.join(ROOT, "v18.py"), "agent"),
+    "v19": (os.path.join(ROOT, "v19.py"), "agent"),
+    "ahmedv43": (os.path.join(ROOT, "ahmedv43.py"), "agent"),
+    "ahmedv44": (os.path.join(ROOT, "ahmedv44.py"), "agent"),
+    "ahmedv45": (os.path.join(ROOT, "ahmedv45.py"), "agent"),
 }
 
 

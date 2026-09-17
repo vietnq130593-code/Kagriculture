@@ -16,3 +16,8 @@ tool-results/
 kaggriculture/research/kaggle_dl/raw_*.json
 kaggriculture/research/kaggle_dl/*.ipynb
 kaggriculture/bench/t78_h11_tapes/
+
+# Task 85: raw Kaggle episode replays are too large for git (7 x ~33MB) — parsed data lives in match1..7/
+kaggriculture/research/v19/top1/episode-*-replay.json
+kaggriculture/research/v19/top1/leaderboard.zip
+kaggriculture/research/v19/top1/__pycache__/
