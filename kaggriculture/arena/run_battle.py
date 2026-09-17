@@ -48,6 +48,20 @@ AGENTS = {
     "ahmedv43": (os.path.join(ROOT, "ahmedv43.py"), "agent"),
     "ahmedv44": (os.path.join(ROOT, "ahmedv44.py"), "agent"),
     "ahmedv45": (os.path.join(ROOT, "ahmedv45.py"), "agent"),
+    # Task 87: đối thủ meta mới (extracted từ notebook Kaggle 17-09, sha256-verified)
+    # seyit4 = seyitkaangunes "V44+4 layers" (live 56280605, ~2801 rank ~188)
+    # ahmedv46 = ahmedberatozer "First-Turn Microstructure" (EXP293)
+    "seyit4": (os.path.join(ROOT, "seyit4.py"), "agent"),
+    "ahmedv46": (os.path.join(ROOT, "ahmedv46.py"), "agent"),
+    # v19.1 = v19 + first-turn microstructure (v46-mechanism port)
+    "v191": (os.path.join(ROOT, "v191.py"), "agent"),
+    # v19.2 = + h21/22 preguard (seyit-L1 adapted); v19.3 = + LOOKAHEAD 3;
+    # v19.4 = + clone-gated lockstep SELL reorder (seyit-L2 port)
+    "v192": (os.path.join(ROOT, "v192.py"), "agent"),
+    "v193": (os.path.join(ROOT, "v193.py"), "agent"),
+    "v194": (os.path.join(ROOT, "v194.py"), "agent"),
+    # v20 = FLAT single-namespace build of the v19.4 chain (submission format, 410KB)
+    "v20": (os.path.join(ROOT, "v20.py"), "agent"),
 }
 
 

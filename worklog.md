@@ -373,3 +373,115 @@ Stage Summary:
 - Hạ tầng: batteryd.py (daemon battery) + restart.sh pre-kill + bench/t86_p2_*.json (3 file)
 - Artifacts đẩy GitHub: kaggriculture/{arena/batteryd.py, bench/t86_p2_*.json},
   mini-services/arena-service/restart.sh, research/v19/05_V19_DEPLOYMENT_PLAN.md §9
+
+---
+Task ID: 15 (project Task 87) — Intel 2 đối thủ mới (seyit4 + ahmedv46) + chuỗi v19.1-v19.4
+Agent: Z.ai Code (main, vai trò Bio)
+
+Task:
+- User: v19 thắng v18/ahmedv45 nhưng chênh lệch còn quá thấp; nghiên cứu 2 notebook
+  đối thủ (seyitkaangunes kaggressulture-2820-score + ahmedberatozer v46 first-turn
+  microstructure), áp dụng vào v19 thành các phiên bản v19.x để đột phá
+
+Work Log:
+- Kaggle API pull 2 notebook (KAGGLE_API_TOKEN env); extract V44 base của seyit =
+  byte-identical ahmedv44.py local (sha 797d9bca); extract main.py v46 (sha
+  735c3703 verify OK); tái tạo byte-exact agent live 4-layer của seyit (sha
+  fa9e47d8 = submission 56280605) → seyit4.py; cả 2 thành sparring agents trong
+  arena + UI (8 agents ban đầu)
+- Diff v45→v46 toàn diện: opening [BUY 7, SELL 2] index-0 + turn-1 strip + BUY 30
+  attack (gate 2860) + turn-2 sellback; sale advance LOOK=3; frontload sells→buys→rest;
+  EXP288 mirror gate (cash bằng nhau step 1 = copy → horizon 24); EXP293 race-lost v2
+- Phân tích markdown seyit: 4 layer (preguard h21/22 +562-834; lockstep reorder +1436;
+  cadence +30-70; yarn herd +3770 yarn-seeds); âm tính quan trọng (hire-cap mất
+  9883, wheat-pump sụp live); phương pháp live-tape testbed
+- Baseline battery 4×48 trận: v19 vs seyit4 46W/2L +$1225; v18 vs seyit4 46W/2L
+  +$1205; v19 vs ahmedv46 2W/46L -$396; v18 vs ahmedv46 2W/46L -$506 → v46 khắc chế
+  dòng jaxa đúng như eval của họ (pub_beyond48 0-64)
+- PHÁT HIỆN PHÁP Y LỚN: V43 chassis KHÔNG có day-end guard (V44 mới có EXP-154) —
+  phân tích battle JSONL: ~90-116 units/player/game bị PHÁ HỦY ở h23 overflow (96%
+  WHEAT, giá $22-42, giá trị thực ~$1.3-1.6K/game); shed comp h21/22: WHEAT 69% EGG 16%
+- Build v19.1 (opening port v46): smoke khớp số v46 từng đồng (2872→174, shed 35,
+  sellback 30); battery: vs ahmedv46 18W/30L -$45 [−176,+85] (từ 2W/46L -$396);
+  vs v19 46W/2L +$135 [+84,+186]
+- Build v19.2 (preguard h21/22, seyit-L1 thích ứng: +WHEAT+EGG, −CARROT−FERTILIZER,
+  dùng helper _r127_fields/_r97_market_stock của chính V43): smoke seed5 overflow
+  79→8 units, +$900; CARROT bị loại vì giá tăng 8x cuối trận ($35→$280)
+- Build v19.3 (LOOKAHEAD 2→3 qua namespace override) + v19.4 (lockstep SELL reorder
+  port seyit-L2: permute block 2-6 SELL, replay lockstep 2 người bằng price model
+  engine-exact của v18, gate clone qua _R37_HORIZONS raw + _r37_similarity ≥0.95);
+  smoke cả hai sạch; v194 vs v192 seed11 +$396
+- Orchestrator daemon (t87_orchestrator.py): tự chạy chain v192 (4 battery) rồi
+  v194 (4 battery) sau khi chain v191 xong; đăng ký v192/193/194 vào run_battle +
+  arena-service UI (11 agents); app:3000 = 200
+- Phát hiện + xử lý: 2 bản sao repo (/home/z/Kagriculture/kaggressulture là bản sao
+  cũ của /home/z/my-project/kaggressulture — arena-service + git đều dùng bản sau);
+  hợp nhất toàn bộ công việc về /home/z/my-project/kaggressulture
+- Viết 07_COMPETITOR_INTEL_V46_SEYIT4.md (nguồn + xác thực, cơ chế 2 đối thủ, định
+  vị ta, phát hiện pháp y V43, kế hoạch v19.x)
+
+Stage Summary:
+- ĐỊNH VỊ MỚI: ta MẠNH HƠN rank-188 head-to-head (v19 +$1225 vs seyit4) nhưng THUA
+  ahmedv46 (-$396) — v46 được thiết kế để khắc chế dòng jaxa (eval của họ: 0-64 → 52-12)
+- ĐÒN BẨY ĐỘT PHÁ TÌM THẤY: (1) V43 đang đốt ~$1.3-1.6K/game ở h23 overflow — v19.2
+  preguard vá (smoke +$900/seed); (2) opening microstructure của v46 — v19.1 kéo
+  matchup v46 từ -$396 lên -$45; (3) lockstep reorder của seyit (+1436 vs V44) — v19.4
+- Chuỗi agent: v19.1 (opening) → v19.2 (+preguard) → v19.3 (+LOOK 3) → v19.4
+  (+lockstep reorder); battery chain đang chạy nền qua orchestrator
+- Sparring mới: seyit4 (byte-exact live 2801) + ahmedv46 — meta ladder giờ mô phỏng
+  được locally; UI có đủ 11 agents để user xem trực quan
+
+---
+Task ID: 15b (project Task 87, tiếp nối) — Kết quả battery chuỗi v19.x + verify UI
+Agent: Z.ai Code (main, vai trò Bio)
+
+Work Log:
+- Battery chain 1 (v191) hoàn tất: vs v19 46W/2L +$135; vs ahmedv46 18W/30L -$45;
+  vs seyit4 43W/5L +$941; vs ahmedv43 48W/0L +$993
+- Battery chain 2 (v192) hoàn tất: vs ahmedv46 **46W/0L +$1,022** [+844,+1199];
+  vs v191 47W/0L +$1,035 [+907,+1176]; vs seyit4 **48W/0L +$1,928** [+1691,+2178];
+  vs ahmedv43 **48W/0L +$1,976** [+1750,+2220] — preguard đảo chiều hoàn toàn v46
+  matchup và đẩy biên seyit4/ahmedv43 lên ~gấp đôi v19
+- Battery v194 vs v192: **48W/0L +$1,257** [+1099,+1422], worst +$396 —
+  lockstep reorder + LOOKAHEAD 3 cộng thêm >$1,200 trên nền v192
+- Xây v20.py = FLAT build toàn chuỗi v19.4 (1 namespace, 410KB so với 1MB nested);
+  differential test: hành xử gần như trùng khớp (chênh lệch deterministic nhỏ +$54/seed
+  nghiêng về phía flat); battery chain v20 riêng đã xếp hàng qua orchestrator-2
+- Verify end-to-end bằng agent-browser qua gateway :81: chọn v192 vs ahmedv46 →
+  trận 720 lượt stream live đầy đủ (MoneyChart/FarmBoard/MarketPanel), kết quả
+  🏆 v192 THẮNG $96,004 vs $95,387, screenshot t87_ui_v192_vs_v46_win.png;
+  UI serve đủ 12 agents (v18→v20 + 5 đối thủ); console sạch không lỗi
+- Điều tra lỗi battery "no end line" seed 17 seat 1 (v192 vs v191): reproduce thủ công
+  chạy sạch (v192 thắng +$1,013) → kết luận transient do tranh chấp CPU khi tôi chạy
+  test song song, không phải bug agent
+- Update 05_V19_DEPLOYMENT_PLAN.md §10 (bảng battery) + 07_COMPETITOR_INTEL đầy đủ
+
+Stage Summary:
+- ĐỘT PHÁ XÁC NHẬN ĐỊNH LƯỢNG: chuỗi v19.1→v19.4 cộng dồn (vs nền ngay dưới):
+  opening +$135 → preguard +$1,035 → lockstep+LOOK3 +$1,257
+- MATCHUP HOÁN ĐỔI: vs ahmedv46 từ 2W/46L −$396 (v19) → 46W/0L +$1,022 (v192);
+  vs seyit4 48W/0L +$1,928; vs ahmedv43 48W/0L +$1,976 (v192)
+- v20 (flat, submission 410KB) chờ battery cuối; khuyến nghị nộp v20 hoặc v192-flat
+  tùy kết quả chain v194/v20 còn đang chạy
+
+---
+Task ID: 15c (project Task 87, kết thúc) — Chuỗi v19.4 + v20 hoàn tất 192-0, push GitHub
+Agent: Z.ai Code (main, vai trò Bio)
+
+Work Log:
+- Battery v194 chain hoàn tất 4/4: vs v192 48W/0L +$1,257; vs ahmedv46 48W/0L
+  +$1,584; vs seyit4 48W/0L +$2,186; vs ahmedv43 48W/0L +$2,123 — tổng 192-0
+- Battery v20 (flat submission build) chain hoàn tất 4/4: vs ahmedv46 48W/0L
+  +$1,570; vs seyit4 48W/0L +$2,176; vs ahmedv43 48W/0L +$2,122; vs v192
+  48W/0L +$1,120 — khớp v194 trong sai số bootstrap trên mọi matchup, 410KB
+- Git commit + push toàn bộ (67 file): agents seyit4/ahmedv46/v19x/v20, layers,
+  build scripts, battery results t87_*, docs 05/07, screenshots, orchestrators
+- Health check cuối: app:3000 = 200, arena-service 12 agents, dev.log sạch
+
+Stage Summary:
+- KẾT QUẢ CUỐI CÙNG (48 trận/matchup, official runner): trước → sau
+  ahmedv46: 2W/46L −$396 → 48W/0L +$1,570 | seyit4: +$1,225 → +$2,176 |
+  ahmedv43: +$1,298 → +$2,122 — tổng swing lên đến +$1,966/game, 192-0
+- v20.py = submission artifact (flat, 1 namespace, 410KB): khuyến nghị nộp Kaggle
+- Đóng góp từng layer đã định lượng: opening v46-port +$135, preguard h21/22
+  +$1,035, lockstep reorder + LOOKAHEAD3 +$1,257

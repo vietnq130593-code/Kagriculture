@@ -532,3 +532,54 @@ v19 − ahmedv43  =  v18 − ahmedv43  +  v19 − v18
    (mmpq-clone/egg-racer) → cổng G3/G6. Mục tiêu rating: mỗi +$500-1,000/battle vs meta
    trung bình ≈ một bậc thang rating ~+30-80 điểm; cần +234 cho bạc.
 4. Theo dõi worst-case seed 44 (−$2,846) khi mở rộng battery Phase 2+.
+
+
+## 10. Task 87 (17-09): Intel đối thủ mới → chuỗi v19.1-v19.4 + v20
+
+### 10.1 Bối cảnh
+User chỉ 2 notebook đối thủ: seyitkaangunes (V44+4layers, live 2801/rank ~188) và
+ahmedberatozer V46 (First-Turn Microstructure). Chi tiết đầy đủ: `07_COMPETITOR_INTEL_V46_SEYIT4.md`.
+
+### 10.2 Baseline định vị (24 seeds × 2 ghế, official runner)
+| Matchup | Kết quả |
+|---|---|
+| v19 vs seyit4 | 46W/2L +$1,225 [+1009,+1438] |
+| v18 vs seyit4 | 46W/2L +$1,205 |
+| v19 vs ahmedv46 | **2W/46L −$396** [−519,−284] |
+| v18 vs ahmedv46 | 2W/46L −$506 |
+
+→ Ta mạnh hơn rank-188 head-to-head nhưng thua nặng v46 (được thiết kế khắc chế jaxa).
+
+### 10.3 Phát hiện pháp y: V43 đốt tiền ở h23 overflow
+Không có day-end guard (V44 mới có EXP-154): ~90-116 units/player/game bị destroy
+(96% WHEAT), giá trị thực ~$1.3-1.6K/game. Shed h21/22: WHEAT 69% + EGG 16%.
+
+### 10.4 Chuỗi v19.x (mỗi layer gated bằng battery)
+| Bản | Layer | vs ahmedv46 | vs nền dưới | vs seyit4 | vs ahmedv43 |
+|---|---|---|---|---|---|
+| v19.1 | Opening v46-port ([BUY 7,SELL 2] + strip + BUY 30 attack) | 18W/30L −$45 | vs v19: 46W/2L +$135 | 43W/5L +$941 | 48W/0L +$993 |
+| v19.2 | + Preguard h21/22 (seyit-L1 thích ứng) | **46W/0L +$1,022** [+844,+1199] | vs v191: **47W/0L +$1,035** | **48W/0L +$1,928** [+1691,+2178] | **48W/0L +$1,976** [+1750,+2220] |
+| v19.3 | + LOOKAHEAD 2→3 | — | — | — | — |
+| v19.4 | + Lockstep SELL reorder (seyit-L2) | **48W/0L +$1,584** [+1401,+1774] | **vs v192: 48W/0L +$1,257** [+1099,+1422], worst +$396 | **48W/0L +$2,186** [+1914,+2485] | **48W/0L +$2,123** [+1870,+2393] |
+| v20 | FLAT build (nộp Kaggle, 410KB vs 1MB) | **48W/0L +$1,570** [+1383,+1764] | vs v192: **48W/0L +$1,120** [+976,+1274] | **48W/0L +$2,176** [+1900,+2478] | **48W/0L +$2,122** [+1868,+2396] |
+
+v20 (flat) tái hiện v194 (nested) trong sai số bootstrap trên cả 4 matchup → bản nộp.
+
+Trade-off đã định lượng: opening sạch đổi −$284 vs seyit4 nhưng +$351 vs v46 (v191 so v19);
+preguard bù đắp gấp 3 lần. Smoke v194 vs v19 seed 3: +$3,038 (lk_gain $2,686/17 turns).
+
+### 10.4b Tổng kết Task 87 — trước/sau
+| Matchup | v19 (trước) | v194 (sau) | Swing |
+|---|---|---|---|
+| ahmedv46 (kryptonite jaxa) | 2W/46L, −$396 | **48W/0L, +$1,584** | +$1,980 |
+| seyit4 (live 2801, rank ~188) | 46W/2L, +$1,225 | **48W/0L, +$2,186** | +$961 |
+| ahmedv43 (clone-family) | 47W/1L, +$1,298 | **48W/0L, +$2,123** | +$825 |
+| v192 (nội bộ) | — | 48W/0L, +$1,257 | — |
+
+v194 tổng kỷ lục 192-0 trên 4 đối thủ tham chiếu. Đóng góp từng layer (vs nền dưới):
+opening +$135 → preguard +$1,035 → lockstep+LOOK3 +$1,257.
+
+### 10.5 Hạ tầng
+- Sparring mới trong arena + UI: seyit4 (byte-exact live 56280605), ahmedv46 (sha-verified)
+- 2 orchestrator daemon chạy 12 battery tự động; UI 12 agents; screenshots t87_ui_*.png
+- Build chain: build_v191/192/193/194.py (nested) + build_v20.py (flat, submission)
