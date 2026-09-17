@@ -1,0 +1,678 @@
+{
+ "rows": [
+  {
+   "key": "m1",
+   "m": "Majkel1337",
+   "o": "ymg_aq",
+   "win": false,
+   "margin": -451.0,
+   "M$": 86262.0,
+   "O$": 86713.0,
+   "Mrev": 110387.0,
+   "Orev": 116858.0,
+   "Mhire": 4824.0,
+   "Ohire": 6481,
+   "Mland": 3000.0,
+   "Oland": 3000,
+   "Mseed": 7140.0,
+   "Oseed": 7430.0,
+   "Manimal": 6000.0,
+   "Oanimal": 6900.0,
+   "Mprod": 6161.0,
+   "Oprod": 9334.0,
+   "Mland_n": 9,
+   "Oland_n": 2,
+   "Mend29": 7141.0,
+   "Oend29": 10900.0,
+   "Ml3": 17764.0,
+   "Ol3": 20862.0,
+   "Mitems": 8,
+   "Oitems": 9
+  },
+  {
+   "key": "m2",
+   "m": "Majkel1337",
+   "o": "DSM",
+   "win": true,
+   "margin": 7716.0,
+   "M$": 91845.0,
+   "O$": 84129.0,
+   "Mrev": 118173.0,
+   "Orev": 110037.0,
+   "Mhire": 4921.0,
+   "Ohire": 4929.0,
+   "Mland": 3000.0,
+   "Oland": 3000.0,
+   "Mseed": 7900.0,
+   "Oseed": 7530.0,
+   "Manimal": 7000.0,
+   "Oanimal": 7000.0,
+   "Mprod": 6507.0,
+   "Oprod": 6449.0,
+   "Mland_n": 5,
+   "Oland_n": 3,
+   "Mend29": 13575.0,
+   "Oend29": 6943.0,
+   "Ml3": 25248.0,
+   "Ol3": 18340.0,
+   "Mitems": 8,
+   "Oitems": 8
+  },
+  {
+   "key": "m3",
+   "m": "Majkel1337",
+   "o": "M & M & P ",
+   "win": false,
+   "margin": -8968.0,
+   "M$": 95090.0,
+   "O$": 104058.0,
+   "Mrev": 117825.0,
+   "Orev": 130504.0,
+   "Mhire": 4976.0,
+   "Ohire": 3811,
+   "Mland": 3000.0,
+   "Oland": 7000,
+   "Mseed": 8040.0,
+   "Oseed": 8120.0,
+   "Manimal": 5500.0,
+   "Oanimal": 7600.0,
+   "Mprod": 4219.0,
+   "Oprod": 2915.0,
+   "Mland_n": 12,
+   "Oland_n": 3,
+   "Mend29": 12662.0,
+   "Oend29": 19729.0,
+   "Ml3": 26276.0,
+   "Ol3": 32789.0,
+   "Mitems": 8,
+   "Oitems": 9
+  },
+  {
+   "key": "m4",
+   "m": "Majkel1337",
+   "o": "M & M & P ",
+   "win": true,
+   "margin": 7328.0,
+   "M$": 119480.0,
+   "O$": 112152.0,
+   "Mrev": 145490.0,
+   "Orev": 140978.0,
+   "Mhire": 4929.0,
+   "Ohire": 4086,
+   "Mland": 3000.0,
+   "Oland": 7000,
+   "Mseed": 6950.0,
+   "Oseed": 9190.0,
+   "Manimal": 7100.0,
+   "Oanimal": 7400.0,
+   "Mprod": 7031.0,
+   "Oprod": 4150.0,
+   "Mland_n": 6,
+   "Oland_n": 3,
+   "Mend29": 13344.0,
+   "Oend29": 13876.0,
+   "Ml3": 27669.0,
+   "Ol3": 25050.0,
+   "Mitems": 8,
+   "Oitems": 9
+  },
+  {
+   "key": "m5",
+   "m": "Majkel1337",
+   "o": "M & M & P ",
+   "win": true,
+   "margin": 1557.0,
+   "M$": 107051.0,
+   "O$": 105494.0,
+   "Mrev": 130387.0,
+   "Orev": 133896.0,
+   "Mhire": 4942.0,
+   "Ohire": 4625,
+   "Mland": 3000.0,
+   "Oland": 7000,
+   "Mseed": 7750.0,
+   "Oseed": 9660.0,
+   "Manimal": 5200.0,
+   "Oanimal": 7000.0,
+   "Mprod": 5444.0,
+   "Oprod": 3117.0,
+   "Mland_n": 9,
+   "Oland_n": 3,
+   "Mend29": 12114.0,
+   "Oend29": 19049.0,
+   "Ml3": 22466.0,
+   "Ol3": 30684.0,
+   "Mitems": 9,
+   "Oitems": 9
+  },
+  {
+   "key": "m6",
+   "m": "Majkel1337",
+   "o": "SpaTaro",
+   "win": true,
+   "margin": 12324.0,
+   "M$": 108597.0,
+   "O$": 96273.0,
+   "Mrev": 133281.0,
+   "Orev": 131077.0,
+   "Mhire": 4918.0,
+   "Ohire": 4549.0,
+   "Mland": 3000.0,
+   "Oland": 3000.0,
+   "Mseed": 6820.0,
+   "Oseed": 6240.0,
+   "Manimal": 7200.0,
+   "Oanimal": 8300.0,
+   "Mprod": 5746.0,
+   "Oprod": 15715.0,
+   "Mland_n": 4,
+   "Oland_n": 6,
+   "Mend29": 13255.0,
+   "Oend29": 4677.0,
+   "Ml3": 20545.0,
+   "Ol3": 10707.0,
+   "Mitems": 8,
+   "Oitems": 7
+  },
+  {
+   "key": "m7",
+   "m": "Majkel1337",
+   "o": "M & M & P ",
+   "win": true,
+   "margin": 8896.0,
+   "M$": 110903.0,
+   "O$": 102007.0,
+   "Mrev": 138582.0,
+   "Orev": 125529.0,
+   "Mhire": 4929.0,
+   "Ohire": 4154,
+   "Mland": 3000.0,
+   "Oland": 3000,
+   "Mseed": 7350.0,
+   "Oseed": 6970.0,
+   "Manimal": 7700.0,
+   "Oanimal": 8900.0,
+   "Mprod": 7700.0,
+   "Oprod": 3498.0,
+   "Mland_n": 4,
+   "Oland_n": 2,
+   "Mend29": 10156.0,
+   "Oend29": 17671.0,
+   "Ml3": 23485.0,
+   "Ol3": 24378.0,
+   "Mitems": 9,
+   "Oitems": 9
+  }
+ ],
+ "detail": {
+  "m1": {
+   "mrev": {
+    "WHEAT": 19564.0,
+    "FERTILIZER": 10535.0,
+    "WOOL": 4998.0,
+    "MILK": 20320.0,
+    "MELON": 17298.0,
+    "STRAWBERRY": 20598.0,
+    "TOMATO": 11972.0,
+    "CARROT": 5102.0
+   },
+   "orev": {
+    "WHEAT": 18464.0,
+    "FERTILIZER": 14707.0,
+    "WOOL": 5352.0,
+    "CARROT": 6118.0,
+    "MILK": 19507.0,
+    "MELON": 13099.0,
+    "EGG": 10926.0,
+    "STRAWBERRY": 20326.0,
+    "TOMATO": 8359.0
+   },
+   "munits": {
+    "WHEAT": 478,
+    "FERTILIZER": 157,
+    "WOOL": 71,
+    "MILK": 232,
+    "MELON": 72,
+    "STRAWBERRY": 150,
+    "TOMATO": 128,
+    "CARROT": 109
+   },
+   "ounits": {
+    "WHEAT": 482,
+    "FERTILIZER": 251,
+    "WOOL": 70,
+    "CARROT": 137,
+    "MILK": 219,
+    "MELON": 84,
+    "EGG": 208,
+    "STRAWBERRY": 211,
+    "TOMATO": 91
+   },
+   "animals_bought": {
+    "COW": 10,
+    "SHEEP": 4
+   },
+   "m_final_animals": {
+    "COW": 6,
+    "SHEEP": 1
+   },
+   "o_final_animals": {
+    "COW": 9,
+    "GOOSE": 6
+   },
+   "m_final_plants": {
+    "WHEAT": 4,
+    "TOMATO": 5,
+    "STRAWBERRY": 1
+   },
+   "o_final_plants": {
+    "TOMATO": 4,
+    "CARROT": 1,
+    "STRAWBERRY": 3
+   },
+   "seed": 223111085,
+   "midx": 1
+  },
+  "m2": {
+   "mrev": {
+    "WHEAT": 14535.0,
+    "FERTILIZER": 11514.0,
+    "WOOL": 18481.0,
+    "MILK": 4440.0,
+    "MELON": 14377.0,
+    "STRAWBERRY": 29844.0,
+    "CARROT": 16068.0,
+    "TOMATO": 8914.0
+   },
+   "orev": {
+    "WHEAT": 17104.0,
+    "FERTILIZER": 11468.0,
+    "WOOL": 18337.0,
+    "MILK": 4443.0,
+    "MELON": 14503.0,
+    "STRAWBERRY": 24369.0,
+    "TOMATO": 10945.0,
+    "CARROT": 8868.0
+   },
+   "munits": {
+    "WHEAT": 390,
+    "FERTILIZER": 179,
+    "WOOL": 196,
+    "MILK": 107,
+    "MELON": 72,
+    "STRAWBERRY": 196,
+    "CARROT": 310,
+    "TOMATO": 108
+   },
+   "ounits": {
+    "WHEAT": 455,
+    "FERTILIZER": 177,
+    "WOOL": 215,
+    "MILK": 93,
+    "MELON": 72,
+    "STRAWBERRY": 175,
+    "TOMATO": 135,
+    "CARROT": 170
+   },
+   "animals_bought": {
+    "COW": 5,
+    "SHEEP": 10
+   },
+   "m_final_animals": {
+    "COW": 3,
+    "SHEEP": 4
+   },
+   "o_final_animals": {
+    "COW": 3,
+    "SHEEP": 4
+   },
+   "m_final_plants": {
+    "TOMATO": 4,
+    "WHEAT": 6
+   },
+   "o_final_plants": {
+    "TOMATO": 10,
+    "WHEAT": 5
+   },
+   "seed": 771335573,
+   "midx": 0
+  },
+  "m3": {
+   "mrev": {
+    "WHEAT": 15027.0,
+    "FERTILIZER": 9436.0,
+    "WOOL": 6267.0,
+    "MILK": 12804.0,
+    "MELON": 16178.0,
+    "STRAWBERRY": 47628.0,
+    "CARROT": 8402.0,
+    "TOMATO": 2083.0
+   },
+   "orev": {
+    "FERTILIZER": 14839.0,
+    "WHEAT": 9674.0,
+    "CARROT": 8501.0,
+    "WOOL": 4457.0,
+    "EGG": 18604.0,
+    "MILK": 7776.0,
+    "MELON": 15932.0,
+    "STRAWBERRY": 43415.0,
+    "TOMATO": 7306.0
+   },
+   "munits": {
+    "WHEAT": 438,
+    "FERTILIZER": 142,
+    "WOOL": 65,
+    "MILK": 202,
+    "MELON": 71,
+    "STRAWBERRY": 233,
+    "CARROT": 210,
+    "TOMATO": 33
+   },
+   "ounits": {
+    "FERTILIZER": 250,
+    "WHEAT": 299,
+    "CARROT": 218,
+    "WOOL": 41,
+    "EGG": 345,
+    "MILK": 103,
+    "MELON": 102,
+    "STRAWBERRY": 220,
+    "TOMATO": 120
+   },
+   "animals_bought": {
+    "COW": 10,
+    "SHEEP": 3
+   },
+   "m_final_animals": {
+    "COW": 8,
+    "SHEEP": 1
+   },
+   "o_final_animals": {
+    "GOOSE": 12,
+    "COW": 3
+   },
+   "m_final_plants": {
+    "TOMATO": 3,
+    "STRAWBERRY": 6
+   },
+   "o_final_plants": {
+    "STRAWBERRY": 9,
+    "WHEAT": 11
+   },
+   "seed": 1839702094,
+   "midx": 1
+  },
+  "m4": {
+   "mrev": {
+    "WHEAT": 18335.0,
+    "FERTILIZER": 11927.0,
+    "WOOL": 12331.0,
+    "MILK": 29266.0,
+    "MELON": 16022.0,
+    "STRAWBERRY": 54351.0,
+    "TOMATO": 2952.0,
+    "CARROT": 306.0
+   },
+   "orev": {
+    "FERTILIZER": 12612.0,
+    "WHEAT": 11016.0,
+    "CARROT": 6100.0,
+    "WOOL": 7076.0,
+    "EGG": 8898.0,
+    "MILK": 26700.0,
+    "MELON": 15961.0,
+    "STRAWBERRY": 39580.0,
+    "TOMATO": 13035.0
+   },
+   "munits": {
+    "WHEAT": 498,
+    "FERTILIZER": 201,
+    "WOOL": 80,
+    "MILK": 293,
+    "MELON": 71,
+    "STRAWBERRY": 287,
+    "TOMATO": 42,
+    "CARROT": 8
+   },
+   "ounits": {
+    "FERTILIZER": 198,
+    "WHEAT": 318,
+    "CARROT": 163,
+    "WOOL": 55,
+    "EGG": 167,
+    "MILK": 194,
+    "MELON": 96,
+    "STRAWBERRY": 222,
+    "TOMATO": 180
+   },
+   "animals_bought": {
+    "COW": 14,
+    "SHEEP": 3
+   },
+   "m_final_animals": {
+    "COW": 9
+   },
+   "o_final_animals": {
+    "SHEEP": 1,
+    "COW": 4,
+    "GOOSE": 5
+   },
+   "m_final_plants": {
+    "TOMATO": 3
+   },
+   "o_final_plants": {
+    "TOMATO": 3,
+    "WHEAT": 9,
+    "STRAWBERRY": 3,
+    "CARROT": 2
+   },
+   "seed": 302635704,
+   "midx": 1
+  },
+  "m5": {
+   "mrev": {
+    "WHEAT": 19051.0,
+    "FERTILIZER": 9777.0,
+    "WOOL": 6840.0,
+    "MILK": 9567.0,
+    "MELON": 16295.0,
+    "EGG": 5959.0,
+    "STRAWBERRY": 56455.0,
+    "TOMATO": 1856.0,
+    "CARROT": 4587.0
+   },
+   "orev": {
+    "FERTILIZER": 13468.0,
+    "WHEAT": 10717.0,
+    "CARROT": 8411.0,
+    "WOOL": 4134.0,
+    "EGG": 16208.0,
+    "MILK": 6578.0,
+    "MELON": 15716.0,
+    "STRAWBERRY": 47003.0,
+    "TOMATO": 11661.0
+   },
+   "munits": {
+    "WHEAT": 496,
+    "FERTILIZER": 142,
+    "WOOL": 62,
+    "MILK": 160,
+    "MELON": 72,
+    "EGG": 113,
+    "STRAWBERRY": 293,
+    "TOMATO": 26,
+    "CARROT": 108
+   },
+   "ounits": {
+    "FERTILIZER": 212,
+    "WHEAT": 285,
+    "CARROT": 209,
+    "WOOL": 33,
+    "EGG": 309,
+    "MILK": 90,
+    "MELON": 96,
+    "STRAWBERRY": 259,
+    "TOMATO": 161
+   },
+   "animals_bought": {
+    "COW": 7,
+    "SHEEP": 3,
+    "GOOSE": 3
+   },
+   "m_final_animals": {
+    "COW": 6,
+    "GOOSE": 3
+   },
+   "o_final_animals": {
+    "COW": 2,
+    "GOOSE": 10
+   },
+   "m_final_plants": {
+    "TOMATO": 3,
+    "STRAWBERRY": 5,
+    "WHEAT": 1
+   },
+   "o_final_plants": {
+    "CARROT": 5,
+    "WHEAT": 4,
+    "TOMATO": 5,
+    "STRAWBERRY": 8
+   },
+   "seed": 1054156924,
+   "midx": 1
+  },
+  "m6": {
+   "mrev": {
+    "WHEAT": 13646.0,
+    "FERTILIZER": 12161.0,
+    "WOOL": 18913.0,
+    "MILK": 31744.0,
+    "MELON": 14005.0,
+    "STRAWBERRY": 36795.0,
+    "TOMATO": 5087.0,
+    "CARROT": 930.0
+   },
+   "orev": {
+    "WHEAT": 27523.0,
+    "FERTILIZER": 13862.0,
+    "WOOL": 20244.0,
+    "MILK": 30035.0,
+    "MELON": 13711.0,
+    "STRAWBERRY": 22302.0,
+    "CARROT": 3400.0
+   },
+   "munits": {
+    "WHEAT": 489,
+    "FERTILIZER": 210,
+    "WOOL": 111,
+    "MILK": 295,
+    "MELON": 72,
+    "STRAWBERRY": 248,
+    "TOMATO": 69,
+    "CARROT": 30
+   },
+   "ounits": {
+    "WHEAT": 916,
+    "FERTILIZER": 267,
+    "WOOL": 137,
+    "MILK": 257,
+    "MELON": 60,
+    "STRAWBERRY": 160,
+    "CARROT": 105
+   },
+   "animals_bought": {
+    "COW": 13,
+    "SHEEP": 4
+   },
+   "m_final_animals": {
+    "COW": 9
+   },
+   "o_final_animals": {
+    "COW": 9,
+    "SHEEP": 4
+   },
+   "m_final_plants": {
+    "TOMATO": 3
+   },
+   "o_final_plants": {
+    "WHEAT": 5
+   },
+   "seed": 1330453307,
+   "midx": 1
+  },
+  "m7": {
+   "mrev": {
+    "WHEAT": 14550.0,
+    "FERTILIZER": 11490.0,
+    "WOOL": 29058.0,
+    "MILK": 10494.0,
+    "MELON": 16945.0,
+    "EGG": 6872.0,
+    "STRAWBERRY": 36409.0,
+    "CARROT": 11971.0,
+    "TOMATO": 793.0
+   },
+   "orev": {
+    "FERTILIZER": 13225.0,
+    "WHEAT": 14127.0,
+    "CARROT": 13517.0,
+    "WOOL": 19847.0,
+    "EGG": 12159.0,
+    "MILK": 9854.0,
+    "MELON": 14268.0,
+    "STRAWBERRY": 26462.0,
+    "TOMATO": 2070.0
+   },
+   "munits": {
+    "WHEAT": 394,
+    "FERTILIZER": 217,
+    "WOOL": 197,
+    "MILK": 130,
+    "MELON": 78,
+    "EGG": 158,
+    "STRAWBERRY": 198,
+    "CARROT": 264,
+    "TOMATO": 12
+   },
+   "ounits": {
+    "FERTILIZER": 222,
+    "WHEAT": 415,
+    "CARROT": 303,
+    "WOOL": 130,
+    "EGG": 281,
+    "MILK": 129,
+    "MELON": 84,
+    "STRAWBERRY": 148,
+    "TOMATO": 32
+   },
+   "animals_bought": {
+    "COW": 5,
+    "SHEEP": 9,
+    "GOOSE": 4
+   },
+   "m_final_animals": {
+    "COW": 4,
+    "GOOSE": 4,
+    "SHEEP": 3
+   },
+   "o_final_animals": {
+    "GOOSE": 8,
+    "SHEEP": 2,
+    "COW": 4
+   },
+   "m_final_plants": {
+    "TOMATO": 2,
+    "STRAWBERRY": 1,
+    "CARROT": 1
+   },
+   "o_final_plants": {
+    "WHEAT": 2,
+    "CARROT": 1,
+    "STRAWBERRY": 3
+   },
+   "seed": 1889174384,
+   "midx": 1
+  }
+ }
+}

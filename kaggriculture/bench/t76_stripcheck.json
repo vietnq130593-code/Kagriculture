@@ -1,0 +1,38 @@
+{
+ "a": "v16",
+ "b": "/tmp/v16_original_backup.py",
+ "seeds": "336-337",
+ "wins": 0,
+ "games": 4,
+ "avg_a": 66257.0,
+ "avg_b": 66257.0,
+ "gap": 0.0,
+ "median_ratio": 1.0,
+ "worst_ratio": 1.0,
+ "tag": "strip-equivalence",
+ "rows": [
+  {
+   "seed": 336,
+   "a_seat0": 71960.0,
+   "b_seat1": 71960.0,
+   "b_seat0": 71960.0,
+   "a_seat1": 71960.0,
+   "a_avg": 71960.0,
+   "b_avg": 71960.0,
+   "gap": 0.0,
+   "ratio": 1.0
+  },
+  {
+   "seed": 337,
+   "a_seat0": 60554.0,
+   "b_seat1": 60554.0,
+   "b_seat0": 60554.0,
+   "a_seat1": 60554.0,
+   "a_avg": 60554.0,
+   "b_avg": 60554.0,
+   "gap": 0.0,
+   "ratio": 1.0
+  }
+ ],
+ "fails": []
+}

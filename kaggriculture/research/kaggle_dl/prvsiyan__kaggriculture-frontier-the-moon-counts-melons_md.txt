@@ -1,0 +1,210 @@
+# Kaggriculture Frontier | The Moon Counts Melons
+
+## A livestock decision you can inspect, edit, and test
+
+Version 39 packages **V232Late**, a bounded cattle substitution on the feed baseline. It waits until the third shop is visible before changing a scheduled sheep purchase to cows. The complete source, 13 editable production plans, comparison agents, public cash auditor, and reproducible failures are included.
+
+The six default games include a repaired milk loss, an unresolved wool-production loss, and a related strategy where waiting avoids the early-switch regression, each in both seats. Read the evidence in section 13 before interpreting the results. This research candidate has no verified public rating at publication preparation; historical score badges belong to their submitted versions. Local wins and large margins cannot establish a competition rating.
+
+To use this notebook: run all cells, inspect `main.py` and `actions.json`, change one rule or plan, rerun the rebuild and demonstrations, then download `submission.tar.gz`. Packaging does not spend submission quota. The earlier feed policy remains available as `feed_baseline.py` and an editable `feed_experiment.py`.
+
+
+---
+
+## 1. Read and edit the agent
+
+The default combines two small changes after step 144. First, requested sales move ahead of hires and purchases, preserving sale order and earlier purchases of the same item. Second, the existing one-turn sale advancement also runs on town-consumption ticks. It retains inventory checks, excludes wheat and fertilizer from advancement, and stops at the next route boundary. Neither rule reads future observations or identifies an opponent.
+
+The alternatives are included as complete files: `baseline.py`, `order_only.py`, and `advance_only.py`. Inspect the readable functions below; edit `AGENT_SOURCE`, `PLANS`, or `ROUTE_MAP`, then rerun the rebuild cell. The compressed plans are unpacked into an editable `actions.json`.
+
+The current default also buys a bounded shortage of wheat when an already scheduled next-turn pickup would otherwise fail. It changes no worker route. Inspect `_v226_topup` near the end of the readable policy.
+
+The added livestock rule is `_v231_controller`: only steps216–227, at least three visible shops including two milk consumers, no Yarn Store, milk price at least wool, a compatible herd and no unresolved animal delivery. It converts at most four confirmed purchases, follows each cow through pickup and placement, and bounds extra milk sales by physically harvested stock. The prefix names are retained from the earlier experiment; the later gate is the policy change.
+
+
+---
+
+## 2. Historical timing comparisons
+
+This section reports the earlier timing agent, now preserved in `timing_baseline.py`. The current feed agent is assessed in section 9.
+
+The first six discovery histories were selected to explain known failures. The next 348 controls were frozen before testing this combined version. All 360 games had complete callbacks, reconciled executed cash totals, and matching physical farm states at shared checkpoints. All 44 active investments harvested and sold 80 tomatoes. The nine later public histories below were collected separately and checked by reproducing both rewards of the actual deployed source.
+
+Raw replay opponents cannot replan after our action changes. Guarded rank routes are stress controls, not recovered private top-ten agents. The two fresh reacting sources are related. Keep these panels separate and use new opponents and seeds for your own conclusions.
+
+
+---
+
+## 3. Why selling earlier can win or lose
+
+The shared market quotes and executes orders sequentially. In one diagnosed public history, both players sold 161 wool, 245 milk and 249 strawberries, but our parent earned 3,814 less from those three products. Sale ordering and timing explained much of the gap. Yet the guarded rank-three case changed from +80 to −532: strawberry revenue fell 578 with unchanged quantity. Earlier is not always better, because town demand can raise tomorrow's quote.
+
+The engine also has an easily missed rule: **a sale at $1 disposes of goods without increasing market supply**. A market observer that counts every sale as added supply will be wrong. Our reconstruction of past net supply matched 86,268 included product transitions after excluding dawn and ambiguous floor cases. That validates accounting only; it does not predict the next rival sale. The method and failed initial check are downloadable below.
+
+The newer +391 to −18 regression had unchanged executed quantities. Our cash fell 577 and the rival's fell 168; 354 of our decline came from wool revenue. The positive aggregate result does not remove this failure. We subsequently tested two predictors of competing supply. Both failed their checks; section 8 gives the results.
+
+
+---
+
+## 4. Reproduce six complete games
+
+These diagnostics use public episode 107426389 (the milk loss repaired by the later switch), episode 107442173 (the severe wool-production loss remains), and the related Aurax implementation at the regression seed 9413601 (the later switch stays inactive). Both seats must complete 719 decisions and match both recorded rewards when the source is unedited. Edited policies produce new measurements. None of these selected examples is a population sample.
+
+
+---
+
+## 5. Package the agent you just tested
+
+This creates a deterministic archive containing exactly one root `main.py`. It does not submit anything to Kaggle or spend submission quota. After editing, rerun the source rebuild and the demonstrations before packaging.
+
+
+---
+
+## 6. Run paired experiments after an edit
+
+Enable a switch in the fixture setup cell, then run the following cell. The 636-game public-history panel and 96-game reacting panel compare the current `main.py` with `timing_baseline.py`. The 48-game timing ablation panel is retained as historical research and uses the separate baseline files. These are optional long runs. Inspect newly lost wins and both players' rewards rather than selecting by average margin.
+
+
+---
+
+## 7. Four grain, 27 milk, still a loss
+
+One guarded route drawn from a current rank-five public episode exposed a physical failure. At callbacks 171 and 195, our workers requested two wheat units from an empty shed and received none. Four subsequent feed commands had no wheat available; a cow eventually escaped after two unfed days. Eight cows were purchased, but only 218 milk were produced, harvested and sold.
+
+The **V226A feed repair**, now included in the default agent, forecasts the next wheat pickup using our own existing worker positions, pending commands and current plan. It buys only the full shortage, bounded to four units per turn and eight per day, with cash and shed-room checks. It skips dawn, route boundaries, conflicting purchases and the final day. Worker commands and routes stay unchanged. It uses no rival identity, hidden seed, rival private stock or future observations.
+
+In both diagnosed seats, buying four grain across two turns removed the missing pickups and failed feeds. The cow survived; **245 milk were produced, harvested and sold**, with no milk discarded. The margin improved from **−11,816 to −2,566**, so both games remained losses. The improvement was not solely milk revenue: our reward rose 6,735, the rival's fell 2,515, and our milk revenue rose 5,137. Every changed cashflow is shown below.
+
+The eight discovery games had **two wins and six losses both before and after**. Six zero-purchase controls reproduced both rewards and terminal states exactly. This is a verified repair of one failure mechanism, not a demonstrated public-score improvement. An independent editable copy remains in `feed_experiment.py`. The dated 474-cell transfer comparison below is retained for reproducibility. Section 9 adds the completed fresh comparison and later public histories.
+
+### A win caused by a larger rival decline
+
+Public-history control 107191256 changed from −1,158 to +3,018 in both seats. It also bought four extra grain and sold 27 more milk. Yet **our milk revenue fell 1,231 and our final reward fell 912**. The rival sold exactly the same quantities as before, but its final reward fell 5,088. Shared-market repricing explains the improved relative outcome; describing it as a higher-income farming strategy would be wrong. The complete executed-unit and cash deltas are in the downloadable report. This case has sales accounting, not the full animal-production trace used for the rank-five diagnosis.
+
+The optional twelve-game rerun below compares `timing_baseline.py` and the editable feed experiment on the rank-five case, timing regression 107191723, and newly gained win 107191256, both seats. These are explanatory fixtures. After editing, use new cases and seeds to assess generalization.
+
+A separate current-population refresh tested the earlier timing agent against newly collected guarded routes: 34 wins and six losses in the top-ten panel versus the parent's 30 and ten; 28 wins and four losses at lower ranks versus 26 and six. Those routes can reproduce observed plans and guarded continuations, but are not the private reacting code of the current top ten. The complete dated report is included in `feed_research.json`.
+
+
+---
+
+## 8. Why the supply predictors were rejected
+
+Correctly reconstructing past market flow does not mean predicting the next sale. We tried using positive rival supply from 24 callbacks earlier. Across 45,277 scored predictions, precision was 28.06% and recall 13.99%. Accuracy looked high at 96.38%, but predicting no supply event every time scored 97.03%. Another 3,023 ambiguous predictions were left unscored.
+
+We also tracked publicly visible harvests and the worker's later return to the shed. On 21 already observed histories, this potential-delivery observer reached 42.90% precision and 23.82% recall. Its 96.44% accuracy again fell below the always-no-event baseline of 96.70%. It cannot observe private cargo directly.
+
+A candidate that used this observer to gate the timing rule gained two wins and lost two in 42 discovery games. Both agents won 31 games, but the candidate's mean margin fell from 5,240.98 to 3,885.83 and its worst margin fell from −2,890 to −3,495. We rejected it as a replacement. These results do not show that every possible delivery predictor will fail; they show that these particular signals did not support this particular change.
+
+One further trap is duplicate opponents. Dynamic Route Agent contained exactly the same agent and plans as Aurax v2. Most Powerfull Route duplicated the SevenTurnWide runtime and settings; only JSON whitespace differed. The additional Evgen chassis has different reactive code but all 13 plans match Shop0909. Different notebook titles should not inflate the apparent diversity of a benchmark.
+
+For your next experiment, record actual purchases, pickups, production, sales and both final rewards. Separate an avoided loss of goods from a newly won game, keep the regressions, and identify which opponent implementations share their production plans.
+
+
+---
+
+## 9. Why the feed repair became the baseline
+
+The four-grain repair passed the retained comparisons without losing a parent win in any panel. On 318 selected public cells it gains four mirrored wins over the timing baseline. These are two histories, not four independent discoveries. Later public batches are included; no unfavorable case was removed.
+
+The new reacting comparison was 48–0 for both agents with identical rewards and terminal states. The feed rule never activated there. That is useful regression evidence and provides no active confirmation of the repair. The source review excluded notebooks that duplicated existing implementations under different titles.
+
+Separate crop research also produced a warning: a carrot controller grew and sold all 150 additional carrots, yet worsened a newly collected loss from 5,936 to 8,978. Another selected history improved from a 3,545 loss to a 2,571 win while our own cash fell. The crop controller remains experimental; higher production and a perfect selected record cannot justify promotion by themselves.
+
+Credits and licenses are retained in the source files: [Aurax Reactive Router v2](https://www.kaggle.com/code/aurax7/kaggriculture-shop-router-reactive-v2), [Market Smart Farming](https://www.kaggle.com/code/tetsutani/market-smart-farming-kaggriculture), the Shop0909 plans and SevenTurn implementation credited in those agents, and [Kaggle's official engine](https://github.com/Kaggle/kaggle-environments).
+
+For the crop and labor mechanisms, see [The Soil Remembers Rain](https://www.kaggle.com/code/prvsiyan/kaggriculture-frontier-the-soil-remembers-rain). If this lab helps your experiments, an upvote is appreciated. Testing a new hypothesis and sharing its failures as well as improvements makes the discussion more useful for everyone.
+
+
+---
+
+## 10. Audit a loss before changing the policy
+
+In public episode **107426389**, Soil's submitted carrot agent lost by **4,253**. No added carrot plot, tomato plot, or emergency grain purchase activated. Moon's baseline matches all **719** recorded actions, so this is shared-policy evidence.
+
+The rival sold **420 milk** to our **245**, earning **35,960 more from milk**, plus **9,087 from tomatoes**. Our higher strawberry, wheat, and wool receipts and lower expenses did not cover that gap. This supports investigating productive capacity; it does not prove that copying the rival's twenty-cow schedule would work.
+
+Other public losses look different. In episode **107436133**, both farms sold 161 wool, 249 strawberries and 245 milk, yet our sale proceeds were lower. Episode **107435114** combines a wool quantity deficit (253 versus 281 sold) with a carrot deficit (84 versus 155). A single “buy more animals” rule would not explain every loss.
+
+The table and charts below use executed trades, including capital and hiring costs. Both cash balances were checked against the next public observation on every turn. The accounting method also matched every event in an independently recorded full-engine ledger for a separate episode. These remain descriptive accounts, not counterfactual estimates.
+
+
+---
+
+### Use the same auditor on a downloaded public episode
+
+Attach a public episode JSON as notebook input and set `PUBLIC_REPLAY_PATH` below. The exported `public_cash_audit.py` calls the official worker and market code separately for each recorded starting observation. It checks **both cash transitions for all 719 turns** and both private states outside dawn, and records successful sales, purchases, hiring, and land acquisition.
+
+It deliberately does not roll the entire game forward or reconstruct random dawn events. Its role is to explain executed public cash flows quickly. Both players' recorded private inventories are used for offline accounting only; they are not inputs to the submitted agent. Agent decision rules must use only the information available in their own observation.
+
+
+---
+
+## 11. Editable cattle discovery arms
+
+These are **unsubmitted experimental policies**, not a replacement for the default agent or a claimed improvement. They test whether changing up to two or four scheduled sheep purchases to cows can help when the currently visible shops favor milk. Purchases, pickup, placement, harvest accounting, and sale capacity form one coherent change.
+
+The gate requires at least two currently unlocked milk-consuming shops, no Yarn Store, milk price at least wool price, and a compatible existing herd. Purchases must be confirmed before workers are redirected. Travel, pasture construction, care, feeding, harvest visits, and hiring stay on the base schedule. Extra milk is sold only at an existing sale slot, bounded by tracked extra harvest and available stock.
+
+Mechanical checks passed on a day-eight segment: both variants bought, picked up, and placed two cows, handled failed and partial purchases, and respected extra-sale limits. The cap is an upper bound; unresolved animal delivery can prevent later substitutions. Full-game evidence and broad confirmation are separate requirements. Historical livestock experiments on an older base do not transfer their win records to these agents.
+
+Run the next cell to write `cattle_cap_2.py` and `cattle_cap_4.py`. Edit either file, then enable the final benchmark cell. The 24 jobs compare both arms with the unchanged feed baseline on four selected public histories in both seats. The supplied rival action schedules are diagnostic controls, not recovered adaptive opponents. This small discovery set cannot establish a population win rate.
+
+
+---
+
+### Completed discovery results — September 10, 2026
+
+The table below records **24 completed full games** with the official engine: four selected public histories, two seats, and three policies. The feed baseline went **6–2**; each cattle variant went **8–0**. On the motivating loss, the margin changed from **−4,253** to **+9,138** with cap two and **+15,060** with cap four, in both seats. Both variants retained the six control wins.
+
+**Eight wins are not eight independent opponent families, and this is not an estimated 100% public win rate.** These histories were selected for diagnosis, the motivating loss helped define the experiment, and the rival schedules are fixed. Broad public-loss and fresh opponent confirmation remain necessary before changing the default or submitting either arm.
+
+Verification checked all 719 source actions per experimental game, both cash ledgers, actual cow purchases, pickups and placements, milk harvest and mass balance, bounded extra sale requests, and exact parent equivalence where the branch stayed inactive. A pre-run export error was fixed with a final callable alias; the policy rules were unchanged, and the original rejected files produced no full-game scores.
+
+
+---
+
+## 12. Keep the negative evidence visible
+
+The additional overnight comparison completed **648 full games** across **81 public histories** in both seats. The following are selected replay controls, not a population sample:
+
+| Public history group | Earlier B control | Earlier feed baseline A | Carrot variant V229 |
+| --- | ---: | ---: | ---: |
+| 44 Soil histories, 88 cases each | 61 wins / 25 losses / 2 ties | 80 wins / 8 losses | 80 wins / 8 losses |
+| 37 Moon histories, 74 cases each | 61 wins / 11 losses / 2 ties | 69 wins / 5 losses | 69 wins / 5 losses |
+
+In the Moon group, A turned ten B non-wins into wins but lost two other B wins; its worst margin was **−1,752**, versus B's **−1,274**. In the Soil group, A's worst margin was **−26,296**. V229 added no wins in either group. These failures remain part of the evidence even when an average improves.
+
+A newer actual Soil loss, episode **107442173**, finished at **−27,840**. Our farm sold **294 wool** against **417**, with **29,964 less wool revenue**, and **66 carrots** against **195**, with **6,868 less carrot revenue**. No experimental carrot or tomato expansion activated. This is a different production deficit from the milk case, and cattle substitution is not established as its repair.
+
+**Dated public snapshot, September 10 at 10:49 UTC:** Soil 33 had rating **1828.4**, 27 wins and two losses; Soil 32 had **2282.2**, 24 wins and five losses. Moon 37's submitted default was inactive after three wins, with historical score **872.7**. Kaggle keeps the latest two submissions active; notebook score badges may refer to earlier versions. These numbers do not establish a completed rating above 3000 or a score for the cattle experiments.
+
+Useful extensions: audit one of your own public losses, compare executed quantities with sale prices, and change a single coherent production or market rule. Keep losing cases, use both seats, and record the source hash alongside every result. If the notebook helps your work, an upvote is appreciated.
+
+
+---
+
+## 13. Waiting for information has a measurable cost
+
+The early cattle switch looked excellent in its four-history discovery. The broader 204-case transfer then gained ten parent wins and lost six. All six regressions came from one seed across three related implementations: the third shop was Yarn, after early conversions had already reduced wool production. On one seat, our own cash fell 7724 while the rival's fell 4025. Lowering the cap to two would not fix that case: only two cows had been substituted already.
+
+The later rule waits until step 216 and at least three shops are visible. It retained the six related wins and repaired the original milk loss from−4253 to+3331 in both seats. Its14–0 discovery record covers four selected milk histories and the shared regression seed; it is not fourteen independent discoveries.
+
+On six newer public losses in both seats, the parent and later switch both finished2 wins/10 losses. The milk deficit in episode 107442106 improved from−19318 to−13711 with the later rule, versus−3075 with the early rule. Waiting preserves wool when Yarn appears but gives up some earlier milk production. The−27840 wool-production failure remains unresolved. No losing case was removed.
+
+### Inspect the paired records and fresh comparison
+
+The table separates discovery, newer loss diagnostics, and the prospective fresh panel. The fresh panel uses 36 public routes from ranks1–10 and eight lower ranks, both seats, and one new seed. There are 32 source episodes and 30 distinct worker schedules, so route labels overstate independent evidence. The earlier C4 fresh protocol was preserved and deferred; this separate A-versus-later comparison was frozen before any fresh outcome.
+
+The completed fresh comparison: feed baseline 60 wins/12 losses, later switch 60 wins/12 losses, with 0 wins gained and 0 lost. Mean margin changed from 27,296.08 to 28,217.31; worst margin from -4,174 to -4,174. These are paired stress-control results. A higher mean without additional wins is not evidence of a higher Kaggle rating. The later rule is a public experiment motivated by its discovery repair and retained controls, rather than a proven broad win-rate improvement.
+
+
+---
+
+### Why a113705 margin is not a rank-one victory
+
+One frozen control derived from the then rank-one team finished with 56297 cash, while its actual public source episode finished with 106039. In the simulated control, the land purchase at step 150 failed; the first successful expansion came at 245. It sold 36 wool instead of the original195,64 strawberries instead of 253, and 108 milk instead of 180. Both cash ledgers were audited. The original and simulation have different seeds, markets and opponents, so their difference is not a causal effect of our policy. This control does not recover the team's private adaptive code. We retain the result as a stress test, and do not use it as evidence that we beat that team.
+
+The latest public losses also include an egg-production deficit (78 eggs sold versus270), a cow lost after unfed days, and price differences despite equal production. Useful next experiments should address those distinct mechanisms. Public episodes provide the decision points; full counterfactual games test the repair; actual public submissions determine its rating.
+
+If these tools help you understand a loss or improve your own agent, an upvote is appreciated. The most useful contributions are reproducible comparisons, including the cases that still fail.

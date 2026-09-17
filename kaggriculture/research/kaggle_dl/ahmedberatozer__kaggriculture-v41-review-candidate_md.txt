@@ -1,0 +1,233 @@
+--- CELL 0 (markdown) ---
+# Kaggriculture V41 — Review Candidate
+
+**The original competitive protocol did not pass every gate.** This source beat
+V39 and V40 in all 128 new direct games against each, and gained 110 wins over V39
+in 3,200 independent games against working public policies. On 352 new current-elite
+records it gained 20 wins, but the 95% team-level point interval was −1.14 to +12.22
+percentage points. That confidence gate remains FAILED; no sample was redrawn.
+
+This notebook produces a technically validated REVIEW archive for an informed
+live-test decision. It is not a claim of certain superiority or a 2800+ rating.
+The full results below include the failed gate and lower public cash/margins.
+Running the notebook does not submit the agent to Kaggle.
+
+
+V41 builds on our V39 agent. It combines Rayk Kretzschmar's public opening
+sequence with rules that make the farming plan depend on available cash,
+seeds and food. The objective is to win more matches; income and winning
+margin are measured separately and may move in different directions.
+
+The agent reserves the next morning's worker budget and keeps planting
+requests within the seeds already owned. It can fund urgent wheat purchases
+while preserving existing purchases and hires. An animal must have food
+before its feeding action: an idle worker can collect it early, or a pickup
+immediately after an unfunded feeding action can be moved before that feed.
+The following observation confirms that the expected supplies arrived.
+
+Market funding uses conservative price bounds. A first sale may finance later
+orders only with products already in the shed after the current field actions.
+Expected future harvests do not count as cash. Before dawn, the agent avoids
+planting a seed that would die immediately without same-turn watering.
+
+Validation includes games against running public policies, comparisons with
+V39 and V40, and replay-based checks against elite opponents. Recorded actions
+cannot react to a changed game, so replay results alone do not establish a
+ladder advantage. The results below describe this exact source and its limits.
+
+Run all cells to produce `submission_competitive_v41_REVIEW.tar.gz`. The notebook
+contains the full source as plain text. Its default build needs no GPU,
+installation, download or attached input and does not train or play games.
+Set `RUN_GAME_CHECKS = True` to run four optional complete-game checks with
+the official engine. Source and archive hashes verify the output files.
+
+No live ladder score is guaranteed.
+
+
+--- CELL 1 (markdown) ---
+## Start the build
+
+
+--- CELL 3 (markdown) ---
+## Write the complete agent
+
+
+--- CELL 5 (markdown) ---
+## Verify source and entry point
+
+
+--- CELL 7 (markdown) ---
+## Build the submission archive
+
+
+--- CELL 9 (markdown) ---
+## Optional: run complete games
+
+
+--- CELL 11 (markdown) ---
+# V41 review candidate — complete results
+
+Exact source SHA-256: `8951ff93742015cba535b125223cf2e541bb7b602080fc4584f30c2613d210f3`.
+
+V39 is the primary reference following the reported live regression in V40. The protocol was frozen before candidate game outcomes. The original competitive protocol FAILED its current-elite point-confidence gate. Technical checks passed. This is a REVIEW CANDIDATE, not a fully qualified release or a guaranteed live ladder upgrade. No failed sample was redrawn.
+
+| Cohort | Agent | W/L/T | Win rate | Mean score margin |
+|---|---|---:|---:|---:|
+| Development, all 1,859 | V41 | 1327/532/0 | 71.382% | +14,323.390 |
+| Development, all 1,859 | V39 | 1242/617/0 | 66.810% | +11,536.082 |
+| Development, all 1,859 | V40 | 1353/506/0 | 72.781% | +12,764.639 |
+| Development, strong 1,744 | V41 | 1222/522/0 | 70.069% | +13,589.892 |
+| Development, strong 1,744 | V39 | 1143/601/0 | 65.539% | +11,421.079 |
+| Development, strong 1,744 | V40 | 1249/495/0 | 71.617% | +12,642.045 |
+| Older live 115 | V41 | 105/10/0 | 91.304% | +25,447.043 |
+| Older live 115 | V39 | 99/16/0 | 86.087% | +13,280.139 |
+| Older live 115 | V40 | 104/11/0 | 90.435% | +14,623.800 |
+| Working public, 800 | V41 | 750/50/0 | 93.750% | +27,421.755 |
+| Working public, 800 | V39 | 740/60/0 | 92.500% | +35,051.665 |
+| live_v39 | V41 | 110/3/0 | 97.345% | +31,460.062 |
+| live_v39 | V39 | 93/18/2 | 82.301% | +11,062.761 |
+| live_v40 | V41 | 50/0/0 | 100.000% | +33,281.740 |
+| live_v40 | V39 | 47/3/0 | 94.000% | +31,669.480 |
+| Consumed direct vsv39 | V41 | 16/0/0 | 100.000% | +24,177.500 |
+| Consumed direct vsv40 | V41 | 16/0/0 | 100.000% | +23,220.312 |
+| Independent direct vsv39 | V41 | 128/0/0 | 100.000% | +24,999.742 |
+| Independent direct vsv40 | V41 | 128/0/0 | 100.000% | +24,582.656 |
+| Independent working public, 3,200 | V41 | 3144/56/0 | 98.250% | +29,061.645 |
+| Independent working public, 3,200 | V39 | 3034/166/0 | 94.812% | +34,247.138 |
+| New current elite records | V41 | 218/134/0 | 61.932% | +18,013.750 |
+| New current elite records | V39 | 198/154/0 | 56.250% | +12,333.014 |
+| New current elite records | V40 | 223/129/0 | 63.352% | +13,048.759 |
+| historical_top | V41 | 115/5/0 | 95.833% | +20,718.000 |
+| historical_opp | V41 | 146/4/0 | 97.333% | +19,518.540 |
+| arena | V41 | 108/0/0 | 100.000% | +14,585.852 |
+| thomas955 | V41 | 12/0/0 | 100.000% | +8,721.083 |
+
+## Paired changes and uncertainty
+
+Point differences count a draw as half a win. Intervals resample whole teams for recorded elite cohorts and whole worlds for reacting public cohorts; they do not treat repeated games within a cluster as independent. All cash and margin changes, including negative values, are shown.
+
+| Comparison with V39 | Point gain | 95% point interval | Own cash change | 95% cash interval | Margin change | 95% margin interval |
+|---|---:|---|---:|---|---:|---|
+| Strong development | +4.530pp | [+0.215, +9.091]pp | +504.647 | [-2,641.119, +3,490.795] | +2,168.814 | [-3,313.921, +8,288.260] |
+| Consumed working public | +1.250pp | [-3.000, +4.250]pp | -6,054.376 | [-9,306.045, -3,037.885] | -7,629.910 | [-9,281.423, -6,007.675] |
+| Independent working public | +3.438pp | [+2.750, +4.094]pp | -2,216.125 | [-3,659.069, -902.330] | -5,185.493 | [-6,297.578, -4,146.310] |
+| New current elite | +5.682pp | [-1.136, +12.216]pp | +3,098.037 | [+1,095.043, +5,139.480] | +5,680.736 | [+942.108, +11,381.852] |
+
+Point changes and their intervals use percentage points. Income and margin are diagnostics under the prospectively declared WIN-primary objective. Earlier variants rejected under stricter cash criteria remain rejected; their results were not relabeled as passes.
+
+All 128 direct games against each exact baseline were won. A resampling interval degenerates to [1,1] when every observed world succeeds; it does not imply certainty about future matches. For 64 independent worlds won in both seats, the exact two-sided 95% binomial lower bound is 94.399%. These statements concern the two tested policies, not arbitrary ladder opponents.
+
+The independent working-policy sample was one predeclared draw: 64 worlds in both seats against V39 and V40, plus 32 other worlds against all 50 public policies. No failed sample was redrawn. New current-elite records were selected once by rating, eligibility and recency, with all prior episodes and worlds excluded. Recorded actions cannot react to a changed opening, so these are auxiliary results rather than tests of unavailable private policy code.
+
+## Physical and execution checks
+
+All 1,859 development pairs used exact official-engine cash, all nine product ledgers and both rewards. Raw candidate thirst deaths: 1859; V39: 3611. Candidate planned replacements: 1859. Raw feed shortfalls: 0 vs 138; pickup shortfalls: 0 vs 49; animal escapes: 0 vs 64.
+
+Inherited failures remain visible. The prospective physical rule permits only an empty mature ongoing crop whose next material action is a successful dig followed by an accepted different-crop planting within 24 steps. Any intervening harvest, watering or fertilization, positive yield, immaturity or failed replant rejects the exception. All raw deaths are retained. EXP258 failed its earlier literal rule and remains a failed study. This classifier does not alter agent actions.
+
+The current elite cohort also passed all 352 candidate and 352 control physical checks, with exact original comparison rewards, cash and all nine product ledgers. Candidate/control feed shortfalls: 0/24; pickup shortfalls: 0/6; animal escapes: 0/65; raw thirst deaths: 352/690. Candidate planned replacements: 352.
+
+An initial physical-audit run failed while constructing result metadata because the new cohort lacked a descriptive group field. Both candidate and control were affected. The invalid records were preserved; the runner supplied the label and repeated the same frozen sample in a separate directory. No agent source, game configuration, source selection or competitive result was changed.
+
+- runtime_windows: PASS; measured maximum callback 20.849ms, normal garbage collection enabled.
+- runtime_linux: PASS; measured maximum callback 22.869ms, normal garbage collection enabled.
+- fullgame_runtime: PASS; measured maximum callback 19.221ms, normal garbage collection enabled.
+- Full-game Linux replay: PASS; maximum callback 20.311ms.
+- Official-loader identity, immutable observations, all 64 ordered shop pairs, self-play and starter games passed.
+- 107 earlier artifacts remain unchanged. The default notebook contains the complete plaintext source and performs no downloads, installations or games.
+
+The latest public-Code audit was on 14 September at 00:29 Istanbul time and covered 493 references, excluding our account. MetaCounter R1 and the updated 74-vote Master Engine runtime matched V40. Adaptive Land Allocator was tested and did not provide evidence of a useful new capability. The newly updated Kaggriculture Utils V1 embedded exactly the previously reviewed Rayk low-pressure source already present in the public opponent panel; V41 won 63/64 independent games against that exact policy, with mean margin +509.953. The opening adapted from Rayk Kretzschmar remains explicitly credited.
+
+
+--- CELL 12 (markdown) ---
+# Attribution and license
+
+This agent retains Apache-2.0 notices in its source. Modified in EXP-167 on
+September 10, 2026 by Ahmed Berat Özer's Kaggriculture project.
+
+- [Dmitrii Gluzdov — Two Coins, One Sheep](https://www.kaggle.com/code/dmitriigluzdov/kaggriculture-two-coins-one-sheep-lb-2650): bounded two-turn stock reservations, protection of scheduled pickups, partial future-order deductions and placement after worker repairs. Adapted to our per-player chassis state and preserved terminal planner. Earlier seven-turn physical closure work is also retained through v31.
+- [prvsiyan — The Moon Counts Melons](https://www.kaggle.com/code/prvsiyan/kaggriculture-frontier-the-moon-counts-melons): the later cattle substitution controller. Earlier fertilizer/feed and tomato production work remains credited in v31's source.
+- [yhay81 — Shop Router 0909](https://www.kaggle.com/code/yhay81/shop-router-0909): thirteen public action schedules and ordered shop-pair routing; earlier ShopForge/Fieldbook lineage.
+- [aurax7 — Reactive Router](https://www.kaggle.com/code/aurax7/kaggriculture-reactive-router): sale timing and shed projection lineage.
+- thomastschinkel: replay-routing research and earlier foundation of this project; tetsutani: market, room and repair mechanisms credited in the retained source.
+- [destbreso — X-ray Your Agent](https://www.kaggle.com/code/destbreso/x-ray-your-agent): diagnostic methodology. Its notebook is not bundled as agent runtime.
+
+Other audited Codes appear in SOURCE_AUDIT.md and the evaluation panel; their
+presence there does not imply their code was incorporated. Credits do not
+imply author endorsement or a verified private-leader implementation.
+
+## EXP-168 changes (v34)
+
+- [lucifer19 — Harvest Nocturne](https://www.kaggle.com/code/lucifer19/harvest-nocturne-the-market-has-a-rhythm): occupied-tile similarity and exact price-loss ordering ideas/code, adapted and independently tested. Per-seat memory/reset replaces its single shared controller state.
+- [flexonafft — Most Powerfull Route](https://www.kaggle.com/code/flexonafft/kaggriculture-most-powerfull-route): requested source snapshot; its full executable bundle is byte-identical to Two Coins above. No new route or original capability is attributed to a renamed copy.
+- leoprovorov: public-layout comparison lineage credited by Nocturne.
+- [Kaggle official implementation](https://github.com/Kaggle/kaggle-environments/tree/master/kaggle_environments/envs/kaggriculture): Apache-2.0 market-price functions from version1.32.7; verified against local engine.
+
+All earlier in-source notices and the full Apache-2.0 license remain in main.py.
+This list implies no author endorsement. Exact incorporated switches appear
+in agent/manifest.json; unselected experiments are not claimed as improvements.
+
+## EXP-175–178 changes (v35, September 11, 2026)
+
+- [yhay81 — Shop Router 0911 Simple](https://www.kaggle.com/code/yhay81/shop-router-0911-simple): revised opening market-sequence idea. Our selected opening uses `BUY_PRODUCT WHEAT 13`, `BUY_PRODUCT WHEAT 30`, `SELL WHEAT 30`; it retains the earlier thirteen routes rather than adopting the donor's complete fourteen-route revision.
+- [leoprovorov — Two Coins at High Noon: Small Improvement](https://www.kaggle.com/code/leoprovorov/two-coins-at-high-noon-small-improvement): Mirror Counter's public cash-response mechanism. Adapted to the existing occupied-tile similarity guard and per-player state, requiring positive matching cash changes after a probe. Our fourth-turn reservation is an independently tested modification, not a claim about the donor's reported results.
+- [prvsiyan — The Soil Remembers Rain](https://www.kaggle.com/code/prvsiyan/kaggriculture-frontier-the-soil-remembers-rain): the already reviewed V234 six-sheep southeast expansion, including financing, confirmed hiring, feed, care and credited production. Adapted to our chassis state, combined telemetry and terminal-planner abstention. This capability is newly integrated here; the September 11 exported donor code itself is unchanged from the earlier reviewed version.
+- [lucifer19 — Harvest Nocturne V2](https://www.kaggle.com/code/lucifer19/harvest-nocturne-v2-a-lighter-start): audited startup and runtime packaging reference. Our chassis already shared read-only route data, so no new gameplay gain is attributed to its deep-copy removal.
+- [Nagata V6.2](https://www.kaggle.com/code/nagatakengo/kaggriculture): added as a reacting evaluation opponent. Its policy is not bundled in this submission.
+- [destbreso — X-Ray Your Agent](https://www.kaggle.com/code/destbreso/x-ray-your-agent) and [Georgy Mamarin — What 2600+ Farms Do Differently](https://www.kaggle.com/code/georgymamarin/kaggriculture-what-2600-farms-do-differently): whole-cohort and economic diagnostic references; no runtime code copied from these notebooks.
+
+Integration, public-response safeguards, experiment design, official-engine accounting checks and release packaging: Ahmed Berat Özer's Kaggriculture project. The complete agent retains its Apache-2.0 license and upstream notices. Exact source hashes and the distinction between incorporated code, evaluated opponents and diagnostics are recorded in `research44/SOURCE_AUDIT.md` and `research47/REPORT.md` in the project workspace.
+
+## EXP179–180 changes (V36, September 11, 2026)
+
+- [Tetsutani — Market Smart Farming](https://www.kaggle.com/code/tetsutani/market-smart-farming-kaggriculture): its updated four-turn configuration motivated this isolated extension of our existing Two Coins stock-reservation layer. V36 applies four turns within V35's physical stock, debt, purchase and terminal guards; farm routes and investment controllers are unchanged.
+- [Rayk Kretzschmar — Rank Your Agent](https://www.kaggle.com/code/raykkretzschmar/kaggriculture-rank-your-agent) and [Kunal Desale — Kaggriculture2026V1](https://www.kaggle.com/code/kunaldesale2408/kaggriculture-2026-v1): newly evaluated exported opponents. Their separate sale-order scoring ideas were screened and rejected as standalone modifications; those runtime policies and their route libraries are not incorporated into V36.
+- The September11 afternoon Flexon export hashes identically to V35; this differs from the older EXP168 snapshot described above. It supplies no new V36 capability.
+
+All earlier Apache-2.0 notices and the complete license remain in main.py. This 130-byte source extension, experiment design, accounting checks and packaging are by Ahmed Berat Özer's Kaggriculture project. Full provenance: research48/SOURCE_AUDIT.md and research49/REPORT.md. Credits imply no author endorsement.
+
+## EXP182–190 changes (V37, September 12, 2026)
+
+V37 retains V36's route library and all earlier source notices. The finite native-crop fertilizer planner, committed-parent priority guard, projected warehouse guard and exact-spawn cooperative tomato labor scheduler were developed and physically audited in this project. Earlier unsuccessful livestock and rival-flow experiments are not included. The latest public Code review is documented in research56/SOURCE_AUDIT.md; those updated analytical/data notebooks supplied no new executable policy to this release.
+
+All earlier Apache-2.0 notices, including thomastschinkel, yhay81 and destbreso, remain intact in main.py along with the full license. Evaluation, guards and packaging are by Ahmed Berat Özer's Kaggriculture project. Credits imply no author endorsement. See research59/REPORT.md for the mixed evidence and release-candidate status.
+
+
+## EXP193–217 changes (V38, September 12, 2026)
+
+- [Steven Lee Hans — Lord Momo Returns](https://www.kaggle.com/code/stevenleehans/kaggriculture-rank-580-lord-momo-returns): conceptual reference for comparing feed cost with production value and selling surplus fertilizer. Our implementation independently adds care-value accounting, the following-day feeding schedule check, actual carried-food checks, and a reserve for all remaining native and committed crop inputs. No guarantee about future feeding or monotone fertilizer prices is inherited from the donor narrative. Audited exported source SHA-256: `b5c2e156689b41cea5f2e1a0a1cae2e18fd70423931bbac0885bba8b2142c497`.
+- The exact-spawn finite-input tour planner, committed-parent fertilizer queue guard, conservative tomato fertilization margin test, next-day service simulation, whole-animal survival audit and integration are by Ahmed Berat Özer's Kaggriculture project. The source preserves the existing route and chassis lineage; tested mechanisms are identified by the frozen manifest.
+- [Pilkwang — Structured Economic Policy](https://www.kaggle.com/code/pilkwang/kaggriculture-structured-economic-policy), the Momo source and four other distinct exports were examined in the September 12 public refresh. Six new distinct policies entered the reacting panel; their inclusion as opponents does not mean their runtime was incorporated. Exact V37 duplicates were deduplicated. Complete review: `research84/SOURCE_AUDIT.md` in the project workspace.
+
+All earlier Apache-2.0 notices, including thomastschinkel, yhay81 and destbreso,
+remain in `main.py` with the full license. Credits imply no author endorsement.
+The final source, complete raw outcomes and frozen-source confirmation are
+documented in `research86/REPORT.md` and `research86/results/release_evidence.json`.
+
+
+## V39 consolidation — September 13, 2026
+
+Production-calendar feeding, bounded physical wheat replenishment, native-pickup
+coverage, stock reservation before saturated market turns and current-liability
+funding were developed in Ahmed Berat Özer's Kaggriculture project. V39 selects
+the unchanged combined EXP231 source after the requested candidate consolidation.
+All earlier credits and Apache-2.0 notices remain in main.py, including
+thomastschinkel, yhay81 and destbreso. Credits do not imply endorsement.
+
+The latest public inventory audit covered 485 references. Zhihuan Xue's
+Kaggriculture Timed Six Cow was reviewed and retained once as an evaluation
+opponent. None of its code was copied into this agent. Results and provenance
+are recorded in research100, research101 and research102.
+
+
+## V41 development attribution
+
+The V39 base and all embedded upstream notices are retained. The low-volume
+opening was adapted from Rayk Kretzschmar's public [Rank Your Agent notebook](https://www.kaggle.com/code/raykkretzschmar/kaggriculture-rank-your-agent).
+Funded atomic planting, first-slot grain funding and final-hour watering
+contracts were implemented by Ahmed Berat Ozer. Newly reviewed MetaCounter R1
+and Adaptive Land Allocator were evaluated as opponents; their agent source
+was not incorporated into this release.
+
+
+EXP259 owned-input preloading, adjacent pickup/feed ordering, conservative first-sale funding and observation confirmations were implemented by Ahmed Berat Özer. The planned-crop-retirement classifier belongs to validation tooling and is not agent behavior. Master Engine V3 was audited as a V40 runtime copy; its source was not incorporated. All Apache-2.0 license text and upstream notices remain in main.py.

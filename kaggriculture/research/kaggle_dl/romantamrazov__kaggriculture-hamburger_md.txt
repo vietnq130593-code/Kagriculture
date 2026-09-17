@@ -1,0 +1,63 @@
+# Kaggriculture | V27 Internal Economy Lab
+
+---
+
+## Key correction
+
+The official interpreter processes the action for step 718 and then marks the episode DONE. A planned action at index 719 is not executed. V27 therefore concentrates final routing and liquidation on 716–718.
+
+---
+
+## Candidate branches
+
+- exact anchor;
+- disable cashflow sorting;
+- static or collision-aware reordering only inside existing SELL slots;
+- collision-aware SELL-front ordering;
+- terminal inventory relay starting at 716 or 717;
+- collision slots combined with terminal relay.
+
+The terminal relay overrides only terminal PASS/PLACE/DROP actions that cannot deposit carried products. It moves reachable carriers toward an unlocked shed-access tile and uses DROP on the final executable step when the complete inventory fits.
+
+---
+
+## 1. Static invariants
+
+
+---
+
+## 2. Official 1.32.2 evaluator
+
+
+---
+
+## 3. Stage A — direct ablation against the exact baseline
+
+
+---
+
+## 4. Stage B — broad money and leftover-inventory gate
+
+
+---
+
+## 5. Conservative promotion
+
+
+---
+
+## 6. Package the verified winner
+
+
+---
+
+## 7. Optional extended holdout
+
+
+---
+
+## Output
+
+Run all cells and submit `/kaggle/working/submission.tar.gz`.
+
+If no candidate produces strictly higher broad mean money without reducing wins or robust minimum, the notebook packages the exact uploaded baseline.

@@ -1,0 +1,21 @@
+# Shop Router 0909 Python
+
+1. At step 144, choose a plan using the first two revealed shops.
+2. Insert DIG when weeds block planting or construction, delaying only that worker's remaining actions for the current day.
+3. Bring eligible sales forward one turn and liquidate on the final turn. All routes share the ending from step 648.
+
+The complete runtime code is shown below. Data files are stored separately from the implementation.
+
+Sale timing is based on [aurax7 Reactive Router](https://www.kaggle.com/code/aurax7/kaggriculture-reactive-router). Shop-pair routing and same-day worker queues were added in this research.
+
+---
+
+## Load the data
+
+Restore the submission data, including the 13 complete, 719-turn plans.
+
+---
+
+## Build the submission
+
+Package the verified files.

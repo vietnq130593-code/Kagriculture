@@ -1,0 +1,1087 @@
+     1→     1→import json
+     2→     2→import math
+     3→     3→import random
+     4→     4→from os import path
+     5→     5→
+     6→     6→from kaggle_environments.utils import resolve_episode_seed
+     7→     7→
+     8→     8→dirpath = path.dirname(__file__)
+     9→     9→
+    10→    10→
+    11→    11→CROPS = {
+    12→    12→    "WHEAT":      {"seed": 10, "first_yield_day": 2, "max_yield_day": 4, "interval": 0, "max_yield": 6, "ongoing": False},
+    13→    13→    "CARROT":     {"seed": 20, "first_yield_day": 2, "max_yield_day": 3, "interval": 0, "max_yield": 4, "ongoing": False},
+    14→    14→    "TOMATO":     {"seed": 50, "first_yield_day": 8, "max_yield_day": 8, "interval": 1, "max_yield": 4, "ongoing": True},
+    15→    15→    "STRAWBERRY": {"seed": 100, "first_yield_day": 10, "max_yield_day": 10, "interval": 2, "max_yield": 4, "ongoing": True},
+    16→    16→    "MELON":      {"seed": 80, "first_yield_day": 10, "max_yield_day": 12, "interval": 0, "max_yield": 6, "ongoing": False},
+    17→    17→}
+    18→    18→
+    19→    19→ANIMALS = {
+    20→    20→    "GOOSE": {"cost": 300, "structure": "COOP",    "first_yield_day": 4, "interval": 1, "max_held": 4, "product": "EGG"},
+    21→    21→    "COW":   {"cost": 400, "structure": "PASTURE", "first_yield_day": 8, "interval": 2, "max_held": 6, "product": "MILK"},
+    22→    22→    "SHEEP": {"cost": 500, "structure": "PASTURE", "first_yield_day": 6, "interval": 3, "max_held": 6, "product": "WOOL"},
+    23→    23→}
+    24→    24→
+    25→    25→PRODUCTS = ["WHEAT", "CARROT", "TOMATO", "STRAWBERRY", "MELON", "EGG", "MILK", "WOOL", "FERTILIZER"]
+    26→    26→
+    27→    27→# Pricing model:
+    28→    28→#     price(inv) = base + sign * amp * f(|inv - I0|)
+    29→    29→#     sign = +1 below I0 (scarcity), -1 above I0 (glut)
+    30→    30→#     amp  = target * base / f(T)            (derived; selling T units moves
+    31→    31→#                                             price by `target` * base)
+    32→    32→#     T    = production capacity of one 5x5 field over a 24-day window at
+    33→    33→#            optimal watering, no fertilizer (animal T pre-discounted 30% for
+    34→    34→#            wheat-feed overhead). Shorter than the 30-day season on purpose:
+    35→    35→#            the opening days are setup-heavy and yield little.
+    36→    36→#     f    in {linear, sq, sqrt, log, log10}; log uses ln(1+x) so f(0)=0
+    37→    37→# Floored at PRICE_FLOOR.
+    38→    38→MARKET_I0 = 10000
+    39→    39→PRICE_FLOOR = 1
+    40→    40→
+    41→    41→MARKET_PARAMS = {
+    42→    42→    "WHEAT":      {"base":  25, "I0": MARKET_I0, "T": 400, "below_func": "sqrt",   "below_target": 0.80, "above_func": "log",    "above_target": 0.20},
+    43→    43→    "CARROT":     {"base":  35, "I0": MARKET_I0, "T": 450, "below_func": "hinge",  "below_target": 1.00, "above_func": "sqrt",   "above_target": 0.70},
+    44→    44→    "TOMATO":     {"base":  60, "I0": MARKET_I0, "T": 200, "below_func": "hinge",  "below_target": 0.40, "above_func": "sqrt",   "above_target": 0.60},
+    45→    45→    "STRAWBERRY": {"base": 120, "I0": MARKET_I0, "T": 100, "below_func": "sqrt",   "below_target": 0.70, "above_func": "linear", "above_target": 1.60},
+    46→    46→    "MELON":      {"base": 250, "I0": MARKET_I0, "T": 300, "below_func": "log",    "below_target": 0.20, "above_func": "sq",     "above_target": 3.60},
+    47→    47→    "EGG":        {"base":  50, "I0": MARKET_I0, "T": 332, "below_func": "hinge",  "below_target": 0.40, "above_func": "log",    "above_target": 0.20},
+    48→    48→    "MILK":       {"base": 160, "I0": MARKET_I0, "T": 122, "below_func": "sqrt",   "below_target": 0.60, "above_func": "linear", "above_target": 1.60},
+    49→    49→    "WOOL":       {"base": 200, "I0": MARKET_I0, "T": 105, "below_func": "log",    "below_target": 0.20, "above_func": "sq",     "above_target": 3.20},
+    50→    50→    "FERTILIZER": {"base": 100, "I0": MARKET_I0, "T": 200, "below_func": "linear", "below_target": 0.40, "above_func": "linear", "above_target": 0.40},
+    51→    51→}
+    52→    52→
+    53→    53→
+    54→    54→# "hinge" spikes once x passes T. Below the knee it is linear in x/T; above it
+    55→    55→# a quadratic term takes over, so the price is calm right up until the resource is
+    56→    56→# genuinely scarce and then runs away. f(T) == 1 by construction, which keeps
+    57→    57→# `target` meaning the same thing it does for every other shape.
+    58→    58→HINGE_GAIN = 8.0
+    59→    59→
+    60→    60→
+    61→    61→def _shape(func, x, T=None):
+    62→    62→    x = max(0.0, x)
+    63→    63→    if func == "linear": return x
+    64→    64→    if func == "sq":     return x * x
+    65→    65→    if func == "sqrt":   return math.sqrt(x)
+    66→    66→    if func == "log":    return math.log(1.0 + x)
+    67→    67→    if func == "log10":  return math.log10(1.0 + x)
+    68→    68→    if func == "hinge":
+    69→    69→        # Degenerates to linear if T is missing or non-positive.
+    70→    70→        if not T or T <= 0:
+    71→    71→            return x
+    72→    72→        u = x / T
+    73→    73→        return u + HINGE_GAIN * max(0.0, u - 1.0) ** 2
+    74→    74→    return x
+    75→    75→
+    76→    76→
+    77→    77→def _resolve_market_params(overrides):
+    78→    78→    """Merge per-resource overrides onto MARKET_PARAMS defaults (sparse)."""
+    79→    79→    resolved = {item: dict(p) for item, p in MARKET_PARAMS.items()}
+    80→    80→    if not overrides:
+    81→    81→        return resolved
+    82→    82→    for item, patch in overrides.items():
+    83→    83→        if item in resolved and isinstance(patch, dict):
+    84→    84→            resolved[item].update(patch)
+    85→    85→    return resolved
+    86→    86→
+    87→    87→# (dx, dy); y grows downward.
+    88→    88→FARMER_MOVES = {
+    89→    89→    "NORTH": (0, -1),
+    90→    90→    "SOUTH": (0, 1),
+    91→    91→    "EAST":  (1, 0),
+    92→    92→    "WEST":  (-1, 0),
+    93→    93→}
+    94→    94→
+    95→    95→# NW is always unlocked; players unlock the rest in this order.
+    96→    96→LAND_ORDER = ["NE", "SW", "SE"]
+    97→    97→LAND_PRICES = [1000, 2000, 4000]
+    98→    98→
+    99→    99→# n-th hire of the day -> cost = FARM_HAND_COST_MULT * fib(n), where
+   100→   100→# fib starts 1, 1, 2, 3, 5, 8, 13, ... Configurable via `farmHandCostMult`.
+   101→   101→FARM_HAND_COST_MULT = 1
+   102→   102→
+   103→   103→SHOPS = {
+   104→   104→    "BAKERY":         ["EGG", "WHEAT"],
+   105→   105→    "PIZZA_SHOP":     ["MILK", "TOMATO", "WHEAT"],
+   106→   106→    "BRUNCH_SPOT":    ["EGG", "WHEAT", "STRAWBERRY"],
+   107→   107→    "YARN_STORE":     ["WOOL"],
+   108→   108→    "ICE_CREAM_SHOP": ["STRAWBERRY", "MILK", "WHEAT"],
+   109→   109→    "PET_CAFE":       ["CARROT"],
+   110→   110→    "SMOOTHIE_SHOP":  ["STRAWBERRY", "MILK"],
+   111→   111→    "FARMERS_MARKET": ["WHEAT", "CARROT", "TOMATO", "STRAWBERRY"],
+   112→   112→}
+   113→   113→
+   114→   114→TOWN_CENTER_PRODUCTS = [p for p in PRODUCTS if p != "FERTILIZER"]
+   115→   115→
+   116→   116→# Maximum number of shop instances the town will ever unlock. Shops are drawn
+   117→   117→# with replacement, so this caps total count, not variety.
+   118→   118→MAX_SHOP_INSTANCES = 8
+   119→   119→
+   120→   120→
+   121→   121→def get(d, key, default):
+   122→   122→    if isinstance(d, dict):
+   123→   123→        return d.get(key, default)
+   124→   124→    return getattr(d, key, default)
+   125→   125→
+   126→   126→
+   127→   127→def _quadrant_of(x, y, board_size):
+   128→   128→    half = board_size // 2
+   129→   129→    return ("N" if y < half else "S") + ("W" if x < half else "E")
+   130→   130→
+   131→   131→
+   132→   132→def _shed_access_tiles(board_size):
+   133→   133→    """Four inner-corner tiles around the shed, in NWSE order."""
+   134→   134→    half = board_size // 2
+   135→   135→    return [(half - 1, half - 1), (half, half - 1), (half - 1, half), (half, half)]
+   136→   136→
+   137→   137→
+   138→   138→def _is_shed_adjacent(pos, board_size):
+   139→   139→    return tuple(pos) in {(x, y) for (x, y) in _shed_access_tiles(board_size)}
+   140→   140→
+   141→   141→
+   142→   142→def _new_farm(board_size, starting_money):
+   143→   143→    return {
+   144→   144→        "money": float(starting_money),
+   145→   145→        # tiles[y][x] = None (empty unlocked) | "LOCKED" | dict structure
+   146→   146→        "tiles": [
+   147→   147→            [_initial_tile(x, y, board_size) for x in range(board_size)]
+   148→   148→            for y in range(board_size)
+   149→   149→        ],
+   150→   150→        "farmer": list(_default_spawn(board_size)),
+   151→   151→        "hands": [],
+   152→   152→        "unlocked_quadrants": ["NW"],
+   153→   153→        "hires_today": 0,
+   154→   154→    }
+   155→   155→
+   156→   156→
+   157→   157→def _initial_tile(x, y, board_size):
+   158→   158→    return None if _quadrant_of(x, y, board_size) == "NW" else "LOCKED"
+   159→   159→
+   160→   160→
+   161→   161→def _default_spawn(board_size):
+   162→   162→    """First free shed-access tile, NWSE preference."""
+   163→   163→    for tile in _shed_access_tiles(board_size):
+   164→   164→        if _quadrant_of(tile[0], tile[1], board_size) == "NW":
+   165→   165→            return tile
+   166→   166→    return (0, 0)
+   167→   167→
+   168→   168→
+   169→   169→def _new_private():
+   170→   170→    return {
+   171→   171→        "shed": {item: 0 for item in PRODUCTS + list(ANIMALS)},
+   172→   172→        "seeds": {crop: 0 for crop in CROPS},
+   173→   173→        # inventories[0] = main farmer; hands appended/removed each day.
+   174→   174→        "inventories": [{}],
+   175→   175→    }
+   176→   176→
+   177→   177→
+   178→   178→def _new_market(params=None):
+   179→   179→    params = params or MARKET_PARAMS
+   180→   180→    inv = {item: params[item]["I0"] for item in PRODUCTS}
+   181→   181→    prices = {item: params[item]["base"] for item in PRODUCTS}
+   182→   182→    market = {"inventory": inv, "prices": prices}
+   183→   183→    if params is not MARKET_PARAMS:
+   184→   184→        market["params"] = params
+   185→   185→    return market
+   186→   186→
+   187→   187→
+   188→   188→def _new_town():
+   189→   189→    return {"unlocked_shops": []}
+   190→   190→
+   191→   191→
+   192→   192→def market_price(item, inventory, params=None):
+   193→   193→    """Floor at PRICE_FLOOR."""
+   194→   194→    p = (params or MARKET_PARAMS)[item]
+   195→   195→    base = p["base"]
+   196→   196→    I0 = p["I0"]
+   197→   197→    T = p["T"]
+   198→   198→    if inventory < I0:
+   199→   199→        f = p["below_func"]
+   200→   200→        amp = p["below_target"] * base / _shape(f, T, T)
+   201→   201→        price = base + amp * _shape(f, I0 - inventory, T)
+   202→   202→    else:
+   203→   203→        f = p["above_func"]
+   204→   204→        amp = p["above_target"] * base / _shape(f, T, T)
+   205→   205→        price = base - amp * _shape(f, inventory - I0, T)
+   206→   206→    return max(PRICE_FLOOR, int(round(price)))
+   207→   207→
+   208→   208→
+   209→   209→def _refresh_prices(market):
+   210→   210→    params = market.get("params")
+   211→   211→    for item in PRODUCTS:
+   212→   212→        market["prices"][item] = market_price(item, market["inventory"][item], params)
+   213→   213→
+   214→   214→
+   215→   215→def _new_plant(crop, day, turns_per_day):
+   216→   216→    cd = CROPS[crop]
+   217→   217→    return {
+   218→   218→        "kind": "PLANT",
+   219→   219→        "crop": crop,
+   220→   220→        "planted_day": day,
+   221→   221→        "watered_today": False,
+   222→   222→        "consecutive_unwatered": 1,  # planting day counts as unwatered
+   223→   223→        "yield_units": 0 if cd["ongoing"] else 1,
+   224→   224→        "max_lifespan_step": (-1 if cd["ongoing"] else (day + cd["max_yield_day"] + 1) * turns_per_day),
+   225→   225→        "fertilized_until_day": -1,
+   226→   226→    }
+   227→   227→
+   228→   228→
+   229→   229→def _new_animal(animal, day):
+   230→   230→    a = ANIMALS[animal]
+   231→   231→    return {
+   232→   232→        "kind": a["structure"],
+   233→   233→        "animal": animal,
+   234→   234→        "placed_day": day,
+   235→   235→        "yield_units": 0,
+   236→   236→        "consecutive_unfed": 0,
+   237→   237→        "fed_today": False,
+   238→   238→        "cared_today": False,
+   239→   239→        "fertilizer_available": False,
+   240→   240→        "pending_care_bonus": 0,
+   241→   241→    }
+   242→   242→
+   243→   243→
+   244→   244→def _initialize(state, env):
+   245→   245→    configuration = env.configuration
+   246→   246→    num_agents = len(state)
+   247→   247→    obs0 = state[0].observation
+   248→   248→
+   249→   249→    seed = resolve_episode_seed(env)
+   250→   250→
+   251→   251→    board_size = int(get(configuration, "boardSize", 10))
+   252→   252→    starting_money = int(get(configuration, "startingMoney", 3000))
+   253→   253→
+   254→   254→    farms = [_new_farm(board_size, starting_money) for _ in range(num_agents)]
+   255→   255→    privates = [_new_private() for _ in range(num_agents)]
+   256→   256→    market_overrides = get(configuration, "marketParams", None)
+   257→   257→    resolved_params = _resolve_market_params(market_overrides) if market_overrides else None
+   258→   258→    market = _new_market(resolved_params)
+   259→   259→    town = _new_town()
+   260→   260→
+   261→   261→    obs0.farms = farms
+   262→   262→    obs0.market = market
+   263→   263→    obs0.town = town
+   264→   264→    obs0.day = 0
+   265→   265→    obs0.hour = 0
+   266→   266→
+   267→   267→    for i in range(num_agents):
+   268→   268→        state[i].observation.player = i
+   269→   269→        state[i].observation.private = privates[i]
+   270→   270→        if i > 0:
+   271→   271→            state[i].observation.farms = farms
+   272→   272→            state[i].observation.market = market
+   273→   273→            state[i].observation.town = town
+   274→   274→            state[i].observation.day = 0
+   275→   275→            state[i].observation.hour = 0
+   276→   276→
+   277→   277→
+   278→   278→def _farmer_position(farm, idx):
+   279→   279→    """idx 0 = main farmer, 1+ = hand index."""
+   280→   280→    if idx == 0:
+   281→   281→        return farm["farmer"]
+   282→   282→    return farm["hands"][idx - 1] if idx - 1 < len(farm["hands"]) else None
+   283→   283→
+   284→   284→
+   285→   285→def _set_farmer_position(farm, idx, pos):
+   286→   286→    if idx == 0:
+   287→   287→        farm["farmer"] = list(pos)
+   288→   288→    else:
+   289→   289→        farm["hands"][idx - 1] = list(pos)
+   290→   290→
+   291→   291→
+   292→   292→def _farmer_inventory(private, idx):
+   293→   293→    """Inventories list is [main_farmer, *hands]; grow it if idx is past the end."""
+   294→   294→    while len(private["inventories"]) <= idx:
+   295→   295→        private["inventories"].append({})
+   296→   296→    return private["inventories"][idx]
+   297→   297→
+   298→   298→
+   299→   299→def _inv_add(inv, item, n=1):
+   300→   300→    inv[item] = inv.get(item, 0) + n
+   301→   301→
+   302→   302→
+   303→   303→def _inv_take(inv, item, n=1):
+   304→   304→    if inv.get(item, 0) < n:
+   305→   305→        return False
+   306→   306→    inv[item] -= n
+   307→   307→    if inv[item] == 0:
+   308→   308→        del inv[item]
+   309→   309→    return True
+   310→   310→
+   311→   311→
+   312→   312→def _apply_unit_action(farm, private, idx, action, board_size, day, turns_per_day, shed_capacity=100):
+   313→   313→    """Process one farmer/hand's action. Invalid / illegal actions are silent no-ops."""
+   314→   314→    if not isinstance(action, list) or not action:
+   315→   315→        return
+   316→   316→    op = action[0]
+   317→   317→    pos = _farmer_position(farm, idx)
+   318→   318→    if pos is None:
+   319→   319→        return
+   320→   320→    fx, fy = pos[0], pos[1]
+   321→   321→    inv = _farmer_inventory(private, idx)
+   322→   322→
+   323→   323→    if op in FARMER_MOVES:
+   324→   324→        dx, dy = FARMER_MOVES[op]
+   325→   325→        nx, ny = fx + dx, fy + dy
+   326→   326→        if not (0 <= nx < board_size and 0 <= ny < board_size):
+   327→   327→            return
+   328→   328→        # Movement onto LOCKED tiles is allowed: a hand can spawn on a locked
+   329→   329→        # shed-access tile, and blocking movement would strand it there forever.
+   330→   330→        # Tile operations (PLANT, WATER, etc.) still no-op on LOCKED tiles.
+   331→   331→        _set_farmer_position(farm, idx, (nx, ny))
+   332→   332→        return
+   333→   333→
+   334→   334→    if op == "PASS":
+   335→   335→        return
+   336→   336→
+   337→   337→    tile = farm["tiles"][fy][fx]
+   338→   338→
+   339→   339→    # Shed operations resolve before the LOCKED guard. They use the tile only as
+   340→   340→    # a standing position -- the shed itself is always owned -- and three of the
+   341→   341→    # four shed-access tiles start LOCKED, so guarding them first would make the
+   342→   342→    # shed unreachable from those tiles.
+   343→   343→    if op == "DROP":
+   344→   344→        if not _is_shed_adjacent((fx, fy), board_size):
+   345→   345→            return
+   346→   346→        shed = private["shed"]
+   347→   347→        for item, n in list(inv.items()):
+   348→   348→            if n <= 0:
+   349→   349→                del inv[item]
+   350→   350→                continue
+   351→   351→            room = max(0, shed_capacity - sum(shed.values()))
+   352→   352→            take = min(n, room)
+   353→   353→            if take > 0:
+   354→   354→                shed[item] = shed.get(item, 0) + take
+   355→   355→            del inv[item]
+   356→   356→        return
+   357→   357→
+   358→   358→    if op == "PICKUP":
+   359→   359→        if not _is_shed_adjacent((fx, fy), board_size):
+   360→   360→            return
+   361→   361→        if len(action) < 2:
+   362→   362→            return
+   363→   363→        item = action[1]
+   364→   364→        n = int(action[2]) if len(action) >= 3 else 1
+   365→   365→        if n <= 0:
+   366→   366→            return
+   367→   367→        # Seeds live in private["seeds"] and are consumed directly by PLANT;
+   368→   368→        # they never pass through farmer inventory or the shed.
+   369→   369→        available = private["shed"].get(item, 0)
+   370→   370→        n = min(n, available)
+   371→   371→        if n <= 0:
+   372→   372→            return
+   373→   373→        private["shed"][item] -= n
+   374→   374→        _inv_add(inv, item, n)
+   375→   375→        return
+   376→   376→
+   377→   377→    if op == "PLACE":
+   378→   378→        if len(action) < 2:
+   379→   379→            return
+   380→   380→        item = action[1]
+   381→   381→        # Animal placement: standing on a matching unoccupied structure. A LOCKED
+   382→   382→        # tile is the string "LOCKED", never a dict, so this branch cannot match
+   383→   383→        # there and PLACE falls through to the shed path below.
+   384→   384→        if (
+   385→   385→            item in ANIMALS
+   386→   386→            and isinstance(tile, dict)
+   387→   387→            and tile.get("kind") == ANIMALS[item]["structure"]
+   388→   388→            and "animal" not in tile
+   389→   389→        ):
+   390→   390→            if _inv_take(inv, item, 1):
+   391→   391→                farm["tiles"][fy][fx] = _new_animal(item, day)
+   392→   392→            return
+   393→   393→        # Shed drop: orthogonally adjacent to the shed; obeys shedCapacity.
+   394→   394→        if _is_shed_adjacent((fx, fy), board_size):
+   395→   395→            n = int(action[2]) if len(action) >= 3 else 1
+   396→   396→            if n <= 0:
+   397→   397→                return
+   398→   398→            n = min(n, inv.get(item, 0))
+   399→   399→            if n <= 0:
+   400→   400→                return
+   401→   401→            current = sum(private["shed"].values())
+   402→   402→            room = max(0, shed_capacity - current)
+   403→   403→            n = min(n, room)
+   404→   404→            if n <= 0:
+   405→   405→                return
+   406→   406→            inv[item] -= n
+   407→   407→            if inv[item] == 0:
+   408→   408→                del inv[item]
+   409→   409→            private["shed"][item] = private["shed"].get(item, 0) + n
+   410→   410→        return
+   411→   411→
+   412→   412→    # Everything below mutates the tile the unit stands on, so it requires that
+   413→   413→    # tile to be owned.
+   414→   414→    if tile == "LOCKED":
+   415→   415→        return
+   416→   416→
+   417→   417→    if op == "PLANT":
+   418→   418→        if len(action) < 2:
+   419→   419→            return
+   420→   420→        crop = action[1]
+   421→   421→        if crop not in CROPS:
+   422→   422→            return
+   423→   423→        if tile is not None:
+   424→   424→            return
+   425→   425→        if private["seeds"].get(crop, 0) <= 0:
+   426→   426→            return
+   427→   427→        private["seeds"][crop] -= 1
+   428→   428→        farm["tiles"][fy][fx] = _new_plant(crop, day, turns_per_day)
+   429→   429→        return
+   430→   430→
+   431→   431→    if op == "WATER":
+   432→   432→        if not (isinstance(tile, dict) and tile.get("kind") == "PLANT"):
+   433→   433→            return
+   434→   434→        if tile["watered_today"]:
+   435→   435→            return
+   436→   436→        tile["watered_today"] = True
+   437→   437→        crop_data = CROPS[tile["crop"]]
+   438→   438→        if not crop_data["ongoing"]:
+   439→   439→            age_days = day - tile["planted_day"]
+   440→   440→            window_start = (crop_data["max_yield_day"] + 1) // 2
+   441→   441→            if window_start <= age_days <= crop_data["max_yield_day"]:
+   442→   442→                bonus = 2 if tile["fertilized_until_day"] >= day else 1
+   443→   443→                tile["yield_units"] = min(crop_data["max_yield"], tile["yield_units"] + bonus)
+   444→   444→        return
+   445→   445→
+   446→   446→    if op == "HARVEST":
+   447→   447→        if not isinstance(tile, dict):
+   448→   448→            return
+   449→   449→        if tile.get("yield_units", 0) <= 0:
+   450→   450→            return
+   451→   451→        if tile.get("kind") == "PLANT":
+   452→   452→            crop_data = CROPS[tile["crop"]]
+   453→   453→            if day - tile["planted_day"] < crop_data["first_yield_day"]:
+   454→   454→                # Ongoing crops only accumulate yield_units after first_yield_day,
+   455→   455→                # so reaching here with yield_units > 0 indicates a bug.
+   456→   456→                if crop_data["ongoing"]:
+   457→   457→                    print(
+   458→   458→                        f"WARNING: HARVEST on immature ongoing {tile['crop']} "
+   459→   459→                        f"(planted day {tile['planted_day']}, current day {day}, "
+   460→   460→                        f"first_yield_day {crop_data['first_yield_day']}, "
+   461→   461→                        f"yield_units {tile['yield_units']}); should never happen"
+   462→   462→                    )
+   463→   463→                return
+   464→   464→            units = tile["yield_units"]
+   465→   465→            tile["yield_units"] = 0
+   466→   466→            _inv_add(inv, tile["crop"], units)
+   467→   467→            if not crop_data["ongoing"]:
+   468→   468→                farm["tiles"][fy][fx] = None
+   469→   469→        elif "animal" in tile:
+   470→   470→            units = tile["yield_units"]
+   471→   471→            tile["yield_units"] = 0
+   472→   472→            _inv_add(inv, ANIMALS[tile["animal"]]["product"], units)
+   473→   473→        return
+   474→   474→
+   475→   475→    if op == "FERTILIZE":
+   476→   476→        if not (isinstance(tile, dict) and tile.get("kind") == "PLANT"):
+   477→   477→            return
+   478→   478→        if not _inv_take(inv, "FERTILIZER", 1):
+   479→   479→            return
+   480→   480→        # Active for `day`, `day+1`, `day+2` (3 days inclusive).
+   481→   481→        tile["fertilized_until_day"] = max(tile.get("fertilized_until_day", -1), day + 2)
+   482→   482→        return
+   483→   483→
+   484→   484→    if op == "DIG":
+   485→   485→        if tile is None:
+   486→   486→            return
+   487→   487→        # Removes plants, weeds, empty coop/pasture. Does NOT remove a placed animal.
+   488→   488→        if isinstance(tile, dict) and "animal" in tile:
+   489→   489→            return
+   490→   490→        farm["tiles"][fy][fx] = None
+   491→   491→        return
+   492→   492→
+   493→   493→    if op == "BUILD_COOP":
+   494→   494→        if tile is not None:
+   495→   495→            return
+   496→   496→        farm["tiles"][fy][fx] = {"kind": "COOP"}
+   497→   497→        return
+   498→   498→
+   499→   499→    if op == "BUILD_PASTURE":
+   500→   500→        if tile is not None:
+   501→   501→            return
+   502→   502→        farm["tiles"][fy][fx] = {"kind": "PASTURE"}
+   503→   503→        return
+   504→   504→
+   505→   505→    if op == "FEED":
+   506→   506→        if not (isinstance(tile, dict) and "animal" in tile):
+   507→   507→            return
+   508→   508→        if tile["fed_today"]:
+   509→   509→            return
+   510→   510→        if not _inv_take(inv, "WHEAT", 1):
+   511→   511→            return
+   512→   512→        tile["fed_today"] = True
+   513→   513→        return
+   514→   514→
+   515→   515→    if op == "COLLECT_FERTILIZER":
+   516→   516→        if not (isinstance(tile, dict) and "animal" in tile):
+   517→   517→            return
+   518→   518→        if not tile["fertilizer_available"]:
+   519→   519→            return
+   520→   520→        tile["fertilizer_available"] = False
+   521→   521→        _inv_add(inv, "FERTILIZER", 1)
+   522→   522→        return
+   523→   523→
+   524→   524→    if op == "CARE":
+   525→   525→        if not (isinstance(tile, dict) and "animal" in tile):
+   526→   526→            return
+   527→   527→        if tile["cared_today"]:
+   528→   528→            return
+   529→   529→        tile["cared_today"] = True
+   530→   530→        return
+   531→   531→
+   532→   532→
+   533→   533→def _spawn_hand(farm, board_size):
+   534→   534→    """First free shed-access tile (NWSE order); ties broken by min occupancy."""
+   535→   535→    occupants = {tile: 0 for tile in _shed_access_tiles(board_size)}
+   536→   536→    all_pos = [tuple(farm["farmer"])] + [tuple(p) for p in farm["hands"]]
+   537→   537→    for pos in all_pos:
+   538→   538→        if pos in occupants:
+   539→   539→            occupants[pos] += 1
+   540→   540→    best = sorted(occupants.items(), key=lambda kv: (kv[1], _shed_access_tiles(board_size).index(kv[0])))
+   541→   541→    return list(best[0][0])
+   542→   542→
+   543→   543→
+   544→   544→def _process_market(state, env):
+   545→   545→    """Per-unit lockstep: at each step, quote both players' current-unit prices, then commit both."""
+   546→   546→    obs0 = state[0].observation
+   547→   547→    market = obs0.market
+   548→   548→    farms = obs0.farms
+   549→   549→    privates = [s.observation.private for s in state]
+   550→   550→    board_size = int(get(env.configuration, "boardSize", 10))
+   551→   551→    max_orders = max(1, int(get(env.configuration, "maxMarketOrdersPerTurn", 10)))
+   552→   552→    hire_mult = int(get(env.configuration, "farmHandCostMult", FARM_HAND_COST_MULT))
+   553→   553→    shed_capacity = int(get(env.configuration, "shedCapacity", 100))
+   554→   554→
+   555→   555→    queues = []
+   556→   556→    for s in state:
+   557→   557→        action = s.action if isinstance(s.action, dict) else {}
+   558→   558→        m = action.get("market", []) if isinstance(action, dict) else []
+   559→   559→        q = list(m) if isinstance(m, list) else []
+   560→   560→        queues.append(q[:max_orders])
+   561→   561→
+   562→   562→    max_len = max((len(q) for q in queues), default=0)
+   563→   563→    for i in range(max_len):
+   564→   564→        order_states = []
+   565→   565→        for player_id, q in enumerate(queues):
+   566→   566→            ostate = None
+   567→   567→            if i < len(q):
+   568→   568→                ostate = _parse_order(q[i])
+   569→   569→            order_states.append(ostate)
+   570→   570→
+   571→   571→        # Atomic orders (HIRE, BUY_LAND): handle once, in player order.
+   572→   572→        for player_id, ostate in enumerate(order_states):
+   573→   573→            if ostate is None:
+   574→   574→                continue
+   575→   575→            op = ostate["type"]
+   576→   576→            if op == "HIRE":
+   577→   577→                _do_hire(farms[player_id], privates[player_id], board_size, hire_mult)
+   578→   578→                order_states[player_id] = None
+   579→   579→            elif op == "BUY_LAND":
+   580→   580→                _do_buy_land(farms[player_id], board_size)
+   581→   581→                order_states[player_id] = None
+   582→   582→
+   583→   583→        # Per-unit lockstep loop for SELL / BUY_*.
+   584→   584→        idx_esc = 0
+   585→   585→        while True:
+   586→   586→            idx_esc += 1
+   587→   587→            if idx_esc >= 100_000:
+   588→   588→                print("WARNING: kaggriculture market loop exceeded 100k iterations; aborting")
+   589→   589→                break
+   590→   590→            quoted = [None, None]
+   591→   591→            for player_id, ostate in enumerate(order_states):
+   592→   592→                if ostate is None or ostate["remaining"] <= 0:
+   593→   593→                    continue
+   594→   594→                op = ostate["type"]
+   595→   595→                item = ostate["item"]
+   596→   596→                if op == "SELL" and item in PRODUCTS:
+   597→   597→                    quoted[player_id] = ("SELL", item, market_price(item, market["inventory"][item], market.get("params")), ostate)
+   598→   598→                elif op == "BUY_PRODUCT" and item in ("WHEAT", "FERTILIZER"):
+   599→   599→                    # Quote at post-buy inventory so a buy/sell round-trip
+   600→   600→                    # against an unchanged market nets zero.
+   601→   601→                    quoted[player_id] = ("BUY_PRODUCT", item, market_price(item, market["inventory"][item] - 1, market.get("params")), ostate)
+   602→   602→                elif op == "BUY_SEED" and item in CROPS:
+   603→   603→                    quoted[player_id] = ("BUY_SEED", item, CROPS[item]["seed"], ostate)
+   604→   604→                elif op == "BUY_ANIMAL" and item in ANIMALS:
+   605→   605→                    quoted[player_id] = ("BUY_ANIMAL", item, ANIMALS[item]["cost"], ostate)
+   606→   606→                else:
+   607→   607→                    order_states[player_id] = None  # malformed sub-op; abort
+   608→   608→
+   609→   609→            if all(q is None for q in quoted):
+   610→   610→                break
+   611→   611→
+   612→   612→            # Both players see the same pre-commit inventory for this unit.
+   613→   613→            committed_any = False
+   614→   614→            for player_id, q in enumerate(quoted):
+   615→   615→                if q is None:
+   616→   616→                    continue
+   617→   617→                op, item, price, ostate = q
+   618→   618→                ok = _commit_unit(op, item, price, farms[player_id], privates[player_id], market, shed_capacity)
+   619→   619→                if ok:
+   620→   620→                    ostate["remaining"] -= 1
+   621→   621→                    committed_any = True
+   622→   622→                else:
+   623→   623→                    order_states[player_id] = None  # can't continue this order
+   624→   624→
+   625→   625→            if not committed_any:
+   626→   626→                break
+   627→   627→
+   628→   628→        _refresh_prices(market)
+   629→   629→
+   630→   630→
+   631→   631→def _parse_order(order):
+   632→   632→    if not isinstance(order, list) or not order:
+   633→   633→        return None
+   634→   634→    op = order[0]
+   635→   635→    if op == "HIRE":
+   636→   636→        return {"type": "HIRE"}
+   637→   637→    if op == "BUY_LAND":
+   638→   638→        return {"type": "BUY_LAND"}
+   639→   639→    if op in ("BUY_SEED", "BUY_PRODUCT", "BUY_ANIMAL", "SELL"):
+   640→   640→        if len(order) < 3:
+   641→   641→            return None
+   642→   642→        try:
+   643→   643→            n = int(order[2])
+   644→   644→        except (TypeError, ValueError):
+   645→   645→            return None
+   646→   646→        if n <= 0:
+   647→   647→            return None
+   648→   648→        return {"type": op, "item": order[1], "remaining": n}
+   649→   649→    return None
+   650→   650→
+   651→   651→
+   652→   652→def _commit_unit(op, item, price, farm, private, market, shed_capacity=100):
+   653→   653→    if op == "SELL":
+   654→   654→        if private["shed"].get(item, 0) <= 0:
+   655→   655→            return False
+   656→   656→        private["shed"][item] -= 1
+   657→   657→        farm["money"] += price
+   658→   658→        # Sales at $1 do not increase market supply.
+   659→   659→        if price > 1:
+   660→   660→            market["inventory"][item] += 1
+   661→   661→        return True
+   662→   662→    if op == "BUY_PRODUCT":
+   663→   663→        if farm["money"] < price:
+   664→   664→            return False
+   665→   665→        # Bought goods land in the shed, which obeys shedCapacity like every
+   666→   666→        # other deposit path (pickup, shed-drop, end-of-day drop).
+   667→   667→        if sum(private["shed"].values()) >= shed_capacity:
+   668→   668→            return False
+   669→   669→        farm["money"] -= price
+   670→   670→        private["shed"][item] = private["shed"].get(item, 0) + 1
+   671→   671→        market["inventory"][item] -= 1
+   672→   672→        return True
+   673→   673→    if op == "BUY_SEED":
+   674→   674→        if farm["money"] < price:
+   675→   675→            return False
+   676→   676→        farm["money"] -= price
+   677→   677→        private["seeds"][item] = private["seeds"].get(item, 0) + 1
+   678→   678→        return True
+   679→   679→    if op == "BUY_ANIMAL":
+   680→   680→        if farm["money"] < price:
+   681→   681→            return False
+   682→   682→        if sum(private["shed"].values()) >= shed_capacity:
+   683→   683→            return False
+   684→   684→        farm["money"] -= price
+   685→   685→        private["shed"][item] = private["shed"].get(item, 0) + 1
+   686→   686→        return True
+   687→   687→    return False
+   688→   688→
+   689→   689→
+   690→   690→def _fib(n):
+   691→   691→    """Indexed so _fib(0)=1, _fib(1)=1, _fib(2)=2, _fib(3)=3, _fib(4)=5..."""
+   692→   692→    a, b = 1, 1
+   693→   693→    for _ in range(n):
+   694→   694→        a, b = b, a + b
+   695→   695→    return a
+   696→   696→
+   697→   697→
+   698→   698→def _hire_cost(n_already_today, mult=FARM_HAND_COST_MULT):
+   699→   699→    return mult * _fib(n_already_today)
+   700→   700→
+   701→   701→
+   702→   702→def _do_hire(farm, private, board_size, mult=FARM_HAND_COST_MULT):
+   703→   703→    cost = _hire_cost(farm["hires_today"], mult)
+   704→   704→    if farm["money"] < cost:
+   705→   705→        return
+   706→   706→    farm["money"] -= cost
+   707→   707→    farm["hires_today"] += 1
+   708→   708→    farm["hands"].append(_spawn_hand(farm, board_size))
+   709→   709→    private["inventories"].append({})
+   710→   710→
+   711→   711→
+   712→   712→def _do_buy_land(farm, board_size):
+   713→   713→    n_unlocked_extra = len(farm["unlocked_quadrants"]) - 1  # NW is always there
+   714→   714→    if n_unlocked_extra >= len(LAND_ORDER):
+   715→   715→        return
+   716→   716→    cost = LAND_PRICES[n_unlocked_extra]
+   717→   717→    if farm["money"] < cost:
+   718→   718→        return
+   719→   719→    farm["money"] -= cost
+   720→   720→    quadrant = LAND_ORDER[n_unlocked_extra]
+   721→   721→    farm["unlocked_quadrants"].append(quadrant)
+   722→   722→    for y in range(board_size):
+   723→   723→        for x in range(board_size):
+   724→   724→            if _quadrant_of(x, y, board_size) == quadrant and farm["tiles"][y][x] == "LOCKED":
+   725→   725→                farm["tiles"][y][x] = None
+   726→   726→
+   727→   727→
+   728→   728→def _town_consume(env, state, step):
+   729→   729→    obs0 = state[0].observation
+   730→   730→    market = obs0.market
+   731→   731→    town = obs0.town
+   732→   732→    cfg = env.configuration
+   733→   733→    shop_interval = max(1, int(get(cfg, "townShopSellInterval", 4)))
+   734→   734→    center_interval = max(1, int(get(cfg, "townCenterSellInterval", 24)))
+   735→   735→
+   736→   736→    if step % shop_interval == 0:
+   737→   737→        # unlocked_shops may list the same shop more than once (shops are drawn
+   738→   738→        # with replacement); each instance consumes independently.
+   739→   739→        for shop_name in town.get("unlocked_shops", []):
+   740→   740→            products = SHOPS[shop_name]
+   741→   741→            multiplier = 2 if len(products) == 1 else 1
+   742→   742→            for item in products:
+   743→   743→                market["inventory"][item] -= multiplier
+   744→   744→
+   745→   745→    if step % center_interval == 0:
+   746→   746→        for item in TOWN_CENTER_PRODUCTS:
+   747→   747→            market["inventory"][item] -= 1
+   748→   748→
+   749→   749→    _refresh_prices(market)
+   750→   750→
+   751→   751→
+   752→   752→def _decay_plants(farm, step):
+   753→   753→    board_size = len(farm["tiles"])
+   754→   754→    for y in range(board_size):
+   755→   755→        for x in range(board_size):
+   756→   756→            tile = farm["tiles"][y][x]
+   757→   757→            if not isinstance(tile, dict) or tile.get("kind") != "PLANT":
+   758→   758→                continue
+   759→   759→            mls = tile["max_lifespan_step"]
+   760→   760→            if mls < 0 or step < mls:
+   761→   761→                continue
+   762→   762→            if (step - mls) % 2 != 0:
+   763→   763→                continue
+   764→   764→            tile["yield_units"] -= 1
+   765→   765→            if tile["yield_units"] <= 0:
+   766→   766→                farm["tiles"][y][x] = {"kind": "WEED"}
+   767→   767→
+   768→   768→
+   769→   769→def _daily_refresh_plants(farm, current_day, turns_per_day):
+   770→   770→    board_size = len(farm["tiles"])
+   771→   771→    next_day = current_day + 1
+   772→   772→    for y in range(board_size):
+   773→   773→        for x in range(board_size):
+   774→   774→            tile = farm["tiles"][y][x]
+   775→   775→            if not isinstance(tile, dict) or tile.get("kind") != "PLANT":
+   776→   776→                continue
+   777→   777→            was_watered = tile["watered_today"]
+   778→   778→            if was_watered:
+   779→   779→                tile["consecutive_unwatered"] = 0
+   780→   780→            else:
+   781→   781→                tile["consecutive_unwatered"] += 1
+   782→   782→            tile["watered_today"] = False
+   783→   783→            if tile["consecutive_unwatered"] >= 2:
+   784→   784→                farm["tiles"][y][x] = {"kind": "WEED"}
+   785→   785→                continue
+   786→   786→            cd = CROPS[tile["crop"]]
+   787→   787→            if not cd["ongoing"]:
+   788→   788→                continue
+   789→   789→            days_since_first = next_day - tile["planted_day"] - cd["first_yield_day"]
+   790→   790→            if days_since_first < 0:
+   791→   791→                continue
+   792→   792→            interval = cd["interval"]
+   793→   793→            if days_since_first % interval != 0:
+   794→   794→                continue
+   795→   795→            production_count = days_since_first // interval + 1
+   796→   796→            if production_count > cd["max_yield"]:
+   797→   797→                continue
+   798→   798→            # Fertilizer bonus only applies on watered days (basic needs first).
+   799→   799→            fertilized = was_watered and tile.get("fertilized_until_day", -1) >= current_day
+   800→   800→            tile["yield_units"] = min(cd["max_yield"], tile["yield_units"] + (2 if fertilized else 1))
+   801→   801→            if production_count == cd["max_yield"]:
+   802→   802→                tile["max_lifespan_step"] = (next_day + 1) * turns_per_day
+   803→   803→
+   804→   804→
+   805→   805→def _daily_refresh_animals(farm, day):
+   806→   806→    board_size = len(farm["tiles"])
+   807→   807→    next_day = day + 1
+   808→   808→    for y in range(board_size):
+   809→   809→        for x in range(board_size):
+   810→   810→            tile = farm["tiles"][y][x]
+   811→   811→            if not (isinstance(tile, dict) and "animal" in tile):
+   812→   812→                continue
+   813→   813→            if tile["fed_today"]:
+   814→   814→                tile["consecutive_unfed"] = 0
+   815→   815→            else:
+   816→   816→                tile["consecutive_unfed"] += 1
+   817→   817→            if tile["consecutive_unfed"] >= 2:
+   818→   818→                # Animal escapes; structure remains.
+   819→   819→                farm["tiles"][y][x] = {"kind": ANIMALS[tile["animal"]]["structure"]}
+   820→   820→                continue
+   821→   821→            a = ANIMALS[tile["animal"]]
+   822→   822→            days_since_first = next_day - tile["placed_day"] - a["first_yield_day"]
+   823→   823→            if days_since_first >= 0 and days_since_first % a["interval"] == 0:
+   824→   824→                base = 1
+   825→   825→                # Care bonus only consumed on a fed production day.
+   826→   826→                bonus = tile.pop("pending_care_bonus", 0) if tile["fed_today"] else 0
+   827→   827→                tile["yield_units"] = min(a["max_held"], tile["yield_units"] + base + bonus)
+   828→   828→                tile["pending_care_bonus"] = 0
+   829→   829→            if tile["cared_today"] and tile["fed_today"]:
+   830→   830→                tile["pending_care_bonus"] = tile.get("pending_care_bonus", 0) + 1
+   831→   831→            tile["fertilizer_available"] = True
+   832→   832→            tile["fed_today"] = False
+   833→   833→            tile["cared_today"] = False
+   834→   834→
+   835→   835→
+   836→   836→def _spawn_weeds(farm, board_size, weed_chance, rng):
+   837→   837→    for y in range(board_size):
+   838→   838→        for x in range(board_size):
+   839→   839→            if farm["tiles"][y][x] is None and rng.random() < weed_chance:
+   840→   840→                farm["tiles"][y][x] = {"kind": "WEED"}
+   841→   841→
+   842→   842→
+   843→   843→def _drop_inventories_to_shed(private, capacity):
+   844→   844→    """Drop every per-farmer inventory into the shed up to `capacity`; overflow is discarded.
+   845→   845→    Seeds are tracked separately in private["seeds"] and don't pass through the shed."""
+   846→   846→    shed = private["shed"]
+   847→   847→    for inv in private["inventories"]:
+   848→   848→        for item, n in list(inv.items()):
+   849→   849→            if n <= 0:
+   850→   850→                del inv[item]
+   851→   851→                continue
+   852→   852→            current = sum(v for k, v in shed.items())
+   853→   853→            room = max(0, capacity - current)
+   854→   854→            take = min(n, room)
+   855→   855→            if take > 0:
+   856→   856→                shed[item] = shed.get(item, 0) + take
+   857→   857→            del inv[item]
+   858→   858→
+   859→   859→
+   860→   860→def _end_of_day(state, env, day):
+   861→   861→    obs0 = state[0].observation
+   862→   862→    cfg = env.configuration
+   863→   863→    board_size = int(get(cfg, "boardSize", 10))
+   864→   864→    turns_per_day = max(1, int(get(cfg, "turnsPerDay", 24)))
+   865→   865→    weed_chance = float(get(cfg, "weedSpawnChance", 0.005))
+   866→   866→    shed_cap = int(get(cfg, "shedCapacity", 100))
+   867→   867→    shop_interval = max(1, int(get(cfg, "townShopUnlockInterval", 3)))
+   868→   868→
+   869→   869→    # Stable RNG keyed off env.info["seed"] + day so replays reproduce.
+   870→   870→    seed = env.info.get("seed", 0)
+   871→   871→    rng = random.Random((seed * 1_000_003) ^ day)
+   872→   872→
+   873→   873→    for player_id, farm in enumerate(obs0.farms):
+   874→   874→        private = state[player_id].observation.private
+   875→   875→        _daily_refresh_plants(farm, day, turns_per_day)
+   876→   876→        _daily_refresh_animals(farm, day)
+   877→   877→        _spawn_weeds(farm, board_size, weed_chance, rng)
+   878→   878→        _drop_inventories_to_shed(private, shed_cap)
+   879→   879→        farm["farmer"] = list(_default_spawn(board_size))
+   880→   880→        farm["hands"] = []
+   881→   881→        farm["hires_today"] = 0
+   882→   882→        private["inventories"] = [{}]
+   883→   883→
+   884→   884→    next_day = day + 1
+   885→   885→    town = obs0.town
+   886→   886→    if next_day > 0 and next_day % shop_interval == 0:
+   887→   887→        # Drawn with replacement: the same shop can unlock repeatedly, and each
+   888→   888→        # copy consumes independently. Variety is not guaranteed; only the total
+   889→   889→        # instance count is capped.
+   890→   890→        if len(town["unlocked_shops"]) < MAX_SHOP_INSTANCES:
+   891→   891→            town["unlocked_shops"].append(rng.choice(sorted(SHOPS)))
+   892→   892→
+   893→   893→
+   894→   894→def interpreter(state, env):
+   895→   895→    num_agents = len(state)
+   896→   896→    obs0 = state[0].observation
+   897→   897→
+   898→   898→    if not hasattr(obs0, "farms") or not obs0.farms:
+   899→   899→        _initialize(state, env)
+   900→   900→        return state
+   901→   901→
+   902→   902→    if env.done:
+   903→   903→        return state
+   904→   904→
+   905→   905→    cfg = env.configuration
+   906→   906→    turns_per_day = max(1, int(get(cfg, "turnsPerDay", 24)))
+   907→   907→    board_size = int(get(cfg, "boardSize", 10))
+   908→   908→    shed_capacity = int(get(cfg, "shedCapacity", 100))
+   909→   909→
+   910→   910→    step = get(obs0, "step", 0)
+   911→   911→    day = step // turns_per_day
+   912→   912→
+   913→   913→    for i, s in enumerate(state):
+   914→   914→        action = s.action if isinstance(s.action, dict) else {}
+   915→   915→        farmer_action = action.get("farmer", ["PASS"]) if isinstance(action, dict) else ["PASS"]
+   916→   916→        hands_actions = action.get("hands", []) if isinstance(action, dict) else []
+   917→   917→        if not isinstance(hands_actions, list):
+   918→   918→            hands_actions = []
+   919→   919→
+   920→   920→        # Atomic PLANT validation: if total PLANT requests for a crop this turn
+   921→   921→        # exceed available seeds, drop ALL PLANT requests for that crop.
+   922→   922→        unit_actions = [farmer_action, *hands_actions]
+   923→   923→        plant_demand = {}
+   924→   924→        for a in unit_actions:
+   925→   925→            if isinstance(a, list) and len(a) >= 2 and a[0] == "PLANT":
+   926→   926→                plant_demand[a[1]] = plant_demand.get(a[1], 0) + 1
+   927→   927→        seeds = s.observation.private.get("seeds", {}) if hasattr(s.observation.private, "get") else {}
+   928→   928→        blocked = {crop for crop, n in plant_demand.items() if n > seeds.get(crop, 0)}
+   929→   929→
+   930→   930→        def _allowed(a):
+   931→   931→            if isinstance(a, list) and len(a) >= 2 and a[0] == "PLANT" and a[1] in blocked:
+   932→   932→                return ["PASS"]
+   933→   933→            return a
+   934→   934→
+   935→   935→        _apply_unit_action(obs0.farms[i], s.observation.private, 0, _allowed(farmer_action),
+   936→   936→                           board_size, day, turns_per_day, shed_capacity)
+   937→   937→        for h_idx, hand_action in enumerate(hands_actions):
+   938→   938→            _apply_unit_action(obs0.farms[i], s.observation.private, h_idx + 1,
+   939→   939→                               _allowed(hand_action), board_size, day, turns_per_day, shed_capacity)
+   940→   940→
+   941→   941→    _process_market(state, env)
+   942→   942→    _town_consume(env, state, step)
+   943→   943→    for farm in obs0.farms:
+   944→   944→        _decay_plants(farm, step)
+   945→   945→    if (step + 1) % turns_per_day == 0:
+   946→   946→        _end_of_day(state, env, day)
+   947→   947→
+   948→   948→    next_step = step + 1
+   949→   949→    obs0.day = next_step // turns_per_day
+   950→   950→    obs0.hour = next_step % turns_per_day
+   951→   951→    for i in range(1, num_agents):
+   952→   952→        state[i].observation.farms = obs0.farms
+   953→   953→        state[i].observation.market = obs0.market
+   954→   954→        state[i].observation.town = obs0.town
+   955→   955→        state[i].observation.day = obs0.day
+   956→   956→        state[i].observation.hour = obs0.hour
+   957→   957→
+   958→   958→    # `step` here is the previous step counter; framework records the post-interpreter
+   959→   959→    # state at the next index. -2 fires DONE on the final recorded step.
+   960→   960→    if step >= cfg.episodeSteps - 2:
+   961→   961→        for s in state:
+   962→   962→            s.status = "DONE"
+   963→   963→            s.reward = float(obs0.farms[s.observation.player]["money"])
+   964→   964→
+   965→   965→    return state
+   966→   966→
+   967→   967→
+   968→   968→def _render_tile(tile):
+   969→   969→    if tile is None:
+   970→   970→        return "."
+   971→   971→    if tile == "LOCKED":
+   972→   972→        return "#"
+   973→   973→    if isinstance(tile, dict):
+   974→   974→        kind = tile.get("kind")
+   975→   975→        if kind == "WEED":
+   976→   976→            return "x"
+   977→   977→        if kind == "PLANT":
+   978→   978→            return tile["crop"][0].lower()
+   979→   979→        if "animal" in tile:
+   980→   980→            return tile["animal"][0]
+   981→   981→        if kind == "COOP":
+   982→   982→            return "C"
+   983→   983→        if kind == "PASTURE":
+   984→   984→            return "P"
+   985→   985→    return "?"
+   986→   986→
+   987→   987→
+   988→   988→def renderer(state, env):
+   989→   989→    obs = state[0].observation
+   990→   990→    out = f"Step {get(obs, 'step', 0)}  Day {get(obs, 'day', 0)}  Hour {get(obs, 'hour', 0)}\n"
+   991→   991→    market = get(obs, "market", {}) or {}
+   992→   992→    town = get(obs, "town", {}) or {}
+   993→   993→    out += f"Town shops: {town.get('unlocked_shops', [])}\n"
+   994→   994→    out += "Prices: " + ", ".join(f"{k}=${v}" for k, v in (market.get("prices", {}) or {}).items()) + "\n"
+   995→   995→    for i, s in enumerate(state):
+   996→   996→        farm = obs.farms[i] if i < len(obs.farms) else None
+   997→   997→        if farm is None:
+   998→   998→            continue
+   999→   999→        priv = get(s.observation, "private", {}) or {}
+  1000→  1000→        out += (
+  1001→  1001→            f"Player {i}: ${farm['money']:.0f}  farmer={farm['farmer']}  "
+  1002→  1002→            f"hands={len(farm['hands'])}  unlocked={farm['unlocked_quadrants']}  "
+  1003→  1003→            f"shed={priv.get('shed')}  seeds={priv.get('seeds')}\n"
+  1004→  1004→        )
+  1005→  1005→        for row in farm["tiles"]:
+  1006→  1006→            out += "  " + " ".join(_render_tile(t) for t in row) + "\n"
+  1007→  1007→    return out
+  1008→  1008→
+  1009→  1009→
+  1010→  1010→json_path = path.abspath(path.join(dirpath, "kaggriculture.json"))
+  1011→  1011→with open(json_path) as json_file:
+  1012→  1012→    specification = json.load(json_file)
+  1013→  1013→
+  1014→  1014→
+  1015→  1015→def html_renderer(env, mode):
+  1016→  1016→    jspath = path.join(dirpath, "visualizer", "default", "dist", "index.html")
+  1017→  1017→    if path.exists(jspath):
+  1018→  1018→        with open(jspath, encoding="utf-8") as f:
+  1019→  1019→            return f.read()
+  1020→  1020→    return ""
+  1021→  1021→
+  1022→  1022→
+  1023→  1023→def pass_agent(obs):
+  1024→  1024→    return {"farmer": ["PASS"], "hands": [], "market": []}
+  1025→  1025→
+  1026→  1026→
+  1027→  1027→def random_agent(obs):
+  1028→  1028→    rng = random.Random()
+  1029→  1029→    farms = obs.get("farms", [])
+  1030→  1030→    player = obs.get("player", 0)
+  1031→  1031→    private = obs.get("private", {}) or {}
+  1032→  1032→    farm = farms[player] if farms and player < len(farms) else None
+  1033→  1033→    if farm is None:
+  1034→  1034→        return {"farmer": ["PASS"], "hands": [], "market": []}
+  1035→  1035→
+  1036→  1036→    farmer_ops = ["NORTH", "SOUTH", "EAST", "WEST", "WATER", "HARVEST", "PASS"]
+  1037→  1037→    market = []
+  1038→  1038→    seeds = private.get("seeds", {})
+  1039→  1039→
+  1040→  1040→    affordable = [c for c in CROPS if CROPS[c]["seed"] <= farm["money"]]
+  1041→  1041→    if affordable and rng.random() < 0.1:
+  1042→  1042→        market.append(["BUY_SEED", rng.choice(affordable), 1])
+  1043→  1043→
+  1044→  1044→    available_seeds = [c for c, n in seeds.items() if n > 0]
+  1045→  1045→    if available_seeds and rng.random() < 0.3:
+  1046→  1046→        farmer = ["PLANT", rng.choice(available_seeds)]
+  1047→  1047→    else:
+  1048→  1048→        farmer = [rng.choice(farmer_ops)]
+  1049→  1049→
+  1050→  1050→    hands_actions = [[rng.choice(farmer_ops)] for _ in farm.get("hands", [])]
+  1051→  1051→    return {"farmer": farmer, "hands": hands_actions, "market": market}
+  1052→  1052→
+  1053→  1053→
+  1054→  1054→def starter_agent(obs):
+  1055→  1055→    """Carrot loop: buy seed, plant on the current tile, water, harvest at max_yield_day."""
+  1056→  1056→    farms = obs.get("farms", [])
+  1057→  1057→    player = obs.get("player", 0)
+  1058→  1058→    private = obs.get("private", {}) or {}
+  1059→  1059→    if not farms or player >= len(farms):
+  1060→  1060→        return {"farmer": ["PASS"], "hands": [], "market": []}
+  1061→  1061→    farm = farms[player]
+  1062→  1062→    fx, fy = farm["farmer"]
+  1063→  1063→    tile = farm["tiles"][fy][fx]
+  1064→  1064→    day = obs.get("day", 0)
+  1065→  1065→    seeds = private.get("seeds", {})
+  1066→  1066→    shed = private.get("shed", {})
+  1067→  1067→
+  1068→  1068→    market = []
+  1069→  1069→    if shed.get("CARROT", 0) > 0:
+  1070→  1070→        market.append(["SELL", "CARROT", shed["CARROT"]])
+  1071→  1071→    if seeds.get("CARROT", 0) == 0 and farm["money"] >= CROPS["CARROT"]["seed"]:
+  1072→  1072→        market.append(["BUY_SEED", "CARROT", 1])
+  1073→  1073→
+  1074→  1074→    farmer = ["PASS"]
+  1075→  1075→    if tile is None and seeds.get("CARROT", 0) > 0:
+  1076→  1076→        farmer = ["PLANT", "CARROT"]
+  1077→  1077→    elif isinstance(tile, dict) and tile.get("kind") == "PLANT" and tile["crop"] == "CARROT":
+  1078→  1078→        age = day - tile["planted_day"]
+  1079→  1079→        if age >= CROPS["CARROT"]["max_yield_day"]:
+  1080→  1080→            farmer = ["HARVEST"]
+  1081→  1081→        elif not tile["watered_today"]:
+  1082→  1082→            farmer = ["WATER"]
+  1083→  1083→    return {"farmer": farmer, "hands": [], "market": market}
+  1084→  1084→
+  1085→  1085→
+  1086→  1086→agents = {"pass": pass_agent, "random": random_agent, "starter": starter_agent}
+  1087→  1087→

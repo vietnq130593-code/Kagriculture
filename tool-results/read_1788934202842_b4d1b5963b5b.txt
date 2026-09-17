@@ -1,0 +1,389 @@
+     1→     1→# PLAN_V5 — KẾ HOẠCH TRIỂN KHAI v5 "ORCHESTRATOR" (đánh bại v4 hoàn toàn)
+     2→     2→
+     3→     3→**Tác giả:** KAIN (kỹ sư AI · kiến trúc sư hệ thống · chuyên gia thuật toán)
+     4→     4→**Mục tiêu tuyệt đối:** v5 đánh bại v4 một cách hoàn toàn — theo chuẩn dominance 6 điều kiện (mục 1.2), không phải "thua đôi vòng"
+     5→     5→**Nền tảng:** LESSONS_V4.md (27 bài học) · RESEARCH_v4.md v2.0 · p0_results.json (ledger $0 residual) · mã nguồn đầy đủ v2/v3/v4 (lợi thế white-box)
+     6→     6→**Phiên bản:** 2.1 — đã review + bổ sung theo mandate kép của user: *kiếm tiền xuất sắc* + *hệ phản thân linh hoạt* (tự đánh giá hiện trạng · tự nhận diện kết quả tồi để tránh · tự đổi kế hoạch theo chiến lược đối thủ quan sát được qua Bayes)
+     7→     7→**Trạng thái tài liệu:** hợp đồng triển khai **ĐÃ KÍ CHỐT** — 4 quyết định mở mục 10 đã được user chốt (D1–D6 · minimax · thư viện 3 bot đủ · não trước). Hạ tầng mới: **ARENA OBSERVER UI** (mục 11) để xem trận v4↔v5 từng turn 720 lượt trong quá trình phát triển.
+     8→     8→
+     9→     9→---
+    10→    10→
+    11→    11→## 0. TÓM TẮT ĐIỀU HÀNH
+    12→    12→
+    13→    13→v4 hiện là một **orchestrator có nền kinh tế mạnh nhưng não tri giác bán phần**: mắt tinh (telemetry 100% chính xác), tay vững (nền kinh tế v3 + 8 edges), nhưng **vùng não "dự đoán tương lai và đổi chiến thuật" chưa được nối**. Cụ thể: Bayes của v4 chỉ là *bộ phân loại 2 lớp* (twin hay không) — nó **không dự đoán** đối thủ ngày mai bán gì, không dự báo đường giá, không mô phỏng kết quả của quyết định trước khi ra quyết định.
+    14→    14→
+    15→    15→Kế hoạch v5 (phiên bản 2.0, review theo mandate kép của user) xây đúng kiến trúc đó — **1 điều phối trung tâm (orchestrator) điều động nhân công con (executor)** — với **não 6 lớp**: 4 lớp Bayes hướng đối thủ (phân loại → dự báo flow → dự báo giá → mô phỏng kết quả) + **2 lớp phản thân** (L5 tự đánh giá hiện trạng, L6 vệ binh rủi ro với thư viện 10 failure-mode và playbook thoát hiểm), tất cả hội tụ về **bộ meta-controller 6 trạng thái chiến lược** có khả năng đổi kế hoạch giữa trận (dwell 2 đêm chống flip-flop, mọi trạng thái khẩn cấp bắt buộc có lối thoát). Mỗi lớp có công thức tường minh, chi phí đo được, đầu ra bắt buộc được consume bởi quyết định, và cổng nghiệm thu bằng benchmark. Lộ trình P0–P6 (não trước theo mandate), mỗi pha một gate two-sided 24 seed; ước tính giá trị còn lại: **+$15–30k/mùa** so với v4, hướng tới vượt ngưỡng knife-edge ~1.25×.
+    16→    16→
+    17→    17→---
+    18→    18→
+    19→    19→## 1. MỤC TIÊU & TIÊU CHUẨN "ĐÁNH BẠI v4 HOÀN TOÀN"
+    20→    20→
+    21→    21→### 1.1 Định nghĩa mục tiêu
+    22→    22→
+    23→    23→Đối thủ trực tiếp cần đánh bại: `submission_v4.py` (order-invariant, 1.117× vs v3, mirror-safe). Đồng thời giữ mọi chuẩn an toàn đã có (meta coverage, validation self-play).
+    24→    24→
+    25→    25→### 1.2 Chuẩn dominance 6 điều kiện (kế thừa LESSONS_V4 §1.4, nâng ngưỡng + thêm điều kiện phản thân)
+    26→    26→
+    27→    27→| # | Điều kiện | Ngưỡng nghiệm thu | v4 hiện tại |
+    28→    28→|---|---|---|---|
+    29→    29→| D1 | Tỷ lệ thu nhập hai phía vs v4 (24 seed) | **≥ 1.25×** | — (v4 là đối tượng) |
+    30→    30→| D2 | Tỷ lệ thắng hai phía vs v4 | **≥ 90%** | — |
+    31→    31→| D3 | Không gãy: trận tệ nhất | **≥ 0.95×** | v4 có 0.80× vs v3 |
+    32→    32→| D4 | Mirror / Validation self-play | 10 trận ≥ $30k/bên, không tự hủy T8 | đạt |
+    33→    33→| D5 | Phủ meta: melon/random/starter 100%; v2 ≥ 1.34×; crop-baseline ≥ 1.58× | giữ hoặc tốt hơn v4 | đạt |
+    34→    34→| D6 | Phản thân: mọi failure mode phát hiện kịp thời, playbook phản hồi kích hoạt, có lối thoát | phát hiện ≤ 24h · hồi phục ≤ 3 ngày | v4: survival không lối thoát (kẹp $4–8k) |
+    35→    35→
+    36→    36→Cột mốc trung gian: P0 ≥ 1.05× · P1 ≥ 1.08× · P2 ≥ 1.10× · P3 ≥ 1.15× · P4 ≥ 1.18× · P5 ≥ 1.20× · P6 ≥ 1.25× (mỗi pha một bậc, không nhảy cóc).
+    37→    37→
+    38→    38→### 1.3 Vì sao 1.25× là "hoàn toàn" chứ không phải 100%/2×
+    39→    39→
+    40→    40→Bài học LE-2 và knife-edge (LESSONS_V4 §1.3): với hai orchestrator cùng mức lao động trên một thị trường dùng chung, biên thắng phụ thuộc phương sai seed ±$3–8k và hiệu ứng thứ tự. Vượt 1.25× trung bình hai phía = toàn bộ phân phối kết quả dịch khỏi vùng hòa/thua — thực chất là "không thua nổi" về xác suất. Đuổi 100% từng trận một trên knife-edge là đuổi con số không tồn tại vật lý.
+    41→    41→
+    42→    42→---
+    43→    43→
+    44→    44→## 2. GÓC NHÌN KIẾN TRÚC — "1 AGENT ĐIỀU PHỐI + NHÂN CÔNG LÀ AGENTS CON"
+    45→    45→
+    46→    46→Nhận định của user là **đúng và là lens thiết kế chính thức của v5**. Đối chiếu với engine:
+    47→    47→
+    48→    48→- **Orchestrator** = hàm `agent(obs)` chạy mỗi giờ: toàn bộ trí tuệ (quan sát, dự đoán, kế hoạch, phân công) tập trung ở đây.
+    49→    49→- **Executors** = thợ thuê: engine cho mỗi thợ đúng 1 hành động/giờ (MOVE/hành vi tại ô), **không có trí tuệ, không có bộ nhớ riêng** — mọi "ý định" của thợ là task do orchestrator gán. Năng lực của hệ = số thợ × chất lượng phân công.
+    50→    50→- **Đối thủ** = 1 orchestrator khác điều động đội thợ của nó; ta không thấy shed của nó, còn lại public (kể cả tiền mặt và số hire — T3).
+    51→    51→- **Môi trường ghép** = thị trường lockstep dùng chung là kênh tương tác gián tiếp duy nhất có ý nghĩa kinh tế ( presence, drain, giá).
+    52→    52→
+    53→    53→Ba hệ quả thiết kế rút ra:
+    54→    54→
+    55→    55→1. **Mọi "AI" phải nằm ở orchestrator.** Không thể "trang bị não cho thợ" — engine không cho phép. Chiến lược sub-agent của user = phân công thông minh: **đấu giá/Hungarian task market** (P4) chính là hiện thực hóa "điều động nhân công con" tối ưu.
+    56→    56→2. **Thông tin đối thủ đầy hơn tưởng tượng:** trừ shed riêng tư, mọi thứ public → lớp tri giác (perception) có thể đạt "gần hoàn hảo"; điểm nghẽn thật của v4 nằm ở *suy diễn* (inference) chứ không phải *quan sát*.
+    57→    57→3. **Đối đầu tuần tự trên thang Kaggle** (user nhấn mạnh): mỗi trận gặp 1 archetype khác → cần **bộ nhận diện + bảng chiến thuật theo archetype**, không phải một chiến thuật cố định tinh chỉnh cho clone của chính mình. Đây chính là lý do não 6 lớp là trụ cột v5.
+    58→    58→4. **Hệ không có ai soi:** orchestrator vừa chơi vừa điều phối — không ai ngoài nó nhìn vào chính nó → muốn "tự đánh giá hiện trạng" phải dựng **gương soi nội tại (L5)**: sổ KPI + chuẩn đối chiếu + điểm sức khỏe; muốn "tránh kết quả tồi" phải dựng **vệ binh nội tại (L6)**: thư viện failure mode với tín hiệu + playbook + lối thoát. Đây là hai lớp mà mandate mới của user yêu cầu và v4 hoàn toàn chưa có.
+    59→    59→
+    60→    60→---
+    61→    61→
+    62→    62→## 3. KIỂM KẾ OODA + PHẢN THÂN CỦA v4 — TRẢ LỜI TRỰC TIẾP CÂU HỎI CỦA USER
+    63→    63→
+    64→    64→*"Agent đã có cơ chế quan sát, xác định trạng thái hiện tại và đối thủ, dùng thuật toán Bayes tính toán trước tương lai kết quả để tùy biến chiến thuật chưa?"*
+    65→    65→
+    66→    66→| Tầng OODA | Trạng thái trong v4 | Bằng chứng mã nguồn | Đánh giá |
+    67→    67→|---|---|---|---|
+    68→    68→| **Quan sát (Observe)** | telemetry thị trường từng giờ: `opp_sales = Δinv + drain − my_sales`, chuẩn 100% (5.854/5.854 cell); đọc tiền mặt/đàn/đất đối thủ; giá + shop public | `_tm_step`, `_tm_orders` (v4.py L81–116) | ✅ **ĐẠT** — mắt tốt nhất có thể có |
+    69→    69→| **Định vị trạng thái (Orient)** | mô hình thế giới đầy đủ mỗi giờ: tile cây/tuổi/urgency, kho, đàn, tiền, drain tương lai xác định | `_forward_absorb` (L306) — chiếu hậu cống hút | ✅ **ĐẠT** (phía vật lý) |
+    70→    70→| **Nhận diện đối thủ (Identify)** | Bayes 2-giả-thuyết: MIRROR vs CONTEST; signature đàn + tỷ lệ tiền; geometric forgetting + hysteresis. 4 archetype khai báo thì **2 chết** (COOP/PASSIVE không bao giờ được gán) | `_bayes_step` (L119–164), `_ARCHES` (L73) | ⚠️ **MỚI 2/5 lớp** — chỉ trả lời "twin hay không", không biết đối thủ mạnh/yếu/hợp tác/dump |
+    71→    71→| **Dự đoán tương lai (Predict)** | ❌ **KHÔNG CÓ**. Không có mô hình hành vi đối thủ; `opp_daily` ghi đầy đủ nhưng **không dòng code nào đọc ra quyết định** (grep xác nhận: chỉ ghi L88/L93, không consume); không dự báo đường giá; không mô phỏng kết quả quyết định. Dự đoán duy nhất = drain vật lý (phía cầu), thuộc dạng giải tích chứ không phải Bayes | `opp_day`/`opp_daily` dead-read; `_daily_plan` dùng `opp_counts` tĩnh từ bàn cờ | ❌ **THIẾU CẢ TẦNG** — đây là khoảng trống lớn nhất |
+    72→    72→| **Thích ứng chiến thuật (Adapt)** | mode đổi **duy nhất mục tiêu đàn** (MIRROR 6/5/3 vs CONTEST công thức). Ngưỡng bán, quota cây, lao động, mua bán — **không đổi theo mode**; telemetry không vào vòng điều khiển | `_daily_plan` L410–426 | ⚠️ **1/5 núm** — đổi não không đổi tay |
+    73→    73→| **Tự đánh giá hiện trạng (Self-evaluate)** | ❌ **KHÔNG CÓ**. Không sổ KPI (net/ngày, burn, doanh thu vs kế hoạch), không so dự báo với thực tế, không điểm sức khỏe — agent không biết mình đang chạy tốt hay xấu so với chuẩn cho tới cuối trận | `_STATE` chỉ chứa dữ liệu thô phục vụ phân công task, không vòng phản hồi | ❌ **THIẾU** — "gương soi" chưa tồn tại |
+    74→    74→| **Tránh kết quả tồi (Risk guard)** | ⚠️ **1/8 mức**: chỉ sàn tiền mặt + survival hire (từng kẹp nghèo $4–8k cả trận vì không có điều kiện thoát — LESSONS_V4 vòng 2); không thư viện failure mode, không detector, không playbook | hire survival, money floor | ⚠️ **SƠ SÀI** — không có khái niệm worst-case |
+    75→    75→
+    76→    76→**Kết luận thẳng thắn:** v4 có *mắt* và *vùng vận động*, chưa có *vỏ não dự đoán* và cũng chưa có *gương soi + vệ binh nội tại*. "Bayes tính toán trước tương lai kết quả" hiện chưa tồn tại dưới bất kỳ dạng nào — Bayes hiện tại chỉ trả lời "đây có phải ảnh của tôi không" trước khi quyết định mua mấy con bò; và agent cũng không hề biết mình đang thắng hay thua cho tới cuối trận. Thiết kế đầy đủ 6 lớp cho v5 ở mục 4.
+    77→    77→
+    78→    78→---
+    79→    79→
+    80→    80→## 4. THIẾT KẾ NÃO 6 LỚP — 4 LỚP BAYES DỰ ĐOÁN + 2 LỚP PHẢN THÂN
+    81→    81→
+    82→    82→Nguyên tắc chung: **mỗi lớp có công thức tường minh, cập nhật theo đêm (flows là đại lượng theo ngày), chi phí O nhỏ, mọi đầu ra phải được consume bởi quyết định cụ thể** (bài học LA-2/LT-3: tính năng không ra quyết định = xóa). Phân tầng: **L1–L4 hướng ngoại** (nhìn đối thủ và tương lai — mandate "linh hoạt theo chiến lược đối thủ qua Bayes"), **L5–L6 hướng nội** (nhìn chính mình — mandate "tự đánh giá + tránh kết quả tồi"); tất cả hội tụ về **bộ meta-controller (4.8)** — nơi đổi kế hoạch giữa trận.
+    83→    83→
+    84→    84→### 4.1 Lớp L1 — Archetype posterior (nhận diện đối thủ bằng Bayes tuần tự)
+    85→    85→
+    86→    86→- **Không gian giả thuyết** H ∈ {`MIRROR` (twin bit-identical), `STRONG-CONTEST` (dòng v3/v4: đa thị trường, threshold-ladder), `COOP` (chia drain ổn định ~drain/2 mỗi bên), `PASSIVE` (yếu/ít bán: melon, random, starter), `DUMP` (dump giá bất thường)}.
+    87→    87→- **Vector đặc trưng mỗi đêm** (từ telemetry đã 100% chính xác): net-flow 9 mặt hàng của đối thủ trong ngày + quỹ đạo tiền + hires_today + cấu trúc đàn (COW/GOOSE/SHEEP) + mức dùng đất.
+    88→    88→- **Hàm likelihood:** naive Bayes trên 9 kênh flow — mỗi mặt hàng một phân phối Poisson quanh "hồ sơ flow kỳ vọng" của archetype; hồ sơ này **học offline từ 10 trận/thủ thư viện** (ta có đủ mã nguồn + bot để sinh dữ liệu). Giữ kernel đàn + tiền như bản v4 hiện tại cho giả thuyết MIRROR (đã chứng minh chính xác).
+    89→    89→- **Cập nhật:** `P(H|D_t) ∝ P(D_t|H)·P(H|D_{t-1})^λ` với λ = 0.8 (geometric forgetting — đối thủ có thể đổi chiến thuật giữa trận).
+    90→    90→- **Chốt mode:** posterior argmax + hysteresis (đổi mode chỉ khi P(mới) > 0.6 hai đêm liên tiếp) — chống flip-flop; **cấm MIRROR trước ngày 8** (giữ nguyên luật v4 đã đúng); với Validation Episode (self-play thật), posterior MIRROR sẽ tự thắng bằng symmetry — an toàn T8 mặc nhiên.
+    91→    91→- **Chi phí:** O(9 × |H|) mỗi đêm ≈ 50 phép nhân — không đáng kể.
+    92→    92→
+    93→    93→### 4.2 Lớp L2 — Posterior predictive flow (dự báo dòng bán đối thủ ngày mai)
+    94→    94→
+    95→    95→- Mỗi mặt hàng p: ước lượng tốc độ bán đối thủ λ_p với độ bất định — mô hình **Gamma–Poisson** (lambda conjugate, predictive = Negative Binomial), trọng số suy biến theo λ = 0.8.
+    96→    96→- Đầu ra: `E[opp_sales_p(mai)]` + phân vị (P25/P75) — **thay thế công thức room tĩnh `−30×opp_COW`** bằng dự báo flow thật (vá trực tiếp điểm yếu W3: telemetry vào quyết định).
+    97→    97→- Công thức room mới: `room_p = deficit_p + drain_cum_p − E[opp_sales_p]` (bán quota) và `herd_target_p = f(room_p)` (quy hoạch đàn) — dùng phân vị thận trọng P75 cho quota, P25 cho kế hoạch đàn.
+    98→    98→- Đây là chỗ "Bayes tính toán trước" hoạt động thật: không đoán mò "đối thủ mạnh cỡ nào" mà **đo trực diện dòng chảy và ngoại suy ngày mai kèm khoảng tin cậy**.
+    99→    99→
+   100→   100→### 4.3 Lớp L3 — Dự báo đường giá (lai: giải tích engine + L2)
+   101→   101→
+   102→   102→- Engine cho công thức giá chính xác theo tồn kho: `price(inv)`. Quỹ đạo tồn kho: `inv(t+1) = inv(t) + my_sales + E[opp_sales] − drain(t)`.
+   103→   103→- ⇒ **mô phỏng giá từng giờ 24h tới cho 9 mặt hàng** (đóng dạng, O(9×24)); dùng để quyết định *bán ngay hay giữ đến ngưỡng tốt hơn* (1-step lookahead + threshold-ladder có chủ đích) thay vì thang ngưỡng tĩnh.
+   104→   104→- Bất định từ L2 lan truyền: quyết định dùng đường giá tại phân vị thận trọng.
+   105→   105→
+   106→   106→### 4.4 Lớp L4 — Mô phỏng kết quả quyết định (rollout có giới hạn)
+   107→   107→
+   108→   108→- Với ≤5 quyết định lớn mỗi ngày (ramp bò? mua đất 4? hire #13? tăng quota X? thanh lý?): rollout **7 ngày** dạng dòng chảy (closed-form: dùng L2+L3, không mô phỏng từng unit) → chênh lệch $ kỳ vọng → chọn.
+   109→   109→- Thanh lý cuối mùa 26–29 là trường hợp riêng của L4: **DP per-product** trên lưới (ngày × tồn kho) tới giờ 22 ngày 29 (23 giờ vàng) — thay dump thô.
+   110→   110→- Ngân sách compute: 5 rollout × 7 ngày × 9 mặt hàng ≈ 10³ phép — vô nghĩa so với step budget.
+   111→   111→
+   112→   112→### 4.5 Chính sách baseline theo archetype (input cho meta-controller 4.8)
+   113→   113→
+   114→   114→| Posterior chiến thắng | Mục tiêu đàn | Thị trường ops | Đặc biệt |
+   115→   115→|---|---|---|---|
+   116→   116→| MIRROR | chia drain (6/5/3 — giữ luật v4) | ngưỡng chia premium | không phá giá đôi bên |
+   117→   117→| STRONG-CONTEST | presence ramp bò sớm 8–10 + kho chứa + drip milk 1.2–1.4× base; wool 2–3 (hợp tác) | pinning ngưỡng; nuốt TOMATO (v4 quota = 0) | FEED make-vs-buy đánh vào burn $35k của đối thủ |
+   118→   118→| COOP | giữ share hiện tại | ngưỡng cao, không undercut | duy trì tín hiệu hợp tác qua flow ổn định |
+   119→   119→| PASSIVE | max đàn + max quota mọi thị trường trống | bán trọn room | không tốn denial |
+   120→   120→| DUMP | giảm exposure mặt hàng bị dump | nâng ngưỡng, chờ drain hút lại | mua wheat rẻ nếu bị dump |
+   121→   121→
+   122→   122→Ghi chú white-box: **ta có toàn bộ mã nguồn v4** — có thể chạy offline v5-ứng-viên vs v4 trên lưới seed, và mô phỏng chính công thức `milk_room −30×opp_COW` của v4 để biết trước phản ứng của nó: **v4 tự rút bò khi v5 ramp bò** (presence valve kế thừa từ v3) → v5 giữ 8–10 bò + stockpile/drip sẽ thu phần 218u premium mà cặp v3/v4 vẫn bỏ hoang (LE-2: ≈ $54–72k/cặp).
+   123→   123→
+   124→   124→### 4.6 Lớp L5 — Tự đánh giá hiện trạng ("gương soi" nội tại)
+   125→   125→
+   126→   126→- **Sổ KPI mỗi đêm** (tận dụng ledger đã chứng minh $0 residual ở P0): net/ngày · gross/ngày · burn phân loại (feed/hire/đất/hạt/thú) · doanh thu theo mặt hàng vs quota kế hoạch · thị phần từng mặt hàng (my_sales / (my + opp)) · dải giá bán trung bình · cây chết · thú trốn · tồn kho ứ đọng.
+   127→   127→- **Chuẩn đối chiếu (expected trajectory):** hồ sơ KPI trung bình ± dải P25–P75 từ 10 trận self-play và 10 trận vs v4 chạy offline — agent biết "ngày 12 lành mạnh net nên ~$1.5–2k" thay vì mù tuyệt đối.
+   128→   128→- **Điểm sức khỏe H ∈ [0, 1]** tổng hợp 5 thành phần: tiền (xu hướng cash) · doanh thu (net vs kỳ vọng) · thị phần (so mốc 0.5) · tài sản sống (cây chết/thú trốn) · chất lượng dự báo (sai số L2). H ≥ 0.7 xanh · 0.4–0.7 vàng · < 0.4 đỏ → kích hoạt L6.
+   129→   129→- Chi phí: cộng dồn từ dữ liệu đã có — O(20) phép/đêm.
+   130→   130→
+   131→   131→### 4.7 Lớp L6 — Vệ binh rủi ro: thư viện failure mode + playbook + lối thoát
+   132→   132→
+   133→   133→- **10 failure mode (F1–F10)**, mỗi mode một tín hiệu phát hiện sớm đo được từ telemetry/L5:
+   134→   134→  - F1 death-spiral tiền (cash < sàn bootstrap ∧ đạo hàm âm 2 ngày) · F2 feed crunch (kho wheat < 2 ngày nhu cầu) · F3 crop death cascade (> 3 cây chết/ngày) · F4 herd collapse (escape dây chuyền) · F5 bị dump giá mặt hàng chủ lực (giá < 0.85× ngưỡng 2 ngày) · F6 mất thị phần trầm trọng (share < 0.25 mặt hàng chủ lực 3 ngày) · F7 overbuild/kẹt đất · F8 nhận diện mirror sai (posterior dao động MIRROR/CONTEST) · F9 dự báo lệch kéo dài (MAE > 40% cửa sổ 5 ngày) · F10 quỹ đạo thua ổn định (net đối thủ − net mình > $3k 3 ngày liên tiếp).
+   135→   135→- **Playbook 3 cấp** mỗi mode (nhẹ → nặng → khẩn) + **điều kiện THOÁT bắt buộc** — bài học vòng 2 của v4: survival không lối thoát = bẫy nghèo $4–8k triền miên. Ví dụ F1: cấp 1 cắt 2 hire + trì hoãn mua đất; cấp 2 thanh lý tồn kho non-core; cấp 3 bán nguyên liệu; thoát khi cash ≥ 3× chi/ngày ∧ net/ngày > 0.
+   136→   136→- **Nguyên tắc minimax khi mù:** khi posterior L1 entropy cao (chưa nhận diện được đối thủ) hoặc H < 0.4 → mọi quyết định của L4 dùng phân vị bi quan (P25) + ràng buộc an toàn cứng (sàn tiền, đệm kho 2 ngày). "Hạ kết quả tồi xuống thấp nhất" đúng nghĩa phân phối, không phải khẩu hiệu.
+   137→   137→
+   138→   138→### 4.8 Bộ meta-controller — nơi "đổi kế hoạch linh hoạt" thành hiện thực
+   139→   139→
+   140→   140→- **6 trạng thái chiến lược:** S-GROW (mặc định, tối đa hóa lợi nhuận) · S-HOLD (bảo toàn, chờ thông tin khi entropy cao) · S-DEFEND (đối thủ STRONG-CONTEST: contest có kiểm soát) · S-RECOVER (H < 0.4 hoặc F cấp 1–2 kích hoạt) · S-SURVIVE (chỉ F1/F3/F4 cấp 3) · S-LIQUIDATE (ngày ≥ 26, DP thanh lý).
+   141→   141→- **Luật chuyển:** đầu vào = (posterior L1, dự báo L2, sức khỏe H, trigger L6, ngày). Chuyển trạng thái yêu cầu đạt ngưỡng (posterior > 0.6 hoặc trigger L6 tương ứng) ∧ **dwell tối thiểu 2 ngày** — chống flip-flop (bài học knife-edge); S-SURVIVE/S-RECOVER mang **điều kiện thoát bắt buộc** — không được phép cư trú vĩnh viễn.
+   142→   142→- **Mỗi trạng thái gán trọn bộ 5 núm** (đàn/quota/ngưỡng bán/lao động/thanh lý) = ma trận archetype (bảng 4.5) × trạng thái — phần lớn ô dùng baseline archetype chỉnh hệ số theo trạng thái, không cần 30 bộ tham số riêng.
+   143→   143→
+   144→   144→### 4.9 Tự hiệu chỉnh dự báo (calibration — đóng vòng học)
+   145→   145→
+   146→   146→- Mỗi đêm: so E[opp_sales_p] dự báo đêm trước với thực tế → MAE cuộn 5 ngày theo mặt hàng.
+   147→   147→- MAE cao → tự điều chỉnh: (a) tăng forgetting λ 0.8 → 0.6 (tin hôm nay hơn); (b) dịch quyết định sang phân vị bi quan hơn; (c) giảm quota mở tối đa cho mặt hàng đang lỗi. λ bị chặn biên [0.5, 0.9] để không tự bóp méo.
+   148→   148→- Vòng học đóng: **dự báo → hành động → đo kết quả → hiệu chỉnh dự báo** — đúng nghĩa "đánh giá kết quả mà thay đổi plan" của user, ở tầng vận hành.
+   149→   149→
+   150→   150→---
+   151→   151→
+   152→   152→## 5. KIẾN TRÚC MODULE v5 & ĐIỂM CẮM VÀO MÃ HIỆN CÓ
+   153→   153→
+   154→   154→Nguyên tắc LA-1: **nền v4 + thay đổi đo lường được** — không rebuild. Bảng map module → điểm cắm:
+   155→   155→
+   156→   156→| Module v5 | Chức năng | Cắm vào đâu trong v4.py | Pha |
+   157→   157→|---|---|---|---|
+   158→   158→| M-1 Perception + | giữ telemetry; thêm kênh tiền/hire đối thủ | `_tm_step` (đã có), `_agent` L1202 | P0 |
+   159→   159→| M-2 Bayesian Core (L1+L2) | archetype posterior + flow predictive | thay `_bayes_step` (L119) — giữ giao diện `tm["mode"]`, thêm `tm["posterior"]`, `tm["flow_pred"]` | P1 |
+   160→   160→| M-3 Forecast giá (L3) | đường giá 24h | hàm mới gọi từ `_build_orders` (L972) thay ngưỡng tĩnh | P3 |
+   161→   161→| M-4 Rollout/DP (L4) | quyết định lớn + thanh lý 26–29 | gọi từ `_daily_plan` (L367) cho 5 quyết định; DP thay nhịp bán d26–29 trong `_build_orders` | P3/P5 |
+   162→   162→| M-5 Portfolio Solver | quota động $/action + T/2 + shadow price lao động | thay khối quota cứng L473–505 | P3 |
+   163→   163→| M-6 Labor market | Hungarian/auction assignment | thay `_assign_and_act` (L880) — giữ greedy làm fallback | P4 |
+   164→   164→| M-7 FEED make-vs-buy | mô hình biên trồng/mua cám | `_daily_plan` (wheat floor đã có 20–24) + logic mua trong `_build_orders` | P2 |
+   165→   165→| M-8 Policy table | 5 hàng archetype → bộ tham số baseline | `_daily_plan` đọc `tm["mode"]` như hiện tại nhưng mở rộng núm (đàn + quota + ngưỡng + lao động) | P1 |
+   166→   166→| M-9 Self-Assessment (L5) | sổ KPI + chuẩn đối chiếu + điểm sức khỏe H | hàm mới gọi cuối ngày trong `_agent` (L1173); dữ liệu = ledger runtime (chuyển p0.py vào agent) | P0 |
+   167→   167→| M-10 Risk Guard (L6) | 10 failure mode + playbook 3 cấp + lối thoát | gọi ngay sau M-9 mỗi đêm; trigger cấp 1 cắm vào `_daily_plan`/`_build_orders` như ràng buộc cứng | P0 lõi → P1 đầy đủ |
+   168→   168→| M-11 Calibration (4.9) | sai số dự báo → tự chỉnh λ/quantile | trong vòng update L2 (M-2) | P1 |
+   169→   169→| M-12 Meta-Controller (4.8) | state machine 6 trạng thái + dwell | thay chỗ đọc `tm["mode"]` (L410) bằng `tm["strategy"]`; 5 núm đọc từ trạng thái | P1 |
+   170→   170→
+   171→   171→---
+   172→   172→
+   173→   173→## 6. CHIẾN LƯỢC THANG ĐẤU KAGGLE — ĐỐI ĐẦU TUẦN TỰ ĐA DẠNG
+   174→   174→
+   175→   175→- **Validation (bắt buộc đi trước):** self-play với bản sao chính mình → L1 posterior MIRROR thắng tự nhiên bởi đối xứng flow; floor chia drain giữ ổn định; gate D4.
+   176→   176→- **Thư viện đối thủ chuẩn (ladder coverage):** melon_maxxer, random, starter, v2, crop-baseline, v3, v4, + 3 bot tổng hợp mới (dump-bot, hoarder-bot, wheat-masser) — mỗi cặp 4 seed hai phía = 88 trận/lượt Sweep (~6 phút máy).
+   177→   177→- **Sinh hồ sơ likelihood L1:** 10 trận mỗi archetype từ thư viện trên → hồ sơ flow kỳ vọng (bước 4.1).
+   178→   178→- **Quản lý 2 submission active:** v4-stable giữ làm bản an toàn; v5-dev nộp thử nghiệm hằng ngày từ khi đạt gate P1 (1.08×). Chỉ "thăng chức" v5 lên primary khi đạt trọn D1–D6.
+   179→   179→- **5 submit/ngày = 5 phép thử có kiểm soát:** mỗi lần nộp đi kèm một biến thay đổi duy nhất — tránh burn đột biến rating (Bradley-Terry chỉ đo W/L).
+   180→   180→
+   181→   181→---
+   182→   182→
+   183→   183→## 7. LỘ TRÌNH P0–P6 (mỗi pha: nhiệm vụ → gate nghiệm thu)
+   184→   184→
+   185→   185→**P0 — Nền tri giác + gương soi + vệ binh lõi (ước 1–2 ngày)**
+   186→   186→- Nối telemetry vào quyết định dạng tối thiểu: `room` dùng `opp_daily` flows thay `opp_counts` tĩnh (bản L2 giản lược: trung bình trượt 3 ngày, chưa Gamma–Poisson).
+   187→   187→- Kênh tiền/hire đối thủ vào `tm` (dự báo lock lao động đối thủ).
+   188→   188→- **M-9 Self-Assessment runtime:** sổ KPI mỗi đêm + chuẩn đối chiếu offline + điểm sức khỏe H (ledger $0 residual chuyển từ bench vào agent).
+   189→   189→- **M-10 Risk Guard lõi:** F1 (death-spiral) + F2 (feed crunch) + F3 (crop cascade) với playbook 3 cấp và điều kiện thoát — chính thức hóa survival mode v4 thành cơ chế có hồi phục.
+   190→   190→- Xóa COOP/PASSIVE chết khỏi `_ARCHES` (tạm 2 lớp, mở lại ở P1 với đủ 5).
+   191→   191→- Endgame surge (hire +1–2 ngày 26–28 khi giá trị biên thu hoạch > fib) + nhịp bán dần 26–29; straw urgency window đúng.
+   192→   192→- **Gate:** two-sided 24 seed vs v4 ≥ 1.05×; vs v3 không hồi phục dưới 1.05×; mirror 10 trận ≥ $30k/bên; **SA chạy thật (KPI khớp ledger, residual $0); không trận nào kẹt trạng thái khẩn cấp quá 3 ngày trên 24 seed.**
+   193→   193→
+   194→   194→**P1 — NÃO 6 LỚP đầy đủ: Bayes L1+L2 + meta-controller + RG đủ 10 mode + calibration (theo mandate "linh hoạt, phân tích, đổi plan")**
+   195→   195→- Cài đúng thiết kế 4.1/4.2 (5 archetype + Gamma–Poisson predictive) + bảng 4.5; sinh hồ sơ likelihood offline từ thư viện 10 đối thủ.
+   196→   196→- M-12 meta-controller 6 trạng thái với dwell 2 đêm + lối thoát; 5 núm (đàn/quota/ngưỡng/lao động/thanh lý) đọc từ trạng thái.
+   197→   197→- M-10 đủ 10 failure mode; M-11 calibration tự hiệu chỉnh λ/quantile.
+   198→   198→- **Gate:** nhận diện archetype (offline, đến ngày 10) ≥ 80%; two-sided vs v4 ≥ 1.08×; forecast MAE < 25% sau ngày 5; mọi F phát hiện ≤ 24h trong sweep; coverage ladder không tụt.
+   199→   199→
+   200→   200→**P2 — FEED make-vs-buy (mỏ tiền lớn nhất — +$8–15k, không cần não)**
+   201→   201→- Mô hình chi phí đầy đủ tự trồng 1 wheat (~$25–30: đất + hạt + tưới + lao động) vs giá mua động; kho đệm 2 ngày; mục tiêu cắt 30–40% khoản feedbuy $35k.
+   202→   202→- **Gate:** feedbuy giảm ≥ 25% (ledger đo); net solo ≥ +$5k; two-sided vs v4 ≥ 1.10×; giữ mọi gate P1.
+   203→   203→
+   204→   204→**P3 — Portfolio Solver + dự báo giá (L3) + rollout (L4)**
+   205→   205→- Quota động theo $/action với ràng buộc T/2 + shadow price; mô phỏng giá 24h vào quyết định bán; rollout 5 quyết định/ngày; DP thanh lý.
+   206→   206→- **Gate:** two-sided vs v4 ≥ 1.15×; solo gross ≥ $110k (đối chiếu mục tiêu RESEARCH); biên tệ nhất ≥ 0.90×.
+   207→   207→
+   208→   208→**P4 — Labor market: Hungarian/auction assignment + zoning**
+   209→   209→- Ma trận 13×~70; O(n²m) ≈ 10⁴–10⁵ op/step; fallback greedy; zoning cụm đất.
+   210→   210→- **Gate:** MOVE lãng phí (đo bằng diag) giảm ≥ 10%; two-sided vs v4 ≥ 1.18×.
+   211→   211→
+   212→   212→**P5 — Đánh bóng: FERT động (bón khi giá FERT < $78 biên), TOMATO own (town ~300/mùa + shop), fert-on-wheat**
+   213→   213→- **Gate:** two-sided vs v4 ≥ 1.20×; giữ nguyên mọi gate trước + D3 (tệ nhất ≥ 0.95×).
+   214→   214→
+   215→   215→**P6 — Đóng băng & thăng chức**
+   216→   216→- AST strip → `submission_v5.py` (pipeline y như quy trình v4); syntax + import check; sweep chuẩn 88 trận cuối; đổi primary submission khi trọn D1–D5.
+   217→   217→
+   218→   218→Thứ tự đã chốt theo mandate của user (phiên bản 2.0): **não trước** — P1 dựng trọn hệ Bayes + meta-controller + phản thân để mọi pha sau hưởng hạ tầng thích ứng; FEED (P2) vẫn là mỏ tiền lớn nhất và không phụ thuộc não. Ghi chú rủi ro đổi thứ tự: nếu P1 trễ lịch, P2 (FEED) có thể kéo lên trước mà không phá phụ thuộc.
+   219→   219→
+   220→   220→---
+   221→   221→
+   222→   222→## 8. PROTOCOL KIỂM ĐỊNH BẮT BUỘC (áp cho mọi pha)
+   223→   223→
+   224→   224→1. Mọi thay đổi một núm → benchmark two-sided 24 seed (100–123) trước/sau; ghi worklog.
+   225→   225→2. Chuẩn 4 lượt sweep mỗi pha: vs v4 · vs v3 · mirror 10 · ladder coverage 88 trận.
+   226→   226→3. Theo dõi riêng chỉ số "rủi ro gãy": trận tệ nhất, không chỉ trung bình.
+   227→   227→4. Quy tắc dừng: 3 vòng liên tiếp không tăng ≥ 2% tỷ lệ hai phía → chốt phiên bản, chuyển pha.
+   228→   228→5. Cấm mọi tối ưu chưa đo (LA-5); cấm tính năng không consume (LA-2).
+   229→   229→6. Ba chỉ số phản thân mỗi pha (cho mandate "tự đánh giá"): **forecast MAE** (sai số dự báo L2) · **detector latency** (giờ từ sự kiện đến khi L6 phát hiện) · **recovery time** (giờ từ phát hiện đến khi thoát failure mode) — mục tiêu: MAE < 25% sau ngày 5 · latency ≤ 24h · recovery ≤ 3 ngày.
+   230→   230→7. Stress-test cố định: 2 seed "nghịch" (bootstrap nghèo — chọn từ tập 24 seed có cash thấp nhất) chạy mỗi pha để xác nhận playbook F1/F2 thoát hiểm thật, không chỉ trên giấy.
+   231→   231→
+   232→   232→---
+   233→   233→
+   234→   234→## 9. RỦI RO & GIẢM NHẸ (tóm tắt, chi tiết ở LESSONS_V4 §5.3)
+   235→   235→
+   236→   236→| Rủi ro chính cho v5 | Giảm nhẹ |
+   237→   237→|---|---|
+   238→   238→| L1 nhầm archetype giữa trận (đối thủ lai) | hysteresis 2 đêm + chính sách mặc định STRONG-CONTEST an toàn |
+   239→   239→| L2 dự báo lệch khi đối thủ đổi chiến thuật | λ = 0.8 forgetting + phân vị thận trọng; fallback room tĩnh |
+   240→   240→| Solver động dao động quota (ping-pong cây) | sticky + damping 15% (bài học vòng 1 v1) |
+   241→   241→| Hungarian chậm vượt step budget | đo trước, fallback greedy |
+   242→   242→| Phá nền kinh tế khi refactor | từng pha một gate; không rebuild toàn cục |
+   243→   243→| Overfit clone, yếu trên ladder | thư viện 10 archetype + coverage bắt buộc |
+   244→   244→| 5 submit/ngày burn rating | submission đôi, mỗi nộp 1 biến đổi |
+   245→   245→| Meta-controller flip-flop giữa 6 trạng thái | dwell 2 đêm + ngưỡng posterior 0.6 + điều kiện thoát một chiều |
+   246→   246→| Vòng phản hồi calibration tự bóp méo dự báo | λ chặn biên [0.5, 0.9]; MAE đo cửa sổ cuộn 5 ngày; dịch quantile có giới hạn |
+   247→   247→| Phức tạp 12 module — khó debug, chậm phát triển | mỗi module một gate riêng; mọi lớp có fallback tĩnh (não hỏng → nền kinh tế v4 vẫn sống) |
+   248→   248→
+   249→   249→---
+   250→   250→
+   251→   251→## 10. BA QUYẾT ĐỊNH MỞ CHO USER — ĐÃ CHỐT TOÀN BỘ (phiên bản 2.1)
+   252→   252→
+   253→   253→1. ~~Thứ tự ưu tiên~~ — **đã chốt theo mandate user: não trước** (P1 = Bayes 6 lớp + meta-controller; P2 = FEED).
+   254→   254→2. ~~Xác nhận chuẩn "hoàn toàn"~~ — **USER CHỐT "D1-D6 ok, đủ"** (phiên 2025-06): D1–D6 với ngưỡng 1.25×/90%/0.95× + phản thân (phát hiện ≤ 24h, hồi phục ≤ 3 ngày) là định nghĩa chính thức của "đánh bại v4 hoàn toàn".
+   255→   255→3. ~~Thư viện đối thủ~~ — **USER CHỐT "đủ"**: 3 bot tổng hợp (dump/hoarder/wheat-masser) + thư viện hiện có là đủ khởi động; bổ sung thủ từ meta Kaggle thật sau khi có dữ liệu thang đấu.
+   256→   256→4. ~~Khẩu vị rủi ro khi mù~~ — **USER CHỐT "minimax"**: khi entropy posterior cao hoặc H < 4/10 → mặc định phân vị bi quan P25 + ràng buộc an toàn cứng (mục 4.7). Nguyên tắc điều khiển v5: **hạ kết quả tồi xuống thấp nhất trước, tối đa hóa kỳ vọng sau**.
+   257→   257→
+   258→   258→---
+   259→   259→
+   260→   260→## 11. HẠ TẦNG ARENA OBSERVER UI — "QUAN SÁT CẢ 2 BÊN TRIỂN KHAI CHIẾN THUẬT ĐẾN CUỐI" (phiên bản 2.1)
+   261→   261→
+   262→   262→User yêu cầu xem trực tiếp trận v4↔v5 suốt 720 turn (30 ngày × 24 giờ) để rút kinh nghiệm chiến thuật thực chiến. Kiểm chứng: dữ liệu Kaggle (kaggle competitions download) cần xác thực — sandbox không có credential; và gói data chỉ chứa môi trường (đã có sẵn kaggle-environments 1.32.7) chứ **không kèm UI trận đấu** — `env.render(mode="ipython")` chỉ là widget notebook. ⇒ tự xây Arena:
+   263→   263→
+   264→   264→- **run_battle.py** (kaggriculture/arena/): bọc 2 agent bằng recorder, chạy `make("kaggriculture")`, xuất JSONL từng turn ra stdout (obs public + action 2 bên + chẩn đoán nội tâm v5) + kết quả cuối. Nguồn sự thật duy nhất vẫn là engine Kaggle thật.
+   265→   265→- **arena-service** (mini-services/, bun + socket.io, port 3005): nhận lệnh bắt đầu trận, spawn python3, chuyển tiếp JSONL → event socket cho UI; cho phép chạy nhiều trận nối tiếp (seed sweep).
+   266→   266→- **UI tại / ** (Next.js): 2 bảng farm 10×10 trực tiếp (tile cây/tuổi/thú/weed, vị trí farmer/hands), biểu đồ giá 9 mặt hàng + market inventory, timeline scrub 720 turn, event log 2 bên, bảng chẩn đoán nội tâm v5 (posterior archetype · flow dự báo · sức khỏe H · trạng thái meta-controller · failure mode) — nơi user nhìn thấy "não 6 lớp" làm việc thật.
+   267→   267→- **Vai trò trong quy trình:** mọi trận nghiệm thu gate P0–P6 đều chạy qua Arena; user xem v5 thay đổi chiến thuật giữa trận ở đâu và hỏi ngược "tại sao quyết định này" → nguồn câu hỏi điều chỉnh chiến thuật mới đúng tinh thần thực chiến của user.
+   268→   268→
+   269→   269→
+   270→   270→## 12. BIÊN BẢN TRIỂN KHAI v5.2 "P1-TUNED" (2 TRỌNG TÂM CỦA USER) — 21:00
+   271→   271→
+   272→   272→User chỉ định 2 trọng tâm phát triển v5: **(1) v5 dùng Bayes xác định kết quả của chiến lược hiện tại giữa bản thân và đối thủ; (2) v5 linh hoạt điều chỉnh chiến lược để đấu với v4.** v5.2 là bản P1 đã tinh chỉnh theo đúng 2 trục này, nghiệm thu bằng battery 20 seed.
+   273→   273→
+   274→   274→### 12.1 Trọng tâm 1 — Bayes đánh giá kết quả (L3-Race + L3-Price + Calibration)
+   275→   275→
+   276→   276→- **EMA run-rate (α=0.45)** làm mượt doanh thu 2 bên trước khi ngoại suy E[tiền cuối] — v5.1 bị flip-flop tier ±50%/đêm vì bán theo đợt làm run-rate nhảy vọt.
+   277→   277→- **Dwell 2 đêm**: tier LEAD/TIGHT/BEHIND chỉ đổi khi tín hiệu lặp lại 2 đêm liên tiếp (có `tier_cand` hiển thị trong diag để quan sát tín hiệu đang tranh).
+   278→   278→- **Calibration M-11 (lite)**: mỗi đêm so E[tiền] dự báo đêm trước với tiền thực → `calib_mae` tích lũy 8 đêm, xuất ra diag — não tự biết mình đo sai bao nhiêu (vòng học đóng đúng thiết kế 4.9).
+   279→   279→- **L3-Price** dự báo giá +3 ngày từng mặt hàng (drift = E[opp flow] − town absorb) → đầu vào cho front-run/hold-back VÀ cho các núm cạnh tranh ở 12.2.
+   280→   280→
+   281→   281→### 12.2 Trọng tâm 2 — linh hoạt chống v4 (bảng núm hoàn chỉnh)
+   282→   282→
+   283→   283→| Núm | Kích hoạt | Hành động | Bài học gốc |
+   284→   284→|---|---|---|---|
+   285→   285→| `straw_compete` | px_pred dâu tăng ≥1.05× + ≥2 shop cầu dâu | tính room KHÔNG trừ opp pipeline | seed 2: nhượng dâu đúng lúc $265 (-$12.9k) |
+   286→   286→| `room sub 0.85→0.35` | px_pred tăng ≥1.04× (mọi mặt hàng) | giảm hệ số nhượng trong room() | seed 42: dưa 96 vs 48 quả (-$8.4k) |
+   287→   287→| `knobs_animal` + animal floor | px_pred sữa/len tăng HOẶC shop draw (≥2 PIZZA/ICE/SMOOTHIE, ≥1 YARN) | cap opp_sub ở 0.45×absorb + nâng target tối thiểu | seed 555: v4 phóng 15 thú độc chiếm $25k |
+   288→   288→| Thứ tự mua có điều kiện | thị trường động vật sâu (milk+yarn shop ≥2) | BUY_ANIMAL lên TRƯỚC BUY_SEED trong list lệnh | seed 555: $274-510 sáng nào cũng bị hạt ăn sạch |
+   289→   289→| `late_ext` | giá EGG/MILK/WOOL ≥1.25× base | nới window mua thú +2 ngày | seed 555: cửa sổ bò đóng d16 |
+   290→   290→| `fast_wheat` | tier BEHIND | quota wheat +3 (vòng tiền 5 ngày) | thay cho mở đàn mù quáng |
+   291→   291→| `herd_expand` (đã sửa) | BEHIND + nợ nước ≤2 + dưới cap + tiền ≥$2.5k | chỉ +1 thú (chọn chân room tốt nhất) | seed 2 bản cũ: +2/+2/+1 giết ruộng |
+   292→   292→| Water labor governance | `water_debt` (nợ tưới cuối ngày, L5) | cap đàn −2 khi nợ ≥3; +1 thợ khi nợ ≥1; tưới parity lên tier 2 | seed 2: 13 thú × 3 turn = ruộng chết |
+   293→   293→
+   294→   294→Cùng 5 núm gốc v5-P1 (front_run/hold_back/than lý sớm/threshold ×0.93/×1.02/+1 thợ khi BEHIND).
+   295→   295→
+   296→   296→### 12.3 Sửa lỗi cơ học (bắt từ bài học máu)
+   297→   297→
+   298→   298→1. **Bug elif tưới (chết cây)**: `cu≥1` vào ngày chẵn lẻ (parity-ON) chỉ được tier 3 → bị SERVICE đói → cu=2 → cỏ dại. Fix: cu≥1 luôn tier 0 bất kể parity (v5.2 cuối cùng). Tưới vẫn mỗi 2 ngày/plant (cùng volume v4) nhưng ưu tiên đúng.
+   299→   299→2. **Animal reserve**: hạt đắt ăn sạch tiền buổi sáng → BUY_ANIMAL fail cả mùa (seed 42: 1 bò).
+   300→   300→3. **Window closing**: plan MELON 14 ngày 14, mua 11 hạt, trồng 0 → leo tier PLANT lên 2 khi window đóng ≤3 ngày.
+   301→   301→4. **`water_crit_late` ghi ĐÈ** giờ cuối (hour 23) thay vì max — đo đúng nợ cuối ngày.
+   302→   302→
+   303→   303→### 12.4 Thí nghiệm thất bại (đã revert — mỗi cái một bài học)
+   304→   304→
+   305→   305→- **Daily-crit đảo ngược ưu tiên**: cu≥1 tier 0 mọi cây mọi ngày (bản đầu) — cây sống nhưng cướp capacity → ruộng trống. Sửa về đúng semantics trên.
+   306→   306→- **Parity chase** (đuổi đàn theo đối thủ +2/+2): giúp seed 555 nhưng giết seed 3 (0.717×) — v5 ruộng đầy + đuổi 5 thú = quá tải. Kết luận: cấu trúc đúng là tín hiệu THỊ TRƯỜNG (giá/shop), không phải chạy đua hành vi đối thủ.
+   307→   307→- **Straw capital balance** (cắt dâu khi đàn thiếu): đúng hướng nhưng cứng — nhường chỗ cho tín hiệu giá.
+   308→   308→
+   309→   309→### 12.5 Kết quả nghiệm thu battery 20 seed (run_battle v5 vs v4)
+   310→   310→
+   311→   311→| Chỉ số | v5.1 (trước) | **v5.2 (sau)** |
+   312→   312→|---|---|---|
+   313→   313→| Tỷ lệ tổng tiền | 0.948× | **1.063×** |
+   314→   314→| Tỷ lệ thắng | 40% (4/10) | **65% (13/20)** |
+   315→   315→| Median ratio | — | 1.081 |
+   316→   316→| P25 | — | 0.970 |
+   317→   317→| Tệ nhất | 0.763× (seed 2) | 0.826× (seed 19) |
+   318→   318→
+   319→   319→Xác nhận qua Arena UI (seed 555: banner "🏆 v5 THẮNG! 1.00×", não hiển thị tier/tier_cand/proj/calib đầy đủ). 7 seed còn thua (42/101/3/19/606/7/808) đều là vấn đề **cân bằng danh mục cấu trúc** — wheat volume + phân bổ cây/thú theo $/action — chính là mục tiêu M-2 Solver (P3) và P2 FEED, không phải núm.
+   320→   320→
+   321→   321→### 12.6 Tiếp theo (đúng lộ trình §7)
+   322→   322→
+   323→   323→P1 gate 1.08× chưa đạt (1.063×) — thiếu đúng phần P1 đầy đủ (L1 5-archetype + Gamma-Poisson L2). Khuyến nghị: hoặc hoàn thiện P1 đúng thiết kế (nhận diện archetype + predictive flow), hoặc kéo P2 (FEED make-vs-buy, +$8-15k không cần não) lên trước vì 7 seed thua đều nhạy chi phí cám + volume wheat.
+   324→   324→
+   325→   325→
+   326→   326→---
+   327→   327→*KAIN — hết kế hoạch phiên bản 2.1 (đã ký chốt 4 quyết định + hạ tầng Arena Observer). File này là hợp đồng triển khai v5; mọi pha P khởi động kèm gate nghiệm thu bằng benchmark, mọi số liệu đối chiếu được với bench/ và worklog.*
+   328→   328→
+   329→   329→## 13. BIÊN BẢN v5.3 (P2 FEED + L1 ARCHETYPE + L2 GAMMA-POISSON) — 8 Sep
+   330→   330→
+   331→   331→**Lệnh user:** "Trước tiên kéo P2 theo khuyến nghị sau đó hoàn thiện L1 archetype + Gamma-Poisson. Sau đó thảo luận chi tiết trước khi nâng cấp Phase 5."
+   332→   332→
+   333→   333→### 13.1 Phát hiện đảo ngược giả định P2 (quan trọng nhất của phiên này)
+   334→   334→
+   335→   335→Khuyến nghị mục 12 ("kéo P2 FEED +$8-15k không cần não vì 7 seed thua nhạy chi phí cám")
+   336→   336→đã được kiểm định A/B và **BỊ ĐẢO NGƯỢC**:
+   337→   337→
+   338→   338→- Trace seed 42: từ d26 cả 2 agent rơi vào vòng "mua 110-120u wheat/ngày rồi bán
+   339→   339→  150u cùng ngày" — ban đầu đọc là máy nghiền tiền (mua $45 bán $19).
+   340→   340→- Bản v5.3-r1 cắt hẳn mua (make-vs-buy thuần: gate $34, dự báo cung 2 ngày, d26+
+   341→   341→  ngừng mua) → feedbuy rơi từ ~$31k → ~$2k NHƯNG two-sided 20 seed tụt 1.058→1.016,
+   342→   342→  tệ nhất 0.856→0.738. Bản P2-only (cô lập) mất **−0.12x/seed** (104: 1.115→0.922,
+   343→   343→  106: 1.295→1.081, 111: 1.325→1.070).
+   344→   344→- Cơ chế thật (đã hiểu): "churn" wheat là **VŨ KHÍ zero-sum** — áp lực mua của v5
+   345→   345→  nâng mặt giá wheat (deficit sâu hơn), đánh thuế vào feedbuy $32-41k của v4
+   346→   346→  (net-buyer 1077u/mùa) và bán self-grown 500u+/mùa đắt hơn. Ngừng mua = tự giải
+   347→   347→  giáp + v4 được cám rẻ. Town drain hấp thụ ~35u/ngày BẤT CHẲP giá → ai bán vào
+   348→   348→  drain ở giá cao hơn sẽ thắng.
+   349→   349→- **P2 đúng nghĩa = FEED WARFARE** (giữ nguyên cơ chế mua v5.2 như một vũ khí),
+   350→   350→  không phải feed-thrift. Mục tiêu P2 mới cho Phase 5: đo bằng ledger feedbuy
+   351→   351→  "$ paid premium" của ĐỐI THỦ (thuế thu được) thay vì "tiết kiệm feedbuy của mình".
+   352→   352→
+   353→   353→### 13.2 Kiến trúc v5.3 chốt (behavior-frozen + observers)
+   354→   354→
+   355→   355→Nguyên tắc: **mọi coupling hành vi sớm đều −0.02-0.04x** trên benchmark 20 seed
+   356→   356→(v4 không phân biệt được các giả thuyết flow — mix wheat của v4 khác nhau theo
+   357→   357→seed nên flow-ll đọc nhầm CONTEST/COOP/PASSIVE). Chốt:
+   358→   358→
+   359→   359→- **Hành vi = v5.2 NGUYÊN TRẠNG** (tái hiện 1.058x/27/40 chính xác từng đô la).
+   360→   360→- **L1 (5 archetype)**: 2 tầng — pm twin-kernel (v5.2, kiểm chứng) + flow posterior
+   361→   361→  4-giả-thuyết (naive Bayes 9 kênh Poisson, softmax τ=5, forgetting 0.8, warmup
+   362→   362→  d7+50u, hysteresis 2 đêm nghiêm ngặt). CHỈ MIRROR (kernel) và PASSIVE-cấu-trúc
+   363→   363→  (P>0.75 hai đêm + tiền đối thủ <45% mình) được đổi playbook; COOP/DUMP posterior
+   364→   364→  tính + hiển thị (diag) nhưng không hành động — chờ validation Phase 5.
+   365→   365→- **L2 Gamma-Poisson**: `_l2_night` mỗi sáng — conjugate decay-0.8 (a←0.8a+x,
+   366→   366→  b←0.8b+1), predictive NB: E/P25/P75 + **l2_mae calibration** (M-11). Chạy như
+   367→   367→  OBSERVER (tm["l2_pred"]) — coupling P75 vào milk_sub đã thử, đo âm, revert.
+   368→   368→- **P2 đo lường**: tm["feedbuy"/"feed_units"] + diag "feed" (buy$/units/px_avg)
+   369→   369→  — ledger P2 cho Arena UI mỗi trận.
+   370→   370→- Bài học coupling đã thử và revert (4 bản r1-r4, mỗi bản benchmark đầy đủ):
+   371→   371→  scale-likelihood hỗn hợp kernel×Poisson (posterior MIRROR 0.99 sai khi đấu v4),
+   372→   372→  instant-flip hysteresis, E trend-blend 0.55/0.45, P75 subs, mua theo dự báo
+   373→   373→  cung — tất cả ghi trong worklog Task 17 kèm số liệu.
+   374→   374→
+   375→   375→### 13.3 Kết quả chốt
+   376→   376→
+   377→   377→20-seed two-sided (100-119, mỗi seed 2 ghế): **1.058x · 27/40 (67.5%) · median
+   378→   378→1.045 · P25 1.005 · worst 0.856** — đúng baseline, giờ với não 5 lớp đầy đủ
+   379→   379→đo được (L1 posterior + L2 quantiles + MAE 2-3 + feed ledger) trong Arena UI.
+   380→   380→
+   381→   381→### 13.4 Điểm thảo luận Phase 5 (đã định sẵn cho user)
+   382→   382→
+   383→   383→1. P2 Feed Warfare: đo thuế trên v4 (feedbuy premium) thay vì tiết kiệm — cần
+   384→   384→   thiết kế thí nghiệm "pump có điều kiện" theo đàn v4 (herd ≥ 12?).
+   385→   385→2. L1 activation: học profile offline từ thư viện bot (10 trận/bot như PLAN
+   386→   386→   §4.1 gốc) thay vì profile tay — rồi mới bật coupling PASSIVE/COOP/DUMP.
+   387→   387→3. L2 coupling: chỉ kích hoạt khi l2_mae < 1.5 (đủ tin cậy) — quy tắc tự tin.
+   388→   388→4. M-2 Solver (P3) vẫn là mỏ tiền thật theo đúng plan ($/action + T/2).
+   389→   389→

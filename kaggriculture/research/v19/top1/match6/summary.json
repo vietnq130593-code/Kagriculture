@@ -1,0 +1,47 @@
+{
+ "episode_id": "4f9a8b7a-b1f2-11f1-84bd-0242ac130202",
+ "teams": [
+  "SpaTaro",
+  "Majkel1337"
+ ],
+ "seed": 1330453307,
+ "rewards": [
+  96273.0,
+  108597.0
+ ],
+ "statuses": [
+  "DONE",
+  "DONE"
+ ],
+ "final_money": [
+  96273.0,
+  108597.0
+ ],
+ "winner": 1,
+ "margin": 12324.0,
+ "majkel_idx": 1,
+ "n_steps": 720,
+ "money_mismatch_player_steps": 0,
+ "p0": {
+  "revenue": 131077.0,
+  "sell_units": 1902,
+  "hire_spend": 4549.0,
+  "land_spend": 3000.0,
+  "seed_spend": 6240.0,
+  "animal_spend": 8300.0,
+  "product_spend": 15715.0,
+  "n_orders": 1192,
+  "n_executed": 909
+ },
+ "p1": {
+  "revenue": 133281.0,
+  "sell_units": 1524,
+  "hire_spend": 4918.0,
+  "land_spend": 3000.0,
+  "seed_spend": 6820.0,
+  "animal_spend": 7200.0,
+  "product_spend": 5746.0,
+  "n_orders": 937,
+  "n_executed": 924
+ }
+}

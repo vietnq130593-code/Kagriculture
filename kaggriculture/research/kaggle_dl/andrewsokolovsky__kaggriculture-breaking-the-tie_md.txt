@@ -1,0 +1,26 @@
+# Kaggriculture V4 — Real Imitation Learning + DAgger Policy Improvement
+
+This notebook is deliberately structured so an untrained baseline can **never** masquerade as a trained submission.
+
+Pipeline:
+
+1. **Behavioral cloning warm start** from the exact V21-R1 teacher. We collect teacher routing decisions on full environment trajectories and train a neural expert-selector.
+2. **Counterfactual oracle labels**. At each decision checkpoint the same world is branched into V21 / Moon / Mutoy / Munib-base / Munib-front continuations and scored by final W/L/T.
+3. **DAgger**. The learned policy generates its own state distribution; those states are re-labelled by the counterfactual oracle and the same network is fine-tuned again.
+4. **Recovery imitation**. Half of oracle states are generated after an intentional missed farmer/hand/market action shortly before the checkpoint.
+5. **Calibration + paired holdout** on disjoint seeds.
+6. `submission.tar.gz` is created **only if** the learned policy finishes training, actually leaves the V21 route on unseen games, and does not regress on paired holdout. Otherwise there is no ambiguous submission file.
+
+The expensive part is environment rollouts, so use **CPU / Accelerator=None**. GPU is intentionally not used.
+
+
+---
+
+## What to submit
+
+- Use **CPU / Accelerator=None**.
+- In `DEEP_MODE=True` the notebook is intentionally measured in **thousands of full 720-turn games**, not seconds.
+- Watch the logs: `BC teacher trajectories`, `R0`, `R1`, optionally `R2`, `CAL`, then `HOLDOUT`.
+- A normal successful run should print `ROLLOUT EPISODES` well above 1000 and `LEARNED OVERRIDES > 0`.
+- Submit `/kaggle/working/submission.tar.gz` **only when `PROMOTED: True`**.
+- If promotion fails, the notebook leaves `submission_learned_candidate.tar.gz` and diagnostics, but deliberately does **not** create a misleading standard submission.

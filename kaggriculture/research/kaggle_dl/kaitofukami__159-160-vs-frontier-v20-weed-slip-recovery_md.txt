@@ -1,0 +1,347 @@
+# 159/160 vs Frontier | v20 WEED-Slip Recovery
+
+**Current-route mirror control + identity-free recovery from visible WEED slips**
+
+The title's **159/160** is a fresh closed-loop benchmark against the exact public
+Frontier agent: 80 new random seeds, each played from both seats. It is **not an
+official Public-LB score**. Frozen v20 scored 151/160 in the same paired games;
+the bounded recovery converted eight losses to wins and no wins to losses.
+
+This is an update to the existing medal-winning v20 Notebook, not a new page.
+The mirror controller, route and 40/40 anti-copy result remain intact. The new
+question is narrower: when a strong open-loop route silently tries to plant or
+build on a visible WEED, can one actor recover without disturbing market orders
+or the other workers?
+
+```text
+v19 decay -> train-only current medoid -> mirror-label audit
+          -> 7-feature logistic model -> step-48 route choice
+          -> state-ranked SELL front-running
+          -> visible-WEED transaction -> exact public artifact
+```
+
+
+---
+
+## 1. Public research lineage and why this stays v20
+
+This version preserves the same public URL, votes and research lineage:
+
+| Work | Contribution carried into v20 |
+|---|---|
+| [Kaito v18 — 40/53 Top-10 Future Holdout](https://www.kaggle.com/code/kaitofukami/40-53-top-10-future-holdout-v18-closed-loop?scriptVersionId=340030138) | Both-seat outcome validation and complete-route controls |
+| [Kaito v19 — 41/49 Replication to Control](https://www.kaggle.com/code/kaitofukami/41-49-future-unseen-v19-replication-to-control?scriptVersionId=340133955) | Replication audit, train-only medoids and late closed-loop inventory control |
+| [Rayk Kretzschmar — Findings from Zero to Top Meta](https://www.kaggle.com/code/raykkretzschmar/kaggriculture-findings-from-zero-to-top-meta) | Independent cross-play and evidence that common routes need explicit controls |
+| [Kun Zhang — C20 Exact Replication Control](https://www.kaggle.com/code/beicicc/kaggriculture-c20-exact-replication-control) | Exact-attribution and terminal-safety discipline |
+| [prvsiyan — Kaggriculture Frontier: The Moon Counts Melons](https://www.kaggle.com/code/prvsiyan/kaggriculture-frontier-the-moon-counts-melons) | Cause-specific public-WEED repair and bounded trace catch-up |
+
+On 2026-08-05, v19 showed **185 views,
+16 votes and 14 copies**. All copies
+were private, so their authors and code were not observable. v20 therefore
+detects convergence from public replay behavior—not user identity, notebook
+ownership or a team-name lookup.
+
+Credit boundary: this update does **not** copy prvsiyan's Subin route, literal
+market tapes or exact shop profiles. It independently generalizes the published
+PLANT recovery idea into one identity-free `PLANT`/`BUILD_PASTURE` transaction
+on the frozen v20 route. The linked source is the direct inspiration and should
+be cited by downstream forks using this mechanism.
+
+
+---
+
+## 2. The old edge really decayed
+
+The fresh snapshot contains **183 unique episodes**: 122 older episodes for
+route/model fitting and 61 later episodes held out. On one later case per
+current Top-20 team and seat, frozen v19 won only **10/38**. A train-only medoid
+of the current `sash` lineage won **34/38**.
+
+The route refresh is the largest effect in v20. The adaptive layer is evaluated
+on top of that stronger control rather than receiving credit for the refresh.
+
+
+---
+
+## 3. Testing the mirror hypothesis without lookahead
+
+At turn `t`, both policies choose simultaneously. We cannot read the opponent's
+current action. The deployable prediction is therefore:
+
+```text
+public farms at t + public money at t + current step t
+                         -> P(our market intent at t == opponent intent at t)
+```
+
+Offline replay actions supply labels only. They never enter runtime features.
+A deliberately strict public-state gate—24 near-equal-board turns, board
+distance at most 2, money gap at most 5—activated in 57/61 later games. Within
+that gate, later replay actions had:
+
+| Equality target | Holdout rate |
+|---|---:|
+| Complete action | **90.53%** |
+| Board action | **93.92%** |
+| Exact market action | **96.51%** |
+| Ordered market intent | **99.11%** |
+| Non-empty market intent | **98.44%** |
+
+This supports the hypothesis as a conditional statement. Similar farms do not
+prove identical private inventories, so the controller uses only our own legal
+SELL quantities and treats the prediction as a route signal—not an oracle.
+
+
+---
+
+## 4. Convergence is visible across author names
+
+Hashing full, board-only and market-only trajectories exposes several shared
+behavioral lineages in the later holdout:
+
+| Component | Largest cross-team cluster |
+|---|---|
+| Full action | Le Viet, Winter Lamb |
+| Board path | Le Viet, Savko, Winter Lamb, somewhere after |
+| Market path | Lucien de Rubempre, somewhere after |
+| Market path | Le Viet, Winter Lamb |
+
+The useful unit is behavior, not attribution. This is also why a hardcoded
+"counter team X" branch would be both brittle and scientifically weaker.
+
+
+---
+
+## 5. A small learned model, not a hand-written mirror threshold
+
+The mirror classifier is logistic regression fit only on 63,028 non-empty
+market turns from the 122 older episodes. Its seven public features are board
+distance, exact-board status, money gap, near-equal-money status, a 96-turn
+board-similarity streak, normalized time and late-game status.
+
+The operating threshold `0.806519` was selected for 95% train
+precision. It transferred to the untouched 61-episode split with **94.90%
+precision** at **32.52% coverage** (10,246 selected turns out of 31,510).
+
+
+---
+
+## 6. Current route provenance
+
+The base is the train-only medoid of eight `sash` trajectories: the complete
+trajectory minimizing summed board+market turn Hamming distance to the other
+older trajectories.
+
+| Field | Value |
+|---|---|
+| Public episode | `90049120` |
+| Player | `0` |
+| Train trajectories | `8` |
+| Medoid sum distance | `5239` |
+| Complete action SHA-256 | `c234e990fd63a168535b55de1f11289fa2bbc563b390390b49d0d65169cedb18` |
+
+The route contributes `farmer`, all `hands`, BUY/HIRE and SELL timing for the
+complete game. v20 does not reduce the game to a late SELL-only script.
+
+
+---
+
+## 7. Two-route closed-loop control
+
+The runtime observes public state until step 48, then commits to one of two
+execution regimes:
+
+```text
+                         logistic P(mirror)
+                                |
+                +---------------+---------------+
+                |                               |
+          mirror regime                    open regime
+    front-run while learned latch       front-run continuously
+    remains valid; release after        after the decision step
+    8 divergent board turns
+                +---------------+---------------+
+                                |
+             rank scheduled SELLs by current public state
+    opponent exposure × glut sensitivity × price × log(1 + own quantity)
+                                |
+       step 718: replace market with every legal projected own SELL
+```
+
+The environment processes market orders in sequence, so moving a scheduled
+SELL earlier can capture the pre-glut price before a later same-product order.
+Quantity is capped by our own projected shed. BUY/HIRE timing and all unit
+actions still come from the complete current route.
+
+The regime decision is learned; the market best response is an interpretable,
+legal state controller. Runtime uses public opponent farms, public prices,
+public money and our private inventory only.
+
+
+---
+
+## 8. Outcome ablation
+
+| Policy on all current Top-20 later cases | Wins | Mean margin |
+|---|---:|---:|
+| Current medoid control | 98/108 | 2,681 |
+| Learned mirror latch only | 99/108 | 6,340 |
+| Always front-run | 102/108 | 9,245 |
+| **v20 hybrid-48** | **102/108** | **7,885** |
+
+The learned-only branch adds one win over the medoid; front-running adds four.
+The hybrid matches the best win count while retaining an explicit mirror/open
+structure for future adaptation. Seat 0 is **53/56** and seat 1 is **49/52**.
+
+
+---
+
+## 9. Anti-copy benchmark: development, then untouched seeds
+
+The paired benchmark pits each candidate against an exact frozen copy of the
+base schedule. It runs both seat assignments for every seed.
+
+| Split and policy | Wins | Losses | Ties | Mean difference |
+|---|---:|---:|---:|---:|
+| Development: exact base vs exact base | 12 | 12 | 16 | 0 |
+| Development: always front-run | 39 | 1 | 0 | 97,578 |
+| Development: learned latch | 40 | 0 | 0 | 91,272 |
+| **Untouched: v20 hybrid-48** | **40** | **0** | **0** | **64,095** |
+
+Untouched seed range starts at `30260805`. v20 is **20/20 from seat 0** and
+**20/20 from seat 1**; the minimum winning difference is
+**14,653**. This is the title metric.
+
+
+---
+
+## 10. Broader generalization
+
+| Evaluation population | Control | v20 hybrid-48 |
+|---|---:|---:|
+| Current Top-20, all later seat-cases | 98/108 | **102/108** |
+| Teams outside current Top-20, later holdout | 10/14 | **13/14** |
+| Exact frozen base, future seeds and both seats | 11 wins / 11 losses / 18 ties | **40/40 wins** |
+
+The non-Top-20 slice is small, so 13/14 is supporting evidence rather than a
+population estimate. It nevertheless checks that the front-running controller
+does not only memorize the Top-20 names.
+
+
+---
+
+## 11. Failure atlas: six losses were visible route slips
+
+The 102/108 aggregate hid a common causal failure. In every lost later replay,
+at least one scheduled `PLANT` or `BUILD_PASTURE` reached a tile that was visibly
+`WEED` at decision time. The action was legal in shape but ineffective on the
+board; the actor then continued an open-loop schedule one turn out of phase.
+
+The public Frontier agent was a useful falsification control. On the same 108
+games it won all six v20 losses, but won only 85/108 overall and turned 23 safe
+v20 wins into losses. Its full route is therefore complementary, not a safe
+replacement. The portable insight is the cause-specific recovery transaction.
+
+```text
+intended PLANT/BUILD on visible WEED
+                 |
+              DIG now
+                 |
+       retry the exact intention at t+1
+                 |
+ replay only that actor's prior route action for <= 8 turns
+                 |
+      resume v20; market and other actors never changed
+```
+
+No opponent identity, source ownership, seed, episode ID or hidden state enters
+this decision.
+
+
+---
+
+## 12. Recovery ablation and fresh closed-loop falsification
+
+| Panel | Frozen v20 | DIG + retry only | DIG + retry + 8-step catch-up |
+|---|---:|---:|---:|
+| Earlier Top-20, all 205 cases | 188/205 | 201/205 | **202/205** |
+| Later Top-20, all 108 cases | 102/108 | 105/108 | **108/108** |
+| Later teams outside Top-20 | 13/14 | — | **13/14** |
+| Fresh exact Frontier, 80 seeds x 2 seats | 151/160 | — | **159/160** |
+
+On the 205-case earlier panel, catch-up converts **14 losses to
+wins and 0 wins to losses**. On the 14-case non-Top slice there
+are no win/loss flips; mean margin changes from
+**3,882** to
+**4,277**.
+
+The 108/108 row is deliberately labelled exploratory: its six failures were
+inspected before this repair was built, so it is not an untouched holdout. The
+title uses the separate closed-loop Frontier test. Across those 160 paired
+fresh games the repair converts **8 losses to wins and
+0 wins to losses**. One game remains a loss at -945.
+
+The result supports a narrow claim: public-state recovery removes a recurring
+fixed-route failure and transfers against the exact cited adaptive agent. It is
+not evidence that eight steps is universally optimal.
+
+
+---
+
+## 13. What v20 does *not* claim
+
+1. Replay opponents are open-loop and cannot react to our counterfactual move.
+2. The 40/40 opponent is the exact frozen base schedule, not an adaptive copy
+   of the entire v20 policy. Two identical deterministic v20 agents cannot be
+   guaranteed a systematic edge over each other.
+3. Current actions are simultaneous. Runtime predicts equality from state; it
+   never observes the opponent's current action.
+4. Similar public farms do not reveal private opponent inventory.
+5. `40/40`, `102/108` and `13/14` are local reproducible studies, not official
+   leaderboard scores or medal guarantees.
+6. A future population shift requires a new chronological snapshot. Refitting
+   on these holdouts would invalidate their role.
+7. `108/108` is post-hoc because the six failures were inspected first.
+8. `159/160` is fresh and both-seat, but it covers one public opponent family.
+9. Eight replay steps are a bounded recovery horizon, not a learned optimum.
+
+The falsifiable next test is a future snapshot in which adaptive v20 forks are
+the opponents, with the current artifact frozen before replay collection.
+
+
+---
+
+## 14. Public source contract
+
+- Exact `main.py` bytes: **26,894**
+- Exact SHA-256: `231cf97fcadb1481e2936395f9a6ac8592b8740903c8f93ec9f88b704e20ac24`
+- Embedded complete schedule actions: **719**
+- Mirror model: **7 features**, train-only fit
+- Slip recovery: visible WEED only, actor-local, maximum **8** catch-up turns
+- Test suite at publication: **54 passed**
+- Dependencies: Python standard library only
+- Runtime exclusions: no network, identity lookup, opponent private state or online fitting
+
+Useful entry points for humans and code-reading agents:
+
+```text
+_public_farm_distance(left, right)
+_mirror_probability(distance, money_gap, board_streak, step)
+_ranked_sells(obs, action, requested)
+_front_run_market(obs, action)
+_terminal_market(obs, action)
+_weed_repair_action(obs, action, step)
+_hybrid_action(obs, action, step)
+agent(obs)
+```
+
+The final cell reconstructs this exact source, creates the submission archive,
+and runs the agent against an exact base copy from both seats.
+
+
+---
+
+## 15. Build and verify the exact Notebook-linked submission
+
+This cell writes `/kaggle/working/main.py` and `submission.tar.gz`. The same
+`main.py` is the file linked to this Notebook version for the competition
+submission.

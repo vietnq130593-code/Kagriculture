@@ -1,0 +1,8 @@
+# Kaggriculture
+
+
+---
+
+## Method
+
+The agent selects its own fixed replay route from the early unlocked-shop order: yarn-led, milk-supported, or balanced production. No extra gate, portfolio forcing, or post-hoc overlay changes this decision.

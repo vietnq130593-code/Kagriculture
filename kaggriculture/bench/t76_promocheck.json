@@ -1,0 +1,38 @@
+{
+ "a": "v16",
+ "b": "v16h7",
+ "seeds": "342-343",
+ "wins": 0,
+ "games": 4,
+ "avg_a": 84001.0,
+ "avg_b": 84001.0,
+ "gap": 0.0,
+ "median_ratio": 1.0,
+ "worst_ratio": 1.0,
+ "tag": "promo-identity",
+ "rows": [
+  {
+   "seed": 342,
+   "a_seat0": 82691.0,
+   "b_seat1": 82691.0,
+   "b_seat0": 82691.0,
+   "a_seat1": 82691.0,
+   "a_avg": 82691.0,
+   "b_avg": 82691.0,
+   "gap": 0.0,
+   "ratio": 1.0
+  },
+  {
+   "seed": 343,
+   "a_seat0": 85311.0,
+   "b_seat1": 85311.0,
+   "b_seat0": 85311.0,
+   "a_seat1": 85311.0,
+   "a_avg": 85311.0,
+   "b_avg": 85311.0,
+   "gap": 0.0,
+   "ratio": 1.0
+  }
+ ],
+ "fails": []
+}

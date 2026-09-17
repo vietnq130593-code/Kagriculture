@@ -1,0 +1,47 @@
+{
+ "episode_id": "c8fd8ef0-b1ec-11f1-8d64-0242ac130203",
+ "teams": [
+  "M & M & P & Q",
+  "Majkel1337"
+ ],
+ "seed": 1889174384,
+ "rewards": [
+  102007.0,
+  110903.0
+ ],
+ "statuses": [
+  "DONE",
+  "DONE"
+ ],
+ "final_money": [
+  102007.0,
+  110903.0
+ ],
+ "winner": 1,
+ "margin": 8896.0,
+ "majkel_idx": 1,
+ "n_steps": 720,
+ "money_mismatch_player_steps": 0,
+ "p0": {
+  "revenue": 125529.0,
+  "sell_units": 1744,
+  "hire_spend": 4154,
+  "land_spend": 3000,
+  "seed_spend": 6970.0,
+  "animal_spend": 8900.0,
+  "product_spend": 3498.0,
+  "n_orders": 585,
+  "n_executed": 585
+ },
+ "p1": {
+  "revenue": 138582.0,
+  "sell_units": 1648,
+  "hire_spend": 4929.0,
+  "land_spend": 3000.0,
+  "seed_spend": 7350.0,
+  "animal_spend": 7700.0,
+  "product_spend": 7700.0,
+  "n_orders": 888,
+  "n_executed": 873
+ }
+}

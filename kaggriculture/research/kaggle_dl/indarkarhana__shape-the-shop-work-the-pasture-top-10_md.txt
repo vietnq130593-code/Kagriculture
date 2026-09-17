@@ -1,0 +1,70 @@
+# Kaggriculture â€” Shape the Shop, Work the Pasture
+
+## Method
+
+This submission is a layered visible-state rule network over a complete farm
+programme. It guards worker alignment, purchases, placement, same-turn shed
+projection, sale capacity, contested-value ordering, and sequential funding.
+It then makes two connected production decisions from current observable
+state:
+
+1. Conserved cow/sheep pasture bundles are relabelled toward visible dairy or
+   wool demand without changing route geometry, animal count, or sale slots.
+2. At a single engine-verified checkpoint, one additional demand-aligned
+   animal and one hand are purchased. The hand follows a guarded
+   pickup/NORTH/PLACE sequence into an already serviced empty pasture. Every
+   geometry, inventory, capacity, and cash mismatch fails closed to the parent.
+
+Farm occupancy is part of the deterministic game trajectory, so using the
+latent pasture changes later shop/economic states through ordinary engine
+mechanics. The policy reacts only to present observation. It never reads team
+identity, rank, seed, replay ID, terminal outcome, future shops/actions,
+opponent-private inventory, network data, or accelerator inference.
+
+## Attribution and original contribution
+
+The complete programme prior is an official CC0 replay from **Kenjo1209**,
+episode 102192548 seat 1, source SHA-256
+`4d686ff547797f776081254ee602eda151ec0fe5de7ddcdf646fedf1bf5f0f89`.
+The inherited execution-network prior also preserves an official CC0
+**NIklitaCheporev** replay, episode 101408728 seat 1, source SHA-256
+`685cdf4d9b14f16985e0dc7bdc0770446c3862a233be5dfe1f0efe508eedb629`.
+
+Our contribution is the guarded execution network, demand-aligned conserved
+pasture substitution, engine-order delivery repair, latent-pasture activation,
+causal ablation, familywise closed-loop gates, and post-freeze chronological
+audit.
+
+```yaml
+candidate_sha256: 2c603fd6f9bf978d7e8eef78a34647bd379d0e89963ada0cbb1c52c39b0f4b3f
+packaged_main_sha256: 0cc2a88594f82b6c8d3cb15fcd4aa2df2bdd2a0a7fb0133d95a3204dd2d6ba38
+packaged_archive_sha256: fa9e7eb1a0174a1bf292fb4d47bd209defed929758214d3506e050a68ee5f98f
+entrypoint: kaggriculture_e776_agent
+engine: kaggle-environments==1.32.7
+archive_members: 13
+internet_during_episode: false
+accelerator: none
+```
+
+---
+
+## Validation
+
+All validation used `kaggle-environments==1.32.7`, both candidate seats, and
+preregistered seed blocks.
+
+- Latest-three gate: 24-6, 27-3, and 27-3 seed blocks; every familywise Wilson
+  and adjusted sign-test requirement passed.
+- Nine-family absolute/population audit: all families passed; the weakest seed
+  score was .817, worst 10% CVaR was -$8,854, and there were no catastrophic
+  losses.
+- Strictly post-freeze current-top diagnostic: 136-14 paired blocks across
+  all ten current team identities, .907 in both seats, positive p10, and zero
+  engine errors.
+- Mean policy runtime was 0.492 ms per call. The inherited contract suite has
+  63 passing tests.
+
+Action tapes are attributed programme controls and cannot reveal inaccessible
+private code. Local evidence cannot guarantee a path-dependent public rating
+or leaderboard rank. The code below emits the exact promoted archive and
+verifies every member hash before writing the required competition output.
