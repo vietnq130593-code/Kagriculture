@@ -1,0 +1,299 @@
+{
+ "summary": {
+  "tag": "t90_v22b_vs_v20",
+  "new": "v22b",
+  "base": "v20",
+  "battles": 32,
+  "errors": 0,
+  "mean_margin": 217.3,
+  "median_margin": 0.0,
+  "worst_margin": -681.0,
+  "best_margin": 1496.0,
+  "wins": 14,
+  "losses": 6,
+  "ties": 12,
+  "mean_paired_margin": 434.6,
+  "bootstrap95_ci_mean": [
+   53.2,
+   402.2
+  ],
+  "elapsed_s": 373.1
+ },
+ "results": [
+  {
+   "seed": 1,
+   "seat": 0,
+   "new": 148865.0,
+   "base": 148865.0,
+   "margin": 0.0,
+   "wallS": 8.7
+  },
+  {
+   "seed": 1,
+   "seat": 1,
+   "new": 148865.0,
+   "base": 148865.0,
+   "margin": 0.0,
+   "wallS": 8.8
+  },
+  {
+   "seed": 2,
+   "seat": 0,
+   "new": 83086.0,
+   "base": 83086.0,
+   "margin": 0.0,
+   "wallS": 9.0
+  },
+  {
+   "seed": 2,
+   "seat": 1,
+   "new": 83086.0,
+   "base": 83086.0,
+   "margin": 0.0,
+   "wallS": 8.8
+  },
+  {
+   "seed": 3,
+   "seat": 0,
+   "new": 76903.0,
+   "base": 75811.0,
+   "margin": 1092.0,
+   "wallS": 8.7
+  },
+  {
+   "seed": 3,
+   "seat": 1,
+   "new": 76903.0,
+   "base": 75811.0,
+   "margin": 1092.0,
+   "wallS": 8.7
+  },
+  {
+   "seed": 4,
+   "seat": 0,
+   "new": 73699.0,
+   "base": 73699.0,
+   "margin": 0.0,
+   "wallS": 8.5
+  },
+  {
+   "seed": 4,
+   "seat": 1,
+   "new": 73699.0,
+   "base": 73699.0,
+   "margin": 0.0,
+   "wallS": 8.4
+  },
+  {
+   "seed": 5,
+   "seat": 0,
+   "new": 92875.0,
+   "base": 91701.0,
+   "margin": 1174.0,
+   "wallS": 9.1
+  },
+  {
+   "seed": 5,
+   "seat": 1,
+   "new": 92875.0,
+   "base": 91701.0,
+   "margin": 1174.0,
+   "wallS": 9.2
+  },
+  {
+   "seed": 6,
+   "seat": 0,
+   "new": 82271.0,
+   "base": 82271.0,
+   "margin": 0.0,
+   "wallS": 8.2
+  },
+  {
+   "seed": 6,
+   "seat": 1,
+   "new": 82271.0,
+   "base": 82271.0,
+   "margin": 0.0,
+   "wallS": 8.2
+  },
+  {
+   "seed": 7,
+   "seat": 0,
+   "new": 105324.0,
+   "base": 105312.0,
+   "margin": 12.0,
+   "wallS": 8.4
+  },
+  {
+   "seed": 7,
+   "seat": 1,
+   "new": 105324.0,
+   "base": 105312.0,
+   "margin": 12.0,
+   "wallS": 8.3
+  },
+  {
+   "seed": 8,
+   "seat": 0,
+   "new": 84642.0,
+   "base": 84347.0,
+   "margin": 295.0,
+   "wallS": 8.6
+  },
+  {
+   "seed": 8,
+   "seat": 1,
+   "new": 84642.0,
+   "base": 84347.0,
+   "margin": 295.0,
+   "wallS": 8.2
+  },
+  {
+   "seed": 9,
+   "seat": 0,
+   "new": 80492.0,
+   "base": 80492.0,
+   "margin": 0.0,
+   "wallS": 8.6
+  },
+  {
+   "seed": 9,
+   "seat": 1,
+   "new": 80492.0,
+   "base": 80492.0,
+   "margin": 0.0,
+   "wallS": 8.8
+  },
+  {
+   "seed": 10,
+   "seat": 0,
+   "new": 79084.0,
+   "base": 78831.0,
+   "margin": 253.0,
+   "wallS": 8.4
+  },
+  {
+   "seed": 10,
+   "seat": 1,
+   "new": 79084.0,
+   "base": 78831.0,
+   "margin": 253.0,
+   "wallS": 8.3
+  },
+  {
+   "seed": 11,
+   "seat": 0,
+   "new": 81190.0,
+   "base": 81871.0,
+   "margin": -681.0,
+   "wallS": 8.8
+  },
+  {
+   "seed": 11,
+   "seat": 1,
+   "new": 81871.0,
+   "base": 81190.0,
+   "margin": 681.0,
+   "wallS": 8.8
+  },
+  {
+   "seed": 12,
+   "seat": 0,
+   "new": 85784.0,
+   "base": 86114.0,
+   "margin": -330.0,
+   "wallS": 9.1
+  },
+  {
+   "seed": 12,
+   "seat": 1,
+   "new": 86695.0,
+   "base": 85199.0,
+   "margin": 1496.0,
+   "wallS": 8.2
+  },
+  {
+   "seed": 13,
+   "seat": 0,
+   "new": 161525.0,
+   "base": 161525.0,
+   "margin": 0.0,
+   "wallS": 8.4
+  },
+  {
+   "seed": 13,
+   "seat": 1,
+   "new": 161525.0,
+   "base": 161525.0,
+   "margin": 0.0,
+   "wallS": 8.4
+  },
+  {
+   "seed": 14,
+   "seat": 0,
+   "new": 106930.0,
+   "base": 106395.0,
+   "margin": 535.0,
+   "wallS": 8.4
+  },
+  {
+   "seed": 14,
+   "seat": 1,
+   "new": 106930.0,
+   "base": 106395.0,
+   "margin": 535.0,
+   "wallS": 8.4
+  },
+  {
+   "seed": 15,
+   "seat": 0,
+   "new": 79178.0,
+   "base": 79341.0,
+   "margin": -163.0,
+   "wallS": 9.1
+  },
+  {
+   "seed": 15,
+   "seat": 1,
+   "new": 79178.0,
+   "base": 79341.0,
+   "margin": -163.0,
+   "wallS": 8.5
+  },
+  {
+   "seed": 16,
+   "seat": 0,
+   "new": 110466.0,
+   "base": 110770.0,
+   "margin": -304.0,
+   "wallS": 8.8
+  },
+  {
+   "seed": 16,
+   "seat": 1,
+   "new": 110466.0,
+   "base": 110770.0,
+   "margin": -304.0,
+   "wallS": 8.5
+  }
+ ],
+ "errors": [],
+ "paired": {
+  "1": 0.0,
+  "2": 0.0,
+  "3": 2184.0,
+  "4": 0.0,
+  "5": 2348.0,
+  "6": 0.0,
+  "7": 24.0,
+  "8": 590.0,
+  "9": 0.0,
+  "10": 506.0,
+  "11": 0.0,
+  "12": 1166.0,
+  "13": 0.0,
+  "14": 1070.0,
+  "15": -326.0,
+  "16": -608.0
+ }
+}

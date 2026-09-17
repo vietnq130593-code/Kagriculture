@@ -65,6 +65,16 @@ AGENTS = {
     # Task 89: v21 = v19.4 chain + v21 trough-banker layer (WOOL/STRAWBERRY/MELON
     # crash-window banking, recovery liquidation). Flat build, 419KB.
     "v21": (os.path.join(ROOT, "v21.py"), "agent"),
+    # Task 90: v22 = v20 chain + milk recovery banker layer (2-shop seeds)
+    "v22": (os.path.join(ROOT, "v22.py"), "agent"),
+    # Task 90b: v22b = tuned milk banker (floor 50, enter on shop count,
+    # h0-h5 emission window, chunk cap 8) — H1 variant #2
+    "v22b": (os.path.join(ROOT, "v22b.py"), "agent"),
+    # Task 90c: v22c = evidence-gated milk banker (inv-fall enter + win-guard)
+    # — H1 variant #3
+    "v22c": (os.path.join(ROOT, "v22c.py"), "agent"),
+    # Task 90d: v22d = evidence-only one-shot milk banker — H1 variant #4
+    "v22d": (os.path.join(ROOT, "v22d.py"), "agent"),
     # Task 88: aurax7 "Farmers Is All You Need" (rank 299, 2723.3) — V45 chassis
     # + V44 race escalator + _r60 survival guard + 2842 overlay (frontload +
     # advance_sales LOOK=2 + HORIZON 24). Extracted byte-exact 17-09.

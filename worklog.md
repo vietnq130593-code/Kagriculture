@@ -630,3 +630,61 @@ Stage Summary:
 - Bài học cấu trúc lớn nhất: thị trường 2 người dùng chung → rời item = nhường
   monopoly cho đối thủ; dồn item = tự crash; chỉ "thêm tổng giá trị" mới tăng
   margin bền
+
+---
+Task ID: 20 (project Task 90) — H1 exhaustive: v22 family (4 biến thể milk-banker) + sim ceiling + cow-expansion screen + EGG discovery
+Agent: Z.ai Code (main, vai trò Bio)
+
+Task:
+- Tiếp tục Task 90 bị ngắt giữa chừng (v22 built, chưa battery). User yêu cầu
+  thử THÊM nhiều phương án H1 trước khi kết luận (không chấp nhận kết luận sớm).
+
+Work Log:
+- Phục hồi trạng thái: v22.py đã build (entry-point OK), run_battle đã đăng ký;
+  smoke seed 3: v22 +$2,273 (v20 +$2,776) → nghi vấn
+- Battery 48 trận v22 vs v46: 48-0, mean +$1,568.9 ≈ v20 (+$1,570) — trung hòa
+- Direct battery v22 vs v20 (32 trận): +$81 CI[-32,+222] noise; per-seed: giúp
+  3/12/15, hại 7/8/10, dormant 10/16
+- Forensic seed 8 (milk_diff_probe.py): inv/giá milk giống hệt v20 — layer chỉ
+  shift giờ bán (strip → emit lại) — không bank thật; engine deterministic 3×✓
+- milk_sim.py screening: ceiling milk-timing = +$273-2,312 CHỈ trên 2-shop seeds
+  (2/8) → mean ceiling +$300-600, thực tế bị free-rider v46 ăn mất phần lớn
+- v22b (floor 50, enter sớm p<100, h0-h5 window, chunk 8): +$217 CI[53,402] —
+  CI loại zero LẦN ĐẦU trong họ H1 — NHƯNG battery vs v46: 46W-2L (seed 21 thua
+  cả 2 ghế −$24) — flip game = không chấp nhận được
+- Forensic seed 21: 2 shop NHƯNG supply≈drain → inv flat, recovery không bao giờ
+  đến; v22b bank 35u bán rác + v46 free-ride +$195 → −$1,000 swing
+- v22c (money-lead win-guard): chặn đúng cửa sổ recovery seed 3 (latch guard
+  sớm) — hủy thiết kế; v22c-2 (cap 20/40 bound): seed 21 vẫn thua −76 (flap
+  enter/stall-exit tái bank rác)
+- v22d (evidence-only enter: inv-fell ≥8/2d — seed 3 có -12/2d, seed 21 max
+  -5 → phân biệt được; one-shot stall latch): phát hiện 2 bug layer
+  (1) NameError _V22D_int nuốt kín 357 turn (fail-open no-op) — chỉ lộ qua
+  replay-telemetry test, (2) low_days đếm theo turn (21×/ngày) thay vì ngày
+- FIX cả 2 bug → v22d: seed 21 +$1,035 (v20 +$976), seed 3 +$2,862 (v20 +$2,776),
+  seed 8 +$2,080 (v20 +$1,882)
+- Direct battery v22d vs v20: +$39 CI[-77,+157] — cẩn thận hơn = edge nhỏ hơn
+  (seed 15 −$972 đổi lấy an toàn seed 21)
+- **Battery 48 trận v22d vs v46: 48-0, mean +$1,601.5, worst +$603** (tốt hơn
+  v20: +$1,570/worst +$568) — gate an toàn PASS
+- Cow-expansion screen (TFC core, chưa từng test, sim): 6 bò thêm = −$5,775 —
+  chết toán học trong mirror (drain không hấp thụ, v46 free-ride)
+- Phát hiện cấu trúc EGG/GOOSE (engine MARKET_PARAMS+SHOPS+ANIMALS): EGG glut
+  curve log GENTLE ($38-50 cả ở +1200 glut) vs milk linear (crash −$2.1/unit);
+  EGG đang đói (inv −426 dưới I0, $88, hinge chạy away tới $190); GOOSE $300,
+  1-2 egg/ngày từ d4, BUILD_COOP MIỄN PHÍ; 20 ngỗng ≈ +$25-35K net — lever
+  TFC-scale thật sự (đề xuất v23 production-planner, không thể layer-wrap)
+- Viết kaggle-research/10_H1_FINAL_VERDICT_EGG_DISCOVERY.md
+
+Stage Summary:
+- H1 KẾT THÚC sau 10 thực nghiệm: dream +$40-80K không tồn tại (3 bức tường:
+  drain yếu + BUY-blocked + free-rider); tồn tại +$40-400 timing edge (v22d =
+  an toàn nhất, 48-0, +$31 mean vs v20) — KHÔNG đáng thay submission #56308666
+  (reset rating climb cho edge trong noise)
+- 2 bài học kỹ thuật lớn: (1) layer fail-open nuôi bug im lặng — mọi layer mới
+  PHẢI replay-test telemetry (0 errors + actions-changed > 0); (2) counter phải
+  đếm theo NGÀY không theo turn
+- EGG/GOOSE = hướng nghiên cứu tiếp theo có math TFC-scale (+$25-35K tiềm năng,
+  log-gentle glut curve, BUILD_COOP free, wheat feed sẵn từ máy wheat) — cần
+  kiến trúc production-planner (tile/labor/feed), mở v23
+- Quyết định submission: GIỮ v20.1 #56308666 đang climb
