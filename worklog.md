@@ -703,3 +703,49 @@ Work Log:
 Stage Summary:
 - 2 commit Task 90 nằm local chờ push (code + worklog đầy đủ)
 - CẦN user cấp lại PAT hợp lệ (kiểm tra scope: repo + workflow) để push
+
+---
+Task ID: 21 (project Task 91) — v23 GOOSE ENGINE: kiến trúc production-planner EGG/GOOSE + phán quyết mirror
+Agent: Z.ai Code (main, vai trò Bio)
+
+Task:
+- Verify 2 token GitHub user cấp; build v23 với KIẾN TRÚC RIÊNG (EGG/GOOSE
+  production planner, không layer-wrap); battery + báo cáo đầy đủ.
+
+Work Log:
+- Token 1 ghp_fQNS...LTQ (đủ 36 ký tự) HỢP LỆ (HTTP 200, push quyền admin);
+  bản cũ fail vì thiếu 1 ký tự "x". Push 4 commit Task 90 kẹt local.
+- Khôi phục môi trường: repo live có đủ v20/v22 family + doc 09/10; engine
+  /home/z/engine.py khớp; runner bench/battery.py hoạt động.
+- Probe tài nguyên v20 (seed 3, full 720 turn): hands 3→12/ngày, PASS 6-40,
+  core tự chạy COW/SHEEP + FEED/CARE/COLLECT_FERTILIZER; EGG inv −14/ngày
+  (9999→9593), giá $50→$83, không ai cung ứng thật; wheat khan hiếm (core tự
+  BUY_PRODUCT 5-15/ngày, giá $28→$42); core mua NE ~d5-7, SW ~d10-11, SE
+  không bao giờ; wallet $27-760 tới d11 rồi $10K+.
+- Kiến trúc v23: v20 core byte-exact + planner (receipt-claimed hands qua
+  HIRE tail-append; wheat feed contract; market tail slots; greedy stateless
+  ladder; fail-open 3 lỗi/ngày; inactive d0 & 696+).
+- 4 vòng forensic-fix: (1) gate total-vs-target giết pump + trim whole-order
+  (free-rider v46 +$8.6K); (2) bootstrap deadlock k_need=0; (3) hire window
+  h1-3 trôi qua trước land unlock + ladder return-PASS trap giữ chân hands
+  16 giờ trên ngỗng duy nhất; (4) section-1 fall-through + SE-clean design.
+- Thiết kế cuối: zone 14 coop ở SE (25 ô $4,000 không ai dùng), pre-positioned
+  builders đứng trên ô LOCKED (engine cho phép), mua SE d11+ khi NW/NE/SW mở.
+- BATTERY (seeds 100-123, 48 trận, official runner): v23 vs v46 0W-48L gap
+  −$20,205 (worst 0.681x); v23l (land-only) 0W-48L gap −$3,304; baseline
+  v20 48W-0L +$1,647. A/B tách biến: land-buy −$6,741 self; goose-engine
+  thêm −$8,278 self + v46 +$8,623 (free-rider).
+- Viết kaggle-research/11_V23_GOOSE_ENGINE_VERDICT.md (5 bức tường kinh tế:
+  tile shadow-price/fib-labor/feed/displacement/free-rider).
+
+Stage Summary:
+- EGG/GOOSE KẾT THÚC trong mirror: engine chạy đúng cơ học (13 coop, 14
+  ngỗng, 220 trứng, 0 lỗi) nhưng −$20K/game. Ước lượng +$25-35K của doc 10
+  không định giá inputs theo opportunity cost của máy v20.
+- KIẾN TRÚC RIÊNG đã build thành công: receipt-claim ownership + stateless
+  ladder giải được bài "không thể layer-wrap lao động" — bài học chuyển được
+  cho hướng khác (H2 peak-pricing).
+- Submission GIỮ NGUYÊN v20.1 #56308666. H1+H5+land-expansion đóng cổng
+  mirror. Hướng còn lại: H2 (timing/price trên output hiện có) + meta-level
+  (field ≠ mirror).
+- Token GitHub hợp lệ, toàn bộ công việc Task 91 đã push.
