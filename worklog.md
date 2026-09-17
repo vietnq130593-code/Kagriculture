@@ -26,7 +26,7 @@ Task: Tải dữ liệu từ GitHub repo vietnq130593-code/Kagriculture (dùng t
 
 Work Log:
 - git clone --depth 1 repo Kagriculture về /home/z/Kagriculture (working tree 102MB + .git 45MB, 1 commit "Task 80: v17 MERCATOR")
-- Lưu token Kaggle KGAT_14164511bf6b0ba6b14ed9050ffdea66 vào ~/.kaggle/kaggle.json (chmod 600) + ~/.kaggle/credentials.env
+- Lưu token Kaggle KGAT_[REDACTED-ROTATED] vào ~/.kaggle/kaggle.json (chmod 600) + ~/.kaggle/credentials.env
 - Verify token Kaggle qua API /api/v1/hello → HTTP 200, username: vietnguyen130593 → token HỢP LỆ
 - Khảo sát repo: source đầy đủ của dự án KaggressurE Arena đã deploy (Next.js src/ + mini-services/arena-service port 3005 + kaggriculture/arena/run_battle.py)
 - Registry 19 agents Python: v16, v16h8, v16h5, v16h7, v16h57, v15, v14, v13, kme3, kme3v10, aurax, kme3v39, kawashigi, indark_e776, thomast, thomast_t0, thomast_t3, ahmedv41, v17 (nhà vô địch)
