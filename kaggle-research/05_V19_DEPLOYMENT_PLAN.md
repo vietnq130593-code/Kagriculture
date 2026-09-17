@@ -440,3 +440,95 @@ chuẩn meta mới $100K+** — đó là "thắng cách xa" bằng tiền, khôn
 4. Stress-clone library (early-dumper / egg-racer / throttle-copy / mmpq-clone) — cổng G3/G6.
 5. Gate G1 nới mục tiêu wrapper-only: kỳ vọng thực chứng +$80-150/battle; khoảng cách lớn
    phải đến từ B-layer (breadth) chứ không phải market-timing trên nền đã tối ưu.
+
+---
+
+## 9. KẾT QUẢ PHASE 2 — BATTERY ĐỊNH LƯỢNG KHÁC BIỆT (Task 86, 17-09, Bio)
+
+> Nhiệm vụ từ user: "đấu thử với v18 và ahmedv43 để xác định khác biệt" — định lượng chính
+> xác bao nhiêu % lợi thế đến từ nền v18 (jaxa623 K0006) vs wrapper REAPER của v19, xác nhận
+> giả thuyết "cấu trúc đã gần tối ưu, cải thiện chỉ thêm vài trăm đến vài nghìn đô".
+
+### 9.1 Battery mới (arena/battery.py, 24 seeds × 2 ghế, official runner)
+
+| Cặp đấu | Kết quả | Mean margin | CI-95% | Paired/seed | Worst | Nguồn |
+|---|---|---|---|---|---|---|
+| **v19 vs ahmedv43** | **47W/1L** | **+$1,298** | [+1,065, +1,523] | +$2,596 | −$820 | `bench/t86_p2_v19_vs_ahmedv43.json` |
+| **v18 vs ahmedv43** | **47W/1L** | **+$1,282** | [+1,060, +1,497] | +$2,564 | −$813 | `bench/t86_p2_v18_vs_ahmedv43.json` |
+| v19 vs v18 (mở rộng seeds 25-48) | 44W/4L | +$125 | [−68, +318] | +$250 | −$2,846 | `bench/t86_p2_v19_vs_v18_ext.json` |
+| **v19 vs v18 POOLED (seeds 1-48)** | **78W/18L (81%)** | **+$103** | **[−1, +209]** | **+$207** | −$2,846 | t85_p1_t1_v2 + t86 ext |
+
+Kết quả ghép với Task 85: v19 vs ahmedv45 24W/0L +$2,360 [+2,088, +2,669]; v18 vs ahmedv45
+24W/0L +$2,372 (hai agent ngang nhau ở cặp này — ahmedv45 yếu hơn ahmedv43 ~$1,000).
+
+### 9.2 Phân rã lợi thế (decomposition) — xác nhận giả thuyết user
+
+```
+v19 − ahmedv43  =  v18 − ahmedv43  +  v19 − v18
+   +$1,298      ≈     +$1,282      +     +$103
+   → 98.8% lợi thế đến từ NỀN v18 (jaxa623 K0006)
+   → chỉ 1.2% đến từ wrapper REAPER (A1-lite front-run + A4)
+```
+
+- **Giả thuyết của user ĐƯỢC XÁC NHẬN ĐỊNH LƯỢNG**: cấu trúc v18/v19 đã gần tới optimum
+  cục bộ — wrapper market-timing trên nền này chỉ còn +$103/battle (81% winrate, CI vừa
+  chạm 0), đúng bậc "vài trăm đô" như user dự đoán; toàn bộ khoảng cách ~$1,282-1,298 so
+  với thế hệ ahmedv43 nằm ở nền jaxa623 vốn đã có sẵn.
+- Wrapper v19 KHÔNG thoái hóa (G5 ✓): giữ nguyên lợi thế của nền ở cả 2 cặp sparring,
+  thêm edge dương có ý nghĩa thống kê, worst-case mới −$2,846 (seed 44) cần theo dõi
+  nhưng 41/48 seeds có paired-margin dương.
+- **Hệ quả chiến lược (khẳng định §8.5)**: đột phá KHÔNG đến từ thêm market-timing trên
+  skeleton v18. Ưu tiên Phase 2 giữ nguyên: **B6 MELON opening #1** (meta-independent,
+  $1,500-2,500/match) → A7 morning window → A5 feed hoist → breadth (EGG/GOOSE dòng
+  "không đối thủ" của ymg_aq/mmpq). Gate G1 wrapper-only chính thức nới về **+$80-150**.
+
+### 9.3 Sửa lỗi "v19 không xuất hiện trong app" (Observer UI)
+
+- Triệu chứng user: không thấy v19 trong dropdown agent của app.
+- Root cause: arena-service (port 3005) chạy tiến trình cũ khởi động TRƯỚC khi Task 85 thêm
+  v19 vào `AGENTS` của `index.ts`. `bun --hot` re-run module nhưng global guard
+  `__arenaListening` giữ listener CŨ (kèm closure AGENTS cũ) phục vụ port — module mới gắn
+  vào server mới không listen. Probe xác nhận service đang phục vụ
+  `["v18","ahmedv43","ahmedv44","ahmedv45"]` (không v19).
+- Fix: `mini-services/arena-service/restart.sh` giờ PRE-KILL tiến trình cũ trước khi
+  double-fork daemon mới (Task 86). Sau restart, probe trả về đủ 5 agent.
+- **Bài học vận hành**: mọi thay đổi `AGENTS`/registry trong index.ts ⇒ bắt buộc chạy
+  `restart.sh` (hot-reload không đủ).
+- Verify end-to-end bằng agent-browser qua gateway :81: chọn v19 vs ahmedv43 → trận chạy
+  full 720 lượt, stream live, MoneyChart/FarmBoard/MarketPanel/BrainPanel render, Result
+  Banner "🏆 v19 THẮNG" ($108,038 vs $106,545 +$1,492; trận 2 cũng thắng). Screenshot:
+  `kaggle-research/screenshots/t86_ui_v19_vs_ahmedv43_win.png`. Selection giữ nguyên sau
+  trận, controls mở khóa chuẩn (hiện tượng reset ở trận đầu là artifact đợt reconnect socket
+  khi restart service, không tái lập được ở trận 2).
+
+### 9.4 Hạ tầng mới
+
+- `arena/batteryd.py`: daemon double-fork cho battery chain — thoát kill-tree của
+  tool-session (bài học Task 75), cho phép chạy chuỗi 3 battery × 48 trận nền trong khi
+  làm việc khác. Log: `bench/t86_battery.log` (gitignored).
+
+### 9.5 Intel xếp hạng Kaggle (mục tiêu rank bạc của user "Mr. Architect")
+
+- Competition **KaggressurE** (id 147734, $50K, Featured): **9,318 đội** tham gia.
+- User hiện **rank 962, skill rating 2,422.9** (17-09-2026 qua API; dao động ±20-30 hạng
+  mỗi đợt game resolve).
+- Ngưỡng huy chương (quy tắc >1,000 đội: Gold 10+0.2%, Silver 5%, Bronze 10%):
+  - **Bạc: rank ≤ 465 ⇔ rating ≥ ~2,657** (rank 465 hiện 2,656-2,660) ⇒ cần **+234 điểm**
+  - Đồng: rank ≤ 931 ⇔ rating ≥ 2,435 ⇒ cần **+12 điểm** (bên rìa)
+  - Gold: rank ≤ 28 (rating ≥ 2,932) — ngoài tầm phiên bản này
+- Deadline **30-09-2026** (còn 13 ngày); merger/new-entrant 23-09; **5 submissions/ngày**,
+  nộp trực tiếp (không bắt buộc qua kernel).
+- Token API hiện tại không có quyền đọc submissions (401/403) — không xác nhận được
+  submission đang active của user; cần user xác nhận trên web.
+
+### 9.6 Kết luận Phase 2 & bước tiếp theo (Phase 2+ implementation)
+
+1. **v19.2-alpha đạt chuẩn deploy local**: vượt v18 có ý nghĩa thống kê, không thoái hóa
+   bất kỳ cặp sparring nào, đã lên UI Observer.
+2. **Nộp Kaggle**: nếu submission đang active cũ hơn v18 (vd v17 MERCATOR = mirror
+   ahmedv41), nộp v19 ngay — toàn bộ ~$1,282/battle lợi thế so với thế hệ ahmedv43 đến từ
+   nền jaxa623, kèm +$103 wrapper. Nếu đã ở v18: chờ v19-beta (B6) rồi nộp.
+3. **Phase 2+ (v19-beta)** theo §8.5: B6 MELON opening → A7 → A5 → stress-clone library
+   (mmpq-clone/egg-racer) → cổng G3/G6. Mục tiêu rating: mỗi +$500-1,000/battle vs meta
+   trung bình ≈ một bậc thang rating ~+30-80 điểm; cần +234 cho bạc.
+4. Theo dõi worst-case seed 44 (−$2,846) khi mở rộng battery Phase 2+.

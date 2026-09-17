@@ -324,3 +324,52 @@ Stage Summary:
 - Artifacts: kaggriculture/{v19.py, v19_layer.py, build_v19.py, arena/battery.py}, research/v19/
   (docs 01-06 + top1 parsed 7 trận + an5 scripts), worklog — đẩy lên GitHub repo
   vietnq130593-code/Kagriculture
+---
+Task ID: 14 (project Task 86) — Phase 2: battery định lượng v19/v18/ahmedv43 + fix v19 trong app + intel rank bạc
+Agent: Z.ai Code (main, vai trò Bio)
+
+Task:
+- "Tiếp tục Phase 2, đấu thử với v18 và ahmedv43 để xác định khác biệt" + fix "v19 chưa
+  xuất hiện trong app" + báo cáo/đề xuất lộ trình rank bạc (user Mr. Architect, rank 944-962)
+
+Work Log:
+- Chẩn đoán "v19 không có trong app": probe socket trực tiếp port 3005 → service đang chạy
+  phục vụ AGENTS cũ ["v18","ahmedv43","ahmedv44","ahmedv45"] — tiến trình khởi động trước
+  Task 85; bun --hot không áp dụng thay đổi AGENTS cho listener cũ (global guard
+  __arenaListening giữ closure cũ)
+- Fix restart.sh: thêm PRE-KILL 'bun --hot index.ts' trước double-fork daemon; restart →
+  probe trả đủ 5 agent ["v18","v19","ahmedv43","ahmedv44","ahmedv45"]
+- Viết arena/batteryd.py (daemon double-fork cho battery chain — battery chạy nền qua nhiều
+  tool-call, thoát kill-tree session; bài học Task 75)
+- Chạy 3 battery × 48 trận (24 seeds × 2 ghế, official kaggle_environments runner):
+  v19 vs ahmedv43 = 47W/1L +$1,298 [1,065-1,523]; v18 vs ahmedv43 = 47W/1L +$1,282
+  [1,060-1,497]; v19 vs v18 ext (seeds 25-48) = 44W/4L +$125 → POOLED v19 vs v18 (96 trận,
+  48 seeds) = 78W/18L +$103 [−1, +209], paired/seed +$207, 41/48 seeds dương
+- Phân rã: v19−ahmedv43 (+$1,298) ≈ v18−ahmedv43 (+$1,282) + v19−v18 (+$103) → 98.8% lợi
+  thế từ nền jaxa623, 1.2% từ wrapper REAPER — XÁC NHẬN ĐỊNH LƯỢNG giả thuyết user "cấu
+  trúc gần tối ưu, chỉ thêm vài trăm đô"
+- Verify UI bằng agent-browser qua gateway :81 (luồng thật của user, KHÔNG phải :3000 vì
+  bypass Caddy làm chết XTransformPort): chọn v19 vs ahmedv43 → 2 trận full 720 lượt, stream
+  live, MoneyChart/FarmBoard/MarketPanel/BrainPanel/ResultBanner render, v19 thắng cả 2
+  (+$1,492 và trận 2); selection giữ nguyên + controls mở khóa sau trận (reset ở trận 1 chỉ
+  là artifact reconnect khi restart service); screenshot t86_ui_v19_vs_ahmedv43_win.png
+- Kaggle API: competition KaggressurE id 147734 — 9,318 đội; user rank 962 rating 2,422.9;
+  ngưỡng bạc rank ≤465 (rating ~2,657, cần +234 điểm), đồng rank ≤931 (2,435, cần +12);
+  deadline 30-09 (13 ngày), 5 subs/ngày; token không đủ quyền đọc submissions (401/403)
+- Update 05_V19_DEPLOYMENT_PLAN.md §9 (9.1 bảng battery, 9.2 decomposition, 9.3 fix app,
+  9.4 batteryd, 9.5 intel rank, 9.6 kết luận + Phase 2+ roadmap)
+- Health check: app:3000 = 200 (không downtime khi restart service), arena-service:3005 =
+  5 agents, dev.log sạch, battery chain 144 trận 0 error
+
+Stage Summary:
+- ĐỊNH LƯỢNG KHÁC BIỆT HOÀN TẤT: v19 vs ahmedv43 +$1,298 (47/48) nhưng 98.8% đến từ nền v18
+  — wrapper chỉ +$103/battle; đột phá phải đến từ B-layer (B6 MELON opening #1) đúng như
+  §8.5 đã sửa
+- APP ĐÃ CÓ v19: root cause = service cũ không restart sau Task 85; đã fix restart.sh
+  (pre-kill) + verify end-to-end 2 trận qua browser — user có thể mở Preview Panel, chọn
+  v19, xem trận trực quan ngay
+- RANK BẠC = rank ≤465/9,318 (rating ≥2,657 vs hiện tại 2,422.9, cần +234); 13 ngày, 5
+  subs/ngày; khuyến nghị nộp v19 ngay nếu submission active cũ hơn v18
+- Hạ tầng: batteryd.py (daemon battery) + restart.sh pre-kill + bench/t86_p2_*.json (3 file)
+- Artifacts đẩy GitHub: kaggriculture/{arena/batteryd.py, bench/t86_p2_*.json},
+  mini-services/arena-service/restart.sh, research/v19/05_V19_DEPLOYMENT_PLAN.md §9

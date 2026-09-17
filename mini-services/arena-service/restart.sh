@@ -5,6 +5,15 @@
 # escapes the session and survives across tool calls / agent sessions.
 # Also: `bun --hot` does NOT reload files replaced via git rename — after any
 # `git checkout/reset` touching index.ts, run this script.
+#
+# Task 86 (17-09): PRE-KILL any running arena-service first. Root cause of
+# "v19 missing in app": `bun --hot` re-runs the module but the
+# `__arenaListening` global guard keeps the OLD httpServer+io (with the OLD
+# AGENTS closure) serving port 3005 — the new module instance attaches to a
+# fresh non-listening server. Only a true process restart picks up registry
+# changes in index.ts.
+pkill -f 'bun --hot index.ts' 2>/dev/null
+sleep 1
 python3 - << 'PYEOF'
 import os
 log = open('/tmp/arena-service.log', 'ab', buffering=0)
