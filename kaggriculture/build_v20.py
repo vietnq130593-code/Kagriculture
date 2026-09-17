@@ -91,7 +91,20 @@ parts = [
     v193_layer,
     "\n\n# ---- flat-chain host alias: v19.3 advance-widen entry ----\n_V193 = agent\n",
     v194_layer,
-    "\n\n# final entry point: `agent` (the v19.4 layer's function, last defined)\n",
+    "\n\n# ---- kaggle_environments entry-point fix (Task 88) ----\n"
+    "# get_last_callable() (kaggle_environments/agent.py L64) picks the LAST-INSERTED\n"
+    "# callable of the module namespace.  Re-defining `agent` above NEVER moves its\n"
+    "# dict position (Python dicts keep the first insertion slot on overwrite), so a\n"
+    "# helper defined later (e.g. _v194_reorder) hijacks the Kaggle harness call and\n"
+    "# every turn silently degrades to PASS (observed: submission 56308181 scored 600).\n"
+    "# del + re-def re-inserts `agent` at the END of the namespace, making it the\n"
+    "# callable the harness actually invokes.  (Same trick the jaxa/aurax lineage uses\n"
+    "# with `agent = globals().pop('agent')`.)\n"
+    "_V20_ENTRY = agent\n"
+    "del agent\n"
+    "def agent(observation, configuration=None):\n"
+    "    return _V20_ENTRY(observation, configuration)\n"
+    "agent.telemetry = _V194_TELEMETRY\n",
 ]
 
 src = "\n".join(parts)
@@ -100,3 +113,12 @@ with open(os.path.join(ROOT, "v20.py"), "w", encoding="utf-8") as f:
 
 size = os.path.getsize(os.path.join(ROOT, "v20.py"))
 print(f"v20.py written: {size:,} bytes (v18 base sha256 {v18_sha[:16]}...)")
+
+# Task 88: verify the kaggle_environments harness picks the REAL agent entry.
+from kaggle_environments.agent import get_last_callable
+
+fn = get_last_callable(src, path=os.path.join(ROOT, "v20.py"))
+assert fn is not None and getattr(fn, "__name__", "") == "agent", (
+    f"entry-point check FAILED: get_last_callable -> {fn!r}"
+)
+print("entry-point check OK: get_last_callable -> agent")

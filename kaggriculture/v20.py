@@ -950,4 +950,17 @@ agent.telemetry = _V194_TELEMETRY
 
 
 
-# final entry point: `agent` (the v19.4 layer's function, last defined)
+# ---- kaggle_environments entry-point fix (Task 88) ----
+# get_last_callable() (kaggle_environments/agent.py L64) picks the LAST-INSERTED
+# callable of the module namespace.  Re-defining `agent` above NEVER moves its
+# dict position (Python dicts keep the first insertion slot on overwrite), so a
+# helper defined later (e.g. _v194_reorder) hijacks the Kaggle harness call and
+# every turn silently degrades to PASS (observed: submission 56308181 scored 600).
+# del + re-def re-inserts `agent` at the END of the namespace, making it the
+# callable the harness actually invokes.  (Same trick the jaxa/aurax lineage uses
+# with `agent = globals().pop('agent')`.)
+_V20_ENTRY = agent
+del agent
+def agent(observation, configuration=None):
+    return _V20_ENTRY(observation, configuration)
+agent.telemetry = _V194_TELEMETRY

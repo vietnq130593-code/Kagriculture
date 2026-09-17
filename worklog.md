@@ -494,3 +494,58 @@ Agent: Z.ai Code (main)
 - KHÔNG push được GitHub: môi trường hiện tại không có remote + không có
   credentials (no gh CLI, no .git-credentials, no GH_ env, .env chỉ có
   DATABASE_URL). Muốn push: user thêm remote hoặc cung cấp token.
+
+---
+Task ID: 16 (project Task 88) — Push GitHub + submit v20 + intel aurax7 v7 + fix entry-point
+Agent: Z.ai Code (main, vai trò Bio)
+
+Task:
+- User cấp PAT GitHub + token Kaggle mới; yêu cầu push code, nộp v20, tải về và
+  nghiên cứu đối thủ aurax7/kaggressurE-shop-router-reactive-v7
+
+Work Log:
+- Merge git 2 lịch sử không chung gốc: GitHub Kagriculture (116 commits Tasks 1-86)
+  + workspace live (Task 87) qua `merge --allow-unrelated-histories -X ours`;
+  push `5da4a7a..3c5cef3` OK (user: vietnq130593-code, repo Kagriculture, public)
+- SECURITY: token Kaggle KGAT_… bị lộ public trong worklog.md (cả local + GitHub
+  history — raw.githubusercontent truy cập không cần auth) → redact + commit riêng;
+  KHUYẾN NGHỊ user rotate token sau khi rating hội tụ
+- Submit #1 (56308181, 15:26): score 600→281 — validation episode self-play 720
+  lượt toàn PASS, kết thúc $3000. Root cause: `kaggle_environments.agent
+  .get_last_callable()` (agent.py L64) trả về callable CHÈN CUỐI trong namespace —
+  dict Python giữ vị trí cũ khi re-define `agent`, nên `_v194_reorder` (def sau
+  cùng trong flat build) hijack harness: harness gọi _v194_reorder(obs, action=CONFIG)
+  → engine nhận config thay action → PASS mọi turn. Local không gặp vì
+  run_battle.py load qua getattr(mod, "agent")
+- Fix build_v20.py: append `_V20_ENTRY = agent; del agent; def agent(...): return
+  _V20_ENTRY(...)` (thủ thuật jaxa/aurax `globals().pop`) + tự verify
+  get_last_callable(src) == agent khi build; v20.py rebuild 410,415 bytes;
+  differential battles khớp từng đồng (seed5 vs aurax7 +$2,609; seed11 vs
+  ahmedv46 +$711)
+- Submit #2 v20.1 (56308666, 15:47): validation episode 110099769 chạy THẬT —
+  rewards [67544, 68171], opening BUY 7/SELL 2, 719/720 turn có hành động;
+  600 = rating khởi tạo; leaderboard tạm hiển thị 600 (rank 5746) chờ matchmaking
+- aurax7 v7 intel: slug thật aurax7/kaggressurE-shop-router-reactive-v7; team
+  "Farmers Is All You Need" rank 299/9318 (2723.3), 5 thành viên; main.py
+  347,602 chars SHA e221f487 — = ahmedv45.py NGUYÊN VẸN 85 defs + 13 defs mới:
+  _r60 survival guard (giữ $4 hire day-1 + rescue thú sắp thoát ở h22) + overlay
+  2842 (opening wash [BUY 10, SELL 10] index-0; advance_sales LOOK=2 PROTECT_FIRST;
+  frontload A/B/C reorder có solo-sim guard; _Horizons dict-hack mở reservation
+  window 4→24 turn)
+- aurax7.py sparring byte-exact → run_battle + arena-service (13 agents); battery
+  48 trận: v20 vs aurax7 **48-0 +$1,711** [worst +$679, CI95 1546-1876, paired
+  +$3,422]; v194 vs aurax7 48-0 +$1,740 — biên LỚN NHẤT từng đo vs đối thủ meta
+  mạnh (seyit4 +$2,176, ahmedv43 +$2,122, ahmedv46 +$1,570)
+- Viết kaggle-research/08_AURAX7_V7_INTEL.md (nguồn, kiến trúc, 4 cơ chế overlay,
+  battery, ứng viên port v20.1: _r60 rescue + HORIZON 24)
+
+Stage Summary:
+- PUSH + SUBMIT hoàn tất: GitHub 3c5cef3; Kaggle v20.1 = 56308666 đang chờ
+  matchmaking leo rating (khởi tạo 600; local evidence 48-0 vs rank-299 → kỳ vọng
+  hội tụ 2700+; silver = 2659.7 hiện tại)
+- BUG KILLER được fix: get_last_callable entry-point — mọi submission flat-build
+  từ giờ build-time-verified; lesson ghi trong build_v20.py + doc 08 §5
+- aurax7 (rank 299) bị v20 khắc chế 48-0 +$1,711 — meta ladder local giờ đầy đủ
+  (v46, seyit4, aurax7, ahmedv43-46); 2 ứng viên port v20.1: _r60 animal rescue,
+  HORIZON 24
+- Token Kaggle đã lộ trong public repo → cần rotate (đã redact phần hiện tại)
