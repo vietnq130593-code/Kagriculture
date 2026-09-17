@@ -278,3 +278,49 @@ Stage Summary:
 - Tài liệu: 06_TOP1_7MATCH_DEEP_ANALYSIS.md (đã verify 15 lỗi sửa) + 05_V19_DEPLOYMENT_PLAN.md
   (13 module, G1-G6, Phase 1-3) — sẵn sàng triển khai code v19 Phase 1 (A1+A2+A4)
 - Scripts/audit: top1/an5_*.py + verify_06.py + m1_part1-6.py (reproduce toàn bộ bảng số liệu)
+---
+Task ID: 13 (project Task 85) — Triển khai v19-alpha Phase 1 + battery G1/G2 + push GitHub
+Agent: Z.ai Code (main, vai trò Bio)
+
+Task:
+- "Triển khai bước tiếp theo" theo 05_V19_DEPLOYMENT_PLAN.md §4 Phase 1 ("v19-alpha": A1, A2, A4
+  trên nền v18) + báo cáo + push code lên GitHub
+
+Work Log:
+- Khảo sát v18 wrapper (advance_sales skip ≥718, frontload sim-gate, _future_market route 2 ≥648)
+  + engine facts: SHOPS L103-111 (single-product ×2), town consume L728-749, DROP verb L343-358
+  (nộp inv→shed TRONG NGÀY), FEED/FERTILIZE tiêu shed, lockstep per-unit _process_market L544-628,
+  reward = money, shed overflow = PHÁ HỦY (L843-858)
+- Viết v19_layer.py (REAPER: A1 endgame liquidation, A2 trough throttle, A4 debt invariant,
+  C1 reset) + build_v19.py (assemble v19.py = v18 byte-exact nhúng + sha256 assert, 389KB)
+- Đăng ký v19 vào arena/run_battle.py + mini-services/arena-service AGENTS (UI)
+- Smoke 48 bước → bắt bug NameError (obs vs observation) → fix → full battle sạch 0 lỗi
+- PHÁT HIỆN ENGINE LỚN: bước cuối THỰC THI = 718 (episodeSteps−2; chứng minh bằng BUY_LAND
+  trigger test + env.steps phân tích); entry index replay Kaggle LỆCH +1 vs submission step →
+  toàn bộ nhãn "s719" trong 04A/04B/06 = engine step 718 ("bell" thật)
+- Vòng 1 (A1-staging + A2 throttle 0.85×peak14): T1 battery 24 seeds × 2 ghế vs v18
+  (arena/battery.py mới — paired margins + bootstrap CI, 2 workers) → 1W/47L, mean −$1,280
+  [−1,516,−1,044] FAIL G1 → chẩn đoán seed 17: A2 crash-hold −$1,823 tại d21-22 (mirror meta
+  recovery chỉ 50-65% peak) + A1 staging lag 1 bước vs flow-through của parent
+- Vòng 2 = v19.2 "front-run": A1-lite (từ s696 strip BUY chết trừ FERT + boost SELL cap
+  shed+40 + catch-all → bán inflow CÙNG BƯỚC, front-run dump lockstep), A4 giữ, A2 tắt
+  (A2_ENABLED=False, giữ code cho Phase 2) → T1 lại: 34W/14L, mean +$82 [CI +6,+158],
+  worst −$842, paired +$163 — dương có ý nghĩa thống kê nhưng G1 fail (v18 route-2 đã tự
+  liquidate endgame bằng catch-all 1000-cap; edge còn lại của wrapper = front-run)
+- Sparring G2-lite: v19 vs ahmedv45 24/24, mean +$2,360, worst +$1,123 (v18: +$2,372) —
+  PASS G2-lite, không thoái hóa G5; G4 ✓ (official runner, single-file, 0 lỗi, ~11ms/turn)
+- Update 05_V19_DEPLOYMENT_PLAN.md mục 8 (kết quả Phase 1: 8.1 build + phát hiện step 718,
+  8.2 vòng 1 fail + chẩn đoán, 8.3 vòng 2 kết quả + nguyên nhân gốc G1 fail, 8.4 hạ tầng đo,
+  8.5 kế hoạch Phase 2 sửa lại theo bằng chứng)
+- Health check: app:3000 = 200, arena-service:3005 sống (socket.io), dev.log sạch
+
+Stage Summary:
+- v19.2-alpha = v18 + A1-lite front-run liquidation + A4 debt invariant (A2 disabled có bằng
+  chứng); T1 vs v18: +$82 [6,158]/battle, 71% winrate; sparring ahmedv45 24/24 +$2,360
+- Bài học định giá intel: "endgame premium" của top-1 phần lớn đã có trong route-2 của parent —
+  khoảng cách lớn phải đến từ B-layer (B6 MELON opening 7/7 trận là ưu tiên #1 Phase 2)
+- Phát hiện engine: bell = step 718; replay index +1 — mọi phân tích sau này phải map lại
+- Hạ tầng: arena/battery.py (paired bootstrap CI) + v19 telemetry trên UI + bench/t85_*.json
+- Artifacts: kaggriculture/{v19.py, v19_layer.py, build_v19.py, arena/battery.py}, research/v19/
+  (docs 01-06 + top1 parsed 7 trận + an5 scripts), worklog — đẩy lên GitHub repo
+  vietnq130593-code/Kagriculture

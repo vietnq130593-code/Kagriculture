@@ -374,3 +374,69 @@ v19 REAPER = v18 + 13 module (7 market-timing A1-A7 + 6 breadth B1-B6) với m�
 G1-G6:
 **mean margin ≥ +$2,500 vs v18 trên 64 worlds, CI-95% > +$1,000, worst world ≥ −$1,500,
 chuẩn meta mới $100K+** — đó là "thắng cách xa" bằng tiền, không phải bằng cảm giác.
+
+---
+
+## 8. KẾT QUẢ PHASE 1 — v19-alpha "REAPER" (Task 85, 16-09, Bio)
+
+### 8.1 Build
+
+- `kaggriculture/v19.py` (389KB single-file) = v18.py nhúng nguyên văn (sha256
+  `4757f3f5…60e95e`, assert lúc exec) + REAPER layer (`v19_layer.py`, assemble bằng
+  `build_v19.py`). Registry `arena/run_battle.py` + UI arena-service đã đăng ký v19.
+- **Phát hiện engine quan trọng (đổi toàn bộ bản đồ bước cuối)**: bước được THỰC THI cuối
+  cùng là **step 718 = episodeSteps − 2** (chứng minh thực nghiệm: BUY_LAND tại step N−1 của
+  episodeSteps=N không bao giờ được thực thi; kaggle core set DONE sau khi xử lý step N−2). Entry
+  index trong replay Kaggle **lệch +1** so với submission step → mọi nhãn "s715-719" trong
+  04A/04B/06 thực chất là engine step **714-718**. Window endgame thật: staged 711-717, bell 718.
+
+### 8.2 Vòng 1 — A1-staging + A2-throttle: FAIL, có chẩn đoán đầy đủ
+
+- Thiết kế ban đầu (A1 thay toàn bộ market list từ s711: staged pace + WOOL stagger +
+  anchor giữ tới bell; A2 throttle 0.85×peak14, cap 3 units/step) — T1 battery 24 seeds × 2 ghế
+  vs v18: **1W/47L, mean −$1,280 [−1,516, −1,044]** — fail G1.
+- Chẩn đoán (seed 17 trace + telemetry): (a) A2 crash-hold mất −$1,823 đúng cửa sổ d21-22 —
+  trong meta mirror, đối thủ không bao giờ ngừng xả nên recovery chỉ đạt 50-65% peak, giữ qua
+  crash = đền giá thoát đẹp cho v18; (b) A1 staging chậm 1 bước so với flow-through cùng-bước
+  của parent (hàng HARVEST→DROP trong verb phase chỉ bán được ở bước sau) −$966 nửa cuối d29.
+
+### 8.3 Vòng 2 — v19.2 "front-run" (A1-lite + A4, A2 tắt): dương, có ý nghĩa thống kê
+
+- **A1-lite (front-run liquidation)**: từ s696 (0h d29, khớp intel "buys → $0 từ d28"):
+  strip BUY chết (BUY_SEED/BUY_ANIMAL/BUY_LAND/BUY_PRODUCT trừ FERTILIZER — FERT vẫn hồi
+  yield TOMATO cùng ngày), **boost mọi SELL cap lên shed+40** và append catch-all cho item
+  còn tồn mà tape chưa bán bước này → inflow harvest→DROP được bán **cùng bước**, trước cú
+  dump của đối thủ (lockstep: người bán sớm ăn giá pre-dump). provably-inert khi không khớp.
+- **A4 debt invariant** giữ nguyên (ledger absorb + sim-revert; đếm được debt/absorb từng trận).
+- **A2 giữ trong code nhưng A2_ENABLED=False** — đã chứng minh là net-loser ở meta mirror;
+  sẽ tái hiệu chỉnh ở Phase 2 với đối thủ holder-style (mmpq-clone) trước khi bật.
+- T1 battery lại (cùng 24 seeds × 2 ghế): **34W/14L, mean +$82/battle [CI-95% +6, +158],
+  worst −$842, paired mean +$163** — dương đáng kể nhưng **G1 vẫn FAIL** (mục tiêu +$2,500).
+- **Nguyên nhân gốc G1 fail**: route-2 của parent V43 đã TỰ liquidate endgame bằng catch-all
+  1000-cap mỗi bước d29 — phần lớn "endgame premium" $5-8K của intel đã nằm TRONG nền v18;
+  wrapper chỉ còn edge front-run +$82. Bài học: intel của Majkel phải được đối chiếu với
+  những gì base ĐÃ LÀM trước khi quy đổi thành module.
+- Sparring (G2-lite, 12 seeds × 2 ghế vs ahmedv45): **v19 24/24, mean +$2,360, worst +$1,123**
+  (v18: 24/24, +$2,372, +$1,051) — PASS G2-lite, không thoái hóa (G5 ✓).
+- G4 ✓: toàn bộ đo trên official `kaggle_environments` runner, v19.py single-file standalone,
+  0 lỗi wrapper, ~11ms/turn.
+
+### 8.4 Hạ tầng đo mới (tái dùng cho Phase 2)
+
+- `arena/battery.py`: paired battery runner song song (N seeds × 2 ghế, margins per-seat +
+  per-seed paired, bootstrap CI-95%, JSON lưu `bench/`). Kết quả Task 85: `bench/t85_p1_t1.json`
+  (vòng 1), `bench/t85_p1_t1_v2.json` (v19.2), `bench/t85_p1_sparring_v19/v18.json`.
+- Telemetry v19 (`_arena_diag`): a1_turns/a2_throttle_units/a2_released/a2_structural/
+  a4_debt/a4_absorbed/v19_errors — hiển thị trực tiếp trên Observer UI.
+
+### 8.5 Kế hoạch sửa lại Phase 2 (theo bằng chứng vòng 1)
+
+1. **B6 MELON opening lock** giữ ưu tiên #1 ($1,500-2,500 gần deterministic, 7/7 trận) —
+   không phụ thuộc meta mirror.
+2. **A5 feed-index-0 hoist** + **A7 morning window** (39% revenue ở biên ngày) — can thiệp
+   market-list thuần, rủi ro thấp.
+3. **A2 tái hiệu chỉnh** chỉ bật khi có đối thủ holder (detector: inventory của đối thủ
+   không tăng trong khi giá rơi) — kiểm chứng bằng mmpq-clone trước khi mặc định bật.
+4. Stress-clone library (early-dumper / egg-racer / throttle-copy / mmpq-clone) — cổng G3/G6.
+5. Gate G1 nới mục tiêu wrapper-only: kỳ vọng thực chứng +$80-150/battle; khoảng cách lớn
+   phải đến từ B-layer (breadth) chứ không phải market-timing trên nền đã tối ưu.

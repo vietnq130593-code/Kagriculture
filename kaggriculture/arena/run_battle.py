@@ -44,6 +44,7 @@ sys.path.insert(0, BENCH)
 # Sparring: ahmedv43/v44/v45 = Ahmed Berat Özer lineage (nền của v18).
 AGENTS = {
     "v18": (os.path.join(ROOT, "v18.py"), "agent"),
+    "v19": (os.path.join(ROOT, "v19.py"), "agent"),
     "ahmedv43": (os.path.join(ROOT, "ahmedv43.py"), "agent"),
     "ahmedv44": (os.path.join(ROOT, "ahmedv44.py"), "agent"),
     "ahmedv45": (os.path.join(ROOT, "ahmedv45.py"), "agent"),

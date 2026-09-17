@@ -35,7 +35,7 @@ const PYTHON = 'python3'
 // aurax, kawashigi, indark, thomast, ahmedv41) đã xóa. v18 = jaxa623/sdy623 K0006
 // "Beyond 48-0" (V43 + 4 market micro-edges: front-load, advance-2, horizon-24, open-50).
 // Sparring: ahmedv43/v44/v45 = Ahmed Berat Özer lineage — nền của v18.
-const AGENTS = ['v18', 'ahmedv43', 'ahmedv44', 'ahmedv45']
+const AGENTS = ['v18', 'v19', 'ahmedv43', 'ahmedv44', 'ahmedv45']
 
 mkdirSync(BATTLE_DIR, { recursive: true })
 
