@@ -37,7 +37,9 @@ const PYTHON = 'python3'
 // Sparring: ahmedv43/v44/v45 = Ahmed Berat Özer lineage — nền của v18.
 // Task 87 (17-09): + seyit4 (seyitkaangunes V44+4layers, live 56280605, ~2801/rank~188),
 // + ahmedv46 (ahmedberatozer First-Turn Microstructure EXP293), + v191 (v19.1 opening port).
-const AGENTS = ['v18', 'v19', 'v191', 'v192', 'v193', 'v194', 'v20', 'v21', 'ahmedv43', 'ahmedv44', 'ahmedv45', 'ahmedv46', 'seyit4', 'aurax7']
+// Task 92 (18-09): + v24 (v20 chain + GARBAGE-THROTTLE H2 peak-pricing layer —
+// challenger đầu tiên vượt 3 cổng: 48-0 vs v46 +$1,699, direct vs v20 +$113 CI>0).
+const AGENTS = ['v18', 'v19', 'v191', 'v192', 'v193', 'v194', 'v20', 'v21', 'v24', 'ahmedv43', 'ahmedv44', 'ahmedv45', 'ahmedv46', 'seyit4', 'aurax7']
 
 mkdirSync(BATTLE_DIR, { recursive: true })
 

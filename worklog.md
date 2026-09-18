@@ -794,3 +794,45 @@ Stage Summary:
   thuần timing bán.
 - Hướng còn mở: matchmaking data #56308666 (field ≠ mirror), meta-level
   top-tier, H3 vẫn đóng cổng engine (BUY_PRODUCT chỉ WHEAT/FERTILIZER).
+
+---
+Task ID: 23 (project Task 92b) — Đăng ký v24 vào app KaggressurE Arena cho user tự xem đối đầu
+Agent: Z.ai Code (main, vai trò Bio)
+
+Task:
+- User: "Tiến hành đăng ký v24 vào app để tôi có thể tự xem v24 đối đầu các
+  đối thủ" — register v24 vào UI battle observer (15 agents).
+
+Work Log:
+- 3 điểm đăng ký: (1) arena/run_battle.py AGENTS registry (+v24 → v24.py,
+  kèm comment battery evidence); (2) mini-services/arena-service/index.ts
+  AGENTS array (15 agents, comment Task 92); (3) frontend
+  src/components/arena/constants.ts AGENT_INFO — showcase card v24
+  (GARBAGE-THROTTLE desc + battery + hướng dẫn chọn ghế A).
+- Smoke runner: run_battle.py --a v24 --b ahmedv46 --seed 5 --max-steps 24
+  OK (stream JSONL đầy đủ).
+- Restart arena-service qua restart.sh (bài học Task 86: bun --hot giữ AGENTS
+  closure cũ — phải true restart). Log: listening port 3005.
+- Socket handshake (socket.io-client): arena:hello → agents 15 mục bao gồm
+  v24 ✓.
+- End-to-end qua service: battle:start v24 vs ahmedv46 seed 5 → 719 turn
+  stream, rewards [93547, 91753] — KHỚP TỪNG ĐỒNG với replay-test Task 92
+  (determinism qua pipeline service).
+- Browser verify (agent-browser, gateway :81): dropdown A hiện đủ 15 option
+  incl. v24; chọn v24 (A) vs aurax7 (B) seed random → battle LIVE chạy,
+  720 turn, kết quả 🏆 v24 THẮNG 1.02× ($86,097 vs $84,300, +$1,797, 25.7s
+  wall), 0 console error; screenshot
+  kaggriculture/battles/t92_ui_v24_vs_aurax7_win.png (gitignored, local).
+- Reload fresh: EmptyState showcase card v24 render đúng (tag "v24
+  GARBAGE-THROTTLE" + desc đầy đủ).
+- Commit (session-hook auto-commit 9c5ce05 placeholder UUID → amend đúng
+  message) + push GitHub token 1.
+
+Stage Summary:
+- v24 ĐÃ LÊN APP: user mở Preview Panel (port 3000 / gateway) → chọn v24 ở
+  ghế A hoặc B, bất kỳ đối thủ trong 15 (ahmedv43-46, seyit4, aurax7, v18,
+  v19x, v20, v21), seed tùy chọn → xem 720 turn từng bước với telemetry
+  tiền/bảng giá thị trường. v24 thắng aurax7 ngay trận mở màn (1.02×).
+- Kịch bản gợi ý xem: (a) v24 vs v20 cùng seed — nhìn lần lượt strip cửa
+  sổ rác; (b) v24 vs ahmedv46 seed 100-123 — đúng battery chuẩn 48-0;
+  (c) v24 vs aurax7 — trận field-style.

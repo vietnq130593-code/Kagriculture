@@ -79,6 +79,11 @@ AGENTS = {
     # + V44 race escalator + _r60 survival guard + 2842 overlay (frontload +
     # advance_sales LOOK=2 + HORIZON 24). Extracted byte-exact 17-09.
     "aurax7": (os.path.join(ROOT, "aurax7.py"), "agent"),
+    # Task 92: v24 = v20 flat chain + GARBAGE-THROTTLE layer (H2 peak-pricing:
+    # strip SELL < $15, hold <= 24u, release chunked >= $18; 48-0 vs v46
+    # +$1,699, direct vs v20 +$113 t=2.68 CI[$30,$196]). Flat build 419KB,
+    # entry-point verified (Task 88 pattern).
+    "v24": (os.path.join(ROOT, "v24.py"), "agent"),
 }
 
 
