@@ -749,3 +749,48 @@ Stage Summary:
   mirror. Hướng còn lại: H2 (timing/price trên output hiện có) + meta-level
   (field ≠ mirror).
 - Token GitHub hợp lệ, toàn bộ công việc Task 91 đã push.
+
+---
+Task ID: 22 (project Task 92) — H2 peak-pricing: v24 GARBAGE-THROTTLE (layer re-time SELL trên output hiện có)
+Agent: Z.ai Code (main, vai trò Bio)
+
+Task:
+- Triển khai H2 với bài học đã rút ra (directive user sau phán quyết v23):
+  build v24 + sweep knob + battery 48 trận + báo cáo đầy đủ SAU khi xong.
+
+Work Log:
+- Phục hồi trạng thái phiên bị ngắt: đọc worklog Task 91 + TODO + bench t92 —
+  v24/v24_layer/build_v24 + 8 biến thể sweep (v24b-i) đã build, 2 battery t92
+  đã chạy, replay-test file còn nguyên (hiển thị cat trước đó méo mó nhưng
+  file hợp lệ). Commit b6db72e (UUID placeholder) kẹt local chưa push.
+- Fix understanding + chạy replay-telemetry: seed 5 → 39 strips (MILK 97u,
+  WOOL 31u), gap +$1,794 (v20 cùng seed +$1,556 → v24 +$238 tốt hơn); seed 11
+  (STRA crash) → 56 strips + 1 release (STRA 4u), gap +$715; 0 errors, held→0
+  cuối game (không kẹt kho), interlock không bắn. PASS L-tel.
+- Thống kê battery t92: v24 vs v20 direct 43W-5L mean +$113 sd $207 t=2.68
+  CI95 [$30, $196] — CI LOẠI TRỪ 0; v24 vs v46 48W-0L +$1,699 (v20 baseline
+  +$1,647, worst gap v24 +$438 — không seed nguy hiểm).
+- Tái tạo bằng chứng sweep (số gốc mất theo context): 5 battery 12 trận trên
+  6 crash seeds (3/5/8/11/17/21) — v24c(10/18) +$117, v24h(12/25) +$110,
+  v24e(15/25) +$127, v24f(20/25) +$169, v24-final(15/18+price-chunk) +$139,
+  đều 11/12 wins; v24f full battery 100-123: +$111 ≈ v24 +$113 → knob flat
+  trong dải an toàn, KHÔNG rebuild, giữ final 15/18.
+- Viết kaggle-research/12_V24_GARBAGE_THROTTLE.md (3 probe → 8 bài học H1/H5
+  áp vào layer → sweep → battery → telemetry → bối cảnh challenger + quyết
+  định).
+- Kaggle submission: KHÔNG thể submit từ sandbox — token Kaggle mất theo
+  reboot (đã từng leak + rotate). #56308666 (v20.1) tiếp tục climb phía Kaggle.
+  v24 là ứng viên submit khi user cấp token mới.
+- Commit Task 92 đầy đủ + push GitHub bằng token 1 (đã verify Task 91).
+
+Stage Summary:
+- H2 KẾT THÚC DƯƠNG: v24 = v20 + garbage-throttle (strip SELL <$15, hold
+  ≤24u, release ≤12u/ngày/item khi ≥$18, chunk co theo giá, h0-h20, d27+
+  REAPER, fail-open). 48-0 vs v46, direct +$113 CI>0 — CHALLENGER ĐẦU TIÊN
+  vượt 3 cổng (gate 48-0 / CI>0 / telemetry sạch) trong lịch sử project
+  (v21 +$11, v22b flip, v22d +$31, v23 −$20K đều bị giữ lại).
+- Biên H2 nhỏ (+0.12%/game) và đã vắt kiệt: intraday dead, hoard=0, garbage
+  window nửa lấy được, knob flat [10-20]/[18-25]. Không còn $ đáng kể trong
+  thuần timing bán.
+- Hướng còn mở: matchmaking data #56308666 (field ≠ mirror), meta-level
+  top-tier, H3 vẫn đóng cổng engine (BUY_PRODUCT chỉ WHEAT/FERTILIZER).

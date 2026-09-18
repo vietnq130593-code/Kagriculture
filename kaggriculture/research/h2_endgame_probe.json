@@ -1,0 +1,1085 @@
+{
+ "games": [
+  {
+   "seed": 3,
+   "rewards": [
+    77804.0,
+    75028.0
+   ],
+   "per": {
+    "FERTILIZER": {
+     "eg_units": 102,
+     "eg_avg_price": 2.0686274509803924,
+     "best_day": 18,
+     "gain": 3410.0
+    },
+    "STRAWBERRY": {
+     "eg_units": 52,
+     "eg_avg_price": 95.65384615384616,
+     "best_day": 18,
+     "gain": 1905.1666666666658
+    },
+    "WHEAT": {
+     "eg_units": 315,
+     "eg_avg_price": 36.03174603174603,
+     "best_day": 23,
+     "gain": 2130.14705882353
+    },
+    "WOOL": {
+     "eg_units": 68,
+     "eg_avg_price": 27.544117647058822,
+     "best_day": 18,
+     "gain": 8263.857142857143
+    }
+   },
+   "inv_by_day": {
+    "6": {
+     "WHEAT": 9951,
+     "CARROT": 9993,
+     "TOMATO": 9993,
+     "STRAWBERRY": 9993,
+     "MELON": 9993,
+     "EGG": 9969,
+     "MILK": 9993,
+     "WOOL": 10001,
+     "FERTILIZER": 10060
+    },
+    "8": {
+     "WHEAT": 9899,
+     "CARROT": 9991,
+     "TOMATO": 9991,
+     "STRAWBERRY": 9991,
+     "MELON": 9991,
+     "EGG": 9955,
+     "MILK": 10015,
+     "WOOL": 9979,
+     "FERTILIZER": 10094
+    },
+    "11": {
+     "WHEAT": 9758,
+     "CARROT": 9988,
+     "TOMATO": 9988,
+     "STRAWBERRY": 9970,
+     "MELON": 10132,
+     "EGG": 9916,
+     "MILK": 10045,
+     "WOOL": 9956,
+     "FERTILIZER": 10146
+    },
+    "16": {
+     "WHEAT": 9745,
+     "CARROT": 9983,
+     "TOMATO": 9983,
+     "STRAWBERRY": 9971,
+     "MELON": 10127,
+     "EGG": 9821,
+     "MILK": 10076,
+     "WOOL": 10011,
+     "FERTILIZER": 10284
+    },
+    "17": {
+     "WHEAT": 9756,
+     "CARROT": 9982,
+     "TOMATO": 9982,
+     "STRAWBERRY": 9990,
+     "MELON": 10126,
+     "EGG": 9802,
+     "MILK": 10069,
+     "WOOL": 10022,
+     "FERTILIZER": 10310
+    },
+    "18": {
+     "WHEAT": 9747,
+     "CARROT": 9981,
+     "TOMATO": 9981,
+     "STRAWBERRY": 10019,
+     "MELON": 10125,
+     "EGG": 9783,
+     "MILK": 10068,
+     "WOOL": 10037,
+     "FERTILIZER": 10336
+    },
+    "19": {
+     "WHEAT": 9728,
+     "CARROT": 9980,
+     "TOMATO": 9980,
+     "STRAWBERRY": 10032,
+     "MELON": 10124,
+     "EGG": 9764,
+     "MILK": 10063,
+     "WOOL": 10048,
+     "FERTILIZER": 10354
+    },
+    "20": {
+     "WHEAT": 9715,
+     "CARROT": 9979,
+     "TOMATO": 9979,
+     "STRAWBERRY": 10049,
+     "MELON": 10123,
+     "EGG": 9745,
+     "MILK": 10058,
+     "WOOL": 10049,
+     "FERTILIZER": 10364
+    },
+    "23": {
+     "WHEAT": 9702,
+     "CARROT": 9976,
+     "TOMATO": 9976,
+     "STRAWBERRY": 10050,
+     "MELON": 10120,
+     "EGG": 9688,
+     "MILK": 10041,
+     "WOOL": 10046,
+     "FERTILIZER": 10432
+    },
+    "24": {
+     "WHEAT": 9720,
+     "CARROT": 9975,
+     "TOMATO": 9975,
+     "STRAWBERRY": 10037,
+     "MELON": 10119,
+     "EGG": 9669,
+     "MILK": 10022,
+     "WOOL": 10053,
+     "FERTILIZER": 10430
+    },
+    "25": {
+     "WHEAT": 9746,
+     "CARROT": 9974,
+     "TOMATO": 9974,
+     "STRAWBERRY": 10033,
+     "MELON": 10118,
+     "EGG": 9650,
+     "MILK": 10033,
+     "WOOL": 10058,
+     "FERTILIZER": 10450
+    },
+    "26": {
+     "WHEAT": 9764,
+     "CARROT": 9973,
+     "TOMATO": 9973,
+     "STRAWBERRY": 10038,
+     "MELON": 10117,
+     "EGG": 9631,
+     "MILK": 10014,
+     "WOOL": 10057,
+     "FERTILIZER": 10466
+    },
+    "27": {
+     "WHEAT": 9832,
+     "CARROT": 9972,
+     "TOMATO": 9972,
+     "STRAWBERRY": 10019,
+     "MELON": 10116,
+     "EGG": 9612,
+     "MILK": 10013,
+     "WOOL": 10044,
+     "FERTILIZER": 10486
+    },
+    "28": {
+     "WHEAT": 9877,
+     "CARROT": 10009,
+     "TOMATO": 9971,
+     "STRAWBERRY": 10028,
+     "MELON": 10115,
+     "EGG": 9593,
+     "MILK": 10014,
+     "WOOL": 10058,
+     "FERTILIZER": 10494
+    },
+    "29": {
+     "WHEAT": 9986,
+     "CARROT": 10141,
+     "TOMATO": 9970,
+     "STRAWBERRY": 9997,
+     "MELON": 10114,
+     "EGG": 9574,
+     "MILK": 10009,
+     "WOOL": 10060,
+     "FERTILIZER": 10494
+    }
+   }
+  },
+  {
+   "seed": 5,
+   "rewards": [
+    93409.0,
+    91853.0
+   ],
+   "per": {
+    "FERTILIZER": {
+     "eg_units": 98,
+     "eg_avg_price": 5.744897959183674,
+     "best_day": 18,
+     "gain": 2849.705882352941
+    },
+    "STRAWBERRY": {
+     "eg_units": 52,
+     "eg_avg_price": 107.73076923076923,
+     "best_day": 18,
+     "gain": 5496.75
+    },
+    "WHEAT": {
+     "eg_units": 272,
+     "eg_avg_price": 40.2389705882353,
+     "best_day": 22,
+     "gain": 1749.3754789272027
+    },
+    "WOOL": {
+     "eg_units": 58,
+     "eg_avg_price": 93.89655172413794,
+     "best_day": 26,
+     "gain": 1020.9999999999998
+    }
+   },
+   "inv_by_day": {
+    "8": {
+     "WHEAT": 9881,
+     "CARROT": 9991,
+     "TOMATO": 9991,
+     "STRAWBERRY": 9973,
+     "MELON": 9991,
+     "EGG": 9937,
+     "MILK": 10015,
+     "WOOL": 10015,
+     "FERTILIZER": 10094
+    },
+    "11": {
+     "WHEAT": 9694,
+     "CARROT": 9988,
+     "TOMATO": 9988,
+     "STRAWBERRY": 9934,
+     "MELON": 10132,
+     "EGG": 9894,
+     "MILK": 10048,
+     "WOOL": 10028,
+     "FERTILIZER": 10148
+    },
+    "14": {
+     "WHEAT": 9673,
+     "CARROT": 9985,
+     "TOMATO": 9985,
+     "STRAWBERRY": 9877,
+     "MELON": 10129,
+     "EGG": 9843,
+     "MILK": 10075,
+     "WOOL": 10059,
+     "FERTILIZER": 10248
+    },
+    "17": {
+     "WHEAT": 9664,
+     "CARROT": 9982,
+     "TOMATO": 9982,
+     "STRAWBERRY": 9882,
+     "MELON": 10126,
+     "EGG": 9810,
+     "MILK": 10076,
+     "WOOL": 10060,
+     "FERTILIZER": 10310
+    },
+    "20": {
+     "WHEAT": 9621,
+     "CARROT": 9979,
+     "TOMATO": 9961,
+     "STRAWBERRY": 9923,
+     "MELON": 10123,
+     "EGG": 9769,
+     "MILK": 10073,
+     "WOOL": 10060,
+     "FERTILIZER": 10350
+    },
+    "24": {
+     "WHEAT": 9635,
+     "CARROT": 9975,
+     "TOMATO": 9927,
+     "STRAWBERRY": 10009,
+     "MELON": 10119,
+     "EGG": 9713,
+     "MILK": 10067,
+     "WOOL": 10046,
+     "FERTILIZER": 10392
+    },
+    "25": {
+     "WHEAT": 9668,
+     "CARROT": 9974,
+     "TOMATO": 9914,
+     "STRAWBERRY": 10006,
+     "MELON": 10118,
+     "EGG": 9706,
+     "MILK": 10064,
+     "WOOL": 10039,
+     "FERTILIZER": 10410
+    },
+    "26": {
+     "WHEAT": 9703,
+     "CARROT": 9973,
+     "TOMATO": 9901,
+     "STRAWBERRY": 10023,
+     "MELON": 10117,
+     "EGG": 9675,
+     "MILK": 10063,
+     "WOOL": 10034,
+     "FERTILIZER": 10436
+    },
+    "27": {
+     "WHEAT": 9742,
+     "CARROT": 9972,
+     "TOMATO": 9888,
+     "STRAWBERRY": 10010,
+     "MELON": 10116,
+     "EGG": 9656,
+     "MILK": 10066,
+     "WOOL": 10035,
+     "FERTILIZER": 10460
+    },
+    "28": {
+     "WHEAT": 9765,
+     "CARROT": 10009,
+     "TOMATO": 9875,
+     "STRAWBERRY": 10022,
+     "MELON": 10115,
+     "EGG": 9641,
+     "MILK": 10062,
+     "WOOL": 10050,
+     "FERTILIZER": 10490
+    },
+    "29": {
+     "WHEAT": 9846,
+     "CARROT": 10144,
+     "TOMATO": 9862,
+     "STRAWBERRY": 10000,
+     "MELON": 10114,
+     "EGG": 9650,
+     "MILK": 10072,
+     "WOOL": 10053,
+     "FERTILIZER": 10494
+    }
+   }
+  },
+  {
+   "seed": 8,
+   "rewards": [
+    86014.0,
+    84132.0
+   ],
+   "per": {
+    "EGG": {
+     "eg_units": 68,
+     "eg_avg_price": 44.55882352941177,
+     "best_day": 18,
+     "gain": 505.9999999999998
+    },
+    "FERTILIZER": {
+     "eg_units": 98,
+     "eg_avg_price": 8.989795918367347,
+     "best_day": 18,
+     "gain": 2741.5
+    },
+    "MILK": {
+     "eg_units": 50,
+     "eg_avg_price": 33.52,
+     "best_day": 24,
+     "gain": 242.74999999999983
+    },
+    "STRAWBERRY": {
+     "eg_units": 51,
+     "eg_avg_price": 44.0,
+     "best_day": 18,
+     "gain": 8545.6875
+    },
+    "WHEAT": {
+     "eg_units": 274,
+     "eg_avg_price": 29.64963503649635,
+     "best_day": 19,
+     "gain": 3384.0000000000005
+    },
+    "WOOL": {
+     "eg_units": 26,
+     "eg_avg_price": 1.6153846153846154,
+     "best_day": 20,
+     "gain": 88.0
+    }
+   },
+   "inv_by_day": {
+    "8": {
+     "WHEAT": 9899,
+     "CARROT": 9955,
+     "TOMATO": 9991,
+     "STRAWBERRY": 9955,
+     "MELON": 9991,
+     "EGG": 9955,
+     "MILK": 10015,
+     "WOOL": 10015,
+     "FERTILIZER": 10094
+    },
+    "14": {
+     "WHEAT": 9753,
+     "CARROT": 9859,
+     "TOMATO": 9967,
+     "STRAWBERRY": 9859,
+     "MELON": 10129,
+     "EGG": 9929,
+     "MILK": 10039,
+     "WOOL": 10059,
+     "FERTILIZER": 10238
+    },
+    "16": {
+     "WHEAT": 9743,
+     "CARROT": 9797,
+     "TOMATO": 9953,
+     "STRAWBERRY": 9869,
+     "MELON": 10127,
+     "EGG": 9959,
+     "MILK": 10073,
+     "WOOL": 10059,
+     "FERTILIZER": 10282
+    },
+    "20": {
+     "WHEAT": 9708,
+     "CARROT": 9673,
+     "TOMATO": 9907,
+     "STRAWBERRY": 9943,
+     "MELON": 10123,
+     "EGG": 9989,
+     "MILK": 10061,
+     "WOOL": 10060,
+     "FERTILIZER": 10348
+    },
+    "21": {
+     "WHEAT": 9717,
+     "CARROT": 9630,
+     "TOMATO": 9894,
+     "STRAWBERRY": 9982,
+     "MELON": 10122,
+     "EGG": 10002,
+     "MILK": 10056,
+     "WOOL": 10059,
+     "FERTILIZER": 10374
+    },
+    "22": {
+     "WHEAT": 9738,
+     "CARROT": 9587,
+     "TOMATO": 9881,
+     "STRAWBERRY": 10004,
+     "MELON": 10121,
+     "EGG": 10007,
+     "MILK": 10059,
+     "WOOL": 10059,
+     "FERTILIZER": 10390
+    },
+    "23": {
+     "WHEAT": 9759,
+     "CARROT": 9544,
+     "TOMATO": 9868,
+     "STRAWBERRY": 10027,
+     "MELON": 10120,
+     "EGG": 10020,
+     "MILK": 10054,
+     "WOOL": 10060,
+     "FERTILIZER": 10398
+    },
+    "24": {
+     "WHEAT": 9784,
+     "CARROT": 9501,
+     "TOMATO": 9855,
+     "STRAWBERRY": 10042,
+     "MELON": 10119,
+     "EGG": 10019,
+     "MILK": 10057,
+     "WOOL": 10059,
+     "FERTILIZER": 10396
+    },
+    "25": {
+     "WHEAT": 9836,
+     "CARROT": 9458,
+     "TOMATO": 9842,
+     "STRAWBERRY": 10039,
+     "MELON": 10118,
+     "EGG": 10030,
+     "MILK": 10056,
+     "WOOL": 10060,
+     "FERTILIZER": 10417
+    },
+    "26": {
+     "WHEAT": 9877,
+     "CARROT": 9415,
+     "TOMATO": 9829,
+     "STRAWBERRY": 10055,
+     "MELON": 10117,
+     "EGG": 10018,
+     "MILK": 10059,
+     "WOOL": 10059,
+     "FERTILIZER": 10427
+    },
+    "27": {
+     "WHEAT": 9929,
+     "CARROT": 9372,
+     "TOMATO": 9816,
+     "STRAWBERRY": 10042,
+     "MELON": 10116,
+     "EGG": 10017,
+     "MILK": 10062,
+     "WOOL": 10060,
+     "FERTILIZER": 10442
+    },
+    "28": {
+     "WHEAT": 9965,
+     "CARROT": 9372,
+     "TOMATO": 9803,
+     "STRAWBERRY": 10056,
+     "MELON": 10115,
+     "EGG": 10020,
+     "MILK": 10065,
+     "WOOL": 10059,
+     "FERTILIZER": 10463
+    },
+    "29": {
+     "WHEAT": 10058,
+     "CARROT": 9496,
+     "TOMATO": 9790,
+     "STRAWBERRY": 10031,
+     "MELON": 10114,
+     "EGG": 10047,
+     "MILK": 10070,
+     "WOOL": 10060,
+     "FERTILIZER": 10487
+    }
+   }
+  },
+  {
+   "seed": 11,
+   "rewards": [
+    81854.0,
+    81143.0
+   ],
+   "per": {
+    "FERTILIZER": {
+     "eg_units": 86,
+     "eg_avg_price": 11.813953488372093,
+     "best_day": 18,
+     "gain": 2147.5714285714284
+    },
+    "MILK": {
+     "eg_units": 50,
+     "eg_avg_price": 4.4,
+     "best_day": 20,
+     "gain": 367.5
+    },
+    "STRAWBERRY": {
+     "eg_units": 52,
+     "eg_avg_price": 95.65384615384616,
+     "best_day": 18,
+     "gain": 4467.25
+    },
+    "TOMATO": {
+     "eg_units": 136,
+     "eg_avg_price": 158.39705882352942,
+     "best_day": 26,
+     "gain": 7788.666666666664
+    },
+    "WHEAT": {
+     "eg_units": 274,
+     "eg_avg_price": 39.996350364963504,
+     "best_day": 21,
+     "gain": 1507.9999999999998
+    },
+    "WOOL": {
+     "eg_units": 26,
+     "eg_avg_price": 1.4615384615384615,
+     "best_day": 25,
+     "gain": 57.333333333333336
+    }
+   },
+   "inv_by_day": {
+    "8": {
+     "WHEAT": 9881,
+     "CARROT": 9991,
+     "TOMATO": 9955,
+     "STRAWBERRY": 9991,
+     "MELON": 9991,
+     "EGG": 9973,
+     "MILK": 9979,
+     "WOOL": 10015,
+     "FERTILIZER": 10094
+    },
+    "14": {
+     "WHEAT": 9699,
+     "CARROT": 9931,
+     "TOMATO": 9859,
+     "STRAWBERRY": 9931,
+     "MELON": 10129,
+     "EGG": 9931,
+     "MILK": 10027,
+     "WOOL": 10059,
+     "FERTILIZER": 10238
+    },
+    "20": {
+     "WHEAT": 9583,
+     "CARROT": 9853,
+     "TOMATO": 9745,
+     "STRAWBERRY": 9993,
+     "MELON": 10123,
+     "EGG": 9905,
+     "MILK": 10072,
+     "WOOL": 10059,
+     "FERTILIZER": 10349
+    },
+    "21": {
+     "WHEAT": 9586,
+     "CARROT": 9828,
+     "TOMATO": 9726,
+     "STRAWBERRY": 10026,
+     "MELON": 10122,
+     "EGG": 9898,
+     "MILK": 10071,
+     "WOOL": 10059,
+     "FERTILIZER": 10365
+    },
+    "22": {
+     "WHEAT": 9630,
+     "CARROT": 9803,
+     "TOMATO": 9707,
+     "STRAWBERRY": 10042,
+     "MELON": 10121,
+     "EGG": 9883,
+     "MILK": 10073,
+     "WOOL": 10059,
+     "FERTILIZER": 10381
+    },
+    "23": {
+     "WHEAT": 9636,
+     "CARROT": 9778,
+     "TOMATO": 9688,
+     "STRAWBERRY": 10054,
+     "MELON": 10120,
+     "EGG": 9880,
+     "MILK": 10072,
+     "WOOL": 10060,
+     "FERTILIZER": 10403
+    },
+    "24": {
+     "WHEAT": 9636,
+     "CARROT": 9753,
+     "TOMATO": 9669,
+     "STRAWBERRY": 10037,
+     "MELON": 10119,
+     "EGG": 9871,
+     "MILK": 10071,
+     "WOOL": 10059,
+     "FERTILIZER": 10381
+    },
+    "25": {
+     "WHEAT": 9682,
+     "CARROT": 9728,
+     "TOMATO": 9650,
+     "STRAWBERRY": 10027,
+     "MELON": 10118,
+     "EGG": 9854,
+     "MILK": 10070,
+     "WOOL": 10060,
+     "FERTILIZER": 10401
+    },
+    "26": {
+     "WHEAT": 9709,
+     "CARROT": 9703,
+     "TOMATO": 9655,
+     "STRAWBERRY": 10038,
+     "MELON": 10117,
+     "EGG": 9841,
+     "MILK": 10071,
+     "WOOL": 10059,
+     "FERTILIZER": 10413
+    },
+    "27": {
+     "WHEAT": 9758,
+     "CARROT": 9678,
+     "TOMATO": 9692,
+     "STRAWBERRY": 10019,
+     "MELON": 10116,
+     "EGG": 9820,
+     "MILK": 10075,
+     "WOOL": 10059,
+     "FERTILIZER": 10429
+    },
+    "28": {
+     "WHEAT": 9771,
+     "CARROT": 9695,
+     "TOMATO": 9713,
+     "STRAWBERRY": 10028,
+     "MELON": 10115,
+     "EGG": 9803,
+     "MILK": 10076,
+     "WOOL": 10060,
+     "FERTILIZER": 10459
+    },
+    "29": {
+     "WHEAT": 9854,
+     "CARROT": 9810,
+     "TOMATO": 9734,
+     "STRAWBERRY": 9997,
+     "MELON": 10114,
+     "EGG": 9802,
+     "MILK": 10077,
+     "WOOL": 10059,
+     "FERTILIZER": 10471
+    }
+   }
+  },
+  {
+   "seed": 17,
+   "rewards": [
+    113026.0,
+    110898.0
+   ],
+   "per": {
+    "FERTILIZER": {
+     "eg_units": 102,
+     "eg_avg_price": 2.3627450980392157,
+     "best_day": 18,
+     "gain": 3380.0000000000005
+    },
+    "STRAWBERRY": {
+     "eg_units": 68,
+     "eg_avg_price": 10.720588235294118,
+     "best_day": 18,
+     "gain": 11811.333333333332
+    },
+    "WHEAT": {
+     "eg_units": 295,
+     "eg_avg_price": 29.461016949152544,
+     "best_day": 23,
+     "gain": 3279.192307692308
+    },
+    "WOOL": {
+     "eg_units": 74,
+     "eg_avg_price": 21.716216216216218,
+     "best_day": 18,
+     "gain": 9424.285714285714
+    }
+   },
+   "inv_by_day": {
+    "6": {
+     "WHEAT": 9975,
+     "CARROT": 9993,
+     "TOMATO": 9993,
+     "STRAWBERRY": 9969,
+     "MELON": 9993,
+     "EGG": 9993,
+     "MILK": 9969,
+     "WOOL": 10001,
+     "FERTILIZER": 10060
+    },
+    "8": {
+     "WHEAT": 9935,
+     "CARROT": 9991,
+     "TOMATO": 9991,
+     "STRAWBERRY": 9955,
+     "MELON": 9991,
+     "EGG": 9991,
+     "MILK": 9979,
+     "WOOL": 9979,
+     "FERTILIZER": 10094
+    },
+    "10": {
+     "WHEAT": 9859,
+     "CARROT": 9989,
+     "TOMATO": 9977,
+     "STRAWBERRY": 9941,
+     "MELON": 10109,
+     "EGG": 9989,
+     "MILK": 9977,
+     "WOOL": 9969,
+     "FERTILIZER": 10118
+    },
+    "11": {
+     "WHEAT": 9812,
+     "CARROT": 9988,
+     "TOMATO": 9970,
+     "STRAWBERRY": 9934,
+     "MELON": 10132,
+     "EGG": 9988,
+     "MILK": 9976,
+     "WOOL": 9956,
+     "FERTILIZER": 10144
+    },
+    "16": {
+     "WHEAT": 9815,
+     "CARROT": 9959,
+     "TOMATO": 9935,
+     "STRAWBERRY": 9917,
+     "MELON": 10127,
+     "EGG": 9983,
+     "MILK": 9977,
+     "WOOL": 10011,
+     "FERTILIZER": 10284
+    },
+    "17": {
+     "WHEAT": 9822,
+     "CARROT": 9946,
+     "TOMATO": 9928,
+     "STRAWBERRY": 9936,
+     "MELON": 10126,
+     "EGG": 9982,
+     "MILK": 9964,
+     "WOOL": 10022,
+     "FERTILIZER": 10310
+    },
+    "18": {
+     "WHEAT": 9817,
+     "CARROT": 9933,
+     "TOMATO": 9921,
+     "STRAWBERRY": 9965,
+     "MELON": 10125,
+     "EGG": 9981,
+     "MILK": 9957,
+     "WOOL": 10037,
+     "FERTILIZER": 10336
+    },
+    "19": {
+     "WHEAT": 9800,
+     "CARROT": 9920,
+     "TOMATO": 9914,
+     "STRAWBERRY": 9978,
+     "MELON": 10124,
+     "EGG": 9980,
+     "MILK": 9950,
+     "WOOL": 10048,
+     "FERTILIZER": 10354
+    },
+    "20": {
+     "WHEAT": 9793,
+     "CARROT": 9907,
+     "TOMATO": 9907,
+     "STRAWBERRY": 9995,
+     "MELON": 10123,
+     "EGG": 9979,
+     "MILK": 9937,
+     "WOOL": 10049,
+     "FERTILIZER": 10364
+    },
+    "24": {
+     "WHEAT": 9792,
+     "CARROT": 9843,
+     "TOMATO": 9855,
+     "STRAWBERRY": 10047,
+     "MELON": 10119,
+     "EGG": 9975,
+     "MILK": 9873,
+     "WOOL": 10053,
+     "FERTILIZER": 10430
+    },
+    "25": {
+     "WHEAT": 9824,
+     "CARROT": 9818,
+     "TOMATO": 9842,
+     "STRAWBERRY": 10055,
+     "MELON": 10118,
+     "EGG": 9974,
+     "MILK": 9878,
+     "WOOL": 10058,
+     "FERTILIZER": 10450
+    },
+    "26": {
+     "WHEAT": 9860,
+     "CARROT": 9793,
+     "TOMATO": 9829,
+     "STRAWBERRY": 10056,
+     "MELON": 10117,
+     "EGG": 9973,
+     "MILK": 9853,
+     "WOOL": 10057,
+     "FERTILIZER": 10464
+    },
+    "27": {
+     "WHEAT": 9925,
+     "CARROT": 9768,
+     "TOMATO": 9816,
+     "STRAWBERRY": 10059,
+     "MELON": 10116,
+     "EGG": 9972,
+     "MILK": 9846,
+     "WOOL": 10044,
+     "FERTILIZER": 10481
+    },
+    "28": {
+     "WHEAT": 9967,
+     "CARROT": 9783,
+     "TOMATO": 9803,
+     "STRAWBERRY": 10062,
+     "MELON": 10115,
+     "EGG": 9971,
+     "MILK": 9841,
+     "WOOL": 10059,
+     "FERTILIZER": 10493
+    },
+    "29": {
+     "WHEAT": 10080,
+     "CARROT": 9899,
+     "TOMATO": 9790,
+     "STRAWBERRY": 10046,
+     "MELON": 10114,
+     "EGG": 9970,
+     "MILK": 9830,
+     "WOOL": 10060,
+     "FERTILIZER": 10493
+    }
+   }
+  },
+  {
+   "seed": 21,
+   "rewards": [
+    77149.0,
+    76173.0
+   ],
+   "per": {
+    "FERTILIZER": {
+     "eg_units": 96,
+     "eg_avg_price": 7.760416666666667,
+     "best_day": 18,
+     "gain": 2803.5714285714284
+    },
+    "MILK": {
+     "eg_units": 64,
+     "eg_avg_price": 13.375,
+     "best_day": 24,
+     "gain": 520.0
+    },
+    "STRAWBERRY": {
+     "eg_units": 59,
+     "eg_avg_price": 5.135593220338983,
+     "best_day": 18,
+     "gain": 8867.8125
+    },
+    "WHEAT": {
+     "eg_units": 274,
+     "eg_avg_price": 35.70802919708029,
+     "best_day": 21,
+     "gain": 2286.0512820512818
+    }
+   },
+   "inv_by_day": {
+    "8": {
+     "WHEAT": 9881,
+     "CARROT": 9991,
+     "TOMATO": 9991,
+     "STRAWBERRY": 9955,
+     "MELON": 9991,
+     "EGG": 9937,
+     "MILK": 10015,
+     "WOOL": 10015,
+     "FERTILIZER": 10094
+    },
+    "14": {
+     "WHEAT": 9699,
+     "CARROT": 9985,
+     "TOMATO": 9931,
+     "STRAWBERRY": 9913,
+     "MELON": 10129,
+     "EGG": 9859,
+     "MILK": 10045,
+     "WOOL": 10059,
+     "FERTILIZER": 10238
+    },
+    "21": {
+     "WHEAT": 9642,
+     "CARROT": 9966,
+     "TOMATO": 9840,
+     "STRAWBERRY": 10061,
+     "MELON": 10122,
+     "EGG": 9850,
+     "MILK": 10062,
+     "WOOL": 9992,
+     "FERTILIZER": 10360
+    },
+    "22": {
+     "WHEAT": 9678,
+     "CARROT": 9953,
+     "TOMATO": 9827,
+     "STRAWBERRY": 10062,
+     "MELON": 10121,
+     "EGG": 9837,
+     "MILK": 10067,
+     "WOOL": 9983,
+     "FERTILIZER": 10376
+    },
+    "23": {
+     "WHEAT": 9703,
+     "CARROT": 9940,
+     "TOMATO": 9814,
+     "STRAWBERRY": 10061,
+     "MELON": 10120,
+     "EGG": 9840,
+     "MILK": 10064,
+     "WOOL": 9974,
+     "FERTILIZER": 10396
+    },
+    "24": {
+     "WHEAT": 9710,
+     "CARROT": 9927,
+     "TOMATO": 9801,
+     "STRAWBERRY": 10052,
+     "MELON": 10119,
+     "EGG": 9833,
+     "MILK": 10063,
+     "WOOL": 9981,
+     "FERTILIZER": 10394
+    },
+    "25": {
+     "WHEAT": 9756,
+     "CARROT": 9914,
+     "TOMATO": 9788,
+     "STRAWBERRY": 10056,
+     "MELON": 10118,
+     "EGG": 9822,
+     "MILK": 10064,
+     "WOOL": 9964,
+     "FERTILIZER": 10415
+    },
+    "26": {
+     "WHEAT": 9795,
+     "CARROT": 9901,
+     "TOMATO": 9775,
+     "STRAWBERRY": 10062,
+     "MELON": 10117,
+     "EGG": 9814,
+     "MILK": 10063,
+     "WOOL": 9947,
+     "FERTILIZER": 10425
+    },
+    "27": {
+     "WHEAT": 9845,
+     "CARROT": 9888,
+     "TOMATO": 9762,
+     "STRAWBERRY": 10061,
+     "MELON": 10116,
+     "EGG": 9799,
+     "MILK": 10070,
+     "WOOL": 9936,
+     "FERTILIZER": 10449
+    },
+    "28": {
+     "WHEAT": 9881,
+     "CARROT": 9917,
+     "TOMATO": 9749,
+     "STRAWBERRY": 10062,
+     "MELON": 10115,
+     "EGG": 9788,
+     "MILK": 10076,
+     "WOOL": 9939,
+     "FERTILIZER": 10479
+    },
+    "29": {
+     "WHEAT": 9976,
+     "CARROT": 10050,
+     "TOMATO": 9736,
+     "STRAWBERRY": 10050,
+     "MELON": 10114,
+     "EGG": 9793,
+     "MILK": 10077,
+     "WOOL": 9930,
+     "FERTILIZER": 10493
+    }
+   }
+  }
+ ]
+}
