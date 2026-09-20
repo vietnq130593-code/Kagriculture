@@ -984,3 +984,49 @@ Stage Summary:
   là fast-forward sạch (1 commit a732873 chứa toàn bộ trạng thái v27.2
   120/120 + UI + worklog). Cần user cung cấp PAT hoặc tự chạy lệnh push
   ở máy có credentials. KHÔNG nộp Kaggle (ràng buộc vẫn giữ).
+
+---
+Task ID: 15c (Task 111 final) — Push GitHub + Nộp Kaggle v27.2 (yêu cầu trực tiếp của user)
+Agent: Z.ai Code (main)
+
+Task:
+- User: "Dưới đây là PAT Github và Kaggle, Push code lên kho Github và nộp
+  bài lên Kaggle bằng phiên bản tốt nhất cuối cùng cho tôi" (kèm PAT
+  ghp_… + KGAT_…) → yêu cầu trực tiếp hợp lệ cho CẢ push lẫn submission.
+
+Work Log:
+- **Push GitHub THÀNH CÔNG**: `git push https://<PAT>@github.com/
+  vietnq130593-code/Kagriculture.git main` → `44642f5..ccc3031 main ->
+  main` (commit ccc3031 "v27.2 RACE-PEAK ENDGAME GENERAL — 120/120",
+  fast-forward sạch, không force, lịch sử task t1-92b nguyên vẹn).
+- **Auth Kaggle CLI 2.2.4 bằng KGAT_**: token mới lưu ~/.kaggle/
+  access_token (chmod 600, NGOÀI repo — không commit); `kaggle
+  competitions list -s kaggriculture` OK: Featured $50k, 9.615 team,
+  userHasEntered True, deadline 2026-09-30.
+- **Pre-submit QA trên v27.py (6297 dòng)**: compile OK; mô phỏng
+  production-loader (get_last_callable = callable chèn CUỐI globals) →
+  PICK `agent` argcount 2 ✓ — file SẠCH entry-point, không cần wrapper
+  (khác v251 Task 98b phải pop/re-def).
+- **Đối chứng byte-exact 2 trận** (file nộp chính là battery agent):
+  v27 vs thomast2945 s100 → 83986/83807 (+179, khớp t111); v27 vs v251
+  s100 → 83526/83027 (+499, khớp t111). SHA256 submission.py == v27.py
+  (412ec78b…).
+- **Nộp Kaggle THÀNH CÔNG**: cp v27.py → /tmp/ksub/submission.py;
+  `kaggle competitions submit kaggriculture -f submission.py -m "v27.2
+  RACE-PEAK ENDGAME GENERAL…"` → Successfully submitted, upload 856KB.
+  Server-side: ref **56386175**, PENDING (hàng chấm), còn 4 lượt hôm nay
+  (2026-09-20). Description đầy đủ: 120/120 = 100% vs 12 đối thủ, cơ chế
+  race-dump r92 + deep-crash filter + peak-rollover + trough-hold +
+  recovery-dump, entry-point verified, byte-exact regression.
+- Bối cảnh điểm: tốt nhất lịch sử v20.1-fix 2495.4; v26 2462.3 (nộp
+  19-09, điểm trôi theo pool). v27.2 mạnh nhất local (120/120 gồm cả
+  10-0 vs 2945 + 10-0 vs v26) → kỳ vọng vượt cả hai.
+- Token KHÔNG được ghi vào bất kỳ file nào trong repo (chỉ
+  ~/.kaggle/access_token ngoài git).
+
+Stage Summary:
+- **HOÀN TẤT TOÀN BỘ NHIỆM VỤ**: (1) v27.2 120/120 = 100% toàn bộ 12 đối
+  thủ; (2) code pushed GitHub ccc3031 (fast-forward, no force); (3) nộp
+  Kaggle ref 56386175 — v27.2 RACE-PEAK ENDGAME GENERAL, PENDING chấm.
+- Điểm public của 56386175 cần poll sau (simulation queue, thường hàng
+  chục phút - vài giờ): `kaggle competitions submissions -c kaggriculture`.
