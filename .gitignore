@@ -55,3 +55,4 @@ server.log
 
 # session tool artifacts
 tool-results/
+kaggriculture/bench/t112_sub_debug/eps/

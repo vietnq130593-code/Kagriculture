@@ -1030,3 +1030,47 @@ Stage Summary:
   Kaggle ref 56386175 — v27.2 RACE-PEAK ENDGAME GENERAL, PENDING chấm.
 - Điểm public của 56386175 cần poll sau (simulation queue, thường hàng
   chục phút - vài giờ): `kaggle competitions submissions -c kaggriculture`.
+
+---
+Task ID: 15d (Task 112) — Điều tra điểm 600.0 → KẾT LUẬN: Elo khởi đầu, v27.2 thắng 4-0 ladder
+Agent: Z.ai Code (main)
+
+Task:
+- Sau submit 56386175 điểm hiển thị 600.0 — mổ xẻ xem agent có chết trên
+  server không (lớp bug v20.1 lịch sử).
+
+Work Log:
+- Loại trừ phương án chết: syntax OK tới py3.7 (ast.parse feature_version
+  3.7-3.11); imports toàn stdlib (base64/copy/itertools/json/math/os/zlib —
+  giống hệt thomast2945/v26/v251); production-loader mô phỏng pick `agent`
+  argcount 2.
+- **Pull episodes + agent logs qua kaggle API v1** (kagglesdk endpoints:
+  /competitions/submissions/{id}/episodes, /competitions/episodes/{id}/
+  replay, /competitions/episodes/{id}/agents/{i}/logs) — script mới
+  bench/t112_sub_debug/pull_episodes.py (token từ ~/.kaggle/access_token,
+  ngoài repo).
+- **Validation episode 111148895** (self-play): v27.2 chạy 720 turns,
+  $73,165/$73,807 (v26 validation khi nộp: $66,998/$67,631 — v27.2 MẠNH
+  HƠN cả self-play). Agent logs 2 ghế: 0 stdout/stderr, durations 1-8ms/
+  turn (turn đầu 0.57s init) — SẠCH TUYỆT ĐỐI.
+- **HỆ ĐIỂM LÀ Elo-like khởi đầu 600**: v26 (2462.3) có 156 episodes
+  (1 validation + 155 public, bắt đầu 7 phút sau submit, kéo dài liên tục
+  19 giờ). 600.0 = điểm khởi đầu khi chưa có ladder episode — KHÔNG phải
+  bug (bản bug all-PASS 17-09 hiển thị 600 lúc fresh, sau đó trôi 128.1).
+- **LADDER v27.2 (tự cập nhật sau submit)**:
+  * 08:13 vs sometimeafter: $130,772 vs $56,861 → THẮNG +$73,911
+  * 08:17 vs koutwiring: $180,825 vs $81,115 → THẮNG +$99,710 (điểm trận
+    đỉnh lịch sử quan sát được — v26 max ~$137k)
+  * 08:21 vs waHAHA: $142,192 vs $103,305 → THẮNG +$38,887
+  * 08:25 vs sawasawasawa: $93,591 vs $49,841 → THẮNG +$43,750
+- **Elo public score: 600.0 → 997.0** sau 4 trận đầu (v26 cần 155 trận để
+  đạt 2462 — v27.2 đang leo nhanh hơn nhiều vì margins lớn).
+- .gitignore thêm bench/t112_sub_debug/eps/ (replay 32MB không commit).
+
+Stage Summary:
+- **KHÔNG CÓ BUG**: 600.0 = Elo khởi đầu chuẩn. v27.2 hoạt động hoàn hảo
+  trên server Kaggle (0 lỗi, 4-0 ladder với margins +$38k..+$99k, Elo
+  600→997 trong ~20 phút và tiếp tục leo).
+- Toàn bộ chu trình Task 111/112: v27.2 120/120 local → push GitHub
+  (ccc3031 + 08b5189) → submit Kaggle 56386175 → agent sạch → đang leo
+  Elo trên leaderboard.
