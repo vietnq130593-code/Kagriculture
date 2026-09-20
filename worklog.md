@@ -1074,3 +1074,51 @@ Stage Summary:
 - Toàn bộ chu trình Task 111/112: v27.2 120/120 local → push GitHub
   (ccc3031 + 08b5189) → submit Kaggle 56386175 → agent sạch → đang leo
   Elo trên leaderboard.
+
+---
+Task ID: 16 (Task 113) — Nghiên cứu v27.2 (4 nhóm + thị trường) + xây v28
+Agent: Z.ai Code (main)
+
+Task:
+- User: "nghiên cứu, xây dựng phiên bản v28 có thể thắng áp đảo v27.2,
+  trước hết nghiên cứu lại v27.2: cây trồng, động vật, lao động, kho —
+  có lãng phí gì không; sau đó mua bán, cung cầu, tăng giảm giá"
+
+Work Log:
+- **Sandbox reset giữa phiên** (mất toàn bộ tree): khôi phục 100% từ
+  GitHub clone (tip 6b772f4) + reinstall kaggle-environments/kaggle bằng
+  uv + restore ~/.kaggle/access_token. Sanity v27 vs v251 s100 khớp
+  byte-exact 83526/83027 (+499) với battery t111.
+- **Nghiên cứu 4 nhóm** (t113_audit4.py mới + tape mirror s200 + engine
+  source 1086 dòng đọc trực tiếp): báo cáo đầy đủ RESEARCH_V28_T113.md.
+  Lãng phí tìm thấy: quad-4 $4k không mua khi money $15k+ (25 tiles phí
+  18 ngày); FERT ops = 0 trước d14 (wheat fert doubling 3→6 units bỏ
+  quên); PASS 1,422 unit-turns; unwatered ~26 cây/ngày; COOP build/dig
+  mù quáng.
+- **Thị trường giải mã**: price = base + amp·f(|inv−I0|) I0=10k; SELL
+  lockstep 1 unit/turn; town hút mỗi 4 turns/shop; price curves đầy đủ
+  (MELON đỉnh d6-8 sụp d12; MILK chết d18; WOOL chết d20-22; W/C/T/EGG
+  tăng đều).
+- **8 cấu hình v28 thí nghiệm có hệ thống** (v28.0→v28.7): quad4-buy,
+  PASS-swaps, 1/2/3-hand override SE farm, FERT doubling, GOOSE squad,
+  borrow-when-pass. TẤT CẢ ÂM: −$108 (noise) tới −$54,806. Battery
+  v28.7 10 trận: 0W-4L-1T mean −$3,975.
+- **Giải mã cấu trúc sâu vì sao patch additive bất khả thi**: V219 =
+  SE TOMATO FARM sẵn trong chassis (d18, tự BUY_LAND + 10 tomato seeds +
+  2-3 workers, gate shops ≥3 PIZZA/FARMERS + money $12k + tomato price);
+  race-mode geese tự nuôi 5 con; state-sync d4-8 clone/race detectors
+  (L5854) — mọi lệch (mua đất/hire/move) đổi mode → cascade tắt layers;
+  chassis plans cmds cho TẤT CẢ hands (không thể có hand riêng); override
+  1 worker = −$20k/game; hire cạnh tranh fib $55-377 sau chassis burst.
+- KẾT LUẬN: v27.2 = local optimum trong không gian can thiệp additive.
+  Push GitHub 1814fd2 (research + tools + batteries + v28.7 negative-
+  result artifact). KHÔNG nộp Kaggle (ràng buộc vĩnh viễn — không có yêu
+  cầu trực tiếp trong tin nhắn này; bản đang chạy 56386175 vẫn tốt).
+
+Stage Summary:
+- Research mission HOÀN THÀN出色的 with full evidence; v28 positive build
+  CHƯA đạt (0/8 configs). Đường đi tiếp theo: (A) giữ v27.2 (an toàn),
+  (B) re-architect chassis planning 100-tiles từ init (đầu tư 1-2
+  session, đường build_v2X chain), (C) exploit race/clone detector.
+- v28.py giữ làm artifact nghiên cứu (v28.7 = borrow-when-pass goose,
+  gần neutral); registry run_battle có 'v28' để benchmark tương lai.
