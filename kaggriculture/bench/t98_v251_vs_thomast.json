@@ -1,0 +1,112 @@
+{
+ "summary": {
+  "tag": "t98_v251_vs_thomast",
+  "new": "v251.py",
+  "base": "thomast.py",
+  "battles": 10,
+  "errors": 0,
+  "mean_margin": 10071.6,
+  "median_margin": 9971.0,
+  "worst_margin": 5805.0,
+  "best_margin": 15668.0,
+  "wins": 10,
+  "losses": 0,
+  "ties": 0,
+  "mean_paired_margin": 20143.2,
+  "bootstrap95_ci_mean": [
+   8099.0,
+   12154.3
+  ],
+  "elapsed_s": 104.4
+ },
+ "results": [
+  {
+   "seed": 100,
+   "seat": 0,
+   "new": 83751.0,
+   "base": 73780.0,
+   "margin": 9971.0,
+   "wallS": 7.7
+  },
+  {
+   "seed": 100,
+   "seat": 1,
+   "new": 83751.0,
+   "base": 73780.0,
+   "margin": 9971.0,
+   "wallS": 7.4
+  },
+  {
+   "seed": 101,
+   "seat": 0,
+   "new": 98146.0,
+   "base": 90043.0,
+   "margin": 8103.0,
+   "wallS": 7.3
+  },
+  {
+   "seed": 101,
+   "seat": 1,
+   "new": 98146.0,
+   "base": 90043.0,
+   "margin": 8103.0,
+   "wallS": 7.7
+  },
+  {
+   "seed": 102,
+   "seat": 0,
+   "new": 101957.0,
+   "base": 96152.0,
+   "margin": 5805.0,
+   "wallS": 7.3
+  },
+  {
+   "seed": 102,
+   "seat": 1,
+   "new": 101957.0,
+   "base": 96152.0,
+   "margin": 5805.0,
+   "wallS": 8.0
+  },
+  {
+   "seed": 103,
+   "seat": 0,
+   "new": 109528.0,
+   "base": 93860.0,
+   "margin": 15668.0,
+   "wallS": 7.3
+  },
+  {
+   "seed": 103,
+   "seat": 1,
+   "new": 109528.0,
+   "base": 93860.0,
+   "margin": 15668.0,
+   "wallS": 7.7
+  },
+  {
+   "seed": 104,
+   "seat": 0,
+   "new": 108597.0,
+   "base": 97786.0,
+   "margin": 10811.0,
+   "wallS": 7.5
+  },
+  {
+   "seed": 104,
+   "seat": 1,
+   "new": 108597.0,
+   "base": 97786.0,
+   "margin": 10811.0,
+   "wallS": 7.8
+  }
+ ],
+ "errors": [],
+ "paired": {
+  "100": 19942.0,
+  "101": 16206.0,
+  "102": 11610.0,
+  "103": 31336.0,
+  "104": 21622.0
+ }
+}

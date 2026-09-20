@@ -39,7 +39,44 @@ const PYTHON = 'python3'
 // + ahmedv46 (ahmedberatozer First-Turn Microstructure EXP293), + v191 (v19.1 opening port).
 // Task 92 (18-09): + v24 (v20 chain + GARBAGE-THROTTLE H2 peak-pricing layer —
 // challenger đầu tiên vượt 3 cổng: 48-0 vs v46 +$1,699, direct vs v20 +$113 CI>0).
-const AGENTS = ['v18', 'v19', 'v191', 'v192', 'v193', 'v194', 'v20', 'v21', 'v24', 'ahmedv43', 'ahmedv44', 'ahmedv45', 'ahmedv46', 'seyit4', 'aurax7']
+// Task 93 (18-09): + ahmedv48 (Ahmed Berat Özer "V48 — Clear the Queue",
+// Kaggle pull 18-09, byte-exact sha256 4b540288…, entry _e335_agent).
+// Task 95 (18-09): + v25 "THE LAST DAY GENERAL" (nghiên cứu Task 94 →
+// kaggle-research/v25-blueprint.md): base = ahmedv48 byte-exact + 2 lớp
+// ngoài cùng của ta — H2 garbage-throttle có crash-gate (chỉ khiên khi item
+// từng ≥$25 trong 3 ngày, strip SELL <$15) + compact projected-shed.
+// Task 96 (19-09) nâng cấp "two-band drain-eta throttle": FERT-never-strip
+// (R40 không drain → giá đơn điệu giảm), dải p<$5 strip vô điều kiện, dải
+// $5-14 chỉ strip khi oracle drain-eta OK (shop tiêu item + hồi giá ≤6 ngày),
+// flush hoard từ d27. Battery 48 trận vs ahmedv48: 44W-2L-2T (91.7%)
+// +$215 CI95 [$152,$283]; 10-0 vs v24 +$813; 10-0 vs ahmedv46 +$2,086.
+// Task 97 (19-09): + alperen1 (alperen5252525 "First in Line — Stock Into
+// Income", Kaggle pull 19-09, byte-exact sha256 53dc224a…, entry
+// _e335_agent) = ahmedv48 nguyên bản + _ADV_LOOK=8 (EXP293 sale-advance
+// nhìn trước tape 8 turn — bán sớm cash-product trước đối thủ cùng tape).
+// Đối thủ MẠNH: 34W-14L (71%) vs v25 Task 96! Phản công Task 97 (2 vòng):
+// vòng 1 _ADV_LOOK=8 (91.7% vs alperen1) nhưng vẫn 2W-8L vs tetsutani v65
+// (notebook nghiên cứu: V48 + look 14 + guards). Vòng cuối v25 =
+// _ADV_LOOK=14: 48W-0L (100%) +$723 vs alperen1, 46W-2L (95.8%) +$494
+// vs ahmedv48, 44W-4L (91.7%) +$370 vs tetsutani_v65, 10-0 vs v24 +$785.
+// Backups: bench/t96_v25_task96_champion.py.bak, t97_v25f_interim.py.bak.
+// Task 98 (19-09): + v251 "DEMAND-PRESERVING RACE GENERAL" (v25.1) =
+// v25 + FIX-A slot hygiene (compact sắp SELL ghép theo doanh thu giảm dần
+// trong cửa sổ endgame h21/h22 + d>=27 — mổ xẻ s100: MILK rác $3 chiếm
+// slot 1 đẩy STRAW 17u ra sau đợt dump của đối thủ, -$530/turn) + port
+// guards demand-preserving của tetsutani v65 dạng RACE-CONDITIONAL (≥2
+// BAKERY → look 3; WOOL offset 5-14 hoãn khi YARN mở; chỉ bật khi máy
+// race EXP283/288 KHÔNG phát hiện cùng-tape). Battery: vs ahmedv48
+// 48W-0L (100%!) +$640 CI95 [$521,$759]; vs alperen1 10-0 +$1.192; vs
+// tetsutani_v65 10-0 +$689; vs v25 cũ 8W-2L +$330; vs thomast 10-0
+// +$10.072. Audit 4 lĩnh vực CLEAN, 0 lỗi agent.
+// Task 100 (19-09): + v26 "HERD-ADAPTIVE ANSWER GENERAL" (chính thức, file
+// v26c.py, Kaggle submission 56359569) = v25.1 + port verdict COW của
+// 2945-farm V9 herd (V9_HERD_* gates chính xác: egg_shops==0 & chưa YARN &
+// milk_shops>=3 & MILK>=150 -> SHEEP/GOOSE window 8-11 -> COW). Battery:
+// ahmedv48 48W-0L mean +1204 (s110: +186 -> +13728!), thomast2945 6W-42L
+// mean -1361 (s110: -9845 -> +3638), byte-exact v25.1 trên seed khác.
+const AGENTS = ['v27', 'v26', 'v251', 'v25', 'v18', 'v19', 'v191', 'v192', 'v193', 'v194', 'v20', 'v21', 'v24', 'ahmedv43', 'ahmedv44', 'ahmedv45', 'ahmedv46', 'ahmedv48', 'seyit4', 'aurax7', 'alperen1', 'thomast2945']
 
 mkdirSync(BATTLE_DIR, { recursive: true })
 
@@ -384,7 +421,13 @@ async function checkOnce() {
   }
 }
 
-if (!g.__devSupStarted) {
+// PM2 UPDATE (deploy 2026-09-18): the in-process dev-server supervisor is
+// now DISABLED by default — PM2 (ecosystem.config.cjs) supervises BOTH the
+// Next.js app (kagriculture-web, port 3000, auto-restart + memory cap) and
+// this service (kagriculture-arena, port 3005). Keeping the supervisor on
+// would spawn a second dev server and fight PM2 for port 3000.
+// Fallback for manual runs without PM2: SUPERVISE_DEV=1 bun --hot index.ts
+if (!g.__devSupStarted && process.env.SUPERVISE_DEV === '1') {
   ;(globalThis as any).__devSupStarted = true
   setTimeout(spawnDev, 1500)
   gSup.timer = setInterval(checkOnce, 10_000)

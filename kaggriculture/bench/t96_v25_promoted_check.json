@@ -1,0 +1,61 @@
+{
+ "summary": {
+  "tag": "t96_v25_promoted_check",
+  "new": "v25",
+  "base": "ahmedv48",
+  "battles": 4,
+  "errors": 0,
+  "mean_margin": 82.5,
+  "median_margin": 161.0,
+  "worst_margin": 4.0,
+  "best_margin": 161.0,
+  "wins": 4,
+  "losses": 0,
+  "ties": 0,
+  "mean_paired_margin": 165.0,
+  "bootstrap95_ci_mean": [
+   4.0,
+   161.0
+  ],
+  "elapsed_s": 31.0
+ },
+ "results": [
+  {
+   "seed": 100,
+   "seat": 0,
+   "new": 84295.0,
+   "base": 84134.0,
+   "margin": 161.0,
+   "wallS": 11.5
+  },
+  {
+   "seed": 100,
+   "seat": 1,
+   "new": 84295.0,
+   "base": 84134.0,
+   "margin": 161.0,
+   "wallS": 11.0
+  },
+  {
+   "seed": 101,
+   "seat": 0,
+   "new": 96544.0,
+   "base": 96540.0,
+   "margin": 4.0,
+   "wallS": 10.8
+  },
+  {
+   "seed": 101,
+   "seat": 1,
+   "new": 96544.0,
+   "base": 96540.0,
+   "margin": 4.0,
+   "wallS": 11.1
+  }
+ ],
+ "errors": [],
+ "paired": {
+  "100": 322.0,
+  "101": 8.0
+ }
+}

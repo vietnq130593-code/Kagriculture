@@ -1,0 +1,112 @@
+{
+ "summary": {
+  "tag": "t97_v25g_vs_tetsutani_v65",
+  "new": "v25g.py",
+  "base": "tetsutani_v65.py",
+  "battles": 10,
+  "errors": 0,
+  "mean_margin": 410.6,
+  "median_margin": 479.0,
+  "worst_margin": -213.0,
+  "best_margin": 934.0,
+  "wins": 8,
+  "losses": 2,
+  "ties": 0,
+  "mean_paired_margin": 821.2,
+  "bootstrap95_ci_mean": [
+   157.5,
+   660.8
+  ],
+  "elapsed_s": 112.3
+ },
+ "results": [
+  {
+   "seed": 100,
+   "seat": 0,
+   "new": 83840.0,
+   "base": 84053.0,
+   "margin": -213.0,
+   "wallS": 8.4
+  },
+  {
+   "seed": 100,
+   "seat": 1,
+   "new": 83840.0,
+   "base": 84053.0,
+   "margin": -213.0,
+   "wallS": 8.2
+  },
+  {
+   "seed": 101,
+   "seat": 0,
+   "new": 96195.0,
+   "base": 96056.0,
+   "margin": 139.0,
+   "wallS": 7.9
+  },
+  {
+   "seed": 101,
+   "seat": 1,
+   "new": 96195.0,
+   "base": 96056.0,
+   "margin": 139.0,
+   "wallS": 8.2
+  },
+  {
+   "seed": 102,
+   "seat": 0,
+   "new": 102298.0,
+   "base": 101819.0,
+   "margin": 479.0,
+   "wallS": 7.9
+  },
+  {
+   "seed": 102,
+   "seat": 1,
+   "new": 102298.0,
+   "base": 101819.0,
+   "margin": 479.0,
+   "wallS": 8.5
+  },
+  {
+   "seed": 103,
+   "seat": 0,
+   "new": 99811.0,
+   "base": 98877.0,
+   "margin": 934.0,
+   "wallS": 8.3
+  },
+  {
+   "seed": 103,
+   "seat": 1,
+   "new": 99811.0,
+   "base": 98877.0,
+   "margin": 934.0,
+   "wallS": 8.2
+  },
+  {
+   "seed": 104,
+   "seat": 0,
+   "new": 110101.0,
+   "base": 109387.0,
+   "margin": 714.0,
+   "wallS": 8.1
+  },
+  {
+   "seed": 104,
+   "seat": 1,
+   "new": 110101.0,
+   "base": 109387.0,
+   "margin": 714.0,
+   "wallS": 8.2
+  }
+ ],
+ "errors": [],
+ "paired": {
+  "100": -426.0,
+  "101": 278.0,
+  "102": 958.0,
+  "103": 1868.0,
+  "104": 1428.0
+ }
+}

@@ -1,0 +1,112 @@
+{
+ "summary": {
+  "tag": "t110_v27c_10match",
+  "new": "v27c",
+  "base": "thomast2945",
+  "battles": 10,
+  "errors": 0,
+  "mean_margin": -28.4,
+  "median_margin": -118.0,
+  "worst_margin": -535.0,
+  "best_margin": 503.0,
+  "wins": 4,
+  "losses": 6,
+  "ties": 0,
+  "mean_paired_margin": -56.8,
+  "bootstrap95_ci_mean": [
+   -240.0,
+   198.9
+  ],
+  "elapsed_s": 121.2
+ },
+ "results": [
+  {
+   "seed": 1,
+   "seat": 0,
+   "new": 149377.0,
+   "base": 149912.0,
+   "margin": -535.0,
+   "wallS": 9.4
+  },
+  {
+   "seed": 1,
+   "seat": 1,
+   "new": 149377.0,
+   "base": 149912.0,
+   "margin": -535.0,
+   "wallS": 9.3
+  },
+  {
+   "seed": 2,
+   "seat": 0,
+   "new": 78025.0,
+   "base": 77857.0,
+   "margin": 168.0,
+   "wallS": 9.7
+  },
+  {
+   "seed": 2,
+   "seat": 1,
+   "new": 78025.0,
+   "base": 77857.0,
+   "margin": 168.0,
+   "wallS": 9.5
+  },
+  {
+   "seed": 3,
+   "seat": 0,
+   "new": 76041.0,
+   "base": 76159.0,
+   "margin": -118.0,
+   "wallS": 9.0
+  },
+  {
+   "seed": 3,
+   "seat": 1,
+   "new": 76041.0,
+   "base": 76159.0,
+   "margin": -118.0,
+   "wallS": 8.5
+  },
+  {
+   "seed": 4,
+   "seat": 0,
+   "new": 74105.0,
+   "base": 74265.0,
+   "margin": -160.0,
+   "wallS": 8.8
+  },
+  {
+   "seed": 4,
+   "seat": 1,
+   "new": 74105.0,
+   "base": 74265.0,
+   "margin": -160.0,
+   "wallS": 9.1
+  },
+  {
+   "seed": 5,
+   "seat": 0,
+   "new": 91322.0,
+   "base": 90819.0,
+   "margin": 503.0,
+   "wallS": 8.6
+  },
+  {
+   "seed": 5,
+   "seat": 1,
+   "new": 91322.0,
+   "base": 90819.0,
+   "margin": 503.0,
+   "wallS": 8.8
+  }
+ ],
+ "errors": [],
+ "paired": {
+  "1": -1070.0,
+  "2": 336.0,
+  "3": -236.0,
+  "4": -320.0,
+  "5": 1006.0
+ }
+}

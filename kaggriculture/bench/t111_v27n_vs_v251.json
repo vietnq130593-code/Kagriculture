@@ -1,0 +1,112 @@
+{
+ "summary": {
+  "tag": "t111_v27n_vs_v251",
+  "new": "v27n",
+  "base": "v251",
+  "battles": 10,
+  "errors": 0,
+  "mean_margin": 1201.1,
+  "median_margin": 916.0,
+  "worst_margin": 499.0,
+  "best_margin": 2110.0,
+  "wins": 10,
+  "losses": 0,
+  "ties": 0,
+  "mean_paired_margin": 2402.2,
+  "bootstrap95_ci_mean": [
+   836.5,
+   1588.9
+  ],
+  "elapsed_s": 115.1
+ },
+ "results": [
+  {
+   "seed": 100,
+   "seat": 0,
+   "new": 83526.0,
+   "base": 83027.0,
+   "margin": 499.0,
+   "wallS": 8.5
+  },
+  {
+   "seed": 100,
+   "seat": 1,
+   "new": 83526.0,
+   "base": 83027.0,
+   "margin": 499.0,
+   "wallS": 8.4
+  },
+  {
+   "seed": 101,
+   "seat": 0,
+   "new": 96902.0,
+   "base": 96139.0,
+   "margin": 763.0,
+   "wallS": 8.5
+  },
+  {
+   "seed": 101,
+   "seat": 1,
+   "new": 96902.0,
+   "base": 96139.0,
+   "margin": 763.0,
+   "wallS": 8.7
+  },
+  {
+   "seed": 102,
+   "seat": 0,
+   "new": 102384.0,
+   "base": 101468.0,
+   "margin": 916.0,
+   "wallS": 9.0
+  },
+  {
+   "seed": 102,
+   "seat": 1,
+   "new": 102384.0,
+   "base": 101468.0,
+   "margin": 916.0,
+   "wallS": 8.4
+  },
+  {
+   "seed": 103,
+   "seat": 0,
+   "new": 100271.0,
+   "base": 98551.0,
+   "margin": 1720.0,
+   "wallS": 8.6
+  },
+  {
+   "seed": 103,
+   "seat": 1,
+   "new": 100271.0,
+   "base": 98551.0,
+   "margin": 1720.0,
+   "wallS": 8.4
+  },
+  {
+   "seed": 104,
+   "seat": 0,
+   "new": 111020.0,
+   "base": 108910.0,
+   "margin": 2110.0,
+   "wallS": 8.6
+  },
+  {
+   "seed": 104,
+   "seat": 1,
+   "new": 111017.0,
+   "base": 108912.0,
+   "margin": 2105.0,
+   "wallS": 8.6
+  }
+ ],
+ "errors": [],
+ "paired": {
+  "100": 998.0,
+  "101": 1526.0,
+  "102": 1832.0,
+  "103": 3440.0,
+  "104": 4215.0
+ }
+}

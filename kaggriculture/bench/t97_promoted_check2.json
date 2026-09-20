@@ -1,0 +1,61 @@
+{
+ "summary": {
+  "tag": "t97_promoted_check2",
+  "new": "v25",
+  "base": "alperen1",
+  "battles": 4,
+  "errors": 0,
+  "mean_margin": 430.0,
+  "median_margin": 737.0,
+  "worst_margin": 123.0,
+  "best_margin": 737.0,
+  "wins": 4,
+  "losses": 0,
+  "ties": 0,
+  "mean_paired_margin": 860.0,
+  "bootstrap95_ci_mean": [
+   123.0,
+   737.0
+  ],
+  "elapsed_s": 43.6
+ },
+ "results": [
+  {
+   "seed": 118,
+   "seat": 0,
+   "new": 139377.0,
+   "base": 139254.0,
+   "margin": 123.0,
+   "wallS": 8.1
+  },
+  {
+   "seed": 118,
+   "seat": 1,
+   "new": 139377.0,
+   "base": 139254.0,
+   "margin": 123.0,
+   "wallS": 8.0
+  },
+  {
+   "seed": 119,
+   "seat": 0,
+   "new": 103605.0,
+   "base": 102868.0,
+   "margin": 737.0,
+   "wallS": 8.0
+  },
+  {
+   "seed": 119,
+   "seat": 1,
+   "new": 103605.0,
+   "base": 102868.0,
+   "margin": 737.0,
+   "wallS": 8.0
+  }
+ ],
+ "errors": [],
+ "paired": {
+  "118": 246.0,
+  "119": 1474.0
+ }
+}

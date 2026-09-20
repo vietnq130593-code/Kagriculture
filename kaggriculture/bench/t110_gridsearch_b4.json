@@ -1,0 +1,245 @@
+{
+ "MW_none_r88": [
+  {
+   "seed": 100,
+   "margin": -32.0,
+   "winner": 1
+  },
+  {
+   "seed": 101,
+   "margin": 4.0,
+   "winner": 0
+  },
+  {
+   "seed": 102,
+   "margin": -383.0,
+   "winner": 1
+  },
+  {
+   "seed": 103,
+   "margin": 1242.0,
+   "winner": 0
+  },
+  {
+   "seed": 104,
+   "margin": 676.0,
+   "winner": 0
+  }
+ ],
+ "MW_none_r95": [
+  {
+   "seed": 100,
+   "margin": -63.0,
+   "winner": 1
+  },
+  {
+   "seed": 101,
+   "margin": -161.0,
+   "winner": 1
+  },
+  {
+   "seed": 102,
+   "margin": 137.0,
+   "winner": 0
+  },
+  {
+   "seed": 103,
+   "margin": 1242.0,
+   "winner": 0
+  },
+  {
+   "seed": 104,
+   "margin": 646.0,
+   "winner": 0
+  }
+ ],
+ "MW_p60_r88": [
+  {
+   "seed": 100,
+   "margin": null,
+   "winner": null
+  },
+  {
+   "seed": 101,
+   "margin": null,
+   "winner": null
+  },
+  {
+   "seed": 102,
+   "margin": null,
+   "winner": null
+  },
+  {
+   "seed": 103,
+   "margin": null,
+   "winner": null
+  },
+  {
+   "seed": 104,
+   "margin": null,
+   "winner": null
+  }
+ ],
+ "MW_p60_r95": [
+  {
+   "seed": 100,
+   "margin": null,
+   "winner": null
+  },
+  {
+   "seed": 101,
+   "margin": null,
+   "winner": null
+  },
+  {
+   "seed": 102,
+   "margin": null,
+   "winner": null
+  },
+  {
+   "seed": 103,
+   "margin": null,
+   "winner": null
+  },
+  {
+   "seed": 104,
+   "margin": null,
+   "winner": null
+  }
+ ],
+ "MW_d20_r88": [
+  {
+   "seed": 100,
+   "margin": null,
+   "winner": null
+  },
+  {
+   "seed": 101,
+   "margin": null,
+   "winner": null
+  },
+  {
+   "seed": 102,
+   "margin": null,
+   "winner": null
+  },
+  {
+   "seed": 103,
+   "margin": null,
+   "winner": null
+  },
+  {
+   "seed": 104,
+   "margin": null,
+   "winner": null
+  }
+ ],
+ "MW_d20_r95": [
+  {
+   "seed": 100,
+   "margin": null,
+   "winner": null
+  },
+  {
+   "seed": 101,
+   "margin": null,
+   "winner": null
+  },
+  {
+   "seed": 102,
+   "margin": null,
+   "winner": null
+  },
+  {
+   "seed": 103,
+   "margin": null,
+   "winner": null
+  },
+  {
+   "seed": 104,
+   "margin": null,
+   "winner": null
+  }
+ ],
+ "MM_none_r88": [
+  {
+   "seed": 100,
+   "margin": 0.0,
+   "winner": -1
+  },
+  {
+   "seed": 101,
+   "margin": 4.0,
+   "winner": 0
+  },
+  {
+   "seed": 102,
+   "margin": -8.0,
+   "winner": 1
+  },
+  {
+   "seed": 103,
+   "margin": -30.0,
+   "winner": 1
+  },
+  {
+   "seed": 104,
+   "margin": 897.0,
+   "winner": 0
+  }
+ ],
+ "MM_none_r95": [
+  {
+   "seed": 100,
+   "margin": 0.0,
+   "winner": -1
+  },
+  {
+   "seed": 101,
+   "margin": -161.0,
+   "winner": 1
+  },
+  {
+   "seed": 102,
+   "margin": 148.0,
+   "winner": 0
+  },
+  {
+   "seed": 103,
+   "margin": -30.0,
+   "winner": 1
+  },
+  {
+   "seed": 104,
+   "margin": 867.0,
+   "winner": 0
+  }
+ ],
+ "MM_p60_r88": [
+  {
+   "seed": 100,
+   "margin": null,
+   "winner": null
+  },
+  {
+   "seed": 101,
+   "margin": null,
+   "winner": null
+  },
+  {
+   "seed": 102,
+   "margin": null,
+   "winner": null
+  },
+  {
+   "seed": 103,
+   "margin": null,
+   "winner": null
+  },
+  {
+   "seed": 104,
+   "margin": null,
+   "winner": null
+  }
+ ]
+}

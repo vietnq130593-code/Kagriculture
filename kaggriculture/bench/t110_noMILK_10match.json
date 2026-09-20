@@ -1,0 +1,112 @@
+{
+ "summary": {
+  "tag": "t110_noMILK_10match",
+  "new": "v27x_noMILK",
+  "base": "thomast2945",
+  "battles": 10,
+  "errors": 0,
+  "mean_margin": 130.6,
+  "median_margin": 346.0,
+  "worst_margin": -881.0,
+  "best_margin": 810.0,
+  "wins": 6,
+  "losses": 4,
+  "ties": 0,
+  "mean_paired_margin": 261.2,
+  "bootstrap95_ci_mean": [
+   -244.0,
+   467.2
+  ],
+  "elapsed_s": 120.3
+ },
+ "results": [
+  {
+   "seed": 1,
+   "seat": 0,
+   "new": 149112.0,
+   "base": 149993.0,
+   "margin": -881.0,
+   "wallS": 9.0
+  },
+  {
+   "seed": 1,
+   "seat": 1,
+   "new": 149112.0,
+   "base": 149993.0,
+   "margin": -881.0,
+   "wallS": 9.0
+  },
+  {
+   "seed": 2,
+   "seat": 0,
+   "new": 78282.0,
+   "base": 77869.0,
+   "margin": 413.0,
+   "wallS": 9.7
+  },
+  {
+   "seed": 2,
+   "seat": 1,
+   "new": 78282.0,
+   "base": 77869.0,
+   "margin": 413.0,
+   "wallS": 9.6
+  },
+  {
+   "seed": 3,
+   "seat": 0,
+   "new": 75999.0,
+   "base": 76034.0,
+   "margin": -35.0,
+   "wallS": 8.6
+  },
+  {
+   "seed": 3,
+   "seat": 1,
+   "new": 75999.0,
+   "base": 76034.0,
+   "margin": -35.0,
+   "wallS": 8.6
+  },
+  {
+   "seed": 4,
+   "seat": 0,
+   "new": 74430.0,
+   "base": 73620.0,
+   "margin": 810.0,
+   "wallS": 8.9
+  },
+  {
+   "seed": 4,
+   "seat": 1,
+   "new": 74430.0,
+   "base": 73620.0,
+   "margin": 810.0,
+   "wallS": 8.9
+  },
+  {
+   "seed": 5,
+   "seat": 0,
+   "new": 91159.0,
+   "base": 90813.0,
+   "margin": 346.0,
+   "wallS": 8.6
+  },
+  {
+   "seed": 5,
+   "seat": 1,
+   "new": 91159.0,
+   "base": 90813.0,
+   "margin": 346.0,
+   "wallS": 8.7
+  }
+ ],
+ "errors": [],
+ "paired": {
+  "1": -1762.0,
+  "2": 826.0,
+  "3": -70.0,
+  "4": 1620.0,
+  "5": 692.0
+ }
+}

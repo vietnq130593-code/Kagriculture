@@ -1,0 +1,112 @@
+{
+ "summary": {
+  "tag": "t97_v25f_vs_alperen1",
+  "new": "v25f",
+  "base": "alperen1",
+  "battles": 10,
+  "errors": 0,
+  "mean_margin": 137.4,
+  "median_margin": 127.0,
+  "worst_margin": 4.0,
+  "best_margin": 391.0,
+  "wins": 10,
+  "losses": 0,
+  "ties": 0,
+  "mean_paired_margin": 274.8,
+  "bootstrap95_ci_mean": [
+   55.0,
+   228.9
+  ],
+  "elapsed_s": 113.1
+ },
+ "results": [
+  {
+   "seed": 100,
+   "seat": 0,
+   "new": 84096.0,
+   "base": 83935.0,
+   "margin": 161.0,
+   "wallS": 8.3
+  },
+  {
+   "seed": 100,
+   "seat": 1,
+   "new": 84096.0,
+   "base": 83935.0,
+   "margin": 161.0,
+   "wallS": 8.3
+  },
+  {
+   "seed": 101,
+   "seat": 0,
+   "new": 96236.0,
+   "base": 96232.0,
+   "margin": 4.0,
+   "wallS": 8.3
+  },
+  {
+   "seed": 101,
+   "seat": 1,
+   "new": 96236.0,
+   "base": 96232.0,
+   "margin": 4.0,
+   "wallS": 8.0
+  },
+  {
+   "seed": 102,
+   "seat": 0,
+   "new": 102424.0,
+   "base": 102420.0,
+   "margin": 4.0,
+   "wallS": 8.0
+  },
+  {
+   "seed": 102,
+   "seat": 1,
+   "new": 102424.0,
+   "base": 102420.0,
+   "margin": 4.0,
+   "wallS": 9.7
+  },
+  {
+   "seed": 103,
+   "seat": 0,
+   "new": 99797.0,
+   "base": 99406.0,
+   "margin": 391.0,
+   "wallS": 8.1
+  },
+  {
+   "seed": 103,
+   "seat": 1,
+   "new": 99797.0,
+   "base": 99406.0,
+   "margin": 391.0,
+   "wallS": 8.1
+  },
+  {
+   "seed": 104,
+   "seat": 0,
+   "new": 110255.0,
+   "base": 110128.0,
+   "margin": 127.0,
+   "wallS": 8.3
+  },
+  {
+   "seed": 104,
+   "seat": 1,
+   "new": 110255.0,
+   "base": 110128.0,
+   "margin": 127.0,
+   "wallS": 8.1
+  }
+ ],
+ "errors": [],
+ "paired": {
+  "100": 322.0,
+  "101": 8.0,
+  "102": 8.0,
+  "103": 782.0,
+  "104": 254.0
+ }
+}

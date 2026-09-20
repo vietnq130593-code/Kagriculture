@@ -84,6 +84,212 @@ AGENTS = {
     # +$1,699, direct vs v20 +$113 t=2.68 CI[$30,$196]). Flat build 419KB,
     # entry-point verified (Task 88 pattern).
     "v24": (os.path.join(ROOT, "v24.py"), "agent"),
+    # Task 93 (18-09): ahmedv48 = Ahmed Berat Özer "V48 — Clear the Queue"
+    # (kaggle.com/code/ahmedberatozer/kaggriculture-v48-clear-the-queue,
+    # version 1, pulled 18-09 via Kaggle API). V47 + market-slot cleanup:
+    # remove sale slots that cannot sell, merge repeated same-product SELLs,
+    # move executable cash-product sales into freed slots. Byte-exact
+    # extraction, sha256 4b5402888feeb4170dce38f34bebe56788b62ca287139fce
+    # 7db72df8eb89bb96 (pinned digest asserted inside the notebook). Author's
+    # held-out: 36/0/0 vs 6 opponents, mean margin +1471. Entry point
+    # _e335_agent = last top-level function (Kaggle last-callable convention,
+    # asserted by notebook cell 3).
+    "ahmedv48": (os.path.join(ROOT, "ahmedv48.py"), "_e335_agent"),
+    # Task 95 (18-09): v25 "THE LAST DAY GENERAL" = v24 chain + stealth
+    # opening [BUY 7, SELL 5] (breaks ahmedv48's EXP288 money-mirror at
+    # step 1) + COMPACT-FROM-0 outermost layer (V48 Clear-the-Queue
+    # mechanism port: merge same-item SELL runs, dead SELL -> [] keeping
+    # indices, quantities clamped by the engine-exact projected post-unit
+    # shed; gate from step 0). Design: kaggle-research/v25-blueprint.md.
+    # Task 96 (19-09): v25 = ahmedv48 byte-exact + two-band drain-eta
+    # throttle + compact (44W-2L-2T vs ahmedv48, backup: bench/
+    # t96_v25_task96_champion.py.bak).
+    # Task 97 (19-09): v25 += _ADV_LOOK=14 module-end rebind — sale-advance
+    # horizon race: round 1 look=8 (parity alperen1) nhưng vẫn thua tetsutani
+    # v65 (V48 + look 14 + guards, public notebook). Final look=14 (không port
+    # guards — đo guards làm yếu trong shared-tape race). v25 = 48W-0L (100%)
+    # +$723 vs alperen1; 46W-2L (95.8%) +$494 vs ahmedv48; 44W-4L (91.7%)
+    # +$370 vs tetsutani_v65; 10-0 +$785 vs v24. Backups: t96_v25_task96_
+    # champion.py.bak, t97_v25f_interim.py.bak.
+    "v25": (os.path.join(ROOT, "v25.py"), "agent"),
+    # Task 96 (19-09): quiet-seed autopsy upgrades (s119 forensics).
+    # v25b = v25 + FERT-never-strip (R40: no town drain -> monotonic decay)
+    #         + endgame flush (day>=27 hoard unwinds at any price).
+    # v25c = v25b + gate 15->5 (only strip true-bottom sells; avoids the
+    #         d16 cliff-delay: strip@$5 -> re-sold@$1 one turn later).
+    "v25b": (os.path.join(ROOT, "v25b.py"), "agent"),
+    "v25c": (os.path.join(ROOT, "v25c.py"), "agent"),
+    # v25d = v25b + drain-eta oracle: hold only shop-backed items whose
+    # pure-drain recovery ETA fits before the flush (s106/s119/s121 forensics).
+    "v25d": (os.path.join(ROOT, "v25d.py"), "agent"),
+    # v25e = v25d + two-band gate: p<5 hoards unconditionally (v25c micro-wins),
+    # $5..14 band hoards only drain-backed (v25 crash wins).
+    "v25e": (os.path.join(ROOT, "v25e.py"), "agent"),
+    # Task 97 (19-09): alperen1 = alperen5252525 "First in Line — Stock Into
+    # Income" (kaggle.com/code/alperen5252525/kaggriculture-first-in-line-
+    # stock-into-income, pulled 19-09 via Kaggle API). = ahmedv48 byte-exact
+    # + module-level _ADV_LOOK=8 override (EXP293 sale-advance: nhìn trước
+    # tape 8 turn thay 3, bán sớm cash-product trước đối thủ cùng tape).
+    # sha256 53dc224a75301affb6ba6ea549b6d9842110b6b9913f001510d36991c8d
+    # fe07a (pinned digest asserted inside the notebook). Author claim:
+    # 136W-8L-0T / 144 local games vs 6 public opponents. Entry
+    # _e335_agent (giống ahmedv48, Kaggle last-callable convention).
+    "alperen1": (os.path.join(ROOT, "alperen1.py"), "_e335_agent"),
+    # Task 97 (19-09): v25f = v25 + _ADV_LOOK=8 (match public param change
+    # của alperen1 — EXP293 sale-advance lookahead 8). Biến thể nghiên cứu
+    # (đã bị v25g vượt: interim backup bench/t97_v25f_interim.py.bak).
+    "v25f": (os.path.join(ROOT, "v25f.py"), "agent"),
+    # v25g = v25 + _ADV_LOOK=14 — CHAMPION Task 97, đã thăng cấp vào v25.py
+    # (giữ file cho bench đối chứng).
+    "v25g": (os.path.join(ROOT, "v25g.py"), "agent"),
+    # tetsutani_v65 = tetsutani "Demand-Preserving Fourteen-Turn Sale
+    # Timing" (kaggle.com/code/tetsutani/demand-preserving-turn-sale-timing,
+    # pull 19-09, byte-exact sha256 95b02b9b…) = V48 + _ADV_LOOK=14 +
+    # bakery guard (>=2 BAKERY -> look 3) + WOOL/YARN hold guard +
+    # canonical 'agent' entry. Sparring partner nghiên cứu (không đăng ký UI).
+    "tetsutani_v65": (os.path.join(ROOT, "tetsutani_v65.py"), "agent"),
+    # Task 98 (19-09): v251 "DEMAND-PRESERVING RACE GENERAL" (v25.1) =
+    # v25 (Task 97 champion) + (1) FIX-A slot hygiene: _v25_compact sắp
+    # dòng SELL ghép theo doanh thu giảm dần, CHỈ trong cửa sổ endgame
+    # h21/h22 + day>=27 (mổ xẻ s100: MILK $3 ở slot 1 đẩy STRAW 17u ra
+    # sau đợt dump của đối thủ -> -$530/turn; fix lật s100 từ thua thành
+    # thắng, 48W-0L vs ahmedv48) và (2) port nghiên cứu tetsutani v65
+    # "Demand-Preserving Fourteen-Turn Sale Timing" dạng RACE-CONDITIONAL:
+    # guards demand-preserving (>=2 BAKERY -> look 3; WOOL offset 5-14
+    # hoãn khi YARN_STORE mở) chỉ kích hoạt khi KHÔNG phát hiện race
+    # (mirror step-1 / clone-lock / escalation) — tắt khi race để giữ
+    # đỉnh look=14. Battery: vs ahmedv48 48W-0L (100%!) +$640 CI95
+    # [$521,$759]; vs alperen1 10-0 +$1.192; vs tetsutani_v65 10-0
+    # +$689; vs v25 cũ 8W-2L +$330; vs thomast (guard-path) 10-0
+    # +$10.072. Audit 4 lĩnh vực (thực vật/động vật/nhân công/kho): CLEAN.
+    "v251": (os.path.join(ROOT, "v251.py"), "agent"),
+    # Task 99 (19-09): thomast2945 = "The 2945 Farm v9/4" của
+    # thomastschinkel (kaggle.com/code/thomastschinkel/
+    # the-2945-farm-96-vs-the-top-10-public-bots, pull 19-09) —
+    # byte-exact main.py sha256 bfee70e9… = đúng submission 56269928
+    # ladder 2944.7. Kiến trúc: route replayer (yhay81/Ahmed V39-V40)
+    # + 12 lớp reflex (RACE/RACEPX, PREDICT 451k-event, COURIER, CARROT,
+    # HERD, CAPHARV, SL2/VE1/VT1…). H2H của tác giả: tetsutani 55-5,
+    # alperen 54-6, V48 55-5. Loader-verified entry 'agent' (last-callable
+    # rule). Sparring partner nghiên cứu.
+    "thomast2945": (os.path.join(ROOT, "thomast2945.py"), "agent"),
+    # Task 100 (19-09): v26 "HERD-ADAPTIVE ANSWER GENERAL" (chính thức, file
+    # v26c.py, submission Kaggle 56359569) = v25.1 + port ĐÚNG verdict COW
+    # của 2945-farm V9 herd (gate chính xác V9_HERD_*: egg_shops==0 AND YARN
+    # chưa mở AND milk_shops>=3 AND MILK>=$150 -> SHEEP/GOOSE mua window
+    # (8,11) đổi thành COW — profile "bò chuyên sâu" s110). Đối chứng:
+    # ahmedv48 48W-0L mean +1204 (v25.1: +640, s110: +186 -> +13.728!);
+    # alperen1 10-0 +1192 & tetsutani_v65 10-0 +689 (đều khớp byte-exact
+    # v25.1 trên seed không verdict); thomast2945 48 trận 6W-42L mean -1361
+    # (v25.1: 4W-44L -1922; s110 lật -9845 -> +3638). Bản port rộng đầu
+    # (4 lớp: herd-mở-rộng + RACEGATE glut + horizon-40 + ORDERPRI2 +
+    # CAPHARV) đã LOẠI sau ablation A0/A3: herd sớm đoán-sai YARN muộn tốn
+    # -8.7k/ghế s102-104, các lớp runtime khác neutral-đến-hại (-2.3k s122)
+    # — xem bench/t100_v26_* và v26.py (lưu bản thí nghiệm thất bại).
+    "v26": (os.path.join(ROOT, "v26c.py"), "agent"),
+    # Task 110 (19-09): v27 program = chassis thomast2945 byte-exact + các lớp
+    # outermost patch (wrapper an toàn kiểu production-loader). v27a = lớp
+    # CRASH-DUMP ACCELERATOR: sản phẩm pure-output (MILK/STRAW/MELON/WOOL/
+    # EGG/CARROT/TOMATO) đang sập giá cấu trúc (yest <= 88% peak 4 ngày,
+    # không hồi) -> bán sạch shed ngay (extend order của tape nếu có, không
+    # append vượt MAX 10). WHEAT/FERTILIZER loại trừ (input nội bộ máy móc).
+    # v27b = crash-dump NHẤT MỘT LẦN/product/game (tránh bắn đáy dao động);
+    # v27c = gate sụt kéo dài 2 ngày (yest & yest2 đều <= 88% peak).
+    "v27x_noMILK": (os.path.join(ROOT, "v27x_noMILK.py"), "agent"),
+    "v27x_noWOOL": (os.path.join(ROOT, "v27x_noWOOL.py"), "agent"),
+    "v27x_noSTRAW": (os.path.join(ROOT, "v27x_noSTRAW.py"), "agent"),
+    "v27x_noCARROT": (os.path.join(ROOT, "v27x_noCARROT.py"), "agent"),
+    "v27x_noEGG": (os.path.join(ROOT, "v27x_noEGG.py"), "agent"),
+    "v27x_onlyMILK": (os.path.join(ROOT, "v27x_onlyMILK.py"), "agent"),
+    "v27x_onlySTRAW": (os.path.join(ROOT, "v27x_onlySTRAW.py"), "agent"),
+    "v27x_onlyWOOL": (os.path.join(ROOT, "v27x_onlyWOOL.py"), "agent"),
+    # v27d = ablation-final: chỉ STRAWBERRY + WOOL (MILK trap dao động đã loại)
+    # v27e = v27a + PREPEND (dump order lên đầu queue); v27f = noMILK + prepend
+    # v27g = milk gate p>=60; v27h = milk gate day<20
+    # v27i = milk gate (day<20 OR p>=60)
+    # v27j = dump chỉ từ d26+; v27k = dump chỉ từ d20+
+    "v27gs_ALL_none_r88": (os.path.join(ROOT, "v27gs_ALL_none_r88.py"), "agent"),
+    "v27gs_ALL_none_r95": (os.path.join(ROOT, "v27gs_ALL_none_r95.py"), "agent"),
+    "v27gs_ALL_p60_r88": (os.path.join(ROOT, "v27gs_ALL_p60_r88.py"), "agent"),
+    "v27gs_ALL_p60_r95": (os.path.join(ROOT, "v27gs_ALL_p60_r95.py"), "agent"),
+    "v27gs_ALL_d20_r88": (os.path.join(ROOT, "v27gs_ALL_d20_r88.py"), "agent"),
+    "v27gs_ALL_d20_r95": (os.path.join(ROOT, "v27gs_ALL_d20_r95.py"), "agent"),
+    "v27gs_SMW_none_r88": (os.path.join(ROOT, "v27gs_SMW_none_r88.py"), "agent"),
+    "v27gs_SMW_none_r95": (os.path.join(ROOT, "v27gs_SMW_none_r95.py"), "agent"),
+    "v27gs_SMW_p60_r88": (os.path.join(ROOT, "v27gs_SMW_p60_r88.py"), "agent"),
+    "v27gs_SMW_p60_r95": (os.path.join(ROOT, "v27gs_SMW_p60_r95.py"), "agent"),
+    "v27gs_SMW_d20_r88": (os.path.join(ROOT, "v27gs_SMW_d20_r88.py"), "agent"),
+    "v27gs_SMW_d20_r95": (os.path.join(ROOT, "v27gs_SMW_d20_r95.py"), "agent"),
+    "v27gs_SM_none_r88": (os.path.join(ROOT, "v27gs_SM_none_r88.py"), "agent"),
+    "v27gs_SM_none_r95": (os.path.join(ROOT, "v27gs_SM_none_r95.py"), "agent"),
+    "v27gs_SM_p60_r88": (os.path.join(ROOT, "v27gs_SM_p60_r88.py"), "agent"),
+    "v27gs_SM_p60_r95": (os.path.join(ROOT, "v27gs_SM_p60_r95.py"), "agent"),
+    "v27gs_SM_d20_r88": (os.path.join(ROOT, "v27gs_SM_d20_r88.py"), "agent"),
+    "v27gs_SM_d20_r95": (os.path.join(ROOT, "v27gs_SM_d20_r95.py"), "agent"),
+    "v27gs_SW_none_r88": (os.path.join(ROOT, "v27gs_SW_none_r88.py"), "agent"),
+    "v27gs_SW_none_r95": (os.path.join(ROOT, "v27gs_SW_none_r95.py"), "agent"),
+    "v27gs_SW_p60_r88": (os.path.join(ROOT, "v27gs_SW_p60_r88.py"), "agent"),
+    "v27gs_SW_p60_r95": (os.path.join(ROOT, "v27gs_SW_p60_r95.py"), "agent"),
+    "v27gs_SW_d20_r88": (os.path.join(ROOT, "v27gs_SW_d20_r88.py"), "agent"),
+    "v27gs_SW_d20_r95": (os.path.join(ROOT, "v27gs_SW_d20_r95.py"), "agent"),
+    "v27gs_MSM_none_r88": (os.path.join(ROOT, "v27gs_MSM_none_r88.py"), "agent"),
+    "v27gs_MSM_none_r95": (os.path.join(ROOT, "v27gs_MSM_none_r95.py"), "agent"),
+    "v27gs_MSM_p60_r88": (os.path.join(ROOT, "v27gs_MSM_p60_r88.py"), "agent"),
+    "v27gs_MSM_p60_r95": (os.path.join(ROOT, "v27gs_MSM_p60_r95.py"), "agent"),
+    "v27gs_MSM_d20_r88": (os.path.join(ROOT, "v27gs_MSM_d20_r88.py"), "agent"),
+    "v27gs_MSM_d20_r95": (os.path.join(ROOT, "v27gs_MSM_d20_r95.py"), "agent"),
+    "v27gs_MS_none_r88": (os.path.join(ROOT, "v27gs_MS_none_r88.py"), "agent"),
+    "v27gs_MS_none_r95": (os.path.join(ROOT, "v27gs_MS_none_r95.py"), "agent"),
+    "v27gs_MS_p60_r88": (os.path.join(ROOT, "v27gs_MS_p60_r88.py"), "agent"),
+    "v27gs_MS_p60_r95": (os.path.join(ROOT, "v27gs_MS_p60_r95.py"), "agent"),
+    "v27gs_MS_d20_r88": (os.path.join(ROOT, "v27gs_MS_d20_r88.py"), "agent"),
+    "v27gs_MS_d20_r95": (os.path.join(ROOT, "v27gs_MS_d20_r95.py"), "agent"),
+    "v27gs_MW_none_r88": (os.path.join(ROOT, "v27gs_MW_none_r88.py"), "agent"),
+    "v27gs_MW_none_r95": (os.path.join(ROOT, "v27gs_MW_none_r95.py"), "agent"),
+    "v27gs_MW_p60_r88": (os.path.join(ROOT, "v27gs_MW_p60_r88.py"), "agent"),
+    "v27gs_MW_p60_r95": (os.path.join(ROOT, "v27gs_MW_p60_r95.py"), "agent"),
+    "v27gs_MW_d20_r88": (os.path.join(ROOT, "v27gs_MW_d20_r88.py"), "agent"),
+    "v27gs_MW_d20_r95": (os.path.join(ROOT, "v27gs_MW_d20_r95.py"), "agent"),
+    "v27gs_MM_none_r88": (os.path.join(ROOT, "v27gs_MM_none_r88.py"), "agent"),
+    "v27gs_MM_none_r95": (os.path.join(ROOT, "v27gs_MM_none_r95.py"), "agent"),
+    "v27gs_MM_p60_r88": (os.path.join(ROOT, "v27gs_MM_p60_r88.py"), "agent"),
+    "v27gs_MM_p60_r95": (os.path.join(ROOT, "v27gs_MM_p60_r95.py"), "agent"),
+    "v27gs_MM_d20_r88": (os.path.join(ROOT, "v27gs_MM_d20_r88.py"), "agent"),
+    "v27gs_MM_d20_r95": (os.path.join(ROOT, "v27gs_MM_d20_r95.py"), "agent"),
+    "v27gs_MWL_none_r88": (os.path.join(ROOT, "v27gs_MWL_none_r88.py"), "agent"),
+    "v27gs_MWL_none_r95": (os.path.join(ROOT, "v27gs_MWL_none_r95.py"), "agent"),
+    "v27gs_MWL_p60_r88": (os.path.join(ROOT, "v27gs_MWL_p60_r88.py"), "agent"),
+    "v27gs_MWL_p60_r95": (os.path.join(ROOT, "v27gs_MWL_p60_r95.py"), "agent"),
+    "v27gs_MWL_d20_r88": (os.path.join(ROOT, "v27gs_MWL_d20_r88.py"), "agent"),
+    "v27gs_MWL_d20_r95": (os.path.join(ROOT, "v27gs_MWL_d20_r95.py"), "agent"),
+    "v27gs_SMWC_none_r88": (os.path.join(ROOT, "v27gs_SMWC_none_r88.py"), "agent"),
+    "v27gs_SMWC_none_r95": (os.path.join(ROOT, "v27gs_SMWC_none_r95.py"), "agent"),
+    "v27gs_SMWC_p60_r88": (os.path.join(ROOT, "v27gs_SMWC_p60_r88.py"), "agent"),
+    "v27gs_SMWC_p60_r95": (os.path.join(ROOT, "v27gs_SMWC_p60_r95.py"), "agent"),
+    "v27gs_SMWC_d20_r88": (os.path.join(ROOT, "v27gs_SMWC_d20_r88.py"), "agent"),
+    "v27gs_SMWC_d20_r95": (os.path.join(ROOT, "v27gs_SMWC_d20_r95.py"), "agent"),
+    "v27gs_MWMS_none_r88": (os.path.join(ROOT, "v27gs_MWMS_none_r88.py"), "agent"),
+    "v27gs_MWMS_none_r95": (os.path.join(ROOT, "v27gs_MWMS_none_r95.py"), "agent"),
+    "v27gs_MWMS_p60_r88": (os.path.join(ROOT, "v27gs_MWMS_p60_r88.py"), "agent"),
+    "v27gs_MWMS_p60_r95": (os.path.join(ROOT, "v27gs_MWMS_p60_r95.py"), "agent"),
+    "v27gs_MWMS_d20_r88": (os.path.join(ROOT, "v27gs_MWMS_d20_r88.py"), "agent"),
+    "v27gs_MWMS_d20_r95": (os.path.join(ROOT, "v27gs_MWMS_d20_r95.py"), "agent"),
+    "v27gs_S_none_r88": (os.path.join(ROOT, "v27gs_S_none_r88.py"), "agent"),
+    "v27gs_S_none_r95": (os.path.join(ROOT, "v27gs_S_none_r95.py"), "agent"),
+    "v27gs_S_p60_r88": (os.path.join(ROOT, "v27gs_S_p60_r88.py"), "agent"),
+    "v27gs_S_p60_r95": (os.path.join(ROOT, "v27gs_S_p60_r95.py"), "agent"),
+    "v27gs_S_d20_r88": (os.path.join(ROOT, "v27gs_S_d20_r88.py"), "agent"),
+    "v27gs_S_d20_r95": (os.path.join(ROOT, "v27gs_S_d20_r95.py"), "agent"),
+    # Task 110 fine-tune: ratio sweep quanh ALL_none (r90/r92/r93, r95+min_day)
+    # Task 110 FINAL: v27 "SECOND-HALF PRICE-CURVE GENERAL" = chassis 2945
+    # byte-exact + DUAL-MODE crash-dump (clone-detector d4-8: 2945-family
+    # r92 full-dump / V48-class race-mode no-milk d12+ r95). Protocol
+    # 100-104 vs thomast2945: 10W-0L (paired +358/+1446/+184/+2706/+1094).
+    # 20-seed: 26W-14L mean +201 worst -274. Vs 11 đối thủ khác: V48 10-0,
+    # tetsutani 10-0, v18/43/44/45 10-0, alperen1/v24 8-2, v25/251/26 6-4.
+    "v27": (os.path.join(ROOT, "v27.py"), "agent"),
+    # v27n = v27 + clone-detector dual-mode (clone=2945-family r92 full;
+    # non-clone=V48-class race-mode: no MILK, d12+, r95)
 }
 
 

@@ -1,0 +1,750 @@
+     1→# Worklog — Kagriculture Arena @ /home/z/my-project
+     2→
+     3→---
+     4→Task ID: 1
+     5→Agent: Z.ai Code (main)
+     6→Task: Tải xuống dữ liệu từ kho lưu trữ GitHub https://github.com/vietnq130593-code/Kagriculture và dùng PM2 duy trì hiển thị giao diện app cho user.
+     7→
+     8→Work Log:
+     9→- Clone repo GitHub → /home/z/Kagriculture (2260 files: Next.js Observer UI + Python agent kaggriculture/ + mini-services/arena-service socket.io :3005 + kaggle-research/skills/bench artifacts).
+    10→- Đọc kiến trúc: frontend Next.js (port 3000, route / duy nhất) + arena-service socket.io (port 3005, spawn python3 kaggriculture/arena/run_battle.py, stream 720 turn JSONL) + Caddy gateway :81 route theo query XTransformPort. Service gốc có dev-server supervisor nội bộ (spawn `bun run dev`) — nguyên nhân: process sinh ra từ bash tool bị chết theo session.
+    11→- Cài Python engine: pip install kaggle-environments==1.32.7 (env "kaggriculture" là env chính thức của Kaggle) + smoke test runner trực tiếp: v20 vs ahmedv46 seed 5, 24 turn — JSONL stream đầy đủ.
+    12→- Deploy vào /home/z/my-project: copy src/app/page.tsx + layout.tsx, src/components/arena/* (12 components), kaggriculture/ (agents v13→v24 + ahmed/seyit/aurax lineage + arena/ + bench/), mini-services/arena-service/, next.config.ts (webpackMemoryOptimizations + devtool:false cho box 4GB), eslint.config.mjs (bổ sung ignore kaggriculture/**, mini-services/**, ecosystem.config.cjs), package.json (dev script NODE_OPTIONS 768MB + --webpack --disable-source-maps, thêm socket.io-client).
+    13→- Sửa arena-service/index.ts: DISABLE dev-supervisor nội bộ (gate env SUPERVISE_DEV=1) — nhường việc giám sát dev server cho PM2, tránh 2 dev server tranh port 3000.
+    14→- Cài PM2 7.0.4 (npm -g, daemon PPID=1 — survive mọi bash session) + ecosystem.config.cjs với 2 app:
+    15→  * kagriculture-web: bun run dev, cwd /home/z/my-project, max_memory_restart 2000M, autorestart.
+    16→  * kagriculture-arena: bun --hot index.ts, cwd mini-services/arena-service, PATH pin /home/z/.venv/bin (python3 có kaggle-environments), max_memory_restart 600M.
+    17→- bun install cả 2 project (socket.io-client 4.8.3 + socket.io 4.8.3).
+    18→- Kill dev server cũ (pid 1189 của scaffold mặc định), pm2 start ecosystem.config.cjs + pm2 save (dump ~/.pm2/dump.pm2).
+    19→- E2E socket test (node + socket.io-client): battle v20 vs ahmedv46 seed 5 qua service → 719 turn, rewards [93409, 91853], winner 0, wallS 14.8 — engine + service + Python spawn hoạt động đúng.
+    20→- Browser verify (agent-browser qua gateway :81): page render đầy đủ (header, control panel 15 agent dropdown, EmptyState showcase cards); chọn v24 ghế A → bấm "Bắt đầu trận đấu" → badge LIVE + seed khoá + playback controls; 719 turn stream; result banner "🏆 v19 THẮNG!" (v18 $106,835 vs v19 $106,956, tỷ lệ 1.00×, turn 719/719); MoneyChart + 2 FarmBoard grid + MarketPanel bảng giá + sparkline + ActionLog + RunnerLog đầy đủ; 0 console error, 0 page error. VLM phân tích screenshot xác nhận render hoàn chỉnh.
+    21→- Lint sạch (eslint . — không lỗi). Dev.log: 1 lần "SyntaxError: Unexpected end of JSON input" benign (request body rỗng lúc compile đầu, các GET / sau đó đều 200). Lưu ý: Preview Panel sandbox thỉnh thoảng tự reload trang → reset view trận đang xem (hành vi đã được app handle bằng notice "đã bỏ lỡ các lượt đầu", không phải bug).
+    22→- Mobile 390px: responsive OK, footer push-down tự nhiên (bodyH 5008px > winH 844px).
+    23→
+    24→Stage Summary:
+    25→- APP HOẠT ĐỘNG + PM2 DUY TRÌ: user mở Preview Panel → KaggressurE Arena (giao diện tiếng Việt) → chọn 2 trong 15 agent (v18/v19/v191-v194/v20/v21/v24, ahmedv43-46, seyit4, aurax7) + seed tùy chọn → xem 720 turn battle trên engine Kaggle thật (kaggle-environments 1.32.7) streamed qua socket.io, kèm money race chart, farm grid, market table, action log, result banner.
+    26→- PM2: `pm2 status` (2 app online, ↺ 0), `pm2 logs`, `pm2 restart kagriculture-arena` (sau khi đổi AGENTS registry trong index.ts), `pm2 save` đã chạy (resurrect bằng `pm2 resurrect`). Daemon PM2 PPID=1 tồn tại vĩnh viễn độc lập bash session — đúng yêu cầu "PM2 duy trì hiển thị giao diện app".
+    27→- File新增: ecosystem.config.cjs (PM2 config). File sửa: package.json, next.config.ts, eslint.config.mjs, mini-services/arena-service/index.ts (supervisor gate).
+    28→- Python deps mới trong /home/z/.venv: kaggle-environments 1.32.7 (+ jax/gym... dependencies).
+    29→
+    30→---
+    31→Task ID: 2 (project Task 93) — Đăng ký đối thủ mới ahmedv48 "V48 Clear the Queue" + battery 10 trận v24 vs ahmedv48
+    32→Agent: Z.ai Code (main, vai trò Bio)
+    33→
+    34→Task:
+    35→- User (Mr. Architect): "có một đối thủ mới xuất hiện trên Kaggle"
+    36→  https://www.kaggle.com/code/ahmedberatozer/kaggriculture-v48-clear-the-queue
+    37→  + API token KGAT_1416… — tải về, đăng ký trên app, cho v24 đấu thử 10 trận,
+    38→  báo cáo kết quả.
+    39→
+    40→Work Log:
+    41→- Kaggle API pull (Bearer KGAT): GET /api/v1/kernels/pull?userName=ahmedberatozer&kernelSlug=kaggriculture-v48-clear-the-queue
+    42→  → HTTP 200, 933KB, notebook version 1 "Kaggriculture V48 — Clear the Queue"
+    43→  (4 cells). Lưu raw: kaggle-research/raw/ahmedv48_pull.json.
+    44→- Phân tích notebook: cell 2 embed nguồn agent dạng byte-literals với digest
+    45→  pinned 4b5402888feeb417… (b''.join + assert sha256 bên trong notebook);
+    46→  cell 3 verify + đóng gói tar.gz. Mechanism trùng pattern Task 87/88
+    47→  (ahmed lineage byte-exact).
+    48→- Extract: exec cell 1+2 nguyên văn trong sandbox cwd → v48_agent/main.py
+    49→  357.742 bytes, sha256 khớp digest pinned (byte-exact). Module load qua
+    50→  importlib OK; entry thật = _e335_agent (function top-level CUỐI CÙNG —
+    51→  Kaggle last-callable convention, cell 3 assert đúng tên này; lưu ý
+    52→  mod.agent là layer cũ _e334, KHÔNG dùng).
+    53→- Deploy: kaggriculture/ahmedv48.py (byte-exact, không sửa một byte).
+    54→- Đăng ký 3 điểm (pattern Task 92b): (1) arena/run_battle.py AGENTS:
+    55→  "ahmedv48" → entry "_e335_agent" (registry hỗ trợ entry tùy chỉnh — giữ
+    56→  file nguyên bản); (2) mini-services/arena-service/index.ts AGENTS (16
+    57→  agents); (3) frontend constants.ts AGENT_INFO — showcase card ĐỐI THỦ
+    58→  MỚI đặt đầu danh sách.
+    59→- pm2 restart kagriculture-arena (Task-86 lesson: bun --hot giữ closure cũ
+    60→  → true restart bắt buộc). Socket verify: arena:hello → 16 agents incl.
+    61→  ahmedv48 ✓.
+    62→- Smoke runner: run_battle.py --a ahmedv48 --b v24 --seed 5 --max-steps 24 →
+    63→  JSONL stream sạch, engine end OK.
+    64→- E2E qua service: battle:start v24 vs ahmedv48 seed 100 → 719 turn,
+    65→  rewards [83542, 84761] — ahmedv48 THẮNG ngay trận đầu (+$1.219).
+    66→- Battery 10 trận (battery.py chuẩn dự án): --new v24 --base ahmedv48
+    67→  --seeds 5 --seed-start 100 (seed 100-104 × 2 ghế = 10 trận, 5 workers,
+    68→  89.5s, 0 error). Kết quả bench/t93_v24_vs_ahmedv48.json.
+    69→- Browser verify: reload → showcase card ahmedv48 render đầy đủ; dropdown
+    70→  A hiện 16 option incl. ahmedv48; lint sạch.
+    71→
+    72→Stage Summary:
+    73→- KẾT QUẢ BATTERY (10 trận, seed 100-104, cả 2 ghế): v24 THUA 0-10 trước
+    74→  ahmedv48. Mean margin −$699/trận, median −$712, worst −$1.219, best
+    75→  −$118, bootstrap CI95 [−$920, −$465] — CI loại trừ 0 hoàn toàn.
+    76→  Chi tiết theo seed (ghế nào cũng identical — engine đối xứng):
+    77→  s100 −$1.219, s101 −$712, s102 −$541, s103 −$907, s104 −$118.
+    78→- NGƯỠNG MỚI CỦA META: ahmedv48 (V47 + market-slot cleanup: gỡ SELL slot
+    79→  rỗng, gộp SELL trùng sản phẩm, dồn lệnh vào slot tự do) LẬT ĐỔ hoàn toàn
+    80→  thứ tự cũ: v24 từng 48-0 +$1.699 vs ahmedv46, giờ 0-10 −$699 vs ahmedv48.
+    81→  Dòng Ahmed tiếp tục leo: v43→v44→v45→v46→v48, mỗi bậc là lớp kinh tế vi
+    82→  mô mới trên cùng chassis V43.
+    83→- APP: user mở Preview Panel → chọn v24 vs ahmedv48 (hoặc 15 cặp khác trong
+    84→  16 agent) → xem 720 turn. Kịch bản gợi ý: v24 (A) vs ahmedv48 (B) seed
+    85→  100 — đúng trận battery, thấy rõ khoảng cách tiền mở rộng dần cuối game.
+    86→- Token Kaggle: đã dùng để pull công khai (chỉ đọc), KHÔNG submit gì. Lưu ý
+    87→  bảo mật: token trong lịch sử chat — nên rotate khi tiện.
+    88→
+    89→---
+    90→Task ID: 3-a
+    91→Agent: Chassis analyst (nghiên cứu thuần túy, chỉ đọc)
+    92→Task: Phân tích nền móng ahmedv48.py dòng 1-1217 — Chassis (406-910), helpers, make_agent/_router, chuỗi wrap agent đầu (971/982/1054/1110/1206), unit-model + E182 planner (exec blob 1002/1004), _shadow_terminal, _parent_liquidate, v219 family (1216-1461), giải mã route tape R108 + đối chiếu engine kaggle-environments 1.32.7 thật.
+    93→
+    94→Work Log:
+    95→- Đọc worklog.md (Task 1-2: v24 thua 0-10 trước ahmedv48, margin −$699).
+    96→- Read ahmedv48.py theo chunk: 1-120 (license/attribution), 223-938 (docstring engine facts + helpers + Chassis + make_agent), 941-1216 (route data + _router + chuỗi wrap), tránh blob 94KB dòng 944.
+    97→- Dùng awk cut -c để đọc vùng 945-1461 không bị truncate (dòng 950/1002/1004 dài 2-27KB).
+    98→- ast.parse trích 2 exec blob: (a) unit_model 12K chars = bản sao语义 _apply_unit_action/_decay_plants/_new_plant/_new_animal từ engine 1.32.7 (SHA bc8a5487…); (b) E182 planner 25.8K chars = simulate/plan_terminal/dominates/_proposals/_recover_observed/liquidation.
+    99→- Giải mã read-only _R108_DATA (b85+zlib+json): 3982 action unique, 40 tape 719 bước (13 route cũ 0-12 + 27 route EXP240 100-128), 64 cặp shop→route; thống kê macro từng route (HIRE ~260-282/game, mua 8 COW+6 SHEEP+3 GOOSE, 2 BUY_LAND, bán ~18k WHEAT/CARROT, ~10k FERTILIZER...); in sample bước 0-5, 144, 648, 710-718 (terminal SELL 1000× 8 sản phẩm + PLACE deposit).
+   100→- Đối chiếu engine thật /home/z/.venv/.../kaggriculture.py: _process_market (per-slot lockstep, parse order, empty slot skipped), market_price/MARKET_PARAMS (I0=10000, base WHEAT 25…MELON 250, shape sqrt/log/hinge/linear/sq), _commit_unit (SELL cần shed, BUY_PRODUCT quote tại inventory-1 → round-trip net 0), _do_hire (fib), _do_buy_land (LAND_ORDER NE/SW/SE, 1000/2000/4000), _town_consume (mỗi 4 bước shop -1/sp-product, ×2 nếu 1-product; mỗi 24 bước town-center -1), day-end reset (hands=[], farmer về spawn, hires_today=0, auto-drop shed cap 100, weed 0.005/tile), shop unlock mỗi 3 ngày (max 8 instance).
+   101→- Grep xác nhận comment dòng 3997-3998 ("Empty order slots are explicitly skipped by the pinned engine parser") + 614/861 (zero-qty giữ slot race), cấu trúc entry tail _Y_HOST(3824)→_y_agent_shopherd(3949)→_E334(3972)→e334(4005)→e335(4041).
+   102→- KHÔNG sửa file nào, KHÔNG chạy battle.
+   103→
+   104→Stage Summary:
+   105→- KIẾN TRÚC NỀN: Chassis = route-replay engine (tape 719 action/router chọn tape) + 9 lớp reactive nhưng _SETTINGS chỉ bật 3 (hand_align, weed_repair, sell_lead); budget/room/clamp/dead_stock/terminal/front_run TẮT ở tầng base — được tái hiện bằng wrapper riêng (room guard 1110, terminal 982/1054). Chuỗi gọi: _e335→_e334→_y_agent_shopherd→_Y_HOST(v44y lockstep+herd)→…→_V28_CORE(1206)→room(1110)→E182 terminal planner(1054)→7-turn rescue(982)→_IMPL(968: make_agent+_router)→tape R108.
+   106→- ROUTER: step0-143 route 0; step>=144 (day 6) đọc unlocked_shops[:2]: không YARN_STORE → route EXP240 (100-128 theo cặp shop, default 100); có YARN_STORE → route V39 cũ (yarn 1-12, default 0); step>=648 (day 27) → route 2 (endgame 10×HIRE + SELL 1000). 40 tape × 719 bước, chọn theo 2 shop đầu.
+   107→- VŨ KHÍ NỀN: (1) tape 93.8%-win public router tối ưu hóa cho từng cặp shop; (2) hire-fib mỗi ngày ~9-11 hands (hands reset daily — chi phí 143$/ngày cho 10 hands); (3) vòng FEED→COLLECT_FERTILIZER bán FERTILIZER như product; (4) wheat-wash opening: BUY WHEAT 5+10 rồi SELL 13 bước sau — round-trip net 0 (engine quote buy tại inventory-1) giữ lại ~2 wheat feed miễn phí; (5) slot placeholder rỗng `[]` giữ vị trí lockstep; (6) E182 terminal planner: simulate 712-718 bằng unit-model byte-exact + tối ưu harvest/deposit (64 sims, dominance chứng nhận); (7) room guard giờ 23 cap 99; (8) v219 tomato: mượn 10 tile SE, hired workers riêng, chỉ kích hoạt khi đủ điều kiện (12k money, TOMATO>=70, 3 shop PIZZA/FARMERS_MARKET...).
+   108→- ENGINE FACTS đắt: giá = f(inventory) quanh I0=10000; town consume mỗi 4 bước; day-end reset xoá toàn bộ hands; harga SELL chỉ tăng supply khi price>1; HIRE/BUY_LAND là atomic xử lý 1 lần theo player order (player 0 trước) MỖI SLOT.
+   109→- WEAKNESS HYPOTHESIS (đề xuất test ở task sau): (a) tape cứng — phá trạng thái (weed/replay) chỉ vá được 1 bước, queue pending dễ lệch chuỗi WATER; (b) router chỉ đọc 2 shop đầu ở đúng bước 144 — các shop mở sau (day 9+) không điều chỉnh; (c) sell_lead bị skip tại step%4==0 và biên 72; (d) front_run TẮT — không đọc plan đối thủ ở tầng base; (e) E182 planner abstain khi state pending hoặc 9 SELL chuẩn không khớp; (f) v219 tomato dễ fail eligibility (budget_declines) — quan sát _V219_REPORT.telemetry để đếm.
+   110→
+   111→---
+   112→Task ID: 3-b
+   113→Agent: Sediment & shopherd analyst
+   114→Task: Nghiên cứu thuần túy ahmedv48.py (4042 dòng, đối thủ đầu table: 10-0 vs v24, margin TB +$699) — dựng call-graph runtime thực tế từ _e335_agent xuống đáy, phân tách layer SỐNG vs trầm tích CHẾT, mổ xẻ cơ chế đối kháng (lockstep/race/shopherd/preguard/adv), rút weakness hypothesis + danh mục hằng số cho v25. Không sửa file nào.
+   115→
+   116→Work Log:
+   117→- Đọc worklog (Task 1, 2) nắm ngữ cảnh: ahmedv48 = V48 "Clear the Queue", byte-exact từ Kaggle, entry _e335_agent (Kaggle last-callable), battery v24 0-10.
+   118→- Grep symbol: _Y_HOST/_Y_STATES/_Y_CFG/_Y_REPORT, _PARENT=agent (24 chỗ), globals().pop (24 chỗ), 3 lần capture host kiểu [v for v in globals().values() if callable(v)][-1] (3632 _PG_HOST, 3674 _V44Y_HOST, 3824 _Y_HOST). Idiom agent=globals().pop('agent') = xoá+rồi-gán-lại → đẩy key 'agent' về CUỐI dict globals →保证 lần capture [-1] sau đó bắt đúng wrapper mới nhất.
+   119→- Read theo chunk (awk lọc dòng dài, tránh blob base85 dòng 944): 910-1240 (make_agent/_IMPL/router/terminal planner/storage guard), 1440-1945 (v219 tomato, v224 sales-first, v231 cattle, r36, r37, r44, release, v233/v234), 2130-2530 (r51 input/warehouse, r53, r62/r68/r70, r79), 2530-2960 (r85/r86/r88/r95/r97/r124), 2960-3330 (r127, r128, r148, r149/r150 perf, exec EXP303), 3372-3612 (race, open, adv), 3613-4042 (preguard, v44y lockstep/factor_margin/reorder/clone_gate, shopherd, e334/e335 compact).
+   120→- Kiểm chứng engine: đọc kaggle_environments/envs/kaggriculture/kaggriculture.py::_process_market (dòng 544-650) — xác nhận settlement per-slot đồng thời 2 player + per-unit lockstep, SELL giá = market_price(inventory hiện tại), BUY WHEAT/FERT quote tại inventory-1, SELL giá $1 không tăng inventory → mô hình _v44y_lockstep (3688) là bản sao trung thành (đúng cả chi tiết price>1).
+   121→- Chạy import thực tế (importlib, /tmp) + introspect toàn bộ 40 biến _PARENT/_HOST: KẾT QUẢ CẤU TRÚC — toàn bộ 35 wrapper + chassis ĐỀU SỐNG, chain liên tục không đứt đoạn; monkey-patch xác nhận: Chassis._sell_lead=_r36_native_lead(1644), Chassis._apply_suppression=_r36_suppress(1648), _r36_reserve bị redef 3441 (race-aware, gốc 1660 giữ tại _RACE_ORIG_RESERVE), _shadow_terminal redef 2 lần (1025→1457→2105), copy→_R149CopyProxy(3359), _e334_compact redef 3974→4016 (EXP335 override, gốc giữ tại _E335_ORIGINAL_COMPACT), _RACE_HORIZON_CLONE 8(3378)→9(3671, giá runtime).
+   122→- Phân loại CHẾT thật: nhánh _r148_seed_prefund+_r148_atomic (3244/3270, _R148_SEEDS=False 3194); 6 layer chassis OFF trong _SETTINGS(948): budget_guard/room_guard/clamp_sells/dead_stock/terminal_liquidation/front_run (front_run còn thiếu opponent_plan=None); nhánh APPLY_TIMING=False (1461/1471); _ADV_BOOK=False, _ADV_SUBTRACT_DEBTS=False; hằng _OPEN_UNITS=70/_OPEN_FEED_STEP1=3496 không dùng; _RACE_HORIZON_CLONE=8 bị ghi đè; _r53_labor_assignment/_r70_parent_fert_qty/_r79 là helper SỐNG nhưng được V219 gọi xuôi (forward reference runtime OK).
+   123→- Mổ xẻ 4 cụm đối kháng: (1) v44y lockstep — _v44y_factor_margin(3733) dựng hàm margin per-item có cache, opp = CHÍNH order của mình (giả định clone), _v44y_reorder(3765) hoán vị block SELL liền kề 2-6 phần tử, chỉ chấp nhận gain>0.5, gate 3816: step>=216 AND clone_gate (race horizon>0 hoặc cuối game similarity>=.95); (2) race (3451) — mirror gate step1 |Δcash|<0.5 → horizon 24, _race_clone: 4/6 turn vị trí trùng + similarity>=.95 → horizon 9, _race_lost: địch bán race product đúng lúc mình vừa drop vào shed + tape định bán 6-24 turn sau → escalate 24 vĩnh viễn; horizon áp vào _r36_reserve qua bản patch 3441; (3) shopherd (3949) — _y_target: COW→SHEEP khi có YARN_STORE (yarnsheep=True), GOOSE→SHEEP (yarngeese), chỉ ngày 8-11, maxq 2, check _y_cash (haircut 0.8× doanh thu SELL, +10/unit buy impact) margin>=100; credit theo dõi pending/credit/sites/sale/coop_swap, boost SELL sẵn có đúng lượng thu hoạch vật lý; (4) adv (3549) — kéo SELL trong tape 3 turn tới lên bây giờ (chỉ turn thuần SELL, giờ≠23, từ 144, bảo vệ SELL đầu của turn sau nếu nó fund feed), _adv_frontload(3598) sắp SELL trước BUY; preguard (3639) bán trước 2 giờ cái guard giờ-23 sẽ dump (ngưỡng 93 thay vì 99); e334/e335 "Clear the Queue" — cap SELL theo shed vật lý, gộp SELL trùng sản phẩm vào 1 slot, chừa slot rỗng (engine bỏ qua slot rỗng, giữ index ngoài).
+   124→- Tổng hợp bảng chiến thuật 24 layer active + weakness hypothesis + danh mục hằng số (xem final report task 3-b).
+   125→
+   126→Stage Summary:
+   127→- CALL-GRAPH RUNTIME (đã chứng minh bằng import): _e335_agent(4041)→_e334_agent(4005)→_y_agent_shopherd(3949)→v44y_lockstep_agent(3812)→agent_v44y_preguard(3660)→ADV(3613)→OPEN(3501)→RACE(3451)→R148(3310)→R128(3174)→R127(3025)→R124(2922)→R97(2858)→R95(2728)→R85(2591)→R70(2484,telemetry)→R53(2377,telemetry)→R51-warehouse(2334)→R51-input(2261)→R46(2109)→V233(2053)→RELEASE(1913)→R37(1870)→R36(1706)→V231(1620)→V31(1512)→V224(1498)→EXPERIMENT(1468)→V219(1394)→V28(1206)→ROOM(1110)→TERMINAL-154(1054)→SHOP-718(982)→BASE(971)→_IMPL(968)→Chassis.act(460). _Y_HOST=3824 gán v44y_lockstep_agent. KHÔNG có layer chain nào chết — "trầm tích" nằm ở nhánh OFF bên trong layer + 6 layer chassis tắt + các hằng bị ghi đè.
+   128→- CƠ CHẾ THẮNG v24 (giả thuyết xếp hạng): stack bán-trước (sell_lead 1 turn + r36_reserve horizon 4 + race 9/24 + adv 3 turn + preguard giờ 21/22 + frontload SELL-trước-BUY + lockstep reorder + slot hygiene) — engine per-unit lockstep + inventory chung nghĩa là người bán TRƯỚC đắt hơn; v24 chạy tape cùng lineage nên bị mọi gate clone/similarity kích hoạt và luôn là người bán sau; cộng opening attack (BUY 30 WHEAT index-0 step 1 nâng quote trước lệnh mua của tape địch) + shopherd đổi COW→SHEEP khi YARN mở (WOOL 200 > MILK 160) + e335 dọn slot.
+   129→- WEAKNESS chính cho v25: (1) phá similarity (decoy layout, đổi ca trồng) → tắt horizon-3/clone/r44/reorder; (2) phá money-mirror step 1 (opening khác); (3) BAIT _race_lost 1 lần → ahmed mắc horizon 24 cả game, tự bán sớm giá thấp; (4) dump WOOL trước ngày 8-12 → shopherd vẫn swap COW→SHEEP (target không check giá WOOL) + chặn V233 (cổng WOOL>=220); (5) dump TOMATO <70 trước step 432 → chặn V219; (6) opp-model của factor_margin = chính nó → reorder vô hại vs phi-clone; (7) adv/r36 reserve là "bảo hiểm" mất giá nhỏ mỗi turn vs đối thủ không đua; (8) các ngưỡng cứng 0.90/0.95/0.5/streak 6/hist 4.
+   130→- HẰNG SỐ điều chỉnh được: ~40 nhóm (chi tiết trong final report): _R37_HORIZONS 2/3/4, race 9/24 + gates, _ADV_LOOK=3/FRONT/PROTECT, _Y_CFG days(8,11)/maxq2/margin100/boost, _Y_HOURS(21,22)/_Y_MARGIN=-6, _V231_CAP=4 + window 216-227, V233 WOOL>=220/WHEAT<=45/budget 7000/day12, V219 money>=12000/TOMATO>=70/day18/CROP_MIN_PRICE=70, r95 reserve 6+48turn, r97 budget -2000, r127 prefix 2j-1, r85 reserve min 14, r88 animal-days, OPEN [BUY 7,SELL 2]/ATTACK 30/2860, v44y block 2-6/gain 0.5/gate 216, compaction step>=144, _R37_MARKET_PARAMS 9 item, _RACE_SHOPS consumption table, tape _ROUTES 41 route + router EXP240/V39/route2@648.
+   131→- File KHÔNG đổi. Kết quả nghiên cứu đầy đủ trong final report của agent 3-b (tiếng Việt).
+   132→
+   133→---
+   134→Task ID: 3-c
+   135→Agent: v24 analyst
+   136→Task: Phân tích nghiên cứu thuần túy kaggriculture/v24.py (1167 dòng) — tìm TẠI SAO v24 thua 0-10 (mean −$699, CI95 loại trừ 0) trước ahmedv48, làm nền thiết kế v25. Không sửa bất kỳ file code nào.
+   137→
+   138→Work Log:
+   139→- Đọc worklog.md Task 2 (battery 10 trận v24 vs ahmedv48: 0-10, s100 −$1.219 … s104 −$118).
+   140→- Read v24.py toàn bộ 1167 dòng. Phát hiện: L25 là _V18_SRC = byte-string 371KB (v18 nhúng, bên trong nhúng tiếp _PARENT_SRC V43 321KB) — file thật = 6 layer flat-chain quanh 1 core nhúng kép.
+   141→- Dùng ast trích xuất an toàn (chỉ đọc) _V18_SRC/_PARENT_SRC ra /tmp/v18_extracted.py (315 dòng logic) + /tmp/v43_parent_extracted.py (3366 dòng, 41 layer r-series) để khảo sát.
+   142→- Introspect _ROUTES (41 route × 719 step, tape yhay81/shop-router): seeds MELON 12 (d0) + WHEAT ~163 + STRAWBERRY ~33 (d5) + CARROT ~31 (d24), KHÔNG TOMATO-seed; animals COW 6-8 + SHEEP 6-11 (+GOOSE 0-5, d6-10), KHÔNG gà/ngựa (engine chỉ GOOSE/COW/SHEEP); 2 BUY_LAND ($3K); ~260-280 HIRE; tape market thưa (TB 1.35 lệnh/turn, 42% turn rỗng) — phần lớn lệnh runtime do các layer bơm (r36 reservation, r97 feed, r128 credit).
+   143→- Đọc đủ 6 layer v24: v19 REAPER (A1 liquidation step>=696, A2 TROUGH OFF, A4 debt ledger, C1 reset), v19.1 opening EXP284/293 ([BUY 7,SELL 2], attack 30 @cash>=2860), v19.2 preguard h21/22, v19.3 LOOKAHEAD=3, v19.4 lockstep permutation, v24 garbage-throttle (strip <$15 / release >=$18 / hoard <=24 / chunk 12, d3-27 h0-20).
+   144→- Đọc parent: router (d6 shop-conditional EXP240/V39, d648 → route 2), r36 reservation 216..696 horizon cap block-72, r37 horizons (2/3/4), _Horizons wrapper của v18 (raw>=4 → trả 24), r44 cash-probe, E182 terminal planner 712-718 (yêu cầu 9 mega-SELL >=100/lệnh), liquidation 718, day-end h23 guard.
+   145→- Đối chiếu ahmedv48.py L3378-4042: race layer (_RACE_HORIZON_CLONE=9/ESCALATED=24/MIRROR=24, mirror-gate step-1 money-equality, _race_lost đo doanh số địch qua Δinventory − town consumption), _ADV (FROM=144, guard BUY_PRODUCT, frontload sells-first), _y preguard, v44y lockstep (gate horizon>0 từ 216), shopherd (swap COW→SHEEP khi YARN_STORE, d8-11, boost slot bán sẵn), E334/E335 "Clear the Queue" (merge SELL trùng item về slot đầu, drop SELL chết shed=0, clamp theo shed, giữ index BUY, step>=144; E335 xử lý list toàn SELL = endgame).
+   146→- Xác nhận engine kaggle-environments kaggriculture.py L544-620: _process_market lockstep per-slot/per-unit, quote chung pre-commit inventory, order rỗng → _parse_order None (skip, giữ index), SELL hết stock → abort cả lệnh → "dead slot" = khe địch giao dịch một mình; cả 2 cùng giá bước-0 → mirror-gate của ahmed chắc chắn kích hoạt vs v24.
+   147→
+   148→Stage Summary:
+   149→- KIẾN TRÚC: v24 = V43-tape chassis (nền kinh tế giống hệt ahmedv48) + 6 wrapper tự viết; state module-global per-seat, reset khi step lùi (C1). Kinh tế: MELON opening ROI cao, WHEAT feed+sell, STRA d5, CARROT d24, COW/SHEEP/GOOSE, 2 land, hire fib; endgame timeline: d27 route-2 → d29 (696) A1 strip BUY + SELL cap shed+40 → 712-717 9 mega-SELL + planner E182 → 718 drop-all/sell-all.
+   150→- 5 LỖ HỔNG CHÍNH (xếp theo mức nghi ngờ, dẫn chứng trong báo cáo final):
+   151→  1) KHÔNG có slot cleanup: giữ SELL 0-qty/phantom làm dead-slot mọi turn (parent _apply_suppression giữ order 0; A1 cap +40; v24-layer release append CUỐI list) — ahmed E334/E335 merge+drop+clamp rút volume sống về slot sớm, 吃 lockstep-race mỗi turn từ step 144 tới 718.
+   152→  2) Open-loop với địch: không mirror-gate, không race-lost detector, horizon cố định — ahmed phát giác v24 là mirror ngay step 1 (cùng opening → tiền bằng nhau tuyệt đối) → chạy horizon 24 + reorder từ 216.
+   153→  3) Cửa sổ 216-287: v24 horizon reservation = 2 và v19.4 reorder OFF (gate raw>=4 chỉ đúng từ 288) vs ahmed = 24 + reorder ON → 3 ngày bị front-run nguyên block 72-turn.
+   154→  4) Endgame dead-slot: 9 mega-SELL + phantom +40 chứa slot sản phẩm đã hết → ahmed compact bán sớm hơn trong từng slot của 7 turn cuối (margin tập trung cuối game).
+   155→  5) v24 garbage-throttle phản tác dụng meta mirror-flow (chính header layer ghi crash-hold = 1W/47L ở mirror meta) + release ở slot cuối.
+   156→  (Phụ: thiếu shopherd swap d8-11; advance không guard BUY_PRODUCT; A4 double-book với r36_debts.)
+   157→- GIỮ CHO v25: chassis+tapes, v19.1 opening, v19.2 preguard, A4 invariant, khái niệm A1, engine-exact price model + _simulate 2-áp-lực, v19.4 permutation, fail-open/telemetry.
+   158→- COUNTER v25: port E334/E335-compact (từ step 0, áp cả A1/terminal), mirror-gate + race-lost escalate horizon ≥24 active từ 216 + mở gate reorder từ 216, release hoard vào slot ĐẦU, guard advance khi có BUY_PRODUCT, shopherd swap; nhánh đi xa hơn: reserve cross-block-72 khi mirror + đo flow địch per-slot.
+   159→
+   160→---
+   161→Task ID: 3-d + 4 (project Task 94) — Nghiên cứu sâu ahmedv48 & tài liệu thiết kế v25
+   162→Agent: Z.ai Code (main, vai trò Bio — kỹ sư AI/kiến trúc sư hệ thống/chuyên gia thuật toán)
+   163→
+   164→Task:
+   165→- User (Mr. Architect): "Đây mới là đối thủ xứng tầm… giữ token để tiện dùng… Từ giờ
+   166→  bạn là Bio… Tiến hành nghiên cứu ahmedv48, tìm kiến trúc + chiến thuật để xây
+   167→  tài liệu thiết kế v25 nhằm đánh bại hoàn toàn đối thủ mới."
+   168→
+   169→Work Log:
+   170→- Lưu token Kaggle: kaggle-research/config/kaggle_token.txt (chmod 600).
+   171→- Điều phối 3 agent nghiên cứu song song (3-a Chassis, 3-b sediment/runtime
+   172→  call-graph, 3-c v24 weaknesses) — mỗi agent tự append worklog (3-a/3-b/3-c).
+   173→- Tự đọc xác minh first-hand: _race_clone/_race_lost/_race_town (L3388-3486),
+   174→  v44y lockstep + clone_gate (L3660-3834), shopherd _y_controller (L3834-3947),
+   175→  _r37_similarity (L1764), e334/e335 compact (L3974-4042), engine market
+   176→  processing (_process_market L544-660 + market_price L192, kaggle-environments).
+   177→- Chạy 3 trận instrument đầy đủ (v24 vs ahmedv48, seeds 100/101/104 — worst/
+   178→  median/best của battery) qua arena/run_battle.py, JSONL 721 line/trận, khớp
+   179→  100% kết quả battery (−1219/−712/−118). Lưu t94_study/ (3×15MB).
+   180→- Phân tích thực nghiệm bằng script: mô phỏng lại chính detector của ahmed
+   181→  trên replay (mirror gate step-1, race_clone, similarity, position-equal),
+   182→  margin theo pha + theo từng NGÀY, dead-slot counting, ai-bán-trước từng
+   183→  sản phẩm, zoom turn-độ 646-695.
+   184→- Viết tài liệu thiết kế đầy đủ: kaggle-research/v25-blueprint.md (7 phần:
+   185→  tóm tắt điều hành, kiến trúc ahmedv48, giải phẫu thực nghiệm, engine
+   186→  mechanics, chẩn đoán gốc rễ, thiết kế v25 5 lớp, kế hoạch kiểm định).
+   187→
+   188→Stage Summary:
+   189→- PHÁT HIỆN 1 (mirror tuyệt đối): v24 & ahmedv48 chạy CÙNG tape V43 —
+   190→  positions identical từng ô (446-460/480 lượt), shed identical, cùng lệnh.
+   191→  Mirror gate cháy step 1 (|Δcash|=0.00), race_clone 95-99% lượt → ahmed
+   192→  full-power mode-24 + lockstep reorder suốt game.
+   193→- PHÁT HIỆN 2 (ngày 28 quyết định tất cả): mất mát dồn đúng ngày 28
+   194→  (step 672-695): s100 −$1.465, s101 −$1.368, s104 −$1.417 (gần hằng số)
+   195→  sau khi v24 từng dẫn +$466/+$991/+$1.247 giữa game. 3 turn sát thủ:
+   196→  s648/s672 (dawn) + s694 (h22) — toàn bộ do BUFFER TỐ: ahmed giữ 15-21
+   197→  WHEAT lúc h22 ngày 24-27 (v24: 0-6), bán h23/dawn giá $40-47, v24 khô
+   198→  hàng + dán slot ma SELL ×1000 khi shed rỗng.
+   199→- PHÁT HIỆN 3 (vũ khí của ahmed CÓ THỂ TẮC): cả 3 điều kiện kích hoạt
+   200→  (Δcash<0.5 step1, similarity≥.95, positions 4/6) đều nằm về PHÍA ĐỐI THỦ —
+   201→  v25 kiểm soát được: đổi opening 1 đơn vị (phá money-mirror) + đổi chỗ 2 ô
+   202→  động vật cùng loại structure (phá similarity <0.95) → race_clone/reorder/
+   203→  horizon-24 của ahmed thành dead code, ahmed rơi về horizon 2-4.
+   204→- TÀI LIỆU v25 (v25-blueprint.md): kiến trúc 5 lớp trên chassis V43 nguyên
+   205→  bản — L3 COMPACT-FROM-0 (port E334/E335 nới từ step 0, clamp theo
+   206→  projected-shed), L4 EVENING-BUFFER (port R95/R97/R127/R148, reserve 20
+   207→  wheat tối, bán h21-23), L5 TERMINAL-PRECISE (thanh lý ngày 28 + 712-718
+   208→  đúng lượng, bỏ catch-all), L2 STEALTH-OPENING (phá mirror+similarity),
+   209→  L1 RACE-OUT (horizon-24 tự chủ + lockstep reorder). Giữ: throttle
+   210→  hoard-release CHỈ 288-647 (tắt từ 648 — nguyên nhân khô hàng cuối),
+   211→  preguard, A4 (sửa double-book), E182 planner.
+   212→- Kế hoạch kiểm định: battery 10 trận ≥9 win/+$700 + battery chéo +
+   213→  re-sim detector trên replay + telemetry budget + seat-swap. Token Kaggle
+   214→  sẵn sàng cho việc theo dõi v49+ của đối thủ.
+   215→- Không sửa code nào của app/agents (nghiên cứu thuần). PM2 2 app online,
+   216→  GET / 200 ổn định, không console error mới.
+   217→
+   218→---
+   219→Task ID: 5 (project Task 95) — Xây dựng v25 "The Last Day General"
+   220→Agent: Z.ai Code (main, vai trò Bio)
+   221→
+   222→Task:
+   223→- User: "Tiến hành xây v25 cho tôi" — theo blueprint kaggle-research/v25-blueprint.md
+   224→  (mục tiêu đánh bại hoàn toàn ahmedv48).
+   225→
+   226→Work Log:
+   227→- **Bản v25 thử nghiệm 1 (v24 + compact + stealth-opening)**: copy v24.py, sửa
+   228→  opening [BUY7,SELL2]→[BUY7,SELL5] (phá money-mirror) + append lớp COMPACT-FROM-0
+   229→  (port E334/E335: merge SELL-run, dead→[], clamp theo projected-shed engine-exact).
+   230→  Trận s100: THUA −$7.827!! Chẩn đoán: engine L817-820 — thú đói 2 ngày liên tiếp
+   231→  = CHẠY TRỐN (chết). Opening thiếu 3 wheat feed → mất nửa đàn (COW 3/6, SHEEP
+   232→  3/6 ở s400) → kinh tế sụp. Replay-harness chứng minh compact đúng (chỉ xóa lệnh
+   233→  chết thật) — thủ phạm là opening. Backup: bench/t95_v25_compact_only.py.bak.
+   234→- Hoàn tác opening → v24+compact thuần: s100 −$488 (từ −$1.219, +$731). Phân tích:
+   235→  mất máu còn lại rải rác d19-24 + buffer tối — bản chất là phần stack vi mô V48
+   236→  nằm trong blob không port từng mảnh được.
+   237→- **Kiến trúc cuối (v25 thật)**: base = ahmedv48.py NGUYÊN BẢN byte-exact (giữ
+   238→  attribution Apache-2.0) + 2 lớp ngoài cùng riêng: (1) H2 garbage-throttle port
+   239→  tự-contained từ v24 (strip SELL <$15, hold ≤24u, release ≥$18 chunk 12, h0-20,
+   240→  d3-27) + (2) compact projected-shed (tái dùng). S100: +$146 (THẮNG).
+   241→- Battery 5 seed × 2 ghế: 6W-4L mean +$130. Tinh chỉnh: prepend-release + gate
+   242→  14/17 → tệ hơn (4-6); revert. Phân tích telemetry (_arena_diag port vào v25):
+   243→  s101 strip WOOL $1-5 mạn tính 51 units (friction −$8-16/ghế) vs s103 strip đúng
+   244→  MILK crash 72→1 → khiên giữ qua đáy → +$759/d17.
+   245→- **CRASH-GATE**: chỉ strip khi p<15 AND max(giá 72 turn qua) ≥ $25 (item từng
+   246→  đáng giá = crash thật; rác mạn tính bỏ qua). Window sweep: 72 → 6-4 +$141; 24
+   247→  → 4-4-2 +$97 (s100 mất win). Chốt window 72.
+   248→- **BATTERY LỚN 24 seed × 2 ghế = 48 trận**: 34W-14L (70.8%), mean +$226.1,
+   249→  median +$200, worst −$36, best +$799, CI95 [$162.7, $291.6] — áp đảo có ý nghĩa
+   250→  thống kê. Phân bố: seed có crash (17) thắng lớn +$300-1.472; seed im lặng (7)
+   251→  thua nhẹ −$12-72 (nhiễu sàn mirror ±$16 — bất đối xứng duy nhất còn lại nằm
+   252→  trong runtime noise của identical-parent mirror).
+   253→- **Hồi quy**: v25 vs v24 (cựu vô địch): 10-0, mean +$1.438.
+   254→- Đăng ký 3 điểm: run_battle.py AGENTS ("v25" → v25.py, entry "agent"),
+   255→  arena-service/index.ts AGENTS (17 agent, v25 đầu danh sách), frontend
+   256→  constants.ts AGENT_INFO (card "NHÀ VÔ ĐỊCH MỚI" đầu trang). pm2 restart
+   257→  kagriculture-arena.
+   258→- Browser verify qua Caddy gateway :81 (localhost:3000 trực tiếp không forward
+   259→  socket — phải qua :81): dropdown 17 option có v25; chọn v25 vs ahmedv48 seed
+   260→  100 → LIVE badge → 720 turn → banner "🏆 v25 THẮNG!" $84.336 vs $84.135
+   261→  (+$201), money chart + farm board + market render đầy đủ, 0 console error,
+   262→  0 page error. Screenshot: bench/t95_v25_win_ui.png. Lint sạch.
+   263→- Ghi chú kỹ thuật quan trọng cho lần sau: (a) cwd của Bash tool reset giữa các
+   264→  lệnh — luôn absolute path; (b) battle nền qua setsid vẫn bị kill theo session —
+   265→  chạy foreground timeout 200s là chuẩn; (c) stealth-opening VIỆC PHÁ FEED là
+   266→  cạm bẫy chết người (escape rule) — mọi biến thể opening phải giữ net 5 wheat.
+   267→
+   268→Stage Summary:
+   269→- v25 HOÀN THÀNH + ĐÃ VERIFY: file kaggriculture/v25.py (4.358 dòng = ahmedv48
+   270→  byte-exact + throttle crash-gate + compact). Kết quả:
+   271→    v25 vs ahmedv48: 34W-14L/48 trận, +$226 mean, CI95 [$163,$292], worst −$36
+   272→    v25 vs v24:      10W-0L/10 trận, +$1.438 mean
+   273→- META LẬT ĐỔ: ahmedv48 từng 10-0 v24 (Task 93) giờ thua v25 với xác suất 70.8%
+   274→  và biên độ dương có ý nghĩa thống kê mạnh. v25 là nhà vô địch mới của arena.
+   275→- ĐÃNG KÝ APP: user mở Preview Panel → chọn v25 (đứng đầu dropdown) vs bất kỳ
+   276→  16 agent còn lại → xem trận trực tiếp. Kịch bản gợi ý: v25 vs ahmedv48 seed 100.
+   277→- Hạn chế công khai (đã ghi nhận, dành cho v25.1): 7/24 seed thua nhẹ do noise
+   278→  floor của exact-mirror (identical parents) — các hướng nghiên cứu tiếp:
+   279→  strip-and-replace (bán một phần tại slot gốc thay vì strip toàn bộ),
+   280→  layout-swap similarity break (vô hiệu race-mode cả hai bên rồi cạnh tranh
+   281→  bằng throttle), cần cơ chế bất đối xứng thứ 2 giá trị +$50/seed trở lên.
+   282→- Artifacts: bench/t95_v25_full.json (48 trận), t95_v25_vs_v24.json,
+   283→  t95_v25_win_ui.png, các file battery trung gian t95_v25b-e.json.
+   284→---
+   285→Task ID: 6 (project Task 96) — Nâng cấp v25 "two-band drain-eta throttle" + kiểm định đầy đủ
+   286→Agent: Z.ai Code (main, vai trò Bio)
+   287→
+   288→Task:
+   289→- User: triển khai xây v25, chạy thử đấu với v48, kiểm thử, xử lý vấn đề, nâng
+   290→  cấp nếu có phát hiện quan trọng, hoàn tất báo cáo (tiếp nối Task 95 đã dựng
+   291→  v25 = 34W-14L/48 = 70.8%).
+   292→
+   293→Work Log:
+   294→- **Autopsy quiet-seed (7 seed thua −$6..−36, margin giống hệt 2 ghế →
+   295→  deterministic, không phải noise ghế)**: instrument s119 JSONL full 720 turn.
+   296→  Phát hiện: compact layer không bao giờ fired (V48 có sẵn E334/E335);
+   297→  throttle strip 22 units nhưng v25t_released=0 cả game; 1 FERT chết đến
+   298→  step 718; trace executed-sales 2 bên: WOOL −$36 (cliff-delay d16: strip
+   299→  11u@$5 → tape bán lại 1 turn sau @$1 sau khi ahmed dump), CARROT −$100,
+   300→  FERT −$22.
+   301→- **Bảng calibration 52 strip events trên 7 seed (101/103/106/115/119/121/122)**:
+   302→  giá & inventory KHÔNG phân biệt WIN/DEAD (cùng inv 10075-10077, MILK s106
+   303→  hồi 2 ngày / s121 chết 7 ngày). Phân biệt = TOWN DRAIN: đọc source engine
+   304→  _town_consume (mỗi 4 step mỗi shop instance tiêu 1 unit/item, single-product
+   305→  ×2; mỗi 24 step town center 1 unit/item trừ FERT) + đo drain thực nghiệm
+   306→  từ quiet-turn Δinv: MILK 7/ngày (có shop) vs WOOL 1/ngày (không YARN_STORE)
+   307→  — khớp model engine chính xác. FERT drain=0 → giá đơn điệu giảm cả mùa.
+   308→- **3 biến thể thử**: v25b (FERT-exempt + endgame flush d27) → s119 −$36→−$5,
+   309→  6 seed kia không đổi; v25c (gate 15→5) → quiet seeds 14W-0L nhưng crash-win
+   310→  tan biến (s103 734→4, s121 1186→−100, 91.7% win nhưng mean chỉ +$32.6);
+   311→  v25d (drain-eta oracle: strip chỉ khi shop tiêu item VÀ pure-drain ETA ≤6
+   312→  ngày) → s119 hòa đúng $0 (strips biến mất hoàn toàn).
+   313→- **v25e = two-band gate (chốt)**: p<$5 strip vô điều kiện (micro-win quiet
+   314→  seed như v25c) + dải $5-14 chỉ strip khi oracle drain-eta OK (crash win như
+   315→  v25) + FERT-exempt + flush d27. Oracle dùng _r37_market_price binary-search
+   316→  inv_target@$18 (MILK 10068, WOOL 10056, STRAW 10053 — verify khớp giá quan
+   317→  sát), shop table engine-exact, không cần chassis route (route chỉ đoán đúng
+   318→  ~91% và còn đếm lệnh chết; pure-drain oracle đơn giản và đủ).
+   319→- **Battery đầy đủ 48 trận (t96_v25e_full)**: **44W-2L-2T = 91.7% win, mean
+   320→  +$215.4, CI95 [$152.3, $283.1]**, worst −$31 (s106 = seed hỗn độn duy nhất:
+   321→  MILK oracle-strip +$44 đúng nhưng entangle WOOL interleaving −$36), 2 hòa
+   322→  s118 (strip FERT-vô-nghĩa của v25 cũ trúng xổ số slot-shift +$400 không hệ
+   323→  thống). Crash wins khôi phục đầy đủ: s103 +734, s115 +974, s116 +1186,
+   324→  s121 +1172, s122 +1466. Quiet seeds lật sạch +$2-8/seed.
+   325→- **Kiểm định chéo theo protocol Task 94**: v25e vs v24: 10-0 +$812.6 (gate
+   326→  ≥+$300 ✓); v25e vs ahmedv46: 10-0 +$2,086; v25e mirror: 10 hòa đúng $0
+   327→  (determinism ✓); 0 error mọi battery.
+   328→- **Thăng cấp v25e → v25.py** (backup cũ: bench/t95_v25_task95_champion.py.bak;
+   329→  banner mới ghi Task 96). Sanity: battery 2 seed khớp v25e tuyệt đối
+   330→  (322/8). run_battle.py giữ registry v25b/c/d/e (biến thể nghiên cứu,
+   331→  bench JSON đối chứng).
+   332→- **Đăng ký + vận hành**: arena-service/index.ts comment cập nhật Task 96;
+   333→  frontend constants.ts card v25 cập nhật stats mới; pm2 restart
+   334→  kagriculture-arena; lint sạch; GET / 200.
+   335→- **Browser verify qua Caddy :81** (lưu ý kỹ thuật từ Task 95: localhost:3000
+   336→  trực tiếp không forward socket): chọn v25 vs ahmedv48 seed 100 (combobox B
+   337→  là shadcn custom — select ẩn fails silently, phải click trigger mở listbox
+   338→  rồi click [role=option]), LIVE badge → 720 turn → banner "🏆 v25 THẮNG!",
+   339→  $84.295 vs $84.134 (+$161, khớp chính xác battery s100), 0 console error,
+   340→  0 page error. Screenshot: bench/t96_v25_win_ui.png.
+   341→
+   342→Stage Summary:
+   343→- v25 MỚI (two-band drain-eta throttle) ĐẠT MỤC TIÊU 91.7% win (44/48) vs
+   344→  ahmedv48 — so sánh: v25 cũ 70.8%, v25c 91.7% nhưng mean sụp. v25e = duy
+   345→  nhất đạt cả hai: 91.7% win + mean +$215 + CI95 xa 0.
+   346→- Bài học engine quan trọng (đã ghi RULES dạng code-comment): drain thị
+   347→  trường là tín hiệu dự báo hồi giá DUY NHẤT đáng tin (shop unlock là public);
+   348→  FERT không bao giờ hồi (không drain); route tape dự đoán supply chỉ ~91%
+   349→  (đếm lệnh chết — lệnh catch-all chết khi shed rỗng).
+   350→- Artifacts: bench/t96_v25e_full.json (48 trận), t96_v25c_full.json,
+   351→  t96_v25e_vs_v24.json, t96_v25e_vs_v46.json, t96_v25e_mirror.json,
+   352→  t96_v25_promoted_check.json, t96_v25_win_ui.png, /tmp/oracle_s*.jsonl
+   353→  (7 replay instrument).
+   354→- Còn 2 trận thua (s106 ×2 ghế) = giá của systematic edge trong seed hỗn độn
+   355→  R46; hướng nghiên cứu v25.1: strip-and-replace tại slot gốc (giữ slot, bán
+   356→  1 unit probe) để tránh cliff-delay mà không từ bỏ dải $5-14.
+   357→
+   358→---
+   359→Task ID: 7 (project Task 97) — Đối thủ mới alperen1 + nghiên cứu tetsutani + phản công _ADV_LOOK=14
+   360→Agent: Z.ai Code (main, vai trò Bio)
+   361→
+   362→Task:
+   363→- User: tải đối thủ mới alperen5252525 "First in Line — Stock Into Income"
+   364→  về app, đấu thử 10 trận, báo cáo; ngoài ra nghiên cứu notebook tetsutani
+   365→  "demand-preserving-turn-sale-timing" và báo cáo nội dung.
+   366→
+   367→Work Log:
+   368→- **Kaggle API**: cài kaggle CLI 2.2.4 vào venv, dùng KAGGLE_API_TOKEN
+   369→  (kaggle-research/config/kaggle_token.txt, token KGAT_). `kernels pull` cả 2
+   370→  notebook OK.
+   371→- **alperen1 extraction**: notebook 5 cell, cell code 183KB chứa payload
+   372→  b85+gzip; giải nén ra main.py 357.814 bytes / 4.045 dòng; SHA256
+   373→  53dc224a… khớp digest pin trong notebook. **Diff vs ahmedv48.py: chỉ 3
+   374→  dòng cuối** — comment + `_ADV_LOOK=8` (module-level rebind: EXP293
+   375→  sale-advance lookahead 3→8, ghi đè khi import). Entry _e335_agent như V48.
+   376→  Tác giả claim 136W-8L/144 local games.
+   377→- **Đăng ký alperen1** 3 điểm: run_battle.py AGENTS (entry _e335_agent),
+   378→  arena-service/index.ts AGENTS (18 agent), constants.ts AGENT_INFO card.
+   379→  Smoke test 48 step OK (0.3ms/turn).
+   380→- **10 trận v25 (Task 96) vs alperen1** (protocol Task 93: 5 seed × 2 ghế):
+   381→  **4W-6L, mean −$55.4**! Battery mở rộng 24 seed × 2 = 48 trận:
+   382→  **14W-34L (29.2%), −$48.3** → nhà vô địch v25 bị soán ngôi.
+   383→- **Instrument s118 (thua −473)**: money-flow + SELL timeline 2 bên. Phát
+   384→  hiện: cùng 306 WOOL units nhưng alperen thu +$1.449 nhiều hơn (slot sớm
+   385→  hơn, quote pre-drop); MILK +6u +$1.342. Cơ chế: look=8 bán trước v25
+   386→  (look=3) trong shared-tape race. → "horizon race" là vũ khí thật.
+   387→- **Phản công vòng 1 — v25f = v25 + _ADV_LOOK=8** (append module-end
+   388→  rebind, cùng phương pháp public của alperen): vs alperen1 10W-0L +$137;
+   389→  battery 48: 44W-2L-2T (91.7%) +$152 CI [$88,$216]; vs ahmedv48 42W-6L
+   390→  +$404; vs v24 10-0 +$843. Thăng cấp interim → v25.py (backup t96_v25_
+   391→  task96_champion.py.bak).
+   392→- **Nghiên cứu notebook tetsutani v65**: 27 cell; payload tar.gz b64 →
+   393→  main.py 358.258 bytes, SHA256 95b02b9b… khớp pin. Diff vs ahmedv48:
+   394→  _ADV_LOOK=14 + bakery guard (≥2 BAKERY mở → fallback look 3) + WOOL/
+   395→  YARN guard (offset 5-14 không kéo WOOL khi YARN_STORE mở) + canonical
+   396→  entry `agent` (production-loader hardening). QA nghiêm: SHA pin, compile,
+   397→  get_last_callable, full 720-turn self-play audit, KHÔNG benchmark đối
+   398→  kháng. Port vào kaggriculture/tetsutani_v65.py làm sparring partner.
+   399→- **Đo v65: v25 (look=8) thua 2W-8L −$124** → v65 còn mạnh hơn alperen1.
+   400→- **Phản công vòng 2 — v25g = v25 + _ADV_LOOK=14** (không port guards của
+   401→  tetsutani — đo guards làm yếu trong shared-tape race): vs v65 10 trận
+   402→  8W-2L +$409; vs alperen1 10-0 +$1.052; vs ahmedv48 8-2 +$466.
+   403→- **Battery chuẩn 48 trận × 3 đối thủ (t97_v25g_*_full)**: vs alperen1
+   404→  **48W-0L (100%), +$723, CI95 [$594, $857]**; vs ahmedv48 **46W-2L
+   405→  (95.8%), +$494, CI95 [$382, $610]**; vs tetsutani_v65 **44W-4L (91.7%),
+   406→  +$370, CI95 [$275, $471]**; vs v24 10-0 +$785. Thăng cấp v25g → v25.py
+   407→  (backup t97_v25f_interim.py.bak), sanity 2 trận khớp tuyệt đối (s118
+   408→  +246, s119 +1474).
+   409→- **Registry cập nhật**: run_battle.py + v25f/v25g/tetsutani_v65 (biến thể
+   410→  nghiên cứu); arena-service comment Task 97; constants.ts cards v25 +
+   411→  alperen1 số liệu mới. pm2 restart kagriculture-arena. Lint sạch. GET / 200.
+   412→- **Browser verify qua Caddy :81**: dropdown 18 agent có alperen1 cuối
+   413→  danh sách; v25 vs alperen1 seed 100 LIVE → 720 turn → "🏆 v25 THẮNG!"
+   414→  $84.128 vs $83.587 (+$541, khớp paired s100/2 của battery); 0 console
+   415→  error, 0 page error; mobile 390px không tràn ngang; footer natural-push
+   416→  đúng chuẩn (bodyH > vh → footer đáy nội dung). Screenshot
+   417→  bench/t97_v25_vs_alperen1_ui.png.
+   418→
+   419→Stage Summary:
+   420→- **alperen1 ĐÃ ĐĂNG KÝ** vào app (18 agents). 10 trận đầu: v25 Task 96
+   421→  THUA 4-6 — đối thủ mạnh thật (không phải claim suông): 34W-14L (71%) qua
+   422→  battery 48 trận.
+   423→- **v25 MỚI (Task 97, _ADV_LOOK=14) TUYỆT ĐỐI PHỤC HÒNG**: 100% vs alperen1
+   424→  (48-0, +$723), 95.8% vs ahmedv48 (+$494), 91.7% vs tetsutani_v65
+   425→  (+$370), 100% vs v24 (+$785). META: "horizon race" sale-advance là trục
+   426→  cạnh tranh mới — look 3 → 8 → 14; guards demand của tetsutani là hướng
+   427→  đi lệch (đo được làm yếu mirror).
+   428→- **Nội dung notebook tetsutani** (đã báo cáo user): V48 + lookahead 14
+   429→  turn + 2 guard demand (bakery/wool-yarn) + canonical entry; QA byte-exact
+   430→  + self-play audit; không có benchmark đối kháng; cam kết public-state
+   431→  only.
+   432→- Artifacts: bench/t97_v25_vs_alperen1{,_full}.json,
+   433→  t97_v25f_vs_alperen1{,_full}.json, t97_v25f_vs_ahmedv48{,_full}.json,
+   434→  t97_v25f_vs_v24.json, t97_v25g_vs_{tetsutani_v65,alperen1,ahmedv48}{,_full}.json,
+   435→  t97_v25g_vs_v24.json, t97_v25_vs_tetsutani_v65.json,
+   436→  t97_promoted_check{,2}.json, t97_v25_vs_alperen1_ui.png,
+   437→  /tmp/t97_s118.jsonl (instrument replay).
+   438→- Hạn chế còn lại: s100 −$412/s106 −$26 (2/24 seed quiet vs ahmedv48);
+   439→  hướng v25.1: sweep look 10-20, strip-and-replace tại slot gốc, port guards
+   440→  có điều kiện (chỉ khi đối thủ không cùng chassis).
+   441→---
+   442→Task ID: 8 (project Task 98) — v25.1 "DEMAND-PRESERVING RACE GENERAL" (nghiên cứu v65 + fix 4 lĩnh vực + 30 trận终测)
+   443→Agent: Z.ai Code (main, vai trò Bio)
+   444→
+   445→Task:
+   446→- User: nghiên cứu v25.1, đặc biệt triển khai nghiên cứu từ nội dung v65;
+   447→  xử lý lỗi/thiếu sót; đảm bảo v25.1 chạy tối ưu không lỗi ở thực vật,
+   448→  động vật, nhân công, kho; đấu thử 10 trận mỗi đối thủ vs alperen1,
+   449→  ahmedv48 và v25 cũ; báo cáo tiếng Việt.
+   450→
+   451→Work Log:
+   452→- **Nghiên cứu v65 (đã hoàn thành ở đoạn đầu Task 98)**: notebook tetsutani
+   453→  port sẵn tetsutani_v65.py (Task 97) = V48 + _ADV_LOOK=14 + 2 guards
+   454→  demand-preserving (≥2 BAKERY mở → fallback look 3; WOOL offset 5-14 không
+   455→  kéo bán sớm khi YARN_STORE mở) + canonical entry 'agent'. Điểm mấu chốt:
+   456→  guards của tetsutani đo trực tiếp làm YẾU trong shared-tape race (mirror
+   457→  chassis) → chỉ đáng dùng khi KHÔNG có race.
+   458→- **Mổ xẻ seed 100 (t98_s100.jsonl instrument)**: phát hiện FIX-A —
+   459→  _v25_compact đẩy dòng SELL rác MILK $3 (doanh thu thấp) vào slot 1, đẩy
+   460→  STRAW 17 unit ($35/u) ra sau đợt dump của ahmedv48 → mất $530/turn.
+   461→  Fix: slot hygiene — sắp SELL ghép theo DOANH THU giảm dần, chỉ trong cửa
+   462→  sổ endgame h21/h22 + day≥27. Kết quả: s100 lật từ thua −$530 thành
+   463→  thắng, battery vs ahmedv48 từ 44W-4L → 48W-0L (100%).
+   464→- **v251.py = v25 (Task 97 champion, look=14) + FIX-A slot hygiene +
+   465→  port guards v65 RACE-CONDITIONAL**: guards chỉ kích hoạt khi race-detector
+   466→  (mirror step-1 / clone-lock) KHÔNG phát hiện đối thủ cùng tape; khi có
+   467→  race thì tắt hoàn toàn để giữ đỉnh look=14. v251e (biến thể e) thăng cấp
+   468→  thành v251.py (identical, cmp xác nhận).
+   469→- **Audit 4 lĩnh vực (t98_audit.py trên replay JSONL 720 turn)**: chạy lại
+   470→  xác nhận CLEAN cả 3 replay (s100 final 2 ghế + selfplay): PLANTS 0
+   471→  neglect (max unwatered=1), 0 weed-kills; ANIMALS 0 escapes (max unfed=1,
+   472→  end 17 con); LABOR 0 ngày vượt fib-cap (max 12 hires/ngày vs cap 21);
+   473→  WAREHOUSE overflow parity với đối thủ (87 vs 88 units lost —
+   474→  chassis-inherent d29, không phải bug); MARKET 0 oversize/malformed;
+   475→  AGENT v25_errors=0 v25t_errors=0 v251_guard_errors=0. race_turns=551
+   476→  (vs ahmedv48 guards correctly OFF).
+   477→- **30 trận终测 (protocol Task 93: 5 seed × 2 ghế)**: vs alperen1 **10W-0L,
+   478→  mean +$1.191,6** (CI95 [$1.027,6, $1.381,5], worst +$961); vs ahmedv48
+   479→  **10W-0L, mean +$868,0** (CI95 [$650,9, $1.055,4], worst +$311); vs v25
+   480→  cũ (Task 97 champion) **8W-2L, mean +$330,0** (CI95 [$178,9, $474,3]).
+   481→  Kèm mở rộng: battery 48 trận vs ahmedv48 **48W-0L (100%) +$640** CI95
+   482→  [$521, $759] — vượt mức Task 96 (44W-4L) và Task 97 (46W-2L); vs
+   483→  tetsutani_v65 10-0 +$689; vs thomast (guard-path đối thủ khác chassis)
+   484→  10-0 +$10.072.
+   485→- **Đăng ký v25.1 đầy đủ 3 điểm**: run_battle.py AGENTS (entry 'agent',
+   486→  comment Task 98), arena-service/index.ts AGENTS (v251 đầu danh sách,
+   487→  19 agent), src/components/arena/constants.ts card v251 desc đầy đủ.
+   488→  pm2 restart kagriculture-arena (sau mtime index.ts 05:18). Lint sạch.
+   489→- **Browser verify qua Caddy :81**: page render đầy đủ; dropdown 19 agent
+   490→  có v251 (mặc định ghế A); v251 vs ahmedv48 seed 100 LIVE → 720/719 turn
+   491→  → banner "🏆 v251 THẮNG!", $84.340 vs $83.527 (+$813) KHỚP CHÍNH XÁC
+   492→  paired s100 battery; 0 console error (chỉ Fast Refresh HMR), 0 page
+   493→  error; mobile 390×844 không tràn ngang (overflowX=false), footer
+   494→  natural-push (bodyH 5117 > vh 844, footer đáy nội dung); desktop
+   495→  1920×1080 sạch. Screenshot bench/t98_v251_win_ui.png.
+   496→
+   497→Stage Summary:
+   498→- **v25.1 HOÀN THÀNH & ĐẠT MỤC TIÊU**: 30/30 trận终测 yêu cầu user thắng
+   499→  28 (10-0 alperen1, 10-0 ahmedv48, 8-2 v25 cũ); battery mở rộng 48W-0L
+   500→  100% vs ahmedv48 = kỷ lục mới qua 3 task liên tiếp (T96 91.7% → T97
+   501→  95.8% → T98 100%).
+   502→- Hai nâng cấp cốt lõi: (1) FIX-A slot hygiene endgame (sắp SELL theo
+   503→  doanh thu giảm dần h21/h22 d≥27) — lật s100, kéo battery lên 100%;
+   504→  (2) port guards v65 demand-preserving dạng RACE-CONDITIONAL — chỉ bật
+   505→  khi không race, giữ look=14 đỉnh khi đua.
+   506→- Audit 4 lĩnh vực (thực vật/động vật/nhân công/kho) + thị trường +
+   507→  agent-internal: CLEAN tuyệt đối, 0 lỗi, xác nhận trên 3 replay 720 turn.
+   508→- Artifacts: v251.py (champion), bench/t98_v251_vs_{alperen1,ahmedv48,
+   509→  v25,tetsutani_v65,thomast}.json, bench/t98_v251e_vs_ahmedv48_full.json
+   510→  (48 trận 100%), bench/t98_study/{t98_analyze.py,t98_audit.py,
+   511→  t98_v251_fullfix_variant.py.bak}, /tmp/t98_s100_final.jsonl +
+   512→  t98_selfplay.jsonl (replay audit), bench/t98_v251_win_ui.png.
+   513→- Ghi chú nhỏ: t98_v251_vs_thomast_t3.json 0 trận (agent thomast_t3 chưa
+   514→  đăng ký registry — thí nghiệm phụ, không thuộc yêu cầu user); 2 thua vs
+   515→  v25 cũ là s101 −$1 và 1 seed khác (evolution gap nhỏ +$330 — đúng kỳ
+   516→  vọng nội bộ cùng chassis).
+   517→---
+   518→Task ID: 9 (project Task 98b) — Nộp v25.1 lên cuộc thi Kaggle Kaggriculture
+   519→Agent: Z.ai Code (main, vai trò Bio)
+   520→
+   521→Task:
+   522→- User: dùng PAT KGAT_… để nộp bài thi v25.1 lên cuộc thi Kaggriculture.
+   523→
+   524→Work Log:
+   525→- **Xác thực & cuộc thi**: token trùng token đã cấu hình sẵn
+   526→  (kaggle-research/config/kaggle_token.txt). `kaggle competitions list -s
+   527→  kaggriculture`: Featured, $50k, 9.513 team, đã Join (rank 765), deadline
+   528→  2026-09-30.
+   529→- **Nghiên cứu cơ chế nộp** (AGENTS.md của cuộc thi): single-file agent =
+   530→  `kaggle competitions submit kaggriculture -f <file>.py -m "msg"`, file
+   531→  phải có hàm `agent`. Lịch sử 13 lần nộp trước đều fileName
+   532→  `submission.py` (lần cuối v20.1 ngày 17-09, điểm 2520).
+   533→- **BẮT BUG NGHIÊM TRỌNG TRƯỚC KHI NỘP (lớp bug v20.1)**: đọc source
+   534→  kaggle_environments/agent.py — server chọn entry bằng
+   535→  `get_last_callable() = [v for v in env.values() if callable(v)][-1]`
+   536→  (callable có key chèn CUỐI vào globals, KHÔNG phải tên 'agent').
+   537→  Mô phỏng trên v251.py nguyên trạng: **PICKED `_adv_apply` — SAI!** (file
+   538→  còn def _v251_racing/_adv_apply/_arena_diag sau `agent` cuối cùng; local
+   539→  arena không lộ bug vì registry chỉ định entry tường minh "agent").
+   540→  Nếu nộp thẳng sẽ lặp lại thảm họa v20.1 (600 điểm).
+   541→- **FIX production-loader hardening (pattern v65 tetsutani)**: append cuối
+   542→  file: `_v251_policy = agent; globals().pop('agent', None); def
+   543→  agent(obs, cfg): return _v251_policy(obs, cfg)`. Sau fix: mô phỏng
+   544→  loader → PICKED `agent` ✓, argcount 2 ✓, compile OK ✓.
+   545→- **Kiểm chứng hành vi KHÔNG ĐỔI (2 trận đối chứng khớp tuyệt đối battery)**:
+   546→  s100 vs ahmedv48 → 84340/83527/+813 (khớp); s100 vs alperen1 →
+   547→  84338/83336/+1002 (khớp). Wrapper trong suốt hoàn toàn. Audit 4 lĩnh vực
+   548→  đã CLEAN từ Task 98 (không thay đổi logic — chỉ thêm wrapper + comment).
+   549→- **Nộp bài**: cp v251.py → /tmp/ksub/submission.py (SHA256
+   550→  1ee1deb8… trùng khớp byte-exact); `kaggle competitions submit
+   551→  kaggriculture -f submission.py -m "v25.1 Demand-Preserving Race General:
+   552→  …"` → **Successfully submitted**, upload 379KB. Còn 4 lượt nộp hôm nay.
+   553→- **Xác nhận server-side**: submissions list: ref **56355004**, fileName
+   554→  submission.py, 2026-09-19 09:32:22, status **PENDING** (episodes chưa
+   555→  sinh — matchmaker Kaggle cần vài giờ; điểm sẽ hiện khi COMPLETE, tham
+   556→  chiếu v20.1 = 2520).
+   557→
+   558→Stage Summary:
+   559→- **v25.1 ĐÃ NỘP THÀNH CÔNG lên Kaggle Kaggriculture** (ref 56355004,
+   560→  status PENDING chờ server đấu episodes).
+   561→- Phát hiện và ngăn lỗi entry-point class v20.1 TRƯỚC khi nộp (get_last_
+   562→  callable nhầm _adv_apply); fix hardening pattern v65 + 2 trận đối chứng
+   563→  byte-exact chứng minh hành vi bất biến.
+   564→- v251.py local giờ đã có hardening (arena app vẫn chạy y hệt — registry
+   565→  entry "agent" resolve qua wrapper trong suốt).
+   566→- Artifacts: /tmp/ksub/submission.py (bản nộp),
+   567→  bench/t98_submit_check.json + t98_submit_check2.json (đối chứng),
+   568→  /tmp/ksub/{README.md,AGENTS.md} (spec cuộc thi).
+   569→- Việc tiếp theo (nếu user muốn): poll `kaggle competitions submissions
+   570→  -c kaggriculture` + `kaggle competitions episodes 56355004` để xem điểm
+   571→  public khi server hoàn tất; so sánh với v20.1 (2520) và rank 765 hiện tại.
+   572→---
+   573→Task ID: 10 (project Task 99) — Nghiên cứu notebook "The 2945 Farm v9/4" của thomastschinkel
+   574→Agent: Z.ai Code (main, vai trò Bio)
+   575→
+   576→Task:
+   577→- User: nghiên cứu từ bài đăng kaggle.com/code/thomastschinkel/
+   578→  the-2945-farm-96-vs-the-top-10-public-bots.
+   579→
+   580→Work Log:
+   581→- **Pull notebook** (32 cell, 921KB) qua Kaggle API. Trích main.py từ cell
+   582→  %%writefile: body + '\n' = 856.428 bytes, SHA256 bfee70e9… **khớp pin
+   583→  byte-exact = đúng file submission 56269928 (ladder 2944.7)**. Loader-verified
+   584→  entry: get_last_callable → 'agent' (argcount 2) ✓; compile OK ✓.
+   585→- **Nội dung notebook**: agent open-source đầy đủ — route replayer
+   586→  (yhay81 + Ahmed V39/V40) + 12 lớp reflex (OPENING/CTRTABLE, RACE/RACEPX/
+   587→  RACEGATE horizon-40, PREDICT 451k-event library, COURIER/OVERFLOW/SHEDROOM,
+   588→  CARROT/CARROT2, HERD/HERD2/COWSWAP, FERT, ORDERPRI2, CAPHARV, SL2/VE1/VT1).
+   589→  H2H tự báo cáo vs top-10 public: 493-47 (91.3%) — tetsutani 55-5, alperen
+   590→  54-6, V48 55-5. Tự thú thua 0-36 vs top-7 ladder private. Bài học engine
+   591→  quý: (1) last-callable rule + globals().pop('agent') pattern (xác nhận
+   592→  hardening v251 của ta đúng), (2) "Every sale is also denial" — sách premium
+   593→  dùng chung, chậm bán = mất đôi (mình mất revenue + đối thủ ăn sách trống),
+   594→  (3) tomato là lỗ hổng lớn của cả lineage route-tape (top team bán 71
+   595→  tomato@$114; họ bán 7), (4) notebook Kaggle chạy engine 1.29.3 cũ — phải
+   596→  cài 1.32.7 (local ta đã đúng 1.32.7).
+   597→- **Port sparring**: kaggriculture/thomast2945.py + đăng ký run_battle.py
+   598→  AGENTS (entry 'agent', comment Task 99). Không đăng ký UI (policy như
+   599→  tetsutani_v65). Smoke 48 step OK (0.6ms/turn).
+   600→- **Đối chứng port**: thomast2945 vs ahmedv48 10 trận (5 seed × 2 ghế):
+   601→  8W-2L — khớp claim 92%±noise của tác giả → port nguyên vẹn.
+   602→- **TRẬN CHÍNH: v251 vs thomast2945 10 trận: 2W-8L** (paired −$2.442/seed,
+   603→  chỉ thắng s100 +2.230, s116 +360). **Battery 48 trận: 4W-44L (8.3%),
+   604→  mean −$1.28k/ghế, paired CI95 [−$2.66k, −$1.28k]**. Thảm họa: s110
+   605→  −$19.690, s122 −$15.478, s121 −$9.126. → 2945-farm MẠNH HẲN v25.1.
+   606→- **Mổ xẻ s110 (−$9.845/ghế) + s122 (−$7.684/ghế)**:
+   607→  - Farm census GẦN GIỐNG HỆT (cùng lineage: 24-25 wheat, 33 strawberry,
+   608→    12 melon, carrot cuối mùa) — khác biệt không nằm ở cây trồng.
+   609→  - **Gap nổ tung ngày 20-29**: s110 A dẫn +1.422 (d18) → −9.845 (end);
+   610→    s122 A dẫn +1.339 (d18) → −7.684 (end). B out-earn A MỖI NGÀY nửa sau
+   611→    mùa (~$880-2.500/ngày), không phải 1 event lớn.
+   612→  - **s110 cơ chế động vật**: shops = SMOOTHIE(d3) + ICE_CREAM×2(d6, d24)
+   613→    + PET_CAFE + PIZZA → B COWSWAP/HERD đọc shops → 12 BÒ chuyên sâu (MILK
+   614→    giữ $220-256 cả mùa); A theo tape tĩnh: 9 bò + 5 cừu (WOOL sập $1 từ
+   615→    d15 = dead weight) + 3 ngỗng ($45). s122: cấu trúc động vật giống nhau
+   616→    → chênh lệch thuần về sale-timing/endgame discipline.
+   617→  - Ordered-vs-executed: lệnh SELL x1000 của B là cap-flush (ORDERPRI2 +
+   618→    COURIER), TOMATO 6.000 units ordered nhưng 0 hạt giống mua = dead
+   619→    orders từ tape (xác nhận tomato-hole của cả hai bên).
+   620→- Artifacts: kaggriculture/thomast2945.py, bench/t99_v251_vs_thomast2945
+   621→  {,_full}.json, t99_thomast2945_vs_v48.json, /tmp/t99_s110.jsonl,
+   622→  /tmp/t99_s122.jsonl (replay instrument), /tmp/nb2945/main.py (bản gốc
+   623→  SHA-verified).
+   624→
+   625→Stage Summary:
+   626→- **The 2945 Farm v9/4 = chuẩn mực đối kháng mới**: 2944.7 ladder, đánh bại
+   627→  toàn bộ top-10 public 91%, và **đè v25.1 44-4 (8.3% win)** — chuỗi food
+   628→  chain: top-10 private > 2945-farm > v25.1 > public V48-class.
+   629→- Cơ chế thắng của nó vs ta: (1) second-half execution (RACE horizon 40 +
+   630→  PREDICT 451k library + ORDERPRI2 + flush discipline) thắng look=14 của ta
+   631→  mỗi ngày d20-29; (2) herd-adaptive từ shop unlocks (12 bò khi ICE_CREAM
+   632→  mở) vs tape tĩnh (cừu vào sách WOOL sập).
+   633→- Port candidates cho v26: COWSWAP herd-choice, RACE horizon+glut-gate,
+   634→  ORDERPRI2, CAPHARV, endgame flush. Tomato program (lỗ hổng chung của cả
+   635→  lineage) = frontier lớn nhất nhưng cần kế hoạch labour khác (notebook
+   636→  chứng minh overlay thất bại 0/85).
+   637→- Ladder reality check: submission v25.1 (ref 56355004, đang PENDING) sẽ
+   638→  thắng đám public ~2570-2750 nhưng sẽ gặp 2945-farm class + top private
+   639→  (~2950+) — kỳ vọng rank quanh vùng của thomastschinkel, không cao hơn.
+   640→
+   641→---
+   642→Task ID: 11 (project Task 100) — Đăng ký thomast2945 vào app + khởi động v26
+   643→Agent: Z.ai Code (main, vai trò Bio)
+   644→
+   645→Task:
+   646→- User: "Đăng ký cho thomast2945, ngoài ra hãy triển khai v26 luôn cho tôi"
+   647→
+   648→Work Log:
+   649→- Kiểm tra: đăng ký 3 nơi đã xong từ phần trước context (run_battle.py từ
+   650→  Task 99; index.ts + constants.ts sửa 10:39, pm2 restart 10:39:49).
+   651→- Browser verify QUA GATEWAY http://localhost:81 (bài học: mở trực tiếp
+   652→  :3000 làm socket.io '/?XTransformPort=3005' không route được → dropdown
+   653→  rỗng; phải đi qua Caddy :81). Dropdown hiển thị đủ 20 agent có
+   654→  thomast2945.
+   655→- Chạy trận end-to-end từ UI: v251 vs thomast2945 seed 110 →
+   656→  $148.060 vs $157.905, thomast2945 thắng +$9.845 (27.3s, 720 lượt) —
+   657→  khớp CHÍNH XÁC baseline Task 99 (−$9.845/ghế s110). Radix Select chọn
+   658→  bằng dispatch PointerEvent sequence (click thường không ăn).
+   659→
+   660→Stage Summary:
+   661→- Task ① HOÀN TẤT: thomast2945 đã đăng ký đầy đủ 3 nơi + browser-verify
+   662→  trận thật qua gateway. Bắt đầu Task ②: phát triển v26.
+   663→---
+   664→Task ID: 12 (project Task 100) — Triển khai v26 "HERD-ADAPTIVE ANSWER GENERAL" + nộp Kaggle
+   665→Agent: Z.ai Code (main, vai trò Bio)
+   666→
+   667→Task:
+   668→- User: "Đăng ký cho thomast2945, ngoài ra hãy triển khai v26 luôn cho tôi"
+   669→
+   670→Work Log:
+   671→- **Khởi điểm**: v26.py (port 4 lớp: herd mở rộng + RACEGATE glut +
+   672→  horizon-40 + ORDERPRI2 + CAPHARV, viết trước khi context đứt) đã compile
+   673→  OK, last-callable 'agent' argcount 2. Smoke 48 turn vs thomast2945 OK.
+   674→- **Đối chứng regression v26**: vs ahmedv48 s100 = 84340/83527/+813 và vs
+   675→  alperen1 = 84338/83336/+1002 — KHỚP BYTE-EXACT Task 98 (race-conditional
+   676→  tắt đúng với cùng-chassis).
+   677→- **TRẬN CHÍNH THẤT BẠI**: v26 vs thomast2945 10 trận 2W-8L, gap −$6.342
+   678→  (v25.1 chỉ −$2.442) — port đang PHÁ. Telemetry s104: v26_glut_skips
+   679→  5002, adv_turns chỉ 18 (front-load engine bị ngạt).
+   680→- **ABLATION tìm thủ phạm**: A0 no-glut −10.814 (≈ full v26 −10.879 →
+   681→  glut-gate trung tính); A3 no-herd −2.151 = CHÍNH XÁC baseline v25.1
+   682→  (−2.150) → **HERD-ADAPTIVE port rộng là thủ phạm (−$8.7k/ghế s102-104)**.
+   683→- **Chẩn đoán shop unlocks**: s102 YARN mở d18, s103 d9, s104 d15, s110
+   684→  KHÔNG BAO GIỜ mở YARN. Cửa sổ mua (6,11) chỉ thấy shop d3/d6/d9 →
+   685→  nosheep(min_milk=1) swap SHEEP→COW quá sớm, đánh cược sai YARN tương lai
+   686→  3/4 seed. Đọc lại mã gốc thomast2945: V9 herd gate CHẶT: egg_shops==0
+   687→  (V9_HERD_MAX_EGG_SHOPS_COW=0) AND milk_shops>=3 (MIN_MILK_SHOPS) AND
+   688→  MILK>=$150 (MIN_MILK), quyết định từ day 9+ — KHÔNG đoán tương lai;
+   689→  HERD2/COWSWAP là EV-sim đầy đủ riêng (chỉ port verdict COW là đủ cho
+   690→  profile s110).
+   691→- **v26b (verdict COW 2945-exact)**: gates y hệt V9_HERD_*, SHEEP/GOOSE
+   692→  mua window (8,11) → COW chỉ khi egg==0 & chưa-YARN & milk>=3 & MILK>=150.
+   693→  s102-104 = −2.151 (baseline giữ nguyên, không phá gì). **s110 LẬT ĐÍCH:
+   694→  −9.845 → +3.638 (+13.483 swing)**, census 13 bò + 4 cừu (gần profile
+   695→  12 bò của 2945).
+   696→- **Battery v26b 24 seeds**: mean −1.509 (v25.1: −1.922), s110 +13.483,
+   697→  nhưng s122 −2.306 & s121 −852 tệ hơn → các lớp runtime (hz40/OR2/CAPHARV/
+   698→  glut) neutral-đến-hại; telemetry s122: hz 15 fires/241 turns nhưng
+   699→  glut_skips 6896 chặn front-load, adv_turns chỉ 4.
+   700→- **QUYẾT ĐỊNH KIẾN TRÚC v26c = v251 + CHỈ verdict COW** (diff 4 chỗ:
+   701→  header + _Y_CFG flag v26v9 + _y_target verdict block + call-site truyền
+   702→  prices; KHÔNG thêm lớp runtime nào — mọi thất bại của port rộng đã
+   703→  loại). File v26c.py 389.242 bytes, compile OK, last-callable 'agent'
+   704→  argcount 2 (loader verification PASS — pattern production Task 98).
+   705→- **VALIDATION MATRIX v26c**:
+   706→  - vs ahmedv48 battery 48 trận (s100-123): **48W-0L, mean +$1.204**
+   707→    (v25.1: +640) — s110: +$186 → **+$13.728** (verdict bắn một phía vs
+   708→    V48-class = đè tuyệt đối).
+   709→  - vs alperen1 10 trận: 10-0 +$1.192 — khớp byte-exact v25.1.
+   710→  - vs tetsutani_v65 10 trận: 10-0 +$689 — khớp byte-exact v25.1.
+   711→  - vs thomast2945 48 trận: 6W-42L, mean −$1.361 (v25.1: 4W-44L, −$1.922);
+   712→    s110 lật −9.845 → +3.638; các seed khác ±$10 noise.
+   713→  - Regression byte-exact s100: +813 (v48) / +1.002 (alperen1) — PASS.
+   714→- **Kaggle**: token KGAT tại kaggle-research/config/kaggle_token.txt (CLI
+   715→  mất auth do token không trong env — set KAGGLE_API_TOKEN). **v25.1
+   716→  (56355004) đã chấm xong: 2.613.1 điểm** (v20.1: 2.499.3, +114). Nộp
+   717→  v26c: SHA256 0f9ded00… → **submission 56359569 SUCCESS, PENDING**
+   718→  (còn 3 lượt hôm nay). Top leaderboard hiện 3.285.9 (Majkel1337).
+   719→- **Đăng ký app 3 nơi**: run_battle.py "v26" → v26c.py (comment đối chứng
+   720→  đầy đủ); arena-service index.ts AGENTS + 'v26' (pm2 restart); constants.ts
+   721→  AGENT_INFO đầu danh sách (desc đầy đủ cơ chế + bảng battery). Bản port
+   722→  rộng thất bại lưu v26.py + bench/t100_v26_fullport.py.bak.
+   723→- **Browser verify QUA GATEWAY :81**: dropdown hiện 'v26' mặc định ghế A;
+   724→  chọn B=thomast2945 seed 110 → **🏆 v26 THẮNG $157.209 vs $153.588**
+   725→  (29.8s, 718 lượt) — khớp BYTE-EXACT battery v26c s110 (a_seat0=157209,
+   726→  b_seat1=153588, +3621). Radix Select chọn option được sau 2 click (list
+   727→  box đóng/mở lại). dev.log sạch lỗi, bun lint sạch.
+   728→
+   729→Stage Summary:
+   730→- **v26 CHÍNH THỨC TRIỂN KHAI ĐẦY ĐỦ**: nộp Kaggle (56359569 PENDING) +
+   731→  đăng ký UI 3 nơi + browser-verify trận thật thắng đúng dự đoán battery.
+   732→- **Cải thiện thuần nhất mọi matchup** so v25.1: ahmedv48 +$640→+$1.204
+   733→  (48W-0L giữ nguyên), thomast2945 −$1.922→−$1.361 (s110 lật thắng),
+   734→  alperen1/tetsutani byte-exact. Chỉ 1 cơ chế thêm: verdict COW của
+   735→  2945-farm V9 herd với gate chính xác V9_HERD_* (không đoán YARN tương
+   736→  lai) — bài học port: điều kiện gốc chặt hơn tưởng tượng nhiều
+   737→  (min_milk 3 không phải 1, egg==0, giá MILK>=150).
+   738→- **Bài học ablation**: port 4 lớp dồn cục không hoạt động khi chưa mổ xẻ
+   739→  từng cơ chế — A0/A3 isolate thủ phạm trong 2 vòng battery (80s), tiết
+   740→  kiệm so với debug từng lớp riêng lẻ.
+   741→- Còn ~2945-farm vẫn thắng tổng thể (PREDICT 451k-event + second-half
+   742→  execution là hào nước sâu chưa port được) — frontier cho v27 nếu user
+   743→  muốn tiếp: tomato program (lỗ hổng chung lineage) hoặc PREDICT-style
+   744→  sale forecasting.
+   745→- Artifacts: v26c.py (chính thức), v26.py + bench/t100_v26_fullport.py.bak
+   746→  (port rộng thất bại), v26b.py (bản trung gian), bench/t100_v26c_*.
+   747→  json (4 battery đối chứng), /tmp/ksub/submission.py (bản nộp 56359569).
+   748→- Kỳ vọng ladder v26: ~2.613 + thêm ~0.5-1 điểm từ margin rộng hơn vs
+   749→  V48-class (kỳ vọng dương nhưng episodes matchmaker là biến số).
+   750→
