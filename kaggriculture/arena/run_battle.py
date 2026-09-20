@@ -288,6 +288,9 @@ AGENTS = {
     # 20-seed: 26W-14L mean +201 worst -274. Vs 11 đối thủ khác: V48 10-0,
     # tetsutani 10-0, v18/43/44/45 10-0, alperen1/v24 8-2, v25/251/26 6-4.
     "v27": (os.path.join(ROOT, "v27.py"), "agent"),
+    # Task 113: v28.0 = v27.2 + PRODUCER OVERDRIVE (quad-4 land buy +
+    # PASS-swap WATER/FERTILIZE static ops) — see RESEARCH_V28_T113.md
+    "v28": (os.path.join(ROOT, "v28.py"), "agent"),
     # v27n = v27 + clone-detector dual-mode (clone=2945-family r92 full;
     # non-clone=V48-class race-mode: no MILK, d12+, r95)
 }
